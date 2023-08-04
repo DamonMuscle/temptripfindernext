@@ -463,6 +463,7 @@
 		var self = this;
 		self._viewModal.revertMode = "update-TripStop";
 		self._viewModal.revertData = [];
+		return Promise.resolve();
 	};
 
 	RoutingFieldTripStopDataModel.prototype._runAfterPathChanged = function(tripStops, type, autoAssign, isCreateMultiple)

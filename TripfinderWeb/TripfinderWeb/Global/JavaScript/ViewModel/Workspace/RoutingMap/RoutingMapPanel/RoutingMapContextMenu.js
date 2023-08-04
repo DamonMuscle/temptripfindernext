@@ -11,7 +11,6 @@
 		self.mapCanvas = mapCanvas;
 
 		PubSub.subscribe("DocumentManagerViewModel_TabChange", self.getCurrentTabRouteState.bind(self));
-		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.FieldTripStopClick, self.onFieldTripMapClick_FieldTripStop.bind(self));
 	};
 
 	RoutingMapContextMenu.prototype.showContextMenu = function(documentViewModel, map, arcgis, e, routeState, lastPreventKey)
@@ -87,13 +86,12 @@
 		this.currentTabRouteState = document.routeState;
 	}
 
-
 	RoutingMapContextMenu.prototype.onFieldTripMapClick_InitMapCanvasObject = function(event, mapCanvas)
 	{
 		this.mapCanvas = mapCanvas;
 	}
 
-	RoutingMapContextMenu.prototype.onFieldTripMapClick_FieldTripStop = function(event, dataWrapper)
+	RoutingMapContextMenu.prototype.onFieldTripMapClick_FieldTripStop = function(dataWrapper)
 	{
 		if(this.mapCanvas.editModals().filter((c) => c.obVisible()).length > 0)
 		{
@@ -950,6 +948,5 @@
 	RoutingMapContextMenu.prototype.dispose = function()
 	{
 		PubSub.unsubscribe("DocumentManagerViewModel_TabChange");
-		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.FieldTripStopClick);		
-	}		
+	}
 }());

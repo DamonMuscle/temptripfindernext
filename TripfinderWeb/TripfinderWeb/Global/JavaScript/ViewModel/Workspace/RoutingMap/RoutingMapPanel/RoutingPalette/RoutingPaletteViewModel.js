@@ -16,10 +16,11 @@
 		self.templateName = "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/RoutingPalette";
 		self.$element = null;
 		self._viewModal = mapCanvasPage;
+		self.mapCanvasPage = mapCanvasPage;
 		self.fieldTripPaletteSection = new TF.RoutingMap.RoutingPalette.FieldTripPaletteSectionViewModel(self, routeState, trips);
 		self.dataModel = self.fieldTripPaletteSection.dataModel;
 		self.childViewModels =[self.fieldTripPaletteSection];
-		self._viewModal.onMapLoad.subscribe(this._onMapLoad.bind(this));
+		self.mapCanvasPage.onMapLoad.subscribe(this._onMapLoad.bind(this));
 		self.layers = [];
 
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMap, self.onFieldTripMapAddStopFromMap.bind(self));
@@ -30,17 +31,14 @@
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.UpdateColor, self.onFieldTripMapUpdateColor.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.TripPathTypeChange, self.onFieldTripMapTripPathTypeChange.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocation, self.onFieldTripMapMoveStopLocation.bind(self));
-		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocationCompleted, self.onFieldTripMapMoveStopLocationCompleted.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocation, self.onFieldTripMapDeleteStopLocation.bind(self));
-		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocationCompleted, self.onFieldTripMapDeleteStopLocationCompleted.bind(self));
-		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated, self.onFieldTripMapDirectionUpdated.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.HighlightFieldTripStop, self.onFieldTripMapHighlightFieldTripStop.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.ClearHighlightFieldTripStop, self.onFieldTripMapClearHighlightFieldTripStop.bind(self));
 		mapCanvasPage.onMapViewExtentChangeEvent.subscribe(self.onMapCanvasMapExtentChange.bind(self));
 		mapCanvasPage.onMapViewClickEvent.subscribe(self.onMapCanvasMapViewClick.bind(self));
 		mapCanvasPage.onMapViewKeyUpEvent.subscribe(self.onMapCanvasMapViewKeyUp.bind(self));
 		mapCanvasPage.onMapViewMouseWheelEvent.subscribe(self.onMapCanvasMapViewMouseWheel.bind(self));
-		mapCanvasPage.onModeChangeEvent.subscribe(self.onMapCanvasModeChange.bind(self));
+		mapCanvasPage.onMapViewCustomizedEvent.subscribe(self.onMapCanvasMapViewCustomizedEventHandler.bind(self));
 		PubSub.subscribe("on_MapCanvas_RecalculateTripMove", self.onMapCanvas_RecalculateTripMove.bind(self));
 		PubSub.subscribe("on_MapCanvas_RefreshTripByStops", self.onMapCanvas_RefreshPathByStops.bind(self));
 
@@ -58,8 +56,8 @@
 	RoutingPaletteViewModel.prototype._onMapLoad = function()
 	{
 		var self = this;
-		var map = self._viewModal._map;
-		self.mapInstance = self._viewModal.mapInstance;
+		var map = self.mapCanvasPage._map;
+		self.mapInstance = self.mapCanvasPage.mapInstance;
 		self.map = map;
 		self.initLabelSetting();
 		(self.obShow() && self.showCount == 0) && self.addShowCount();
@@ -91,9 +89,9 @@
 			setTimeout(function()
 			{
 				// use timeout to make sure RoutingMapTool is ready
-				if (self._viewModal.RoutingMapTool.thematicTool)
+				if (self.mapCanvasPage.RoutingMapTool.thematicTool)
 				{
-					self._viewModal.RoutingMapTool.thematicTool.layerId = "candidateStudentFeatureLayer";
+					self.mapCanvasPage.RoutingMapTool.thematicTool.layerId = "candidateStudentFeatureLayer";
 				}
 			}, 2000);
 		}
@@ -300,7 +298,7 @@
 		}
 
 		
-		this.fieldTripMap?.moveStopLocation(fieldTrip, fieldTripStop, this._viewModal.sketchTool);
+		this.fieldTripMap?.moveStopLocation(fieldTrip, fieldTripStop, this.mapCanvasPage.sketchTool);
 	};
 
 	RoutingPaletteViewModel.prototype.onRefreshFieldTripPath = async function({fieldTripId})
@@ -309,7 +307,7 @@
 		await this.fieldTripMap?.refreshFieldTripPath(fieldTrip);
 	};
 
-	RoutingPaletteViewModel.prototype.onFieldTripMapMoveStopLocationCompleted = function(_, data)
+	RoutingPaletteViewModel.prototype.onFieldTripMapMoveStopLocationCompleted = function(data)
 	{
 		const trip = this.dataModel.getTripById(data.FieldTripId);
 		const stop = this.dataModel.getFieldTripStopBySequence(trip, data.Sequence);
@@ -344,7 +342,7 @@
 		this.fieldTripMap?.deleteStopLocation(fieldTrip, fieldTripStop);
 	}
 
-	RoutingPaletteViewModel.prototype.onFieldTripMapDeleteStopLocationCompleted = function(_, data)
+	RoutingPaletteViewModel.prototype.onFieldTripMapDeleteStopLocationCompleted = function(data)
 	{
 		var self = this;
 
@@ -362,7 +360,7 @@
 		});
 	}
 
-	RoutingPaletteViewModel.prototype.onFieldTripMapDirectionUpdated = function(_, data)
+	RoutingPaletteViewModel.prototype.onFieldTripMapDirectionUpdated = function(data)
 	{
 		const trip = this.dataModel.getTripById(data.fieldTrip.id);
 
@@ -403,7 +401,7 @@
 		this.fieldTripMap?.clearHighlightFeatures();
 	}
 
-	RoutingPaletteViewModel.prototype.onMapCanvasMapExtentChange = function(event, data)
+	RoutingPaletteViewModel.prototype.onMapCanvasMapExtentChange = function(_, data)
 	{
 		const fieldTrips = this.dataModel.trips;
 		this.fieldTripMap?.onMapCanvasMapExtentChangeEvent(fieldTrips);
@@ -420,7 +418,7 @@
 		this.fieldTripMap?.onMapClickEvent(data);
 	}
 
-	RoutingPaletteViewModel.prototype.onMapCanvasMapViewKeyUp = function(event, data)
+	RoutingPaletteViewModel.prototype.onMapCanvasMapViewKeyUp = function(_, data)
 	{
 		this.fieldTripMap?.onMapKeyUpEvent(data);
 	}
@@ -431,12 +429,52 @@
 		this.fieldTripMap?.hideArrowLayer();
 	}
 
-	RoutingPaletteViewModel.prototype.onMapCanvasModeChange = async function(event, data)
+	RoutingPaletteViewModel.prototype.onMapCanvasMapViewCustomizedEventHandler = function(_, customData)
 	{
-		if (data.endsWith("Normal"))
+		const { eventType, data } = customData, self = this;
+		switch (eventType)
 		{
-			await this.fieldTripMap?.confirmToStopAddingStop();
+			case TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocationCompleted:
+				self.onFieldTripMapMoveStopLocationCompleted(data);
+				break;
+			case TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocationCompleted:
+				self.onFieldTripMapDeleteStopLocationCompleted(data);
+				break;
+			case TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMapCompleted:
+				self.onAddStopFromMapCompleted(data);
+				break;
+			case TF.RoutingPalette.FieldTripMapEventEnum.FieldTripStopClick:
+				self.mapCanvasPage.routingMapContextMenu.onFieldTripMapClick_FieldTripStop(data);
+				break;
+			case TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated:
+				self.onFieldTripMapDirectionUpdated(data);
+				break;
+			case TF.RoutingPalette.FieldTripMapEventEnum.ExitAddingStop:
+				self.mapCanvasPage.setMode("", "Normal");
+				break;
 		}
+	};
+
+	RoutingPaletteViewModel.prototype.onAddStopFromMapCompleted = function (stop)
+	{
+		var defaultOptions = {
+			isDoorToDoor: false,
+			student: null,
+			isCreateFromUnassignStudent: false,
+			isCreateFromStopSearch: false,
+			isCreateFromSearch: false,
+			boundary: null,
+			insertBehindSpecialStop: null,
+			streetName: "",
+			isCopied: false,
+			selectLastSelectedTrip: true,
+			tryUseLastSettings: false
+		};
+
+		this.fieldTripPaletteSection.editFieldTripStopModal.create({
+			Street: stop.Name,
+			...stop
+		}, null, defaultOptions);
 	}
 
 	RoutingPaletteViewModel.prototype.close = function()
@@ -450,17 +488,17 @@
 		});
 		return Promise.all(promises).then(function()
 		{
-			if (self._viewModal.RoutingMapTool.thematicTool)
+			if (self.mapCanvasPage.RoutingMapTool.thematicTool)
 			{
-				if (!self._viewModal.RoutingMapTool.thematicTool.thematicMenu.obSelectThematicId())
+				if (!self.mapCanvasPage.RoutingMapTool.thematicTool.thematicMenu.obSelectThematicId())
 				{
-					self._viewModal.RoutingMapTool.thematicTool.thematicMenu.clearThematicSelection(true);
+					self.mapCanvasPage.RoutingMapTool.thematicTool.thematicMenu.clearThematicSelection(true);
 				}
-				self._viewModal.RoutingMapTool.thematicTool.grid.allData = [];
-				self._viewModal.RoutingMapTool.thematicTool.grid.allIds = [];
-				self._viewModal.RoutingMapTool.thematicTool.grid.highLightedData = [];
+				self.mapCanvasPage.RoutingMapTool.thematicTool.grid.allData = [];
+				self.mapCanvasPage.RoutingMapTool.thematicTool.grid.allIds = [];
+				self.mapCanvasPage.RoutingMapTool.thematicTool.grid.highLightedData = [];
 			}
-			self._viewModal.RoutingMapTool.$offMapTool.find(".tool-icon.thematics").removeClass("disable");
+			self.mapCanvasPage.RoutingMapTool.$offMapTool.find(".tool-icon.thematics").removeClass("disable");
 			return true;
 		});
 	};
@@ -492,10 +530,7 @@
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.UpdateColor);
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.TripPathTypeChange);
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocation);
-		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocationCompleted);
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocation);
-		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocationCompleted);
-		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated);
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.HighlightFieldTripStop);
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.ClearHighlightFieldTripStop);
 		PubSub.unsubscribe("on_MapCanvas_RecalculateTripMove");

@@ -43,6 +43,7 @@
 			onMapViewExtentChanges: null,
 			onMapViewKeyUp: null,
 			onMapViewMouseWheel: null,
+			onMapViewCustomizedEventHandler: null,
 		}
 	};
 
@@ -59,6 +60,7 @@
 			onMapViewExtentChanges: null,
 			onMapViewKeyUp: null,
 			onMapViewMouseWheel: null,
+			onMapViewCustomizedEventHandler: null,
 		};
 
 		this.defineReadOnlyProperty('mapLayerInstances', []);
@@ -277,12 +279,12 @@
 		self.createMapEvents();
 	}
 
-	Map.prototype.defineReadOnlyProperty = function(propertyName, value)
+	Map.prototype.defineReadOnlyProperty = function(propertyName, value, configurable = false)
 	{
 		Object.defineProperty(this, propertyName, {
 			get() { return value; },
 			enumerable: false,
-			configurable: false
+			configurable: configurable
 		});
 	};
 
@@ -337,6 +339,11 @@
 		{
 			self.eventHandler.onMapViewMouseWheel = mapView.on('mouse-wheel', self.settings.eventHandlers.onMapViewMouseWheel);
 		}
+
+		const func = self.settings.eventHandlers.onMapViewCustomizedEventHandler ?? function() {
+			console.log("this method is available only when passing onMapViewCustomizedEventHandler"); 
+		};
+		this.defineReadOnlyProperty("fireCustomizedEvent", func, true);
 	}
 
 	Map.prototype.destroyMapEvents = function()
@@ -706,5 +713,6 @@
 			this.map.mapView && this.map.mapView.destroy();
 			this.map.destroy && this.map.destroy();
 		}
+		delete this.fireCustomizedEvent;
 	}
 })();

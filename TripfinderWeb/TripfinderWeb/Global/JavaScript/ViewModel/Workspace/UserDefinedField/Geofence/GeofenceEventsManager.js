@@ -8,7 +8,6 @@
 		self.viewModel = viewModel;
 		self._viewModal = self.viewModel._viewModal;
 		self.dataModel = self.viewModel.dataModel;
-		// self._viewModal.onModeChangeEvent.subscribe(this.onModeChangeEvent.bind(this));
 		self.dataModel.highlightChangedEvent.subscribe(this.onHighlightChanged.bind(this));
 		self.obHighlighted = ko.observable(false);
 		this.obMode = ko.observable();

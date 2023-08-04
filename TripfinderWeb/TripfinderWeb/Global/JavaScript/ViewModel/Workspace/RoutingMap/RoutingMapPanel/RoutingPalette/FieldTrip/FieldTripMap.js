@@ -845,7 +845,7 @@
 				XCoord: stop.XCoord,
 				YCoord: stop.YCoord,
 			};
-			PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocationCompleted, data);
+			this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocationCompleted, data });
 		}
 		else
 		{
@@ -907,7 +907,7 @@
 		}
 
 		const data = { fieldTripStopId: stop.id };
-		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocationCompleted, data);
+		this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocationCompleted, data });
 
 		const effectSequences = self._computeEffectSequences(fieldTrip, {deleteStop: stop});
 
@@ -1120,15 +1120,14 @@
 				const newStopData = await self._addNewStop(self.fieldTripHighlightStopLayerInstance, mapPoint);
 				self.hideLoadingIndicator();
 
-				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMapCompleted, newStopData);
+				this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMapCompleted, data: newStopData });
 				self.stopAddFieldTripStop();
 			}
 		}
 		else if (event.button === 2)
 		{
 			// right click
-			response = await this.confirmToStopAddingStop();
-			console.log("TODO: notify right click response " + response);
+			await this.confirmToExitAddingStop();
 
 			response = await self.mapInstance?.map.mapView.hitTest(event);
 			if (response.results.length > 0)
@@ -1142,7 +1141,7 @@
 						return { DBID, FieldTripId, id, Sequence };
 					});
 					const dataWrapper = { data, event };
-					PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.FieldTripStopClick, dataWrapper);
+					this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.FieldTripStopClick, data: dataWrapper });
 				}
 
 				const pathGraphics = graphics.filter(item => item.layer?.id === RoutingPalette_FieldTripPathLayerId);
@@ -1153,8 +1152,7 @@
 						return { DBID, FieldTripId, Sequence };
 					});
 					const dataWrapper = { data, event };
-					console.log(dataWrapper);
-					PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.FieldTripPathClick, dataWrapper);
+					this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.FieldTripPathClick, data: dataWrapper });
 				}
 			}
 		}
@@ -1166,8 +1164,7 @@
 		switch (keyName)
 		{
 			case "Escape":
-				const response = await this.confirmToStopAddingStop();
-				console.log("TODO: notify Escape response " + response);
+				await this.confirmToExitAddingStop();
 				break;
 			case "Enter":
 				console.log("TODO: Press Enter on FieldTripMap");
@@ -1186,7 +1183,7 @@
 			case "Z":
 				if (data.event.native.ctrlKey)
 				{
-					console.log("TODO: Press Ctrl + Z on FieldTripMap, revertMapClick");
+					console.log("TODO: Press Ctrl + Z on FieldTripMap, revertMapClick");//see _initRevertOperation in Plus
 				}
 				break;
 			default:
@@ -1194,7 +1191,7 @@
 		}
 	}
 
-	FieldTripMap.prototype.confirmToStopAddingStop = async function()
+	FieldTripMap.prototype.confirmToExitAddingStop = async function()
 	{
 		if (!this.editing.isAddingStop)
 		{
@@ -1202,12 +1199,13 @@
 		}
 
 		const response = await tf.promiseBootbox.yesNo("Are you sure you want to cancel?", "Confirmation Message");
-		if (response === true)
+		if (response)
 		{
 			this.stopAddFieldTripStop();
 			await this.clearHighlightFeatures();
+
+			this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.ExitAddingStop });
 		}
-		return response;
 	}
 
 	//#endregion
@@ -1588,7 +1586,7 @@
 
 			const data = { fieldTrip };
 
-			PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated, data);
+			this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated, data });
 		}
 
 		let routePath = fieldTrip.FieldTripStops.filter(stop => !!stop._geoPath).map(stop => stop._geoPath.paths);

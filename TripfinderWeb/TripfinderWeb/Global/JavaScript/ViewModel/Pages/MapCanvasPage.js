@@ -17,7 +17,6 @@
 		self.obAreaUnit = ko.observable();
 		self.obDistanceUnit = ko.observable();
 		self._currentMeasureOption = null;
-		self.IsAdmin = window["tf"] && tf.authManager && tf.authManager.obIsLogIn();
 		self.element = null; // the route element of the template html
 		self.obCopyPolygonObject = ko.observable(null);
 		self.obCopyLineObject = ko.observable(null);
@@ -36,6 +35,7 @@
 		self.onMapViewPointerMoveEvent = new TF.Events.Event();
 		self.onMapViewKeyUpEvent = new TF.Events.Event();
 		self.onMapViewMouseWheelEvent = new TF.Events.Event();
+		self.onMapViewCustomizedEvent = new TF.Events.Event();
 
 		// arrange the panels and palettes.
 
@@ -66,7 +66,6 @@
 
 		self.travelScenariosPaletteViewModel = new TF.RoutingMap.TravelScenariosPaletteViewModel(self, true, routeState);
 		self.directionPaletteViewModel = new TF.RoutingMap.DirectionPaletteViewModel(self, true, routeState);
-		// self.parcelPaletteViewModel = new TF.RoutingMap.ParcelPaletteViewModel(self, true, routeState);
 		self.boundaryPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.BoundaryPaletteViewModel(self, true, routeState);
 		self.mapLayersPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.MapLayersPaletteViewModel(self, true, routeState);
 		self.routingPaletteViewModel = new TF.RoutingMap.RoutingPaletteViewModel(self, true, routeState);  // {obShow: ko.observable(false)}; // 
@@ -167,71 +166,10 @@
 		this.onMapViewMouseWheelEvent.notify({event});
 	}
 
-	MapCanvasPage.prototype._initRevertOperation = function()
+	MapCanvasPage.prototype.onMapViewCustomizedEventHandler = function(event)
 	{
-		var self = this;
-		tf.documentEvent.bind("keydown.revertMapClick", self.routeState, function(e)
-		{
-			if (e.ctrlKey && e.keyCode == 90)
-			{
-				e.preventDefault();
-				var revertType = self.revertMode.split("-")[0];
-				if (self.revertMode.toLowerCase().indexOf("trip") > 0)
-				{
-					self.routingPaletteViewModel.drawTool.revert(self.revertData, revertType);
-				} else if (self.revertMode.toLowerCase().indexOf("stoppool") > 0)
-				{
-					self.routingPaletteViewModel.stopPoolPaletteSection.drawTool.revert(self.revertData, revertType);
-				} else if (self.revertMode.toLowerCase().indexOf("trialstop") > 0)
-				{
-					self.routingPaletteViewModel.trialStopPaletteSection.drawTool.revert(self.revertData, revertType);
-				} else if (self.revertMode.toLowerCase().indexOf("mystreets") > 0)
-				{
-					self.mapEditingPaletteViewModel.myStreetsViewModel.drawTool.revert(self.revertData, revertType);
-				}
-				else if (self.revertMode.toLowerCase().indexOf("railroad") > 0)
-				{
-					self.mapEditingPaletteViewModel.railroadViewModel.drawTool.revert(self.revertData, revertType);
-				}
-				else if (self.revertMode.toLowerCase().indexOf("travelregion") > 0)
-				{
-					self.travelScenariosPaletteViewModel.travelRegionsViewModel.drawTool.revert(self.revertData, revertType);
-				}
-				else if (self.revertMode.toLowerCase().indexOf("municipal") > 0)
-				{
-					self.mapEditingPaletteViewModel.municipalBoundaryViewModel.drawTool.revert(self.revertData, revertType);
-				}
-				else if (self.revertMode.toLowerCase().indexOf("water") > 0)
-				{
-					self.mapEditingPaletteViewModel.waterViewModel.drawTool.revert(self.revertData, revertType);
-				}
-				else if (self.revertMode.toLowerCase().indexOf("zipcode") > 0)
-				{
-					self.mapEditingPaletteViewModel.zipCodeViewModel.drawTool.revert(self.revertData, revertType);
-				}
-				else if (self.revertMode.toLowerCase().indexOf("landmark") > 0)
-				{
-					self.mapEditingPaletteViewModel.landmarkViewModel.drawTool.revert(self.revertData, revertType);
-				}
-				else if (self.revertMode.toLowerCase().indexOf("parcel") > 0 ||
-					self.revertMode.toLowerCase().indexOf("addressPoint") > 0)
-				{
-					self.parcelPaletteViewModel.drawTool.revert(self.revertData, revertType, self.revertMode);
-				}
-				else if (self.revertMode.toLowerCase().indexOf("schoolboundary") > 0)
-				{
-					self.boundaryPaletteViewModel.drawTool.revert(self.revertData, revertType);
-				}
-				else if (self.revertMode.toLowerCase().indexOf("populationregion") > 0)
-				{
-					self.boundaryPaletteViewModel.drawPopulationTool.revert(self.revertData, revertType);
-				}
-				self.revertMode = "";
-				self.revertData = [];
-
-			}
-		});
-	};
+		this.onMapViewCustomizedEvent.notify(event);
+	}
 
 	MapCanvasPage.prototype.getHash = function()
 	{
@@ -686,7 +624,6 @@
 					// TF.Map.RoutingMapTool.buildMenuItem('Boundary Planning', 'boundary', self.boundaryPaletteViewModel, self.togglePalettePanel),
 					TF.Map.RoutingMapTool.buildMenuItem('Map Viewer', 'custommap', self.customMapPaletteViewModel, self.togglePalettePanel, 4),
 					TF.Map.RoutingMapTool.buildMenuItem('Directions', 'direction', self.directionPaletteViewModel, self.togglePalettePanel, 0),
-					// TF.Map.RoutingMapTool.buildMenuItem('Parcels & Address Points', 'parcels', self.parcelPaletteViewModel, self.togglePalettePanel),
 					TF.Map.RoutingMapTool.buildMenuItem('Geo Search', 'geoSearch', self.geoSearchPaletteViewModel, self.togglePalettePanel, 3),
 					// TF.Map.RoutingMapTool.buildMenuItem('My Base Map Layers', 'maplayers', self.mapLayersPaletteViewModel, self.togglePalettePanel)
 				];
@@ -739,6 +676,7 @@
 				onMapViewPointerMove: self.onMapViewPointerMove.bind(self),
 				onMapViewKeyUp: self.onMapViewKeyUp.bind(self),
 				onMapViewMouseWheel: self.onMapViewMouseWheel.bind(self),
+				onMapViewCustomizedEventHandler: self.onMapViewCustomizedEventHandler.bind(self),
 			};
 
 		self.mapInstance = await TF.Helper.MapHelper.createMapInstance(self.$mapDiv, eventHandlers);;
@@ -753,7 +691,6 @@
 		self.routingSnapManager.init(this._map);
 		// self._initToggleTrace();
 		self._initSketchTool();
-		self._initRevertOperation();
 		self.onMapLoad.notify();
 
 		self.mapCanvasUpdatedRecord = self.mapCanvasUpdatedRecord.bind(self);
@@ -1071,8 +1008,7 @@
 	MapCanvasPage.prototype.canClose = function()
 	{
 		var self = this,
-			editViewModes = [self.parcelPaletteViewModel,
-			self.boundaryPaletteViewModel,
+			editViewModes = [self.boundaryPaletteViewModel,
 			self.mapEditingPaletteViewModel,
 			self.routingPaletteViewModel];
 
@@ -1104,11 +1040,11 @@
 		this.onMapViewPointerMoveEvent?.unsubscribeAll();
 		this.onMapViewKeyUpEvent?.unsubscribeAll();
 		this.onMapViewMouseWheelEvent?.unsubscribeAll();
+		this.onMapViewCustomizedEvent?.unsubscribeAll();
 
 		// this.routingSnapManager.dispose();
 
 		this.directionPaletteViewModel?.dispose();
-		// this.parcelPaletteViewModel.dispose();
 		// this.boundaryPaletteViewModel.dispose();
 		// this.mapEditingPaletteViewModel.dispose();
 		this.travelScenariosPaletteViewModel?.dispose();
