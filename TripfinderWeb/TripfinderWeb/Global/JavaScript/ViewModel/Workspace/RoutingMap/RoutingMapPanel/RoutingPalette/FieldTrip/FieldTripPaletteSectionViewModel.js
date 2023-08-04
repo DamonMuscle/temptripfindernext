@@ -5,8 +5,10 @@
 	function FieldTripPaletteSectionViewModel(routingPaletteVM, routeState, trips)
 	{
 		var self = this;
-		self.viewModel = routingPaletteVM;
-		self._viewModal = routingPaletteVM._viewModal;
+		self.viewModel = routingPaletteVM; //delete in future
+		self._viewModal = routingPaletteVM.mapCanvasPage;//delete in future
+		self.routingPaletteVM = routingPaletteVM;//recommended
+		self.mapCanvasPage = routingPaletteVM.mapCanvasPage;//recommended
 		self.isEyeVisible = ko.observable(true);
 		self.isShowMode = ko.observable(true);
 		self.isShowMode.subscribe(self._changeShow.bind(self));
@@ -37,7 +39,7 @@
 		this.$element = $(element);
 		// this.documentChange = tf.documentManagerViewModel.obCurrentDocument.subscribe(function(document)
 		// {
-		// 	if (document == self.viewModel._viewModal)
+		// 	if (document == self.mapCanvasPage)
 		// 	{
 		// 		setTimeout(function()
 		// 		{
@@ -52,7 +54,7 @@
 		var self = this;
 		if (!self.drawTool)
 		{
-			self.drawTool = self.viewModel.drawTool = new TF.RoutingMap.RoutingPalette.RoutingTripMapTool(self);
+			self.drawTool = self.routingPaletteVM.drawTool = new TF.RoutingMap.RoutingPalette.RoutingTripMapTool(self);
 		}
 		self.drawTool.selectionChange.subscribe(self.eventsManager.selectionChange_routing.bind(self));
 		self.routingChangePath = new TF.RoutingMap.RoutingPalette.RoutingChangePath(self);
@@ -61,12 +63,12 @@
 	FieldTripPaletteSectionViewModel.prototype.addStopClick = function()
 	{
 		this.eventsManager.createClick();
-		this.viewModel.$element.find(".print-setting-group .icon.destination.add-tripstop").addClass("active");
+		this.routingPaletteVM.$element.find(".print-setting-group .icon.destination.add-tripstop").addClass("active");
 	};
 
 	FieldTripPaletteSectionViewModel.prototype.cancelStopClick = function()
 	{
-		this.viewModel.$element.find(".print-setting-group .icon.destination.add-tripstop").removeClass("active");
+		this.routingPaletteVM.$element.find(".print-setting-group .icon.destination.add-tripstop").removeClass("active");
 	};
 
 	FieldTripPaletteSectionViewModel.prototype.show = function()
@@ -110,7 +112,7 @@
 		{
 			self.dataModel.changeTripVisibility(self.dataModel.trips.map(function(t) { return t.id; }), isShowMode);
 		}
-		self.viewModel.childViewShowChange();
+		self.routingPaletteVM.childViewShowChange();
 	};
 
 	FieldTripPaletteSectionViewModel.prototype.onChangeTripVisibilityEvent = function()
@@ -130,7 +132,7 @@
 		var self = this;
 		return self.layers.map(function(item)
 		{
-			return self.viewModel._viewModal._map.findLayerById(item);
+			return self.mapCanvasPage._map.findLayerById(item);
 		}).filter(function(item)
 		{
 			return !!item;
@@ -141,11 +143,11 @@
 	{
 		var self = this;
 		var layers = this.getLayers();
-		this.viewModel._viewModal.setMode("Routing", "Normal");
+		this.routingPaletteVM._viewModal.setMode("Routing", "Normal");
 		this.editFieldTripStopModal.closeEditModal();
 		return this.dataModel.close().then(function()
 		{
-			if (self.viewModel.showCount == 0)
+			if (self.routingPaletteVM.showCount == 0)
 			{
 				layers.forEach(function(item)
 				{

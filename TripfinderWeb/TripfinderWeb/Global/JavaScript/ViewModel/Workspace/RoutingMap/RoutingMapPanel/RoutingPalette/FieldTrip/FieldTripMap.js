@@ -1187,20 +1187,29 @@
 		}
 	}
 
-	FieldTripMap.prototype.confirmToExitAddingStop = async function()
+	FieldTripMap.prototype.confirmToExitAddingStop = async function(needConfirmation = true)
 	{
 		if (!this.editing.isAddingStop)
 		{
 			return false;
 		}
 
-		const response = await tf.promiseBootbox.yesNo("Are you sure you want to cancel?", "Confirmation Message");
-		if (response)
+		const apply = async () =>
 		{
 			this.stopAddFieldTripStop();
 			await this.clearHighlightFeatures();
-
 			this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.ExitAddingStop });
+		}
+
+		if (!needConfirmation)
+		{
+			await apply();
+		}
+
+		const response = await tf.promiseBootbox.yesNo("Are you sure you want to cancel?", "Confirmation Message");
+		if (response)
+		{
+			await apply();
 		}
 	}
 

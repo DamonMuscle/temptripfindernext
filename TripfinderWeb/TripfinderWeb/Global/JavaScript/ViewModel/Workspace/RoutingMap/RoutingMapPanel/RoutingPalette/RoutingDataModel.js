@@ -5,9 +5,11 @@
 	function RoutingDataModel(fieldTripPaletteSectionVM)
 	{
 		var self = this;
-		TF.RoutingMap.BaseMapDataModel.call(this, fieldTripPaletteSectionVM.viewModel._viewModal);
-		self.viewModel = fieldTripPaletteSectionVM;
-		self.routeState = fieldTripPaletteSectionVM.viewModel._viewModal.routeState;
+		self.mapCanvasPage = fieldTripPaletteSectionVM.routingPaletteVM.mapCanvasPage;
+		TF.RoutingMap.BaseMapDataModel.call(this, self.mapCanvasPage);
+		self.viewModel = fieldTripPaletteSectionVM; //delete in future
+		self.fieldTripPaletteSectionVM = fieldTripPaletteSectionVM;
+		self.routeState = self.mapCanvasPage.routeState;
 		self.trips = [];
 		self.candidateStudents = [];
 		self.tripStopDictionary = {};
@@ -58,7 +60,7 @@
 		// show impact difference chart
 		self.showImpactDifferenceChart = ko.observable(false);
 
-		// self.streetDataModel = self._viewModal.mapEditingPaletteViewModel.myStreetsViewModel.dataModel;
+		// self.streetDataModel = self.mapCanvasPage.mapEditingPaletteViewModel.myStreetsViewModel.dataModel;
 		// self.streetMeterBuffer = 40;
 
 		self.setUserProfileTripColor = self.setUserProfileTripColor.bind(this);
@@ -81,11 +83,11 @@
 		var self = this;
 		// this.fieldTripEditBroadcast.init();
 		// self.subscribeStreetChange();
-		this._viewModal.onUpdateRecordsEvent.subscribe(this.onSchoolLocationDataSourceChange);
+		self.mapCanvasPage.onUpdateRecordsEvent.subscribe(this.onSchoolLocationDataSourceChange);
 
 		return Promise.all([self.setUserProfileTripColor()]).then(function()
 		{
-			var docData = self._viewModal.DocumentData.data;
+			var docData = self.mapCanvasPage.DocumentData.data;
 			// the trips that need to be auto open when trip panel initial
 			if (docData && docData.trips)
 			{
@@ -1271,7 +1273,6 @@
 				deleteTrips.push(trip);
 			}
 		});
-		// return this.closeByViewTrips(deleteTrips, newTrips);
 		return this.closeByViewFieldTrips(deleteTrips, newTrips);
 	};
 
@@ -1834,43 +1835,6 @@
 		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.ShowHide, trips);
 	};
 
-	RoutingDataModel.prototype.closeByTrips = function(tripsToClose, notifyChange)
-	{
-		var self = this;
-		var promise = Promise.resolve();
-		if (tripsToClose && tripsToClose.length > 0)
-		{
-			tripsToClose.forEach(function(trip)
-			{
-				self.deleteChangeDataStackByTripId(trip.id);
-			});
-			self.unLockTripData(tripsToClose);
-			self.removeNeedDeleteTrip(tripsToClose);
-			if (notifyChange != false)
-			{
-				self.onTripsChangeEvent.notify({ add: [], edit: [], delete: tripsToClose });
-			}
-		}
-
-		self.viewModel.routingChangePath && self.viewModel.routingChangePath.clearAll();
-		self.clearContextMenuOperation();
-		self.viewModel.editFieldTripStopModal.closeEditModal();
-		self._viewModal.setMode("Routing", "Normal");
-		// self.clearTripOriginalData(tripsToClose);
-		return promise.then(function()
-		{
-			self._updateTravelScenarioLock(tripsToClose);
-			if (self.getEditTrips().length == 0)
-			{
-				var promise = Promise.resolve(true);
-				return promise;
-			} else if (tripsToClose && tripsToClose.length > 0)
-			{
-				self.onTripsChangeEvent.notify({ add: [], edit: self.getEditTrips(), delete: [], draw: false });
-			}
-		});
-	};
-
 	RoutingDataModel.prototype.closeByFieldTrips = function(tripsToClose, notifyChange)
 	{
 		var self = this;
@@ -1901,7 +1865,7 @@
 				self.onTripsChangeEvent.notify({ add: [], edit: self.getEditTrips(), delete: [], draw: false });
 			}
 		});
-	};	
+	};
 
 	RoutingDataModel.prototype.closeAllEditTrips = function()
 	{
@@ -1948,7 +1912,7 @@
 
 				self.clearContextMenuOperation();
 				self.viewModel.editFieldTripStopModal.closeEditModal();
-				self._viewModal.setMode("Routing", "Normal");
+				self.mapCanvasPage.setMode("Routing", "Normal");
 				tf.loadingIndicator.tryHide();
 				// self._updateTravelScenarioLock();
 			});
@@ -1991,21 +1955,6 @@
 		});
 	};
 
-	RoutingDataModel.prototype.closeByViewTrips = function(viewTripsToClose)
-	{
-		var self = this;
-		var promise = Promise.resolve();
-		if (viewTripsToClose.length > 0)
-		{
-			self.removeNeedDeleteTrip(viewTripsToClose);
-			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: viewTripsToClose });
-		}
-		self.clearContextMenuOperation();
-		self.viewModel.editFieldTripStopModal.closeEditModal();
-		self._viewModal.setMode("Routing", "Normal");
-		return promise;
-	};
-
 	RoutingDataModel.prototype.closeByViewFieldTrips = function(viewTripsToClose)
 	{
 		var self = this;
@@ -2024,7 +1973,6 @@
 	RoutingDataModel.prototype.closeAllViewTrips = function()
 	{
 		var self = this;
-		// return self.closeByViewTrips(self.getViewTrips());
 		return self.closeByViewFieldTrips(self.getViewTrips());
 	};
 
@@ -2218,7 +2166,7 @@
 				promises.push(self.featureData.delete(trip.id));
 				Promise.all(promises).then(function()
 				{
-					self.closeByTrips([trip]);
+					self.closeByFieldTrips([trip]);
 					self.tripLockData.saveData([trip]);
 				});
 			});
@@ -2642,7 +2590,6 @@
 		});
 		if (viewTrips && viewTrips.length > 0)
 		{
-			// self.closeByViewTrips(viewTrips);
 			self.closeByViewFieldTrips(viewTrips);
 		}
 		var promise = Promise.resolve();
@@ -3076,20 +3023,21 @@
 
 	RoutingDataModel.prototype.dispose = function()
 	{
-		this.tripLockData.unLockCurrentDocument();
-		this.onTripsChangeEvent.unsubscribeAll();
-		this.fieldTripEditBroadcast.dispose();
-		this.onTripColorChangeEvent.unsubscribeAll();
-		this.onChangeTripVisibilityEvent.unsubscribeAll();
-		this.onWalkTSRestrictionChangeEvent.unsubscribeAll();
-		// this.streetDataModel.onStreetModifyEvent.unsubscribe(this.onStreetModifyEvent);
-		this.onShowChartChangeEvent.unsubscribeAll();
-		this._viewModal.onUpdateRecordsEvent.unsubscribe(this.onSchoolLocationDataSourceChange);
-		this.onSchoolLocationChangeEvent.unsubscribeAll();
-		PubSub.unsubscribe(this.setUserProfileTripColor);
-		PubSub.unsubscribe(this.stopPathChange);
-		this.tripLockData.dispose();
-		tfdispose(this);
+		const self = this;
+		self.tripLockData.unLockCurrentDocument();
+		self.onTripsChangeEvent.unsubscribeAll();
+		self.fieldTripEditBroadcast.dispose();
+		self.onTripColorChangeEvent.unsubscribeAll();
+		self.onChangeTripVisibilityEvent.unsubscribeAll();
+		self.onWalkTSRestrictionChangeEvent.unsubscribeAll();
+		// self.streetDataModel.onStreetModifyEvent.unsubscribe(self.onStreetModifyEvent);
+		self.onShowChartChangeEvent.unsubscribeAll();
+		self.mapCanvasPage.onUpdateRecordsEvent.unsubscribe(self.onSchoolLocationDataSourceChange);
+		self.onSchoolLocationChangeEvent.unsubscribeAll();
+		PubSub.unsubscribe(self.setUserProfileTripColor);
+		PubSub.unsubscribe(self.stopPathChange);
+		self.tripLockData.dispose();
+		tfdispose(self);
 	};
 
 	RoutingDataModel.isSchoolsEqual = function(currentSchools, originalSchools)

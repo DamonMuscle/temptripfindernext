@@ -60,7 +60,6 @@
 				remainViewTrips.push(c);
 			}
 		});
-		// self.dataModel.closeByViewTrips(refreshViewTrips);
 		self.dataModel.closeByViewFieldTrips(refreshViewTrips);
 		return self.dataModel.setViewFieldTrips(refreshViewTrips.concat(remainViewTrips));
 	};

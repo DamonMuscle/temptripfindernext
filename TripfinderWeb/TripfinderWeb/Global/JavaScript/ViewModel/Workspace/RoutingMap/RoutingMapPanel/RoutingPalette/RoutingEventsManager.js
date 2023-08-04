@@ -362,7 +362,6 @@
 					}
 					if (viewTrips.length > 0)
 					{
-						// promiseList.push(self.dataModel.closeByViewTrips(viewTrips));
 						promiseList.push(self.dataModel.closeByViewFieldTrips(viewTrips));
 					}
 					if (editTrips.length > 0)
