@@ -1160,9 +1160,21 @@
 
 	FieldTripMap.prototype.onMapKeyUpEvent = async function(data)
 	{
-		if (data.event.key === "Escape")
+		const keyName = data.event.key;
+		switch (keyName)
 		{
-			await this.confirmToStopAddingStop();
+			case "Escape":
+				const response = await this.confirmToStopAddingStop();
+				console.log("TODO: notify Escape response " + response);
+				break;
+			case "Enter":
+				console.log("TODO: Press Enter on FieldTripMap");
+				break;
+			case "Delete":
+				console.log("TODO: Press Delete on FieldTripMap");
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -1170,7 +1182,7 @@
 	{
 		if (!this.editing.isAddingStop)
 		{
-			return;
+			return false;
 		}
 
 		const response = await tf.promiseBootbox.yesNo("Are you sure you want to cancel?", "Confirmation Message");
@@ -1179,6 +1191,7 @@
 			this.stopAddFieldTripStop();
 			await this.clearHighlightFeatures();
 		}
+		return response;
 	}
 
 	//#endregion
