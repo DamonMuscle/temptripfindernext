@@ -181,7 +181,6 @@
 			if (self.isChanged)
 			{
 				this.changeStopPath();
-				this.viewModel.dataModel.fieldTripStopDataModel.updatePath(this.tripStop);
 				self._enableSnapping = true;
 				self.isChanged = false;
 			} else

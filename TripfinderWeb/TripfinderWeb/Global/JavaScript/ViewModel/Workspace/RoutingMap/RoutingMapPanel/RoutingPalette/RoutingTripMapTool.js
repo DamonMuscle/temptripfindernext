@@ -1194,7 +1194,6 @@
 						}
 					}
 				});
-				self.dataModel.fieldTripStopDataModel.updateTripBoundary(data, true);
 			}
 		}
 		else if (type == "create")

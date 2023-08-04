@@ -273,10 +273,6 @@
 			stops = insertToStops.slice().map(function(stop) { return $.extend({}, stop); });
 			stops = self.appendNewStopsToTrip(newTripStops, stops);
 			solvePromise = self._refreshTripPathByTripStops(stops);
-			// } else
-			// {
-			// 	solvePromise = self._refreshTipPathByInsertToEnd(insertToStops, newTripStops);
-			// }
 		}
 
 		return solvePromise.then(function(response)
@@ -430,45 +426,6 @@
 		return this._sortTripStops(stops);
 	};
 
-	/**
-	* change trip stop path
-	*/
-	RoutingFieldTripStopDataModel.prototype.updatePath = function(tripStopChanged, isFromBroadCastSync)
-	{
-		var tripStop = this.dataModel.getFieldTripStop(tripStopChanged.id);
-		if (!tripStop) return;
-		var originalData = [this.dataModel.fieldTripEditBroadcast.copyTripStop(tripStop)];
-		this.copyPathInfoToStop(tripStopChanged);
-		this._updateTripStops([tripStop], false);
-		PubSub.publish(topicCombine(pb.DATA_CHANGE, "stoppath"), [tripStop]);
-		if (!isFromBroadCastSync) { this.dataModel.fieldTripEditBroadcast.send(originalData, [tripStop], tripStopChanged.routeStops); }
-	};
-
-	RoutingFieldTripStopDataModel.prototype.copyPathInfoToStop = function(tripStopChanged)
-	{
-		var tripStop = this.dataModel.getFieldTripStop(tripStopChanged.id);
-
-		if (tripStopChanged.path && tripStopChanged.path.geometry)
-		{
-			tripStop.path.geometry = tripStopChanged.path.geometry.clone();
-			tripStop.DrivingDirections = tripStopChanged.DrivingDirections;
-			tripStop.RouteDrivingDirections = tripStopChanged.DrivingDirections;
-			tripStop.routeStops = tripStopChanged.routeStops;
-			tripStop.Distance = tripStopChanged.Distance;
-			tripStop.Speed = tripStopChanged.Speed;
-			tripStop.IsCustomDirection = false;
-		} else
-		{
-			tripStop.DrivingDirections = "";
-			tripStop.RouteDrivingDirections = "";
-			tripStop.Distance = 0;
-			tripStop.Speed = 0;
-			tripStop.routeStops = null;
-			tripStop.IsCustomDirection = false;
-		}
-		return tripStop;
-	};
-
 	RoutingFieldTripStopDataModel.prototype.updateAnotherTripStop = function(newTripStops)
 	{
 		let exceptionMap = {};
@@ -506,68 +463,6 @@
 		var self = this;
 		self._viewModal.revertMode = "update-TripStop";
 		self._viewModal.revertData = [];
-		var changeData = [];
-		var moveTripStops = [];
-		self.viewModel.routingChangePath.clearAll();
-		var promises = [];
-		var originalData = [];
-		modifyDataArray.forEach(function(modifyData)
-		{
-			var data = self.dataModel.getFieldTripStop(modifyData.id);
-			originalData.push(self.dataModel.fieldTripEditBroadcast.copyTripStop(data));
-			if (data.XCoord != modifyData.XCoord ||
-				data.YCoord != modifyData.YCoord ||
-				data.vehicleCurbApproach != modifyData.vehicleCurbApproach ||
-				data.SchoolLocation != modifyData.SchoolLocation)
-			{
-				moveTripStops.push(modifyData);
-				moveTripStops.forEach(function(stop) { stop.StreetSegment = null; })
-				promises.push(self.viewModel.drawTool.stopTool.attachClosetStreetToStop(moveTripStops));
-			}
-			self.insertToRevertData(data);
-			$.extend(data, modifyData, { Students: data.Students });
-
-			if (modifyData.geometry)
-			{
-				data.geometry = TF.cloneGeometry(modifyData.geometry);
-			}
-			changeData.push(data);
-		});
-		return Promise.all(promises).then(function()
-		{
-			moveTripStops.forEach(function(stop)
-			{
-				self.dataModel.getFieldTripStop(stop.id).StreetSegment = stop.StreetSegment;
-			});
-			var pathPromise = Promise.resolve();
-			if (moveTripStops.length > 0)
-			{
-				pathPromise = self.setTripStopPathAndSequence(moveTripStops[0], "move").then(function(prevStop)
-				{
-					if (prevStop)
-					{
-						changeData.push(prevStop);
-					}
-				});
-			}
-			return pathPromise.then(function()
-			{
-				self._updateTripStops(changeData, null, isNoStopChange);
-				if (!isFromBroadCastSync) { self.dataModel.fieldTripEditBroadcast.send(originalData, changeData); }
-				return Promise.resolve(modifyDataArray);
-			});
-		});
-	};
-
-	RoutingFieldTripStopDataModel.prototype._updateTripStops = function(tripStops, refreshTrip, isNoStopChange)
-	{
-		if (!isNoStopChange)
-		{
-			this.dataModel.onTripStopsChangeEvent.notify({ add: [], delete: [], edit: tripStops, refreshTrip: refreshTrip });
-		}
-		
-		this.changeRevertStack(tripStops, false);
-		this._runAfterPathChanged(tripStops, null, tf.storageManager.get("notAutoAssignUnassignedStudent") === false);
 	};
 
 	RoutingFieldTripStopDataModel.prototype._runAfterPathChanged = function(tripStops, type, autoAssign, isCreateMultiple)
@@ -937,25 +832,6 @@
 		})
 	}
 
-	// RoutingFieldTripStopDataModel.prototype._refreshTipPathByInsertToEnd = function(currentTripStops, newTripStops)
-	// {
-	// 	var self = this;
-	// 	var trip = self.dataModel.getTripById(currentTripStops[0].FieldTripId);
-	// 	var currentEndStops = trip.Session == 0 ? currentTripStops.slice(currentTripStops.length - 2) : currentEndStops.slice(0, 2);
-	// 	currentEndStops = [currentEndStops[0]].concat(newTripStops).concat([currentEndStops[1]]);
-	// 	return self.viewModel.drawTool.NAtool.refreshTripByMultiStops(currentEndStops, true).then(function(stops)
-	// 	{
-	// 		if (trip.Session == 0)
-	// 		{
-	// 			return currentTripStops.slice(0, currentTripStops.length - 2).concat(stops);
-	// 		} else
-	// 		{
-	// 			return stops.concat(currentTripStops.slice(2));
-	// 		}
-
-	// 	})
-	// }
-
 	RoutingFieldTripStopDataModel.prototype._refreshTripPathByTripStops = function(tripStops, deleteStops, isBestSequence)
 	{
 		var self = this;
@@ -973,120 +849,6 @@
 		return self.viewModel.drawTool.NAtool.refreshTripByMultiStops(tripStopsCopy.stops, isBestSequence).then((stops) =>
 		{
 			return stops;
-		});
-	};
-
-	RoutingFieldTripStopDataModel.prototype.updateTripBoundary = function(modifyDataArray, isFromRevert)
-	{
-		var self = this;
-		self._viewModal.revertMode = "update-TripBoundary";
-		!isFromRevert && (self._viewModal.revertData = []);
-		var changeData = [];
-		var boundaries = [];
-		var originalData = [];
-		modifyDataArray.forEach(function(modifyData)
-		{
-			var tripStop = self.dataModel.getFieldTripStop(modifyData.FieldTripStopId);
-			if (tripStop.boundary && !tripStop.boundary.id)
-			{
-				tripStop.boundary = self.createTripBoundary(tripStop);
-			}
-			tripStop.originalBoundaryGeometry = tripStop.boundary && tripStop.boundary.geometry;
-			originalData.push(self.dataModel.fieldTripEditBroadcast.copyTripStop(tripStop));
-			var data = tripStop.boundary;
-			!isFromRevert && self.insertToRevertData(data);
-			$.extend(data, modifyData);
-			if (modifyData.geometry)
-			{
-				data.geometry = TF.cloneGeometry(modifyData.geometry);
-			}
-			changeData.push(tripStop);
-		});
-		boundaries = changeData.map(function(tripStop) { return tripStop.boundary; });
-		self.dataModel.fieldTripEditBroadcast.send(originalData, changeData);
-		self.dataModel.onTripStopsChangeEvent.notify({ add: [], delete: [], edit: changeData });
-		self.changeRevertStack(modifyDataArray, isFromRevert);
-		return Promise.resolve(changeData);
-	};
-
-	RoutingFieldTripStopDataModel.prototype.setTripStopPathAndSequence = function(tripStop, type, hasSpecialSequence)
-	{
-		var self = this;
-		var sequenceChanges = [];
-		tf.loadingIndicator.show();
-		tripStop.routeStops = null;
-		return self.viewModel.drawTool.NAtool.refreshTrip(tripStop, type, hasSpecialSequence).then(function(response)
-		{
-			var data = response.hasOwnProperty("stops") ? response.stops : response;
-			if (!data) return data;
-			tf.loadingIndicator.tryHide();
-			if (response.err)
-			{
-				tf.promiseBootbox.alert(response.err);
-			}
-			var prevStop = data[0];
-			var currentStop = data.length > 1 ? data[1] : null;
-			if (tripStop.Sequence == 1)
-			{
-				prevStop = null;
-				currentStop = data[0];
-			}
-			if (currentStop)
-			{
-				var stop = self.dataModel.getFieldTripStop(currentStop.id);
-				stop.path.geometry = currentStop.path.geometry;
-				currentStop.path = stop.path;
-				stop.Speed = currentStop.Speed;
-				stop.Distance = currentStop.Distance;
-				stop.DrivingDirections = currentStop.DrivingDirections;
-				stop.RouteDrivingDirections = stop.DrivingDirections;
-				stop.IsCustomDirection = false;
-			}
-			if (prevStop)
-			{
-				prevStop.routeStops = null;
-			}
-			if (type == "move") { return prevStop; }
-			var tripStops = self.dataModel.getTripById(tripStop.FieldTripId).FieldTripStops;
-			tripStops = self._sortTripStops(tripStops);
-			var startSequence = currentStop ? currentStop.Sequence : prevStop.Sequence;
-			if (type == "delete")
-			{
-				startSequence = currentStop.Sequence - 1;
-			}
-			for (var i = 0; i < tripStops.length; i++)
-			{
-				var solvePathGeometryNotChange = true;
-				if (prevStop && (tripStops[i].id == prevStop.id))
-				{
-					tripStops[i].path = prevStop.path;
-					tripStops[i].DrivingDirections = prevStop.DrivingDirections;
-					tripStops[i].RouteDrivingDirections = tripStops[i].DrivingDirections;
-					tripStops[i].IsCustomDirection = false;
-					solvePathGeometryNotChange = false;
-				} else if (currentStop && tripStops[i].id == currentStop.id)
-				{
-					tripStops[i].path = currentStop.path;
-					tripStops[i].Sequence = currentStop.Sequence;
-					tripStops[i].DrivingDirections = currentStop.DrivingDirections;
-					tripStops[i].RouteDrivingDirections = tripStops[i].DrivingDirections;
-					tripStops[i].IsCustomDirection = false;
-					solvePathGeometryNotChange = false;
-				} else if (tripStops[i].Sequence >= startSequence)
-				{
-					tripStops[i].Sequence = ++startSequence;
-					sequenceChanges.push(tripStops[i]);
-				}
-
-				tripStops[i].solvePathGeometryNotChange = solvePathGeometryNotChange;
-			}
-			self.dataModel.getTripById(tripStop.FieldTripId).FieldTripStops = self._sortTripStops(tripStops);
-			PubSub.publish(topicCombine(pb.DATA_CHANGE, "stoppath"), tripStops);
-			if (sequenceChanges.length > 0)
-			{
-				self.dataModel.onTripSequenceChangeEvent.notify(sequenceChanges);
-			}
-			return prevStop;
 		});
 	};
 

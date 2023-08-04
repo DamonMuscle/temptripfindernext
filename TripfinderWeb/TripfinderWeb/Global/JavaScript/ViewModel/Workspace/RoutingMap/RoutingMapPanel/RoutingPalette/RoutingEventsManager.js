@@ -21,7 +21,6 @@
 		{
 			return self.dataModel.obSelfChangeCount() > 0;
 		});
-		self.bindRefreshMissingTripPathEvent();
 		self.requireDetailsEvent = new TF.Events.Event();
 
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMapCompleted, self.onAddStopFromMapCompleted.bind(self));
@@ -1026,77 +1025,9 @@
 		tf.loadingIndicator.enhancedShow(this.viewModel.viewModel.onRefreshFieldTripPath({fieldTripId: data.id}));
 	};
 
-	/**
-	* ctrl+m to refresh the missing trip path
-	*/
-	RoutingEventsManager.prototype.bindRefreshMissingTripPathEvent = function()
-	{
-		var self = this;
-		tf.documentEvent.bind("keydown.refreshTripPath", self.routeState, function(e)
-		{
-			var trips = self.dataModel.getEditTrips(),
-				mKey = 77;
-			if (trips.length > 0 && e.ctrlKey && e.keyCode == mKey)
-			{
-				var refreshTripPathPromises = [];
-				tf.loadingIndicator.show();
-				trips.forEach(function(trip)
-				{
-					trip.FieldTripStops.forEach(function(tripStop, stopIndex)
-					{
-						// not last stop and has no path
-						if (stopIndex != trip.FieldTripStops.length - 1 && (!tripStop.path || !tripStop.path.geometry))
-						{
-							refreshTripPathPromises.push(
-								self._refreshTripPath(tripStop, trip.FieldTripStops[stopIndex + 1])
-							);
-						}
-					});
-				});
-				Promise.all(refreshTripPathPromises).then(function()
-				{
-					tf.loadingIndicator.tryHide();
-				});
-			}
-		});
-	};
-
 	RoutingEventsManager.prototype.tripPathRefreshClick = function(data)
 	{
 		this.clearMode();
-		var tripStops = data.tripStops;
-		var trip = data.trip;
-		if (tripStops)
-		{
-			var tripStop = tripStops[0];
-			var nextTripStop = trip.FieldTripStops[tripStop.Sequence];
-			tripStop.routeStops = null;
-			tf.loadingIndicator.show();
-			this._refreshTripPath(tripStop, nextTripStop)
-				.then(function()
-				{
-					tf.loadingIndicator.tryHide();
-				});
-		}
-	};
-
-	RoutingEventsManager.prototype._refreshTripPath = function(tripStopStart, tripStopEnd)
-	{
-		var self = this;
-		return this.viewModel.drawTool.NAtool.refreshTripByMultiStops([tripStopStart, tripStopEnd], null, null, null, true)
-			.then(function(result)
-			{
-				if (result && $.isArray(result))
-				{
-					self.dataModel.fieldTripStopDataModel.updatePath(tripStopStart);
-				} else
-				{
-					var tripStopChanged = $.extend(true, {}, tripStopStart);
-					if (tripStopChanged.path && tripStopChanged.path.geometry) tripStopChanged.path.geometry.paths = [];
-					self.dataModel.fieldTripStopDataModel.updatePath(tripStopChanged);
-				}
-
-			});
 	};
 
 	RoutingEventsManager.prototype.clearMode = function()
@@ -1136,9 +1067,6 @@
 	RoutingEventsManager.prototype.tripPathDeleteClick = function(data)
 	{
 		this.clearMode();
-		var tripStop = data.tripStop;
-		tripStop.path = {};
-		this.dataModel.fieldTripStopDataModel.updatePath(tripStop);
 	};
 
 	RoutingEventsManager.prototype.tripDetailsClick = function(data)

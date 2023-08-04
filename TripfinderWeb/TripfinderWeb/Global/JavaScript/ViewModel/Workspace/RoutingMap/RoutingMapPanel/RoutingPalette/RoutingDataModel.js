@@ -2156,7 +2156,6 @@
 
 		if (tripBoundary.length > 0)
 		{
-			return this.fieldTripStopDataModel.updateTripBoundary(tripBoundary);
 		}
 		if (tripStops.length > 0)
 		{

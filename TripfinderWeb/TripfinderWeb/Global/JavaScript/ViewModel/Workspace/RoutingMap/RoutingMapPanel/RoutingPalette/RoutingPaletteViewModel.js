@@ -467,7 +467,7 @@
 
 	RoutingPaletteViewModel.prototype.unSaveCheck = function(openingName)
 	{
-		var viewModels = [this.fieldTripPaletteSection, this.stopPoolPaletteSection];
+		var viewModels = [this.fieldTripPaletteSection];
 		return this._multiViewUnSaveCheck(openingName, viewModels);
 	};
 

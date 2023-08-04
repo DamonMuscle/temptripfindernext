@@ -231,7 +231,6 @@
 
 					if (newTrip.FieldTripStops.length > 1)
 					{
-						// fieldTripPathPromise = self.dataModel.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.TripStops);
 					}
 
 					let newTrips = [newTrip];
