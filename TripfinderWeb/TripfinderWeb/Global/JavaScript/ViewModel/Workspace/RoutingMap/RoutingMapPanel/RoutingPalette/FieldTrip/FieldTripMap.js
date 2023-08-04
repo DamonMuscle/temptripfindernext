@@ -452,11 +452,7 @@
 
 	FieldTripMap.prototype.removeMapLayerFeatures = function(layerInstance, removeFeatures)
 	{
-		for (let i = 0; i < removeFeatures.length; i++)
-		{
-			const feature = removeFeatures[i];
-			layerInstance.remove(feature);
-		}
+		layerInstance.removeMany(removeFeatures);
 	}
 
 	//#endregion

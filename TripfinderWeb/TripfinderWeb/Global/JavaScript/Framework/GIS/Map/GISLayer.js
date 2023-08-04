@@ -169,19 +169,38 @@
 	{
 		if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
 		{
-			this._removeGraphic(graphic, afterRemove);
+			this._removeGraphics([graphic], afterRemove);
 		}
 		else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
 		{
-			this._removeFeature(graphic, afterRemove);
+			this._removeFeatures([graphic], afterRemove);
 		}
 	}
 
-	Layer.prototype._removeGraphic = function(graphic, afterRemove = null)
+	Layer.prototype.removeMany = async function(graphics, afterRemove = null)
+	{
+		return new Promise((resolve, reject) =>
+		{
+			if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
+			{
+				this._removeGraphics(graphics, () =>
+				{
+					resolve();
+				});
+			}
+			else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
+			{
+				this._removeFeatures(graphics, afterRemove);
+				resolve();
+			}
+		});
+	}
+
+	Layer.prototype._removeGraphics = function(graphics, afterRemove = null)
 	{
 		if (afterRemove !== null)
 		{
-			let total = 1;
+			let total = graphics.length;
 			let handler = this.layer.graphics.on("after-remove", (event) =>
 			{
 				total--;
@@ -195,15 +214,19 @@
 			});
 		}
 
-		this.layer.remove(graphic);
+		if (graphics.length === 1)
+		{
+			this.layer.remove(graphics[0]);
+		}
+		else
+		{
+			this.layer.removeMany(graphics);
+		}
 	}
 
-	Layer.prototype._removeFeature = async function(feature, afterRemove = null)
+	Layer.prototype._removeFeatures = async function(features, afterRemove = null)
 	{
-		const edits = {
-			deleteFeatures: [feature]
-		};
-
+		const edits = { deleteFeatures: features };
 		const editsResult = await this.layer.applyEdits(edits);
 		if (afterRemove)
 		{
