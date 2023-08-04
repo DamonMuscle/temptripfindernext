@@ -389,14 +389,11 @@
 			}
 		}
 
-		var maxHeight = $(window).outerHeight() - menuPosition.y - bottomHeight;
-
 		contextMenu.css({
 			position: "fixed",
 			left: menuPosition.x,
 			top: menuPosition.y,
-			"overflow": "hidden",
-			"max-height": maxHeight + "px"
+			"overflow": "hidden"
 		});
 
 		return menuPosition;
