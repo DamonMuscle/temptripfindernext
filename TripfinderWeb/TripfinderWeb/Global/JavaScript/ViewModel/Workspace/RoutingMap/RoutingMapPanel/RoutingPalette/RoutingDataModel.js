@@ -1856,7 +1856,7 @@
 		self.viewModel.routingChangePath && self.viewModel.routingChangePath.clearAll();
 		self.clearContextMenuOperation();
 		self.viewModel.editFieldTripStopModal.closeEditModal();
-		self._viewModal.setMode("Routing", "Normal");
+		self.fieldTripPaletteSectionVM.routingPaletteVM?.fieldTripMap?.confirmToExitAddingStop(false);
 		// self.clearTripOriginalData(tripsToClose);
 		return promise.then(function()
 		{
@@ -1966,7 +1966,7 @@
 		}
 		self.clearContextMenuOperation();
 		self.viewModel.editFieldTripStopModal.closeEditModal();
-		self._viewModal.setMode("Routing", "Normal");
+		self.fieldTripPaletteSectionVM.routingPaletteVM?.fieldTripMap?.confirmToExitAddingStop(false);
 		return promise;
 	};
 
