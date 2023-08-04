@@ -750,15 +750,15 @@
 	{
 		e.stopPropagation();
 		var self = this;
-		var data = this.data;
+		var data = self.data;
 		var confirmPromise = Promise.resolve(true);
 
-		if (this.mode() == "new")
+		if (self.mode() == "new")
 		{
 			confirmPromise = tf.promiseBootbox.yesNo("Are you sure you want to cancel?", "Confirmation Message");
 		} else
 		{
-			var dataSame = self._compareArrayObject(this.original, data);
+			var dataSame = self._compareArrayObject(self.original, data);
 			if (!dataSame)
 			{
 				confirmPromise = tf.promiseBootbox.yesNo("There are unsaved changes.  Are you sure you want to cancel?", "Unsaved Changes");
@@ -777,7 +777,7 @@
 					self.dataModel.viewModel.drawTool._clearTempDrawing();
 				}
 				self.dataModel.viewModel.drawTool.stopTool.clearCandidateGraphics();
-				if (this.mode() == "new")
+				if (self.mode() == "new")
 				{
 					PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMap);
 				}
