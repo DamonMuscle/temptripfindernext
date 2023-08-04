@@ -417,12 +417,6 @@
 			return;
 		}
 
-		const { event } = data;
-		if (event.button === 2 && this._viewModal.mode === "Routing-Create")
-		{
-			this._viewModal.setMode("", "Normal");
-		}
-
 		this.fieldTripMap?.onMapClickEvent(data);
 	}
 

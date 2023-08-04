@@ -1108,6 +1108,7 @@
 	FieldTripMap.prototype.onMapClickEvent = async function(data)
 	{
 		const self = this, event = data.event;
+		let response = null;
 
 		if (event.button === 0)
 		{
@@ -1126,9 +1127,10 @@
 		else if (event.button === 2)
 		{
 			// right click
-			this.stopAddFieldTripStop();
+			response = await this.confirmToStopAddingStop();
+			console.log("TODO: notify right click response " + response);
 
-			const response = await self.mapInstance?.map.mapView.hitTest(event);
+			response = await self.mapInstance?.map.mapView.hitTest(event);
 			if (response.results.length > 0)
 			{
 				const graphics = response.results.map(item => item.graphic);
@@ -1172,6 +1174,20 @@
 				break;
 			case "Delete":
 				console.log("TODO: Press Delete on FieldTripMap");
+				break;
+			case "m":
+			case "M":
+				if (data.event.native.ctrlKey)
+				{
+					console.log("TODO: Press Ctrl + M on FieldTripMap, refresh trip stop path which is NULL");
+				}
+				break;
+			case "z":
+			case "Z":
+				if (data.event.native.ctrlKey)
+				{
+					console.log("TODO: Press Ctrl + Z on FieldTripMap, revertMapClick");
+				}
 				break;
 			default:
 				break;
