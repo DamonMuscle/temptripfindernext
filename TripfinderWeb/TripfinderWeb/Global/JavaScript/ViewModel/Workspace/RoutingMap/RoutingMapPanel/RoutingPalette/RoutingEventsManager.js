@@ -583,13 +583,6 @@
 		PubSub.publish("clear_ContextMenu_Operation");
 	};
 
-	RoutingEventsManager.prototype.editTripBoundaryClick = function(type, data)
-	{
-		var self = this;
-		var boundaryID = data.boundary ? data.boundary.id : data.id;
-		self.viewModel.drawTool.transform(boundaryID);
-	};
-
 	RoutingEventsManager.prototype.selectionChange_routing = function(e, selectedIds)
 	{
 		var self = this;

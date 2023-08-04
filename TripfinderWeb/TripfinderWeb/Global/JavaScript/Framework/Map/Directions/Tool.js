@@ -20,7 +20,6 @@
 		self.defaultCurbApproach = self.CurbApproachEnum.RIGHT_SIDE;
 		self.uTurnPolicy = self.UTurnPolicyEnum.ALLOWED;
 
-		// routingMapDocumentViewModel.onModeChangeEvent.subscribe(this.onModeChange.bind(this));
 		self.stopTool = new TF.RoutingMap.RoutingPalette.StopTool(null, self._map, self._viewModel);
 		self._initialize();
 	}
@@ -137,14 +136,6 @@
 
 		self._unbindGeneralMapEvents();
 		self.stopDraggingMode();
-	};
-
-	Tool.prototype.onModeChange = function()
-	{
-		if (this._onDropMode)
-		{
-			this._stopDropMode();
-		}
 	};
 
 	Tool.prototype._stopDropMode = function()
