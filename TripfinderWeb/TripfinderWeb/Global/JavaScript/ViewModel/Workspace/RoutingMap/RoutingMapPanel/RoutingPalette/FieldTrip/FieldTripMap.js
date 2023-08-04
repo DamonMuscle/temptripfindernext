@@ -1804,7 +1804,7 @@
 	{
 		if (vertexes && vertexes[0] && vertexes[0].geometry)
 		{
-			var firstSegmentGeom = tf.map.ArcGIS.geometryEngine.simplify(pathSegments[0].geometry);
+			var firstSegmentGeom = TF.GIS.SDK.geometryEngine.simplify(pathSegments[0].geometry);
 			if (firstSegmentGeom && firstSegmentGeom.paths[0].length > 2 && pathSegments[0] && pathSegments[1])
 			{
 				firstSegmentGeom.removePoint(0, 0);
@@ -1821,7 +1821,7 @@
 		}
 		if (vertexes && vertexes[1] && vertexes[1].geometry)
 		{
-			var lastSegmentGeom = tf.map.ArcGIS.geometryEngine.simplify(pathSegments[pathSegments.length - 1].geometry);
+			var lastSegmentGeom = TF.GIS.SDK.geometryEngine.simplify(pathSegments[pathSegments.length - 1].geometry);
 			if (lastSegmentGeom && lastSegmentGeom.paths[0].length > 2 && pathSegments[pathSegments.length - 2] && pathSegments[pathSegments.length - 1])
 			{
 				lastSegmentGeom.removePoint(0, lastSegmentGeom.paths[0].length - 1);
@@ -1867,7 +1867,7 @@
 	FieldTripMap.prototype._findVertexToStopOnPath = function(path, stop, networkService)
 	{
 		if (!path || !path.paths || !path.paths[0] || !path.paths[0][0]) return;
-		path = tf.map.ArcGIS.webMercatorUtils.geographicToWebMercator(TF.cloneGeometry(path));
+		path = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(TF.cloneGeometry(path));
 		var point = TF.xyToGeometry(stop.XCoord, stop.YCoord);
 		var startPoint = path.paths[0][0];
 		var distance1 = Math.sqrt((startPoint[0] - point.x) * (startPoint[0] - point.x) + (startPoint[1] - point.y) * (startPoint[1] - point.y));
@@ -1875,7 +1875,7 @@
 		var endPoint = path.paths[0][endIndex];
 		var distance2 = Math.sqrt((endPoint[0] - point.x) * (endPoint[0] - point.x) + (endPoint[1] - point.y) * (endPoint[1] - point.y));
 		var vertexGeom = TF.GIS.StopHelper.GetPointOnPolylineByDistanceToPoint(path, 3, distance1 < distance2);
-		var location = tf.map.ArcGIS.webMercatorUtils.webMercatorToGeographic(vertexGeom);
+		var location = TF.GIS.SDK.webMercatorUtils.webMercatorToGeographic(vertexGeom);
 
 		const stopObject = {
 			curbApproach: stop.vehicleCurbApproach,
@@ -1890,7 +1890,7 @@
 	FieldTripMap.prototype._createPathSegments = function(result)
 	{
 		var self = this, pathSegments = [];
-		var stopToStopPathGeometry = new tf.map.ArcGIS.Polyline({ spatialReference: { wkid: 102100 } });
+		var stopToStopPathGeometry = new TF.GIS.SDK.Polyline({ spatialReference: { wkid: 102100 } });
 		var stopToStopPathDirections = "";
 		stopToStopPathGeometry.paths = [
 			[]
@@ -1931,7 +1931,7 @@
 		else
 		{
 			pathSegments.push({
-				geometry: new self._arcgis.Polyline(self._map.mapView.spatialReference).addPath([])
+				geometry: new TF.GIS.SDK.Polyline(self._map.mapView.spatialReference).addPath([])
 			});
 		}
 		return pathSegments;
