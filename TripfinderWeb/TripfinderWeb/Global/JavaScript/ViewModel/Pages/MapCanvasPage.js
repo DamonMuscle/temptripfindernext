@@ -691,12 +691,25 @@
 		self.routingSnapManager.init(this._map);
 		// self._initToggleTrace();
 		self._initSketchTool();
+		self.initShortKeyDownEvent();
 		self.onMapLoad.notify();
 
 		self.mapCanvasUpdatedRecord = self.mapCanvasUpdatedRecord.bind(self);
 		PubSub.subscribe("MapCanvasUpdatedRecordsHub", this.mapCanvasUpdatedRecord);
 		self.menuDataUpdatd = self.menuDataUpdatd.bind(self);
 		PubSub.subscribe("MenuDataUpdatedHub", this.menuDataUpdatd);
+	};
+
+	MapCanvasPage.prototype.initShortKeyDownEvent = function()
+	{
+		const self = this;
+		tf.documentEvent.bind("keydown.shortCutKey", self.routeState, function(e)
+		{
+			if (e.key == "Escape")
+			{
+				self.routingPaletteViewModel?.fieldTripMap.confirmToExitAddingStop();
+			}
+		});
 	};
 
 	MapCanvasPage.prototype._clickOpenDestinationDropMode = function()
