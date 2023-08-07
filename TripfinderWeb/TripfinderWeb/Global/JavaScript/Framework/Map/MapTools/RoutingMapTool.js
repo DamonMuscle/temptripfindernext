@@ -69,7 +69,7 @@
 
 		if (toolName !== "measurementTool" && previousToolName === "measurementTool")
 		{
-			this.measurementTool && this.measurementTool.deactivate();
+			this.deactivateMeasurementTool();
 		}
 		if (toolName !== "geoSearchTool" && previousToolName === "geoSearchTool")
 		{
@@ -101,7 +101,7 @@
 
 		if (toolName != "measurementTool" && previousToolName == "measurementTool")
 		{
-			this.measurementTool && this.measurementTool.deactivate();
+			this.deactivateMeasurementTool();
 		}
 		if (toolName != "geoSearchTool" && previousToolName == "geoSearchTool")
 		{
@@ -1049,6 +1049,12 @@
 
 	RoutingMapTool.prototype.measurementToolClick = function ()
 	{
+		if (this.routingMapDocumentViewModel.routingPaletteViewModel.fieldTripMap?.editing.isAddingStop)
+		{
+			// skip measurement when adding a field trip stop.
+			return;
+		}
+
 		if (!this.measurementTool)
 		{
 			var routeState = this.getRouteState();
@@ -1058,13 +1064,18 @@
 		var isActive = this.measurementTool.isMeasurementActive();
 		if (isActive)
 		{
-			this.measurementTool.deactivate();
+			this.deactivateMeasurementTool();
 		} else
 		{
 			this.routingMapDocumentViewModel.gridMapPopup && this.routingMapDocumentViewModel.gridMapPopup.close();
 			this.measurementTool.activate();
 		}
 	};
+
+	RoutingMapTool.prototype.deactivateMeasurementTool = function()
+	{
+		this.measurementTool?.deactivate();
+	}
 
 	// click on geo search
 	RoutingMapTool.prototype.geoSearchToolClick = function ()

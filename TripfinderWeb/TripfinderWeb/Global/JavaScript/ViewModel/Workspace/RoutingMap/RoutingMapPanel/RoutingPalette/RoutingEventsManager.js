@@ -445,6 +445,7 @@
 	RoutingEventsManager.prototype.createClick = function()
 	{
 		var self = this;
+		self._viewModal.RoutingMapTool.deactivateMeasurementTool();
 		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMap);
 		self._viewModal.setMode("Routing", "Create");
 	};
