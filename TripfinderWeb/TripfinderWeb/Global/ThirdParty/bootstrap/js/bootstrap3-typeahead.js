@@ -394,11 +394,11 @@
 		next: function(event)
 		{
 			var active = this.$menu.find('.active').removeClass('active')
-				, next = active.nextAll('li:not(.group)').eq(0);
+				, next = active.nextAll('li:not(.group,.disable)').eq(0);
 
 			if (!next.length)
 			{
-				next = $(this.$menu.find('li')[0]);
+				next = $(this.$menu.find('li:not(.disable)')[0]);
 			}
 
 			next.addClass('active');
@@ -417,11 +417,11 @@
 		prev: function(event)
 		{
 			var active = this.$menu.find('.active').removeClass('active')
-				, prev = active.prevAll('li:not(.group)').eq(0);
+				, prev = active.prevAll('li:not(.group,.disable)').eq(0);
 
 			if (!prev.length)
 			{
-				prev = this.$menu.find('li').last();
+				prev = this.$menu.find('li:not(.disable)').last();
 			}
 
 			prev.addClass('active');
