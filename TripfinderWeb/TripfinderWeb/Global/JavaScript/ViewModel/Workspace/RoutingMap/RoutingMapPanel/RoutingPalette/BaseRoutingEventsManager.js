@@ -2,9 +2,9 @@
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").BaseRoutingEventsManager = BaseRoutingEventsManager;
 
-	function BaseRoutingEventsManager(viewModel, viewModal)
+	function BaseRoutingEventsManager(fieldTripPaletteSectionVM, viewModal)
 	{
-		this.viewModel = viewModel;
+		this.viewModel = fieldTripPaletteSectionVM;
 		this._viewModal = viewModal;
 		this.copyFromObject = ko.computed(this.getCopyFrom.bind(this));
 		this.fileOpenCompleteEvent = new TF.Events.Event();
