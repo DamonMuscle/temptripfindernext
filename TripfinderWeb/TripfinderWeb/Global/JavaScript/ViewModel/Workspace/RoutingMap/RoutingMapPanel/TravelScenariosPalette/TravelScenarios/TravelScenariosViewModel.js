@@ -117,7 +117,7 @@
 
 			self.obPreviousSelectedTravelScenarios = null;
 			self.streetCurbTurnDataModel.clearUI();
-			self._viewModal.mapEditingPaletteViewModel.myStreetsViewModel?.close();
+			// self._viewModal.mapEditingPaletteViewModel.myStreetsViewModel?.close();
 		}
 	};
 
