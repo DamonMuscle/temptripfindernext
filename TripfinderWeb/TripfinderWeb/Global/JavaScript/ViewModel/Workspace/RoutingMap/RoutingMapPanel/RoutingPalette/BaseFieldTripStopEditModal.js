@@ -422,7 +422,7 @@
 		panels.each(function(index, panel)
 		{
 			var overlay = $("<div class='overlay'></div>");
-			overlay.css({ "position": "absolute", "z-index": 100, "top": 0, "left": 0, "right": 0, "bottom": 0, "cursor": "default" });
+			overlay.css({ "position": "absolute", "z-index": 100, "top": 0, "left": 0, "right": 0, "bottom": 0, "cursor": "inherit" });
 			$(panel).append(overlay);
 		});
 	};
