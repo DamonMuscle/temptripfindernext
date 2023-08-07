@@ -464,14 +464,17 @@
 		self._viewModal.revertMode = "update-TripStop";
 		self._viewModal.revertData = [];
 
-		self._updateTripStops(modifyDataArray);
+		self._updateTripStops(modifyDataArray, isNoStopChange);
 
 		return Promise.resolve();
 	};
 
-	RoutingFieldTripStopDataModel.prototype._updateTripStops = function(tripStops, refreshTrip)
+	RoutingFieldTripStopDataModel.prototype._updateTripStops = function(tripStops, refreshTrip, isNoStopChange)
 	{
-		this.dataModel.onTripStopsChangeEvent.notify({ add: [], delete: [], edit: tripStops, refreshTrip: refreshTrip });
+		if (isNoStopChange)
+		{
+			this.dataModel.onTripStopsChangeEvent.notify({ add: [], delete: [], edit: tripStops, refreshTrip: refreshTrip });
+		}
 		this.changeRevertStack(tripStops, false);
 	};	
 
