@@ -463,20 +463,44 @@
 		var self = this;
 		self._viewModal.revertMode = "update-TripStop";
 		self._viewModal.revertData = [];
+		var changeData = [];
+		var moveTripStops = [];
+		modifyDataArray.forEach(function(modifyData)
+		{
+			var data = self.dataModel.getFieldTripStop(modifyData.id);
+			if (data.XCoord != modifyData.XCoord ||
+				data.YCoord != modifyData.YCoord ||
+				data.vehicleCurbApproach != modifyData.vehicleCurbApproach ||
+				data.SchoolLocation != modifyData.SchoolLocation)
+			{
+				moveTripStops.push(modifyData);
+				moveTripStops.forEach(function(stop) { stop.StreetSegment = null; })
+			}
+			self.insertToRevertData(data);
+			$.extend(data, modifyData);
 
-		self._updateTripStops(modifyDataArray, isNoStopChange);
+			changeData.push(data);
+		});
+		return Promise.resolve().then(function()
+		{
+			moveTripStops.forEach(function(stop)
+			{
+				self.dataModel.getFieldTripStop(stop.id).StreetSegment = stop.StreetSegment;
+			});
 
-		return Promise.resolve();
+			self._updateTripStops(changeData, null, isNoStopChange);
+			return modifyDataArray;
+		});
 	};
 
 	RoutingFieldTripStopDataModel.prototype._updateTripStops = function(tripStops, refreshTrip, isNoStopChange)
 	{
-		if (isNoStopChange)
+		if (!isNoStopChange)
 		{
 			this.dataModel.onTripStopsChangeEvent.notify({ add: [], delete: [], edit: tripStops, refreshTrip: refreshTrip });
 		}
 		this.changeRevertStack(tripStops, false);
-	};	
+	};
 
 	RoutingFieldTripStopDataModel.prototype._runAfterPathChanged = function(tripStops, type, autoAssign, isCreateMultiple)
 	{
