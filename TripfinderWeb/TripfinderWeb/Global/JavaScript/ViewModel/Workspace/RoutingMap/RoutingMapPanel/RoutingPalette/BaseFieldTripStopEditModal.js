@@ -500,6 +500,7 @@
 					return Promise.resolve();
 				}
 				self.initing = true;
+				self.addOverlayToPanels();
 				self.normalizeData(data);
 				self.initTitle(false, data[0].OpenType);
 				self.init().then(function()
