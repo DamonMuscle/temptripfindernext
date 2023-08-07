@@ -1216,7 +1216,7 @@
 
 	RoutingMapTool.prototype.isAddingFieldTripStop = function()
 	{
-		return this.routingMapDocumentViewModel.routingPaletteViewModel.fieldTripMap?.editing.isAddingStop;
+		return this.routingMapDocumentViewModel.routingPaletteViewModel?.fieldTripMap?.editing.isAddingStop;
 	}
 
 	RoutingMapTool.prototype.dispose = function ()
