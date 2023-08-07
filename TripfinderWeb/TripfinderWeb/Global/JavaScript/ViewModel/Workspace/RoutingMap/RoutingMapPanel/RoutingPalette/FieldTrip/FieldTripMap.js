@@ -1125,13 +1125,19 @@
 		else if (event.button === 2)
 		{
 			// right click
-			await this.confirmToExitAddingStop();
 
 			response = await self.mapInstance?.map.mapView.hitTest(event);
 			if (response.results.length > 0)
 			{
 				const graphics = response.results.map(item => item.graphic);
 				const stopGraphics = graphics.filter(item => item.layer?.id === RoutingPalette_FieldTripStopLayerId);
+				const pathGraphics = graphics.filter(item => item.layer?.id === RoutingPalette_FieldTripPathLayerId);
+
+				if (stopGraphics.length > 0 || pathGraphics.length > 0)
+				{
+					await this.confirmToExitAddingStop(false);
+				}
+
 				if (stopGraphics.length > 0)
 				{
 					const data = stopGraphics.map(stop => {
@@ -1142,7 +1148,6 @@
 					this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.FieldTripStopClick, data: dataWrapper });
 				}
 
-				const pathGraphics = graphics.filter(item => item.layer?.id === RoutingPalette_FieldTripPathLayerId);
 				if (pathGraphics.length > 0)
 				{
 					const data = pathGraphics.map(path => {
