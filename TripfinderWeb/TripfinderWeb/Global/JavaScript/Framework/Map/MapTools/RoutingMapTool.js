@@ -691,8 +691,7 @@
 		var self = this;
 		if (self.isAddingFieldTripStop())
 		{
-			// skip google street view when adding a field trip stop.
-			return;
+			self.exitAddingFieldTripStop();
 		}
 
 		if (!self.googleStreetTool)
@@ -1057,8 +1056,7 @@
 	{
 		if (this.isAddingFieldTripStop())
 		{
-			// skip measurement when adding a field trip stop.
-			return;
+			this.exitAddingFieldTripStop();
 		}
 
 		if (!this.measurementTool)
@@ -1217,6 +1215,11 @@
 	RoutingMapTool.prototype.isAddingFieldTripStop = function()
 	{
 		return this.routingMapDocumentViewModel.routingPaletteViewModel?.fieldTripMap?.editing.isAddingStop;
+	}
+
+	RoutingMapTool.prototype.exitAddingFieldTripStop = function()
+	{
+		return this.routingMapDocumentViewModel.routingPaletteViewModel?.fieldTripMap?.confirmToExitAddingStop(false);
 	}
 
 	RoutingMapTool.prototype.dispose = function ()
