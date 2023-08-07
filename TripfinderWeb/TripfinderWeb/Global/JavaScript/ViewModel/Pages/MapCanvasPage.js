@@ -707,7 +707,7 @@
 		{
 			if (e.key == "Escape")
 			{
-				self.routingPaletteViewModel?.fieldTripMap.confirmToExitAddingStop();
+				self.routingPaletteViewModel?.fieldTripMap?.confirmToExitAddingStop();
 			}
 		});
 	};
