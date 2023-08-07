@@ -149,6 +149,7 @@
 		{
 			self._viewModal.setMode("", "Normal");
 			$target.addClass("active");
+			self.viewModel.routingPaletteVM.fieldTripMap.confirmToExitAddingStop(false, false);
 		}
 		$target.addClass("checked");
 	}

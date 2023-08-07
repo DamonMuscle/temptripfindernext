@@ -671,10 +671,6 @@
 
 	//#endregion
 
-	//#region TODO: Delete Field Trip Stop
-
-	//#endregion
-
 	//#region TODO: Geo Select Field Trip Stop
 
 	//#endregion
@@ -1194,7 +1190,7 @@
 		}
 	}
 
-	FieldTripMap.prototype.confirmToExitAddingStop = async function(needConfirmation = true)
+	FieldTripMap.prototype.confirmToExitAddingStop = async function(needConfirmation = true, doFireEvent = true)
 	{
 		if (!this.editing.isAddingStop)
 		{
@@ -1205,7 +1201,10 @@
 		{
 			this.stopAddFieldTripStop();
 			await this.clearHighlightFeatures();
-			this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.ExitAddingStop });
+			if (doFireEvent)
+			{
+				this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.ExitAddingStop });
+			}
 		}
 
 		if (!needConfirmation)
