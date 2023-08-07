@@ -103,12 +103,20 @@
 			PubSub.publish("clear_ContextMenu_Operation");
 		}
 		var isShowMode = self.isShowMode();
-		var layers = this.getLayers();
+		if (!isShowMode)
+		{
+			// hide all field trips and exit AddFieldTripStop.
+			if (self._viewModal.routingPaletteViewModel?.fieldTripMap?.editing.isAddingStop)
+			{
+				self._viewModal.routingPaletteViewModel.fieldTripMap.stopAddFieldTripStop();
+			}
+		}
+		var layers = self.getLayers();
 		layers.forEach(function(item)
 		{
 			item.visible = isShowMode;
 		});
-		if (!this._directionChangeShowMode)
+		if (!self._directionChangeShowMode)
 		{
 			self.dataModel.changeTripVisibility(self.dataModel.trips.map(function(t) { return t.id; }), isShowMode);
 		}
