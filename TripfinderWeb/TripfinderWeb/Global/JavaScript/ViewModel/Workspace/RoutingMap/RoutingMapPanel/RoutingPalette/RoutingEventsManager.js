@@ -446,6 +446,7 @@
 	{
 		var self = this;
 		self._viewModal.RoutingMapTool.deactivateMeasurementTool();
+		self._viewModal.RoutingMapTool.deactivateGoogleStreetTool();
 		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMap);
 		self._viewModal.setMode("Routing", "Create");
 	};

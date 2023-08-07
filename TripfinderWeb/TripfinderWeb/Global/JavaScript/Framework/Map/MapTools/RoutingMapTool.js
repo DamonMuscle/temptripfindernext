@@ -121,7 +121,7 @@
 		}
 		if (toolName != "googleStreetTool" && previousToolName == "googleStreetTool")
 		{
-			this.googleStreetTool && this.googleStreetTool.deactivate();
+			this.deactivateGoogleStreetTool();
 		}
 	};
 
@@ -689,11 +689,17 @@
 	RoutingMapTool.prototype.googleStreetClick = function(e, data)
 	{
 		var self = this;
+		if (self.isAddingFieldTripStop())
+		{
+			// skip google street view when adding a field trip stop.
+			return;
+		}
+
 		if (!self.googleStreetTool)
 			self.googleStreetTool = new TF.Map.GoogleStreetTool(self.routingMapDocumentViewModel._map, tf.map.ArcGIS, self.getRouteState(), this);
 
-		var isActive = self.googleStreetTool.isMeasurementActive();
-		if (isActive) self.googleStreetTool.deactivate();
+		var isActive = self.googleStreetTool.isGoogleStreetActive();
+		if (isActive) self.deactivateGoogleStreetTool();
 		else self.googleStreetTool.activate();
 	};
 	
@@ -1049,7 +1055,7 @@
 
 	RoutingMapTool.prototype.measurementToolClick = function ()
 	{
-		if (this.routingMapDocumentViewModel.routingPaletteViewModel.fieldTripMap?.editing.isAddingStop)
+		if (this.isAddingFieldTripStop())
 		{
 			// skip measurement when adding a field trip stop.
 			return;
@@ -1075,6 +1081,11 @@
 	RoutingMapTool.prototype.deactivateMeasurementTool = function()
 	{
 		this.measurementTool?.deactivate();
+	}
+
+	RoutingMapTool.prototype.deactivateGoogleStreetTool = function()
+	{
+		this.googleStreetTool?.deactivate();
 	}
 
 	// click on geo search
@@ -1201,6 +1212,11 @@
 			this.deleteShapeTool = new TF.Form.Map.DeleteShapeTool(this);
 		}
 		this.deleteShapeTool.removeShape();
+	}
+
+	RoutingMapTool.prototype.isAddingFieldTripStop = function()
+	{
+		return this.routingMapDocumentViewModel.routingPaletteViewModel.fieldTripMap?.editing.isAddingStop;
 	}
 
 	RoutingMapTool.prototype.dispose = function ()

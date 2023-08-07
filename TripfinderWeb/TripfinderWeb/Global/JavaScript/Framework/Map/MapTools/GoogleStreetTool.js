@@ -97,7 +97,7 @@
 		self.isMouseDownAndMove = false;
 	};
 
-	GoogleStreetTool.prototype.isMeasurementActive = function() { return this.isActive; };
+	GoogleStreetTool.prototype.isGoogleStreetActive = function() { return this.isActive; };
 
 	GoogleStreetTool.prototype.dispose = function()
 	{
