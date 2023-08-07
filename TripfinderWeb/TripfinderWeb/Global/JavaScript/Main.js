@@ -1220,14 +1220,15 @@ createNamespace("TF").createDefaultMapExtent = function()
 /*reversegeocode by use choose param(addresspoint or address)*/
 createNamespace("TF").locationToAddress = function(geometry, param, geocodeServiceUrl)
 {
-	var addressPointGeocoder, streetGeocoder;
+	const locator = tf.map.ArcGIS.Locator;
+	const addressPointLocatorUrl = geocodeServiceUrl || arcgisUrls.AddressPointGeocodeService;
+	const streetLocatorUrl = geocodeServiceUrl || arcgisUrls.StreetGeocodeServiceFile;
+
 	return tf.startup.loadArcgisUrls().then(function()
 	{
-		addressPointGeocoder = new tf.map.ArcGIS.Locator(geocodeServiceUrl || arcgisUrls.AddressPointGeocodeService);
-		streetGeocoder = new tf.map.ArcGIS.Locator(geocodeServiceUrl || arcgisUrls.StreetGeocodeServiceFile);
 		if (param && param.GeocodeType === TF.Helper.TripHelper.GeocodeSource.addressPoint.value)
 		{
-			return addressPointGeocoder.locationToAddress({ location: geometry }).then(function(apResult)
+			return locator.locationToAddress(addressPointLocatorUrl, { location: geometry }).then(function(apResult)
 			{
 				apResult.attributes.Street = normalizeStreet(apResult.attributes.Street ? apResult.attributes.Street : apResult.attributes.Address);
 				return apResult.attributes;
@@ -1239,7 +1240,7 @@ createNamespace("TF").locationToAddress = function(geometry, param, geocodeServi
 		}
 		else if (param && param.GeocodeType === TF.Helper.TripHelper.GeocodeSource.mapStreet.value)
 		{
-			return streetGeocoder.locationToAddress({ location: geometry }).then(function(streetResult)
+			return locator.locationToAddress(streetLocatorUrl, { location: geometry }).then(function(streetResult)
 			{
 				streetResult.attributes.Street = normalizeStreet(streetResult.attributes.Street ? streetResult.attributes.Street : streetResult.attributes.Address);
 				return streetResult.attributes;
@@ -1249,14 +1250,14 @@ createNamespace("TF").locationToAddress = function(geometry, param, geocodeServi
 			});
 		} else
 		{
-			return addressPointGeocoder.locationToAddress({ location: geometry }).then(function(apResult)
+			return locator.locationToAddress(addressPointLocatorUrl, { location: geometry }).then(function(apResult)
 			{
 				apResult.attributes.Street = normalizeStreet(apResult.attributes.Street ? apResult.attributes.Street : apResult.attributes.Address);
 				return apResult.attributes;
 
 			}, function()
 			{
-				return streetGeocoder.locationToAddress({ location: geometry }).then(function(streetResult)
+				return locator.locationToAddress(streetLocatorUrl, { location: geometry }).then(function(streetResult)
 				{
 					streetResult.attributes.Street = normalizeStreet(streetResult.attributes.Street ? streetResult.attributes.Street : streetResult.attributes.Address);
 					return streetResult.attributes;

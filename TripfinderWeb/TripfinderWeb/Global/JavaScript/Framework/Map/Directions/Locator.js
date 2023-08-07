@@ -19,6 +19,7 @@
 			'suggestionsEnabled': false,
 			"includeDefaultSources": false,
 			'view': self._map.mapView,
+			"container": document.createElement("div"),
 			sources: [
 				{
 					locator: self._arcgis.Locator,
@@ -30,7 +31,7 @@
 					}
 				}
 			]
-		}, self._arcgis.domConstruct.create("div"));
+		});
 	};
 
 	Tool.prototype._disposeLocator = function()
