@@ -536,6 +536,11 @@
 		if (this.RoutingMapTool.measurementTool) this.RoutingMapTool.measurementTool.deactivate();
 	}
 
+	LocationPage.prototype.getMapInstance = function()
+	{
+		return this.mapInstance;
+	}
+
 	LocationPage.prototype.dispose = function()
 	{
 		const self = this;

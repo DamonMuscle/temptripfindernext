@@ -1038,6 +1038,11 @@
 		});
 	};
 
+	MapCanvasPage.prototype.getMapInstance = function()
+	{
+		return this.mapInstance;
+	}
+
 	MapCanvasPage.prototype.dispose = function()
 	{
 		TF.Document.BaseDocumentViewModel.prototype.dispose.call(this);

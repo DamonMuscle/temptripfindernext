@@ -985,7 +985,7 @@
 
 	RoutingMapTool.prototype.zoomToLayersExtent = function ()
 	{
-		const mapInstance = this.routingMapDocumentViewModel.mapInstance;
+		const mapInstance = this.routingMapDocumentViewModel.getMapInstance();
 		if (mapInstance)
 		{
 			mapInstance.zoomToFullVisibleExtent();
