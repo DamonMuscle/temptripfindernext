@@ -1,0 +1,16 @@
+<div class="row document-dataentry">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="col-xs-24" data-bind="uiInit:init">
+		<div class="description">
+			Press Enter to add more items.
+		</div>
+		<div>
+			<label class="requirestar" style="text-transform:capitalize;" data-bind="text:field"></label>
+			<div style="position:relative;">
+				<textarea type="text" class="form-control" style="resize:vertical !important" rows="1" data-bind="value:obText,attr:{name:field}" enableRightClickMenu="true" required ></textarea>
+				<label class="error-info" style="color:#ff0000;font-size:11px;"></label>
+			</div>
+		</div>
+	</div>
+</div>

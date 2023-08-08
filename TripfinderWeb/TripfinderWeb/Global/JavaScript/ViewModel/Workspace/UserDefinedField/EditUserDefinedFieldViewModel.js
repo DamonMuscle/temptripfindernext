@@ -39,17 +39,17 @@
 					return new TF.UserDefinedField.DateTimeUserDefinedFieldViewModel();
 				}
 			},
-			// {
-			// 	name: "List",
-			// 	id: 10,// todo: change id to correct value when API done.
-			// 	getTypeData: function()
-			// 	{
-			// 		return new TF.UserDefinedField.ListUserDefinedFieldViewModel({
-			// 			dataEntity: self.dataEntity,
-			// 			isUDFGroup: self.isUDFGroup
-			// 		});
-			// 	}
-			// },
+			{
+				name: "List",
+				id: 10,// todo: change id to correct value when API done.
+				getTypeData: function()
+				{
+					return new TF.UserDefinedField.ListUserDefinedFieldViewModel({
+						dataEntity: self.dataEntity,
+						isUDFGroup: self.isUDFGroup
+					});
+				}
+			},
 			{
 				name: "Memo",
 				id: 4,
