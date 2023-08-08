@@ -95,9 +95,9 @@
 		this.obIsLastStop = ko.observable(false);
 		// this.obSelectedSequenceDisable = ko.computed(() => (this.obIsSmartSequence() && (this.mode() == "new" || this.mode() === 'edit')) || this.isReadOnly());
 		this.obSelectedSequenceDisable = ko.computed(() => this.obIsFirstStop() || this.obIsLastStop() || this.isReadOnly());
+		this.obSelectedFieldTripDisable = ko.observable(false);
 
 		// disable for future implementation
-		this.obSelectedFieldTripDisable = ko.observable(true);
 		this.obSmartAssignmentDisable = ko.observable(true);
 		this.obSmartSequenceDisable = ko.observable(true);
 		this.obCornerStopVisible = ko.observable(false);
