@@ -187,25 +187,25 @@
 				}
 			});
 
-			// if (self.gridType !== "report")
-			// {
-			// 	self.TYPES.push({
-			// 		name: "Roll-up",
-			// 		id: 19,
-			// 		getTypeData: function()
-			// 		{
-			// 			return new TF.UserDefinedField.RollupUserDefinedFieldViewModel(self);
-			// 		}
-			// 	});
-			// 	self.TYPES.push({
-			// 		name: "Case",
-			// 		id: 20,
-			// 		getTypeData: function()
-			// 		{
-			// 			return new TF.UserDefinedField.CaseUserDefinedFieldViewModel(self);
-			// 		}
-			// 	});
-			// }
+			if (self.gridType !== "report")
+			{
+				// self.TYPES.push({
+				// 	name: "Roll-up",
+				// 	id: 19,
+				// 	getTypeData: function()
+				// 	{
+				// 		return new TF.UserDefinedField.RollupUserDefinedFieldViewModel(self);
+				// 	}
+				// });
+				self.TYPES.push({
+					name: "Case",
+					id: 20,
+					getTypeData: function()
+					{
+						return new TF.UserDefinedField.CaseUserDefinedFieldViewModel(self);
+					}
+				});
+			}
 		}
 
 		self.TYPES.sort((x, y) => (x.name < y.name) ? -1 : (x.name > y.name ? 1 : 0));
