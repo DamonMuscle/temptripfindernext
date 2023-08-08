@@ -469,6 +469,10 @@
 				pageData = new TF.Page.UserDefinedFieldsPage();
 				templateName = "workspace/page/userdefinedfield/panel";
 				break;
+			case "requiredfields":
+				pageData = new TF.Page.RequiredFieldPage();
+				templateName = "workspace/page/requiredfield/panel";
+				break;
 			// case "datalist":
 			// 	pageData = {};
 			// 	templateName = "workspace/page/datalist";
@@ -679,7 +683,7 @@
 			configurationSection = _.sortBy([
 				{ text: "Automation", pageType: "automation" },
 				{ text: "Field Trip Configurations", pageType: 'fieldtripconfigs' },
-				{ text: "Required Fields", pageType: "requiredfield" },
+				{ text: "Required Fields", pageType: "requiredfields" },
 				{ text: "System Configurations", pageType: "settingsConfig" },
 				{ text: "User Defined Fields", pageType: "userdefinedfields" },
 				{ text: "Change Password", pageType: "changePassword" }

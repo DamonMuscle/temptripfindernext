@@ -54,84 +54,43 @@
 
 	DetailViewHelper.prototype.updateRequiredFields = function(gridType)
 	{
-		var self = this, updatePromise = Promise.resolve();
-
-		if (gridType)
-		{
-			updatePromise = tf.UDFDefinition.updateByType(gridType);
-		}
+		const self = this, paramData = {
+			"@filter": "eq(Required,true)|eq(SystemRequired,true)"
+		};
 
 		if (self.requiredFields == null)
 		{
 			self.requiredFields = {};
 		}
+
 		if (gridType)
 		{
-			self.requiredFields[gridType] = [];
+			self.requiredFields[gridType] = self.requiredFields[gridType] ? self.requiredFields[gridType].filter(field => field.udfId) : [];
+			paramData["DataTypeID"] = tf.dataTypeHelper.getId(gridType);
 		}
 
-		return updatePromise.then(function()
-		{
-			var dbid = tf.storageManager.get("datasourceId");
-			tf.UDFDefinition.collection.forEach(function(udfDefinition)
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "RequiredFields"), { paramData: paramData })
+			.then(response =>
 			{
-				if (!self.requiredFields[udfDefinition.gridType])
+				response.Items.forEach(item =>
 				{
-					self.requiredFields[udfDefinition.gridType] = [];
-				}
-
-				udfDefinition.userDefinedFields.forEach(function(udf)
-				{
-					if (udf.Required)
+					const typeKey = tf.dataTypeHelper.getKeyById(item.DataTypeID);
+					if (typeKey)
 					{
-						var ds = udf.UDFDataSources,
-							hasDBID = ds.some(function(db)
-							{
-								return db.DBID === dbid;
-							});
-
-						if (hasDBID)
-						{
-							self.requiredFields[udfDefinition.gridType].push(
-								{
-									name: udf.OriginalName,
-									title: udf.DisplayName,
-									udfId: udf.UDFId
-								}
-							);
-						}
-					}
-				});
-			});
-
-			var paramData = {
-				"@filter": "eq(Required,true)|eq(SystemRequired,true)"
-			};
-
-			if (gridType)
-			{
-				paramData["DataTypeID"] = tf.DataTypeHelper.getId(gridType);
-			}
-
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "RequiredFields"), { paramData: paramData })
-				.then(function(response)
-				{
-					response.Items.forEach(function(item)
-					{
-						var typeKey = tf.DataTypeHelper.getKeyById(item.DataTypeID),
-							dataPoint = self.getDataPointByIdentifierAndGrid(item.FieldName, typeKey, true);
+						const dataPoint = self.getDataPointByIdentifierAndGrid(item.FieldName, typeKey, true);
 
 						self.requiredFields[typeKey] = self.requiredFields[typeKey] || [];
-
 						self.requiredFields[typeKey].push({
 							name: item.FieldName,
 							title: dataPoint && dataPoint.title || item.Label,
 							field: dataPoint && dataPoint.field || item.FieldName,
 							dataPointTitle: dataPoint && dataPoint.title || item.Label,
+							systemRequired: item.SystemRequired
 						});
-					});
+					}
+
 				});
-		});
+			});
 	};
 
 	DetailViewHelper.prototype.updateUDFRequiredFields = function(gridType)

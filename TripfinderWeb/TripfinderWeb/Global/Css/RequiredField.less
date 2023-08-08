@@ -1,0 +1,71 @@
+@sys-required-star: red;
+@udf-required-star: black;
+
+.tabstrip-requiredfields {
+
+	.grid-wrapper {
+		padding: 0 15px;
+
+		.k-grid-edit,
+		.k-grid-delete {
+			margin: 0 6px;
+		}
+
+		.k-grid-footer {
+			position: relative;
+
+			.footer-marker {
+				position: absolute;
+				left: 0;
+				top: 0;
+
+				.sys-star {
+					color: @sys-required-star;
+				}
+				.udf-star {
+					color: @udf-required-star;
+				}
+			}
+
+			.footer-label {
+				position: absolute;
+				right: 0;
+				top: 0;
+			}
+		}
+	}
+
+	.general-required-field {
+		.star {
+			display: none;
+		}
+	}
+
+	.system-required-field {
+		.star {
+			color: @sys-required-star;
+			display: inline;
+		}
+
+		.k-grid-edit,
+		.k-grid-delete {
+			display: none;
+		}
+	}
+
+	.udf-required-field {
+		.star {
+			color: @udf-required-star;
+			display: inline;
+		}
+	}
+}
+
+.required-field-list-mover {
+	.sys-star {
+		color: @sys-required-star;
+	}
+	.udf-star {
+		color: @udf-required-star;
+	}
+}

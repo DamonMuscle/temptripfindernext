@@ -43,7 +43,7 @@
 
 		this.availableColumns = _fillDisplayName(availableColumns).slice().sort(_sortByDisplayName);
 		this.selectedColumns = _fillDisplayName(selectedColumns).slice();
-		this.defaultLayoutColumns = defaultLayoutColumns.slice();
+		this.defaultLayoutColumns = defaultLayoutColumns? defaultLayoutColumns.slice() : [];
 
 		this.obavailableColumns(this.availableColumns);
 		this.obselectedColumns(this.selectedColumns);
@@ -263,10 +263,11 @@
 
 	EditKendoColumnViewModel.prototype.onLeftGridChange = function(arg)
 	{
-		var selected = $.map(this.select(), function(item)
-		{
-			return item.dataset[_KendoUid];
-		}.bind(this));
+		var grid = _availableColGrid,
+			selected = $.map(grid.select(), function(item)
+			{
+				return item.dataset[_KendoUid];
+			});
 		_obLeftGridSelectedUids(selected);
 
 		if (_obLeftGridSelectedUids().length !== 0)
@@ -275,19 +276,20 @@
 		}
 
 		var bottomDom = TF.Grid.EditKendoColumnViewModel._buildGridBottom(
-			this.dataItems().length,
-			this.select().length,
+			grid.dataItems().length,
+			grid.select().length,
 			_totalColumnsCount
 		);
-		this.wrapper.find(".k-pager-wrap").html(bottomDom);
+		grid.wrapper.find(".k-pager-wrap").html(bottomDom);
 	};
 
 	EditKendoColumnViewModel.prototype.onRightGridChange = function(arg)
 	{
-		var selected = $.map(this.select(), function(item)
-		{
-			return item.dataset[_KendoUid];
-		}.bind(this));
+		var grid = _selectedColGrid,
+			selected = $.map(grid.select(), function(item)
+			{
+				return item.dataset[_KendoUid];
+			});
 		_obRightGridSelectedUids(selected);
 
 		if (_obRightGridSelectedUids().length !== 0)
@@ -296,11 +298,11 @@
 		}
 
 		var bottomDom = TF.Grid.EditKendoColumnViewModel._buildGridBottom(
-			this.dataItems().length,
-			this.select().length,
+			grid.dataItems().length,
+			grid.select().length,
 			_totalColumnsCount
 		);
-		this.wrapper.find(".k-pager-wrap").html(bottomDom);
+		grid.wrapper.find(".k-pager-wrap").html(bottomDom);
 	};
 
 	EditKendoColumnViewModel._buildGridBottom = function(filteredRecordCount, selectedRecordCount, totalColumnsCount)
@@ -329,7 +331,7 @@
 			columns: _GridConifg.gridColumns,
 			height: _GridConifg.height,
 			selectable: _GridConifg.selectable,
-			change: this.onLeftGridChange,
+			change: this.onLeftGridChange.bind(this),
 			pageable: {},
 			dataBound: function()
 			{
@@ -345,6 +347,7 @@
 		_cancelKendoGridSelectedArea(_availableColGrid);
 		_availableColGrid.shortcutExtender = new TF.KendoGridNavigator({ grid: _availableColGrid });
 		this.initGridScrollBar(this.availableColGridContainer);
+		return _availableColGrid;
 	};
 
 	EditKendoColumnViewModel.prototype.initRightGrid = function()
@@ -359,7 +362,7 @@
 			columns: _GridConifg.gridColumns,
 			height: _GridConifg.height,
 			selectable: _GridConifg.selectable,
-			change: this.onRightGridChange,
+			change: this.onRightGridChange.bind(this),
 			pageable: {},
 			dataBound: function()
 			{
@@ -375,6 +378,7 @@
 		_cancelKendoGridSelectedArea(_selectedColGrid);
 		_selectedColGrid.shortcutExtender = new TF.KendoGridNavigator({ grid: _selectedColGrid });
 		this.initGridScrollBar(this.selectedColGridContainer);
+		return _selectedColGrid;
 	};
 
 	EditKendoColumnViewModel.prototype.initGridScrollBar = function(container)
