@@ -85,18 +85,18 @@
 					<div class="icon fixed-menu-btn destination add-tripstop" title="Add Stop" data-bind="css:{disable:!obEditFieldTripSelected()||!viewModel.isShowMode()},click:addStopClick.bind($data)"></div>
 					<div class="menu map-pinpoint-white withsub-menu">
 						<ul>
-							<li data-bind="click:createClick,mapModeStyleButton">
+							<li data-bind="click:addStopFromMapClick,mapModeStyleButton">
 								<div class="menuIcon"></div>
 								<div class="text"><span>Add Stop from Map</span></div>
 							</li>
-							<li class="disable" data-bind="click:createFromSearchResultClick">
+							<li data-bind="click:addStopFromSearchResultClick">
 								<div class="menuIcon"></div>
 								<div class="text"><span>Quick Add Stop(s)</span></div>
 							</li>
 							<li class="menu-divider">
 								<div class="rule"></div>
 							</li>
-							<li data-bind="clickButton:{disable:copyFromObject()==null,click:createFromSelectionClick}">
+							<li data-bind="clickButton:{disable:copyFromObject()==null,click:addStopFromSelectionClick}">
 								<div class="menuIcon"></div>
 								<div class="text"><span>Add Stop from Selection</span></div>
 							</li>

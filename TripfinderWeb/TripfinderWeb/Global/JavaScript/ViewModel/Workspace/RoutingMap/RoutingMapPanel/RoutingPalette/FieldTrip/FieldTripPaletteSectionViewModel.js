@@ -60,12 +60,6 @@
 		self.routingChangePath = new TF.RoutingMap.RoutingPalette.RoutingChangePath(self);
 	};
 
-	FieldTripPaletteSectionViewModel.prototype.addStopClick = function()
-	{
-		this.eventsManager.createClick();
-		this.routingPaletteVM.$element.find(".print-setting-group .icon.destination.add-tripstop").addClass("active");
-	};
-
 	FieldTripPaletteSectionViewModel.prototype.cancelStopClick = function()
 	{
 		this.routingPaletteVM.$element.find(".print-setting-group .icon.destination.add-tripstop").removeClass("active");

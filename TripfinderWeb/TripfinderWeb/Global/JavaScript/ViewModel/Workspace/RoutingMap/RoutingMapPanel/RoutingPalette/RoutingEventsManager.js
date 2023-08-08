@@ -27,24 +27,6 @@
 	RoutingEventsManager.prototype = Object.create(TF.RoutingMap.RoutingPalette.BaseRoutingEventsManager.prototype);
 	RoutingEventsManager.prototype.constructor = RoutingEventsManager;
 
-	RoutingEventsManager.prototype.continueDrawTripStop = function()
-	{
-		var self = this;
-		if (self._viewModal.mode == "Routing-Create")
-		{
-			setTimeout(function()
-			{
-				self.viewModel.drawTool.start("point", "createPoint");
-			});
-		} else
-		{
-			if (self._viewModal.mode != "Routing-Edit")
-			{
-				self.viewModel.drawTool.stop();
-			}
-		}
-	};
-
 	RoutingEventsManager.prototype.tripInfoClick = function(data)
 	{
 		var trip = this.dataModel.getTripById(data.id);
@@ -443,7 +425,7 @@
 		// }
 	};
 
-	RoutingEventsManager.prototype.createClick = function()
+	RoutingEventsManager.prototype.addStopFromMapClick = function()
 	{
 		var self = this;
 		self._viewModal.RoutingMapTool.deactivateMeasurementTool();
@@ -452,75 +434,14 @@
 		self._viewModal.setMode("Routing", "Create");
 	};
 
-	RoutingEventsManager.prototype.createFromSelectionClick = function()
+	RoutingEventsManager.prototype.addStopFromSelectionClick = function()
 	{
 		var self = this;
 		var copyObject = this.copyFromObject();
 		self.viewModel.drawTool.copyToTripStop(copyObject);
 	};
 
-	RoutingEventsManager.prototype.createStopFromSelectionClick = function()
-	{
-		var self = this;
-		self._viewModal.setMode("Routing", "Normal");
-		self._createFromSelection();
-	};
-
-	RoutingEventsManager.prototype._createFromSelection = function()
-	{
-		var self = this;
-		var points = [];
-		var pointWithoutBoundaryCount = 0;
-		self._viewModal.geoSearchPaletteViewModel.dataModel.getHighlighted().forEach(function(item)
-		{
-			if (item.type == "student")
-			{
-				var geometryExist = false;
-				points.map(function(point)
-				{
-					if (point.geometry.x == item.geometry.x && point.geometry.y == item.geometry.y)
-					{
-						geometryExist = true;
-						return;
-					}
-				});
-				if (!geometryExist)
-				{
-					points.push({
-						address: item.Address,
-						geometry: item.geometry,
-						type: "student"
-					});
-					if (!(item.boundary && item.boundary.geometry)) { pointWithoutBoundaryCount++; }
-				}
-			}
-
-			else if (item.type == "tripStop" || item.type == "stopPoolStop")
-			{
-				points.push({
-					address: item.Street,
-					geometry: item.geometry,
-					type: "mapAddress",
-					boundary: item.boundary
-				});
-				if (!(item.boundary && item.boundary.geometry)) { pointWithoutBoundaryCount++; }
-			}
-		});
-
-		if (points.length > 0)
-		{
-			self.createFromMultiple(points, {
-				isCreateFromSelection: true,
-				isAllCreateFromPoints: pointWithoutBoundaryCount == points.length,
-				isContainsPoints: pointWithoutBoundaryCount > 0
-			});
-		} else
-		{
-			tf.promiseBootbox.alert("No items selected,please select items into Geo Search palette");
-		}
-
-	};
-	RoutingEventsManager.prototype.createFromSearchResultClick = function(model, e, option, insertBehindSpecialStop)
+	RoutingEventsManager.prototype.addStopFromSearchResultClick = function(model, e, option, insertBehindSpecialStop)
 	{
 		var self = this;
 		self._viewModal.setMode("Routing", "AddFromSearchResult");
@@ -535,24 +456,6 @@
 			self._viewModal.setMode("Routing", "Normal");
 			return data;
 		});
-	};
-
-	RoutingEventsManager.prototype.createFromFileClick = function(model, e, option, insertBehindSpecialStop)
-	{
-		if (e)
-		{
-			var $target = e.currentTarget ? $(e.currentTarget).closest(".menu") : e.find(".menu");
-			this.fileInput = $target.find("#create-stop-from-file");
-			this.fileOpenOption = null;
-			this.insertBehindSpecialStop = null;
-		}
-		else
-		{
-			this.fileInput = $($.find("#create-stop-from-file")[0]);
-			this.fileOpenOption = option;
-			this.insertBehindSpecialStop = insertBehindSpecialStop;
-		}
-		this.fileInput.click();
 	};
 
 	RoutingEventsManager.prototype.infoClick = function(item)
@@ -642,16 +545,6 @@
 		var self = this;
 		var tripStop = self.dataModel.getFieldTripStopByStopId(tripStopId);
 		return self.viewModel.viewModel.stopPoolPaletteSection.drawTool.copyToStopPool(tripStop);
-	};
-
-	RoutingEventsManager.prototype._toDictionary = function(data)
-	{
-		var map = {};
-		(data || []).forEach(function(item)
-		{
-			map[item.id] = item;
-		});
-		return map;
 	};
 
 	RoutingEventsManager.prototype.tripAbsorptionClick = function(tripId)
@@ -762,32 +655,10 @@
 				}
 				if (data)
 				{
-					self._applyOptimizeSequenceChange(newTrip);
+					applyOptimizeSequenceChange(self.dataModel, newTrip);
 				}
 			});
 		});
-	};
-
-	RoutingEventsManager.prototype._applyOptimizeSequenceChange = function(newTrip)
-	{
-		var self = this;
-		newTrip.durationDiffRate = 0;
-		newTrip.distanceDiffRate = 0;
-		newTrip.durationDiff = 0;
-		newTrip.distanceDiff = 0;
-		var oldTrip;
-		for (var i = 0; i < self.dataModel.trips.length; i++)
-		{
-			if (self.dataModel.trips[i].id == newTrip.id)
-			{
-				oldTrip = self.dataModel.trips[i];
-				self.dataModel.trips[i] = newTrip;
-				break;
-			}
-		}
-		self.dataModel.onTripsChangeEvent.notify({ add: [], edit: [], delete: [oldTrip] });
-		self.dataModel.onTripsChangeEvent.notify({ add: [newTrip], edit: [], delete: [], notZoom: true, options: { resetScheduleTime: true } });
-		self.dataModel.changeDataStack.push(newTrip);
 	};
 
 	RoutingEventsManager.prototype.optimizeSequenceOnTrip = function(trip)
@@ -1627,11 +1498,32 @@
 					tf.loadingIndicator.show();
 					self.optimizeSequenceOnTrip(trip).then(function()
 					{
-						self._applyOptimizeSequenceChange(trip);
+						applyOptimizeSequenceChange(self.dataModel, newTrip);
 						tf.loadingIndicator.tryHide();
 					});
 				});
 			}
 		});
+	};
+
+	function applyOptimizeSequenceChange(dataModel, newTrip)
+	{
+		newTrip.durationDiffRate = 0;
+		newTrip.distanceDiffRate = 0;
+		newTrip.durationDiff = 0;
+		newTrip.distanceDiff = 0;
+		var oldTrip;
+		for (var i = 0; i < dataModel.trips.length; i++)
+		{
+			if (dataModel.trips[i].id == newTrip.id)
+			{
+				oldTrip = dataModel.trips[i];
+				dataModel.trips[i] = newTrip;
+				break;
+			}
+		}
+		dataModel.onTripsChangeEvent.notify({ add: [], edit: [], delete: [oldTrip] });
+		dataModel.onTripsChangeEvent.notify({ add: [newTrip], edit: [], delete: [], notZoom: true, options: { resetScheduleTime: true } });
+		dataModel.changeDataStack.push(newTrip);
 	};
 })();

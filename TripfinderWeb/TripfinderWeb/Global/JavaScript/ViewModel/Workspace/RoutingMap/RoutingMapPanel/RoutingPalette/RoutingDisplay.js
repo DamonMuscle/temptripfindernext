@@ -1098,7 +1098,7 @@
 			return;
 		}
 		var tripStop = self.dataModel.getFieldTripStopByStopId(data.id);
-		self.dataModel.viewModel.eventsManager.createFromSearchResultClick(null, null, null, tripStop);
+		self.dataModel.viewModel.eventsManager.addStopFromSearchResultClick(null, null, null, tripStop);
 	}
 
 	function copyTripClick(e)
