@@ -17,7 +17,7 @@
 					str += "<span title='{0}' class='udf-star'>(User Defined) </span>";
 				}
 				str += "<span title='{0}'>{0}</span>";
-				return String.format(str, e.Label);
+				return String.format(str, kendo.htmlEncode(e.Label));
 			},
 			title: "Name"
 		}

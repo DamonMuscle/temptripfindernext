@@ -319,7 +319,7 @@
 		kendoGrid.selectable.userEvents.unbind("end");
 	};
 
-	EditKendoColumnViewModel.prototype.initLeftGrid = function()
+	EditKendoColumnViewModel.prototype.initLeftGrid = function(gridColumns)
 	{
 		var self = this;
 		_availableColGrid = null;
@@ -328,7 +328,7 @@
 				data: this.availableColumns,
 				schema: _GridConifg.gridSchema
 			}),
-			columns: _GridConifg.gridColumns,
+			columns: gridColumns || _GridConifg.gridColumns,
 			height: _GridConifg.height,
 			selectable: _GridConifg.selectable,
 			change: this.onLeftGridChange.bind(this),
@@ -350,7 +350,7 @@
 		return _availableColGrid;
 	};
 
-	EditKendoColumnViewModel.prototype.initRightGrid = function()
+	EditKendoColumnViewModel.prototype.initRightGrid = function(gridColumns)
 	{
 		var self = this;
 		_selectedColGrid = null;
@@ -359,7 +359,7 @@
 				data: this.selectedColumns,
 				schema: _GridConifg.gridSchema
 			}),
-			columns: _GridConifg.gridColumns,
+			columns: gridColumns || _GridConifg.gridColumns,
 			height: _GridConifg.height,
 			selectable: _GridConifg.selectable,
 			change: this.onRightGridChange.bind(this),

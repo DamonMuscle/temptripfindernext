@@ -5,7 +5,7 @@
 	function RequiredFieldPage()
 	{
 		var self = this,
-			availableTypes = tf.dataTypeHelper.getAvailableDataTypes().filter(x => !["Trip Schedule", "Student Schedule", "Trip Stop Schedule", "GPS Event", "Field Trip Invoice", "Field Trip Location"].includes(x.name)),
+			availableTypes = tf.dataTypeHelper.getAvailableDataTypes().filter(x => !["Trip Schedule", "Student Schedule", "Trip Stop Schedule", "GPS Event", "Field Trip Invoice"].includes(x.name)),
 			gridColumns = [
 				{
 					field: "RowID",
