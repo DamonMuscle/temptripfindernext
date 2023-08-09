@@ -5,71 +5,101 @@
 	var _DataFiledName = 'DisplayName',
 		_KendoUid = "kendoUid",
 		_keyPressName = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
-		_GridConifg = namespace.GridConfig = {
+		_gridConfig = namespace.GridConfig = {
 			gridSchema: {
 				model: {
 					fields: {
-						'FieldName': {
-							type: "string"
-						},
-						'DisplayName': {
-							type: "string"
-						}
+						'FieldName': { type: "string" },
+						'DisplayName': { type: "string" }
 					}
 				},
 			},
-			gridColumns: [{
-				field: _DataFiledName,
-				title: "Name"
-			},
+			gridColumns: [
+				{
+					field: _DataFiledName,
+					title: "Name"
+				}
 			],
 			height: 400,
 			selectable: TF.isMobileDevice ? "row" : "multiple"
 		};
 
-	var _availableColGrid = null,
-		_selectedColGrid = null,
-		_obLeftGridSelectedUids = ko.observableArray(),
-		_obRightGridSelectedUids = ko.observableArray();
-
-	var _totalColumnsCount = 0;
-
-	function EditKendoColumnViewModel(availableColumns, selectedColumns, defaultLayoutColumns, shortCutKeyHashMapKeyName)
+	function EditKendoColumnViewModel(availableColumns, selectedColumns, defaultLayoutColumns, shortCutKeyHashMapKeyName, isMiniGrid, noLoadingIndicator, disableControl)
 	{
+		var gridConfig;
+		if ($.isPlainObject(availableColumns))
+		{
+			var options = availableColumns;
+			availableColumns = options.availableColumns;
+			selectedColumns = options.selectedColumns;
+			defaultLayoutColumns = options.defaultLayoutColumns;
+			shortCutKeyHashMapKeyName = options.shortCutKeyHashMapKeyName;
+			isMiniGrid = options.isMiniGrid;
+			noLoadingIndicator = options.noLoadingIndicator;
+			gridConfig = options.gridConfig;
+		}
+
+		this.name = "";
+		this.showHandler = false;
+		this.obIsEnabled = ko.observable(true);
+		this.obRightGridDataSourceChanged = ko.observable(false);
+		this.obRightGridDataSourceChanged.extend({ notify: 'always' });
+
+		this._availableColGrid = null;
+		this._selectedColGrid = null;
+		this._obLeftGridSelectedUids = ko.observableArray();
+		this._obRightGridSelectedUids = ko.observableArray();
+
 		this.shortCutKeyHashMapKeyName = shortCutKeyHashMapKeyName;
+
+		if (gridConfig)
+		{
+			this.gridConfig = gridConfig;
+		}
+		else
+		{
+			_gridConfig.gridColumns.forEach(function(item) { item.title = tf.applicationTerm.getApplicationTermSingularByName(item.title); });
+			if (isMiniGrid)
+			{
+				_gridConfig.gridColumns = _gridConfig.gridColumns.filter(function(item) { return !(item.field === "Status" && item.title === "Show"); });
+			}
+
+			this.gridConfig = _gridConfig;
+		}
 
 		this.obavailableColumns = ko.observableArray();
 		this.obselectedColumns = ko.observableArray();
 
-		this.availableColumns = _fillDisplayName(availableColumns).slice().sort(_sortByDisplayName);
-		this.selectedColumns = _fillDisplayName(selectedColumns).slice();
-		this.defaultLayoutColumns = defaultLayoutColumns? defaultLayoutColumns.slice() : [];
+		this.availableColumns = _fillDisplayName(availableColumns).slice().sort(this._sortByDisplayName).filter(x => !x.ParentField);
+		this.selectedColumns = _fillDisplayName(selectedColumns).slice().filter(x => !x.ParentField);
+		this.defaultLayoutColumns = defaultLayoutColumns ? defaultLayoutColumns.slice() : [];
 
 		this.obavailableColumns(this.availableColumns);
 		this.obselectedColumns(this.selectedColumns);
 		this.focusedGridName = 'available';
-		_totalColumnsCount = this.availableColumns.length + this.selectedColumns.length;
+		this._totalColumnsCount = this.availableColumns.length + this.selectedColumns.length;
 
 		this.obLeftGridSelected = ko.computed(function()
 		{
-			return _obLeftGridSelectedUids() && _obLeftGridSelectedUids().length > 0;
-		}, this);
-		this.obRightGridSelected = ko.computed(function()
-		{
-			return _obRightGridSelectedUids() && _obRightGridSelectedUids().length > 0;
+			return this._obLeftGridSelectedUids() && this._obLeftGridSelectedUids().length > 0;
 		}, this);
 
-		//key press in available table
+		this.obRightGridSelected = ko.computed(function()
+		{
+			return this._obRightGridSelectedUids() && this._obRightGridSelectedUids().length > 0;
+		}, this);
+
+		// key press in available table
 		tf.shortCutKeys.bind(_keyPressName, this.onKeyPress.bind(this), this.shortCutKeyHashMapKeyName);
 		this.obErrorMessage = ko.observable("");
 
 		this.obEnabledMoveUp = ko.computed(function()
 		{
-			if (_obRightGridSelectedUids() && _obRightGridSelectedUids().length > 0)
+			if (this._obRightGridSelectedUids() && this._obRightGridSelectedUids().length > 0)
 			{
-				var idxs = _getSelectedRowIdxs();
+				var idxs = this._getSelectedRowIdxs();
 				var maxindex = Math.min.apply({}, idxs);
-				if (maxindex <= 0) //actually it should compare with 0
+				if (maxindex <= 0)// actually it should compare with 0
 				{
 					if (Math.max.apply({}, idxs) - Math.min.apply({}, idxs) == idxs.length - 1)
 					{
@@ -82,11 +112,11 @@
 
 		this.obEnabledMoveDown = ko.computed(function()
 		{
-			if (_obRightGridSelectedUids() && _obRightGridSelectedUids().length > 0)
+			if (this._obRightGridSelectedUids() && this._obRightGridSelectedUids().length > 0)
 			{
-				var idxs = _getSelectedRowIdxs();
+				var idxs = this._getSelectedRowIdxs();
 				var minindex = Math.max.apply({}, idxs) + 1;
-				if (minindex >= _selectedColGrid.dataSource.data().length) //actually it should compare with 0
+				if (minindex >= this._selectedColGrid.dataSource.data().length)// actually it should compare with 0
 				{
 					if (Math.max.apply({}, idxs) - Math.min.apply({}, idxs) == idxs.length - 1)
 					{
@@ -97,18 +127,31 @@
 			return true;
 		}, this);
 		this.pageLevelViewModel = new TF.PageLevel.ListMoverPageLevelViewModel(this);
+		this.noLoadingIndicator = noLoadingIndicator;
+		this.obDisableControl = disableControl;
+		this.obselectedColumns.subscribe(() =>
+		{
+			if (!this.obDisableControl) return;
+			this.obDisableControl(this.obselectedColumns().length === 0);
+		})
 	}
 
 	EditKendoColumnViewModel.prototype.init = function(viewModel, el)
 	{
+		this._init(el);
+	};
+
+	EditKendoColumnViewModel.prototype._init = function(el)
+	{
+		var self = this;
 		this.availableColGridContainer = $(el).find(".availablecolumngrid-container");
 		this.selectedColGridContainer = $(el).find(".selectedcolumngrid-container");
 		$(el).bootstrapValidator();
 
 		this.initLeftGrid();
 		this.initRightGrid();
-		this.obavailableColumns(_availableColGrid.dataSource.data());
-		this.obselectedColumns(_selectedColGrid.dataSource.data());
+		this.obavailableColumns(this._availableColGrid.dataSource.data());
+		this.obselectedColumns(this._selectedColGrid.dataSource.data());
 
 		this.bindLeftGridDraggable();
 		this.bindRightGridDraggable();
@@ -121,7 +164,35 @@
 		this.getSelectedUids.subscribe(this._selectedUidsChange, this);
 		this.onCtrlIPress = this.onCtrlIPress.bind(this);
 		this.onCtrlAPress = this.onCtrlAPress.bind(this);
-		if (_GridConifg.selectable.indexOf("multiple") != -1)
+
+		self.availableInfo = {
+			_selectedIndex: null,
+			findAllElements: function()
+			{
+				return self.availableColGridContainer.find("td");
+			},
+			select: function(index)
+			{
+				self._selectElement("available", index);
+			}
+		};
+		self.selectedInfo = {
+			_selectedIndex: null,
+			findAllElements: function()
+			{
+				return self.selectedColGridContainer.find("td");
+			},
+			select: function(index)
+			{
+				self._selectElement("selected", index);
+			}
+		};
+
+		self.availableGridQuickSearchHelper = new TF.Helper.QuickSearchHelper("", [], self.availableInfo.findAllElements.bind(self), self.availableInfo.select.bind(self), self.availableInfo);
+		self.selectedGridQuickSearchHelper = new TF.Helper.QuickSearchHelper("", [], self.selectedInfo.findAllElements.bind(self), self.selectedInfo.select.bind(self), self.selectedInfo);
+		self.setupQuickSearch();
+
+		if (this.gridConfig.selectable.indexOf("multiple") != -1)
 		{
 			tf.shortCutKeys.bind("ctrl+a", this.onCtrlAPress, this.shortCutKeyHashMapKeyName);
 			tf.shortCutKeys.bind("ctrl+i", this.onCtrlIPress, this.shortCutKeyHashMapKeyName);
@@ -141,12 +212,10 @@
 		this.availableColGridContainer.bind("click", function()
 		{
 			this.focusedGridName = "available";
-			_availableColGrid.element.focus();
 		}.bind(this));
 		this.selectedColGridContainer.bind("click", function()
 		{
 			this.focusedGridName = "selected";
-			_selectedColGrid.element.focus();
 		}.bind(this));
 	};
 
@@ -165,10 +234,11 @@
 		var selectedItems;
 		if (this.obLeftGridSelected())
 		{
-			selectedItems = _obLeftGridSelectedUids();
-		} else if (this.obRightGridSelected())
+			selectedItems = this._obLeftGridSelectedUids();
+		}
+		else if (this.obRightGridSelected())
 		{
-			selectedItems = _obRightGridSelectedUids();
+			selectedItems = this._obRightGridSelectedUids();
 		}
 		var Uids = data;
 		var selectedUid = Enumerable.From(selectedItems);
@@ -195,19 +265,14 @@
 	{
 		if (this.obLeftGridSelected())
 		{
-			return _availableColGrid.dataSource.data().map(
-				function(item)
-				{
-					return item["uid"]
-				}
+			return this._availableColGrid.dataSource.data().map(
+				function(item) { return item["uid"]; }
 			);
-		} else if (this.obRightGridSelected())
+		}
+		else if (this.obRightGridSelected())
 		{
-			return _selectedColGrid.dataSource.data().map(
-				function(item)
-				{
-					return item["uid"]
-				}
+			return this._selectedColGrid.dataSource.data().map(
+				function(item) { return item["uid"]; }
 			);
 		}
 		return false;
@@ -220,7 +285,8 @@
 		if (this.obLeftGridSelected())
 		{
 			selectedAreaKendoGrid = this.availableColGridContainer.data("kendoGrid");
-		} else if (this.obRightGridSelected())
+		}
+		else if (this.obRightGridSelected())
 		{
 			selectedAreaKendoGrid = this.selectedColGridContainer.data("kendoGrid");
 		}
@@ -243,10 +309,11 @@
 
 	EditKendoColumnViewModel.prototype.careteKendoDropTargetEvent = function()
 	{
+		var self = this;
 		this.selectedColGridContainer.find("tbody tr").kendoDropTarget({
 			dragenter: function(e)
 			{
-				targetItem = $(e.dropTarget[0]);
+				var targetItem = self.careteDropTargetHelper(e);
 				targetItem.addClass("drag-target-insert-after-cursor");
 
 				_removeDropTargetCursorTriangle();
@@ -261,46 +328,52 @@
 		});
 	};
 
+	EditKendoColumnViewModel.prototype.careteDropTargetHelper = function(evt)
+	{
+		var targetItem = $(evt.dropTarget[0]);
+		return targetItem;
+	};
+
 	EditKendoColumnViewModel.prototype.onLeftGridChange = function(arg)
 	{
-		var grid = _availableColGrid,
+		var grid = this._availableColGrid,
 			selected = $.map(grid.select(), function(item)
 			{
 				return item.dataset[_KendoUid];
 			});
-		_obLeftGridSelectedUids(selected);
+		this._obLeftGridSelectedUids(selected);
 
-		if (_obLeftGridSelectedUids().length !== 0)
+		if (this._obLeftGridSelectedUids().length !== 0)
 		{
-			_clearRightSelection();
+			this._clearRightSelection();
 		}
 
 		var bottomDom = TF.Grid.EditKendoColumnViewModel._buildGridBottom(
 			grid.dataItems().length,
 			grid.select().length,
-			_totalColumnsCount
+			this._totalColumnsCount
 		);
 		grid.wrapper.find(".k-pager-wrap").html(bottomDom);
 	};
 
 	EditKendoColumnViewModel.prototype.onRightGridChange = function(arg)
 	{
-		var grid = _selectedColGrid,
+		var grid = this._selectedColGrid,
 			selected = $.map(grid.select(), function(item)
 			{
 				return item.dataset[_KendoUid];
 			});
-		_obRightGridSelectedUids(selected);
+		this._obRightGridSelectedUids(selected);
 
-		if (_obRightGridSelectedUids().length !== 0)
+		if (this._obRightGridSelectedUids().length !== 0)
 		{
-			_clearLeftSelection();
+			this._clearLeftSelection();
 		}
 
 		var bottomDom = TF.Grid.EditKendoColumnViewModel._buildGridBottom(
 			grid.dataItems().length,
 			grid.select().length,
-			_totalColumnsCount
+			this._totalColumnsCount
 		);
 		grid.wrapper.find(".k-pager-wrap").html(bottomDom);
 	};
@@ -322,15 +395,15 @@
 	EditKendoColumnViewModel.prototype.initLeftGrid = function(gridColumns)
 	{
 		var self = this;
-		_availableColGrid = null;
+		this._availableColGrid = null;
 		this.availableColGridContainer.kendoGrid({
 			dataSource: new kendo.data.DataSource({
 				data: this.availableColumns,
-				schema: _GridConifg.gridSchema
+				schema: this.gridConfig.gridSchema
 			}),
-			columns: gridColumns || _GridConifg.gridColumns,
-			height: _GridConifg.height,
-			selectable: _GridConifg.selectable,
+			columns: gridColumns || this.gridConfig.gridColumns,
+			height: this.gridConfig.height,
+			selectable: this.gridConfig.selectable,
 			change: this.onLeftGridChange.bind(this),
 			pageable: {},
 			dataBound: function()
@@ -338,30 +411,31 @@
 				var bottomDom = TF.Grid.EditKendoColumnViewModel._buildGridBottom(
 					this.dataItems().length,
 					this.select().length,
-					_totalColumnsCount
+					self._totalColumnsCount
 				);
 				self.availableColGridContainer.find(".k-pager-wrap").html(bottomDom);
 			}
 		});
-		_availableColGrid = this.availableColGridContainer.data("kendoGrid");
-		_cancelKendoGridSelectedArea(_availableColGrid);
-		_availableColGrid.shortcutExtender = new TF.KendoGridNavigator({ grid: _availableColGrid });
+		this._availableColGrid = this.availableColGridContainer.data("kendoGrid");
+		_cancelKendoGridSelectedArea(this._availableColGrid);
+		this._availableColGrid.shortcutExtender = new TF.KendoGridNavigator({ grid: this._availableColGrid, pageSize: 8 });
+		this._availableColGrid.element.on('click', function() { this.focus(); });
 		this.initGridScrollBar(this.availableColGridContainer);
-		return _availableColGrid;
+		return this._availableColGrid;
 	};
 
 	EditKendoColumnViewModel.prototype.initRightGrid = function(gridColumns)
 	{
 		var self = this;
-		_selectedColGrid = null;
+		this._selectedColGrid = null;
 		this.selectedColGridContainer.kendoGrid({
 			dataSource: new kendo.data.DataSource({
 				data: this.selectedColumns,
-				schema: _GridConifg.gridSchema
+				schema: this.gridConfig.gridSchema
 			}),
-			columns: gridColumns || _GridConifg.gridColumns,
-			height: _GridConifg.height,
-			selectable: _GridConifg.selectable,
+			columns: gridColumns || this.gridConfig.gridColumns,
+			height: this.gridConfig.height,
+			selectable: this.gridConfig.selectable,
 			change: this.onRightGridChange.bind(this),
 			pageable: {},
 			dataBound: function()
@@ -369,16 +443,23 @@
 				var bottomDom = TF.Grid.EditKendoColumnViewModel._buildGridBottom(
 					this.dataItems().length,
 					this.select().length,
-					_totalColumnsCount
+					self._totalColumnsCount
 				);
 				self.selectedColGridContainer.find(".k-pager-wrap").html(bottomDom);
 			}
 		});
-		_selectedColGrid = this.selectedColGridContainer.data("kendoGrid");
-		_cancelKendoGridSelectedArea(_selectedColGrid);
-		_selectedColGrid.shortcutExtender = new TF.KendoGridNavigator({ grid: _selectedColGrid });
+		this._selectedColGrid = this.selectedColGridContainer.data("kendoGrid");
+		_cancelKendoGridSelectedArea(this._selectedColGrid);
+		this._selectedColGrid.shortcutExtender = new TF.KendoGridNavigator({ grid: this._selectedColGrid, pageSize: 8 });
+		this._selectedColGrid.element.on('click', function() { this.focus(); });
 		this.initGridScrollBar(this.selectedColGridContainer);
-		return _selectedColGrid;
+
+		this._selectedColGrid.dataSource.bind("change", function(e)
+		{
+			if (e.action == "add" || e.action == "remove" || e.action == undefined) this.obRightGridDataSourceChanged(true); // add, remove, reorder
+		    else if (e.action == "sync") this.obRightGridDataSourceChanged(false);
+		}.bind(this));
+		return this._selectedColGrid;
 	};
 
 	EditKendoColumnViewModel.prototype.initGridScrollBar = function(container)
@@ -388,13 +469,13 @@
 			"overflow-y": "auto"
 		});
 
-
 		if ($gridContent[0].clientHeight == $gridContent[0].scrollHeight)
 		{
 			$gridContent.find("colgroup col:last").css({
 				width: 77
 			});
-		} else
+		}
+		else
 		{
 			$gridContent.find("colgroup col:last").css({
 				width: 60
@@ -402,32 +483,35 @@
 		}
 	};
 
-	EditKendoColumnViewModel.prototype.bindLeftGridDraggable = function()
+	EditKendoColumnViewModel.prototype.bindLeftGridDraggable = function(filter)
 	{
 		this.availableColGridContainer.kendoDraggable({
-			filter: "tbody > tr",
+			filter: filter || "tbody > tr",
 			threshold: 100,
 			holdToDrag: TF.isMobileDevice,
 			hint: function(e)
 			{
 				if (e.hasClass("k-state-selected"))
 				{
-					var selectedColumns = this.availableColGridContainer.find('.k-state-selected')
+					var selectedColumns = this.availableColGridContainer.find('.k-state-selected');
 					return _getHintElements(e, selectedColumns);
-				} else
+				}
+				else
 				{
 					return _getHintElements(e);
 				}
 			}.bind(this),
-			dragstart: function(e) { }.bind(this),
+			dragstart: function(e)
+			{
+			}.bind(this),
 			autoScroll: true
 		});
 	};
 
-	EditKendoColumnViewModel.prototype.bindRightGridDraggable = function()
+	EditKendoColumnViewModel.prototype.bindRightGridDraggable = function(filter)
 	{
 		this.selectedColGridContainer.kendoDraggable({
-			filter: "tbody > tr",
+			filter: filter || "tbody > tr",
 			threshold: 100,
 			holdToDrag: TF.isMobileDevice,
 			autoScroll: true,
@@ -435,14 +519,17 @@
 			{
 				if (e.hasClass("k-state-selected"))
 				{
-					var selectedColumns = this.selectedColGridContainer.find('.k-state-selected')
+					var selectedColumns = this.selectedColGridContainer.find('.k-state-selected');
 					return _getHintElements(e, selectedColumns);
-				} else
+				}
+				else
 				{
 					return _getHintElements(e);
 				}
 			}.bind(this),
-			dragstart: function(e) { }.bind(this),
+			dragstart: function(e)
+			{
+			}.bind(this),
 		});
 	};
 
@@ -452,27 +539,27 @@
 			drop: function(e)
 			{
 				e.draggable.hint.hide();
-				var selectedUids = e.draggable.currentTarget.hasClass("k-state-selected") ? _obRightGridSelectedUids() : [e.draggable.currentTarget.data().kendoUid];
+				var selectedUids = e.draggable.currentTarget.hasClass("k-state-selected") ? this._obRightGridSelectedUids() : [e.draggable.currentTarget.data().kendoUid];
 				if (!e.draggable.element.hasClass("availablecolumngrid-container"))
 				{
-					this._moveItem(selectedUids, _selectedColGrid.dataSource, _availableColGrid.dataSource);
+					this._moveItem(selectedUids, this._selectedColGrid.dataSource, this._availableColGrid.dataSource);
 				}
-				_sortAvailableGrid();
+				this._sortAvailableGrid.bind(this)();
 				if (selectedUids.length > 0)
 				{
-					_obLeftGridSelectedUids(selectedUids);
+					this._obLeftGridSelectedUids(selectedUids);
 				}
 				var dropTargetTrs = e.dropTarget.find("tbody[role=rowgroup]").find("tr");
 				var selectTrs = $.grep(dropTargetTrs, function(n)
 				{
-					return _obLeftGridSelectedUids().indexOf($(n).data().kendoUid) != -1;
-				});
+					return this._obLeftGridSelectedUids().indexOf($(n).data().kendoUid) != -1;
+				}.bind(this));
 				if (selectTrs.length > 0)
 				{
 					$(selectTrs).addClass("k-state-selected");
 				}
-				_clearLeftSelection();
-				_clearRightSelection();
+				this._clearLeftSelection();
+				this._clearRightSelection();
 			}.bind(this)
 		});
 	};
@@ -482,28 +569,15 @@
 		this.selectedColGridContainer.kendoDropTarget({
 			dragenter: function(e)
 			{
-				var selectedColItems = this.selectedColGridContainer.find('tr');
-				var targetItem;
-				var insertBeforeTarget;
-				if (e.draggable.hint.offset().top < $('.selectedcolumngrid-container .k-grid-content').offset().top)
-				{
-					targetItem = $(selectedColItems[1]);
-					targetItem.addClass("drag-target-insert-before-cursor"); //modify dropTarget element
-					insertBeforeTarget = true;
-				} else
-				{
-					targetItem = $(selectedColItems[selectedColItems.length - 1]);
-					targetItem.addClass("drag-target-insert-after-cursor");
-				}
-
+				var helper = this.rightGridDropTargetHelper(e);
 				_removeDropTargetCursorTriangle();
-				_appendDropTargetCursorTriangle(targetItem, insertBeforeTarget);
+				_appendDropTargetCursorTriangle(helper.targetItem, helper.insertBeforeTarget);
 			}.bind(this),
 			dragleave: function(e)
 			{
 				var selectedColItems = this.selectedColGridContainer.find('tr');
 				selectedColItems.removeClass("drag-target-insert-before-cursor");
-				selectedColItems.removeClass("drag-target-insert-after-cursor"); //modify dropTarget element
+				selectedColItems.removeClass("drag-target-insert-after-cursor"); // modify dropTarget element
 
 				_removeDropTargetCursorTriangle();
 
@@ -512,26 +586,52 @@
 		});
 	};
 
+	EditKendoColumnViewModel.prototype.rightGridDropTargetHelper = function(evt)
+	{
+		var selectedColItems = this.selectedColGridContainer.find('tr');
+		var targetItem;
+		var insertBeforeTarget = false;
+		if (evt.draggable.hint.offset().top < $('.selectedcolumngrid-container .k-grid-content').offset().top)
+		{
+			targetItem = $(selectedColItems[1]);
+			targetItem.addClass("drag-target-insert-before-cursor"); // modify dropTarget element
+			insertBeforeTarget = true;
+		}
+		else
+		{
+			targetItem = $(selectedColItems[selectedColItems.length - 1]);
+			targetItem.addClass("drag-target-insert-after-cursor");
+		}
+		return {
+			targetItem: targetItem,
+			insertBeforeTarget: insertBeforeTarget
+		};
+	};
+
 	EditKendoColumnViewModel.prototype.toAllRightClick = function()
 	{
-		this._moveItem(_getUids(_availableColGrid.dataSource), _availableColGrid.dataSource, _selectedColGrid.dataSource);
+		this._moveItem(_getUids(this._availableColGrid.dataSource), this._availableColGrid.dataSource, this._selectedColGrid.dataSource);
 	};
 
 	EditKendoColumnViewModel.prototype.toRightClick = function()
 	{
-		this._moveItem(_obLeftGridSelectedUids(), _availableColGrid.dataSource, _selectedColGrid.dataSource);
+		this._moveItem(this._obLeftGridSelectedUids(), this._availableColGrid.dataSource, this._selectedColGrid.dataSource);
 	};
 
 	EditKendoColumnViewModel.prototype.toLeftClick = function()
 	{
-		this._moveItem(_obRightGridSelectedUids(), _selectedColGrid.dataSource, _availableColGrid.dataSource);
-		_sortAvailableGrid();
+		this.toLeftGrid(this._obRightGridSelectedUids(), this._selectedColGrid.dataSource, this._availableColGrid.dataSource);
 	};
 
 	EditKendoColumnViewModel.prototype.toAllLeftClick = function()
 	{
-		this._moveItem(_getUids(_selectedColGrid.dataSource), _selectedColGrid.dataSource, _availableColGrid.dataSource);
-		_sortAvailableGrid();
+		this.toLeftGrid(_getUids(this._selectedColGrid.dataSource), this._selectedColGrid.dataSource, this._availableColGrid.dataSource);
+	};
+
+	EditKendoColumnViewModel.prototype.toLeftGrid = function(moveItems, sourceData, targetData)
+	{
+		this._moveItem(moveItems, sourceData, targetData);
+		this._sortAvailableGrid.bind(this)();
 	};
 
 	EditKendoColumnViewModel.prototype.toTopClick = function()
@@ -542,33 +642,27 @@
 
 	EditKendoColumnViewModel.prototype.toUpClick = function()
 	{
-		this._moveItemUpDown(Math.max(Math.min.apply({}, _getSelectedRowIdxs()) - 1, 0));
-
+		this._moveItemUpDown(Math.max(Math.min.apply({}, this._getSelectedRowIdxs()) - 1, 0));
 		var scrollUp = true;
 		this._scrollUpDownByselectedUids(scrollUp);
 	};
 
 	EditKendoColumnViewModel.prototype.toDownClick = function()
 	{
-		this._moveItemUpDown(Math.min(Math.max.apply({}, _getSelectedRowIdxs()) + 2, _selectedColGrid.dataSource.data().length));
-
+		this._moveItemUpDown(Math.min(Math.max.apply({}, this._getSelectedRowIdxs()) + 2, this._selectedColGrid.dataSource.data().length));
 		var scrollUp = false;
 		this._scrollUpDownByselectedUids(scrollUp);
 	};
 
 	EditKendoColumnViewModel.prototype.toBottomClick = function()
 	{
-		this._moveItemUpDown(_selectedColGrid.dataSource.data().length);
-
-		this._scrollUpDown(_selectedColGrid.items().length * $(_selectedColGrid.items()[0]).height());
+		this._moveItemUpDown(this._selectedColGrid.dataSource.data().length);
+		this._scrollUpDown(this._selectedColGrid.items().length * $(this._selectedColGrid.items()[0]).height());
 	};
 
 	EditKendoColumnViewModel.prototype.onKeyPress = function(e, keyCombination)
 	{
-		if (this.focusedGridName === "selected")
-		{
-			return;
-		}
+		if (this.focusedGridName === "selected") { return; }
 		var gridContainer = this.focusedGridName === "available" ? this.availableColGridContainer : this.selectedColGridContainer;
 		var top = 0;
 		var gridTr = gridContainer.find("div.k-grid-content").find("tbody[role=rowgroup]").find("tr");
@@ -583,6 +677,40 @@
 		}
 	};
 
+	EditKendoColumnViewModel.prototype.setupQuickSearch = function()
+	{
+		var self = this;
+		self.availableColGridContainer.on("keydown", function(e)
+		{
+			self.availableGridQuickSearchHelper.quickSearch(e);
+		});
+		self.selectedColGridContainer.on("keydown", function(e)
+		{
+			self.selectedGridQuickSearchHelper.quickSearch(e);
+		});
+	};
+
+	EditKendoColumnViewModel.prototype._selectElement = function(gridType, index)
+	{
+		var self = this;
+		var grid;
+		if (gridType == "available")
+		{
+			grid = self.availableColGridContainer;
+			self.availableInfo._selectedIndex = index;
+		}
+		else
+		{
+			grid = self.selectedColGridContainer;
+			self.selectedInfo._selectedIndex = index;
+		}
+		var row = grid.data("kendoGrid").tbody.find(">tr:not(.k-grouping-row)").eq(index);
+		var top = row[0].offsetHeight * index;
+		grid.find("div.k-grid-content").scrollTop(top);
+		grid.data("kendoGrid").clearSelection();
+		grid.data("kendoGrid").select(row);
+	};
+
 	EditKendoColumnViewModel.prototype._clearMessage = function()
 	{
 		this.obErrorMessage("");
@@ -594,7 +722,10 @@
 		tf.shortCutKeys.power(true);
 		return new Promise(function(resolve)
 		{
-			tf.loadingIndicator.showImmediately();
+			if (!self.noLoadingIndicator)
+			{
+				tf.loadingIndicator.showImmediately();
+			}
 			setTimeout(function()
 			{
 				resolve();
@@ -602,14 +733,23 @@
 		}).then(function()
 		{
 			self._clearMessage();
+			self.obIsEnabled(true);
 			return self._applyDefaultColumns()
 				.then(function(result)
 				{
-					setTimeout(function()
+					if (!self.noLoadingIndicator)
+					{
+						setTimeout(function()
+						{
+							tf.shortCutKeys.power(false);
+							tf.loadingIndicator.tryHide();
+						}, 1000);
+					}
+					else
 					{
 						tf.shortCutKeys.power(false);
-						tf.loadingIndicator.tryHide();
-					}, 1000);
+					}
+
 					if (result)
 						return this;
 				}.bind(self));
@@ -624,7 +764,7 @@
 			self.toAllLeftClick();
 			self.defaultLayoutColumns.map(function(column)
 			{
-				self._moveItem(self._getUidByColumnName(column.FieldName, _availableColGrid.dataSource), _availableColGrid.dataSource, _selectedColGrid.dataSource);
+				self._moveItem(self._getUidByColumnName(column.FieldName, self._availableColGrid.dataSource), self._availableColGrid.dataSource, self._selectedColGrid.dataSource);
 			});
 			return Promise.resolve(true);
 		})();
@@ -647,14 +787,17 @@
 
 	EditKendoColumnViewModel.prototype.apply = function()
 	{
-		this._clearMessage();
-
-		return this._save()
+		var self = this;
+		self._clearMessage();
+		return self._save()
 			.then(function(result)
 			{
 				if (result)
-					return this;
-			}.bind(this));
+				{
+					self.obRightGridDataSourceChanged(false);
+					return self;
+				}
+			});
 	};
 
 	EditKendoColumnViewModel.prototype.getSelectDataCount = function()
@@ -662,26 +805,27 @@
 		return this.selectedColumns.length;
 	};
 
-	//VIEW-1301 Grid will freeze up if last remaining unlocked column is removed from grid
+	// VIEW-1301 Grid will freeze up if last remaining unlocked column is removed from grid
 	EditKendoColumnViewModel.prototype._removingOnlyOneUnLockColumn = function()
 	{
 		var lockedColumn = Enumerable.From(this.selectedColumns).Where("$.locked").ToArray();
-		if (lockedColumn.length === this.selectedColumns.length)
+		if (this.selectedColumns.length > 0 && lockedColumn.length === this.selectedColumns.length)
 		{
-			return tf.promiseBootbox.confirm({
-				message: "All grid columns in the Selected list box are locked. At least one grid column must be unlocked to preserve the locked columns. If you Apply these changes, all of these columns will be unlocked. Are you sure you want to continue?",
-				title: "Confirmation"
-			}).then(function(ans)
-			{
-				if (ans === true)
+			return tf.promiseBootbox.confirm(
 				{
-					this.selectedColumns.forEach(function(element, index)
+					message: "All grid columns in the Selected list box are locked. At least one grid column must be unlocked to preserve the locked columns. If you Apply these changes, all of these columns will be unlocked. Are you sure you want to continue?",
+					title: "Confirmation"
+				}).then(function(ans)
+				{
+					if (ans === true)
 					{
-						element.locked = false;
-					});
-				}
-				return ans;
-			}.bind(this));
+						this.selectedColumns.forEach(function(element, index)
+						{
+							element.locked = false;
+						});
+					}
+					return ans;
+				}.bind(this));
 		}
 		return Promise.resolve(true);
 	};
@@ -699,7 +843,8 @@
 					{
 						return Promise.resolve(removeOnlyOneConfirmResult);
 					});
-				} else
+				}
+				else
 				{
 					return Promise.resolve(false);
 				}
@@ -720,12 +865,10 @@
 
 		var switchColumns = function(orign, dest, colKeys, filterCondition)
 		{
+			// var keys = Enumerable.From(colKeys).Where(function(r) { return typeof (r.hidden) === "undefined" || r.hidden === filterCondition; }).ToArray();
 			for (var i = 0; i < orign.length; i++)
 			{
-				if (colKeys.some(function(key)
-				{
-					return key.FieldName === orign[i].FieldName;
-				}))
+				if (colKeys.some(function(key) { return key.FieldName === orign[i].FieldName; }))
 				{
 					orign[i].hidden = !filterCondition;
 					dest.push(orign[i]);
@@ -741,10 +884,7 @@
 
 			keys.forEach(function(key)
 			{
-				var column = columnsCopy.filter(function(col)
-				{
-					return col.FieldName === key.FieldName
-				})[0];
+				var column = columnsCopy.filter(function(col) { return col.FieldName === key.FieldName; })[0];
 				if (column)
 				{
 					column.locked = key.locked;
@@ -753,8 +893,8 @@
 			});
 		};
 
-		rightColKeys = _selectedColGrid.dataSource.data().map(getColKeys);
-		leftColKeys = _availableColGrid.dataSource.data().map(getColKeys);
+		var rightColKeys = this._selectedColGrid.dataSource.data().map(getColKeys);
+		var leftColKeys = this._availableColGrid.dataSource.data().map(getColKeys);
 
 		switchColumns(this.availableColumns, this.selectedColumns, rightColKeys, true);
 		switchColumns(this.selectedColumns, this.availableColumns, leftColKeys, false);
@@ -777,40 +917,41 @@
 		var gridContentViewZoneBottom = gridContentElement.offset().top + itemHeight * maxItemRowCount;
 		var itemsOffSetBottom = itemsOffSetTop + itemHeight;
 
-		var topPostion;
+		var topPosition;
 		if (scrollUp)
 		{
 			var uponViewZone = itemsOffSetTop < gridContentElement.offset().top;
 			if (uponViewZone)
 			{
-				topPostion = Math.max(gridContentElement.scrollTop() - itemHeight, 0);
+				topPosition = Math.max(gridContentElement.scrollTop() - itemHeight, 0);
 			}
-		} else
+		}
+		else
 		{
 			var underViewZone = itemsOffSetBottom > gridContentViewZoneBottom;
 			if (underViewZone)
 			{
-				topPostion = Math.min(gridContentElement.scrollTop() + itemHeight, gridContentHeight);
+				topPosition = Math.min(gridContentElement.scrollTop() + itemHeight, gridContentHeight);
 			}
 		}
 
-		if (topPostion && !isNaN(topPostion))
+		if (topPosition && !isNaN(topPosition))
 		{
-			this._scrollUpDown(topPostion);
+			this._scrollUpDown(topPosition);
 		}
 	};
 
-	EditKendoColumnViewModel.prototype._scrollUpDown = function(topPostion)
+	EditKendoColumnViewModel.prototype._scrollUpDown = function(topPosition)
 	{
 		var gridContentElement = this.selectedColGridContainer.find(".k-grid-content");
-		gridContentElement.scrollTop(topPostion);
+		gridContentElement.scrollTop(topPosition);
 	};
 
 	EditKendoColumnViewModel.prototype._moveItemUpDown = function(targetIdx)
 	{
-		var selectedRows = _getDataRowsBySelectedUids(_obRightGridSelectedUids(), _selectedColGrid.dataSource);
+		var selectedRows = _getDataRowsBySelectedUids(this._obRightGridSelectedUids(), this._selectedColGrid.dataSource);
 
-		var gridData = _selectedColGrid.dataSource.data();
+		var gridData = this._selectedColGrid.dataSource.data();
 		var insertBefore = Enumerable.From(gridData.slice(0, targetIdx)).Except(selectedRows).ToArray();
 		var insertAfter = Enumerable.From(gridData.slice(targetIdx)).Except(selectedRows).ToArray();
 		if (insertBefore.length > 0 && insertBefore[insertBefore.length - 1].locked == false)
@@ -819,19 +960,17 @@
 			{
 				item.locked = false;
 			});
-		} else if (insertAfter.length > 0 && insertAfter[0].locked == true)
+		}
+		else if (insertAfter.length > 0 && insertAfter[0].locked == true)
 		{
 			selectedRows.forEach(function(item)
 			{
 				item.locked = true;
 			});
 		}
-		_selectedColGrid.dataSource.data([insertBefore, selectedRows, insertAfter].reduce(function(a, b)
-		{
-			return a.concat(b);
-		}, []));
+		this._selectedColGrid.dataSource.data([insertBefore, selectedRows, insertAfter].reduce(function(a, b) { return a.concat(b); }, []));
 
-		_hightLightSelectedItems();
+		this._hightLightSelectedItems();
 
 		this.careteKendoDropTargetEvent();
 	};
@@ -846,7 +985,10 @@
 		var selectedRows = [];
 		for (var i = 0; i < selectedItemUids.length; i++)
 		{
-			selectedRows.push(depDataSource.getByUid(selectedItemUids[i]));
+			if (selectedItemUids[i])
+			{
+				selectedRows.push(depDataSource.getByUid(selectedItemUids[i]));
+			}
 		}
 
 		if (selectedRows.length > 0)
@@ -860,17 +1002,17 @@
 			distDataSource.add(selectedRows[i]);
 		}
 
-		_clearLeftSelection();
-		_clearRightSelection();
+		this._clearLeftSelection();
+		this._clearRightSelection();
 
 		this.careteKendoDropTargetEvent();
-		var availableColumns = _availableColGrid.dataSource.data();
+		var availableColumns = this._availableColGrid.dataSource.data();
 		availableColumns.forEach(function(item)
 		{
 			item.locked = false;
 		});
 		this.obavailableColumns(availableColumns);
-		this.obselectedColumns(_selectedColGrid.dataSource.data());
+		this.obselectedColumns(this._selectedColGrid.dataSource.data());
 
 		this.initGridScrollBar(this.availableColGridContainer);
 		this.initGridScrollBar(this.selectedColGridContainer);
@@ -890,46 +1032,49 @@
 			if (!this.obLeftGridSelected() &&
 				!this.obRightGridSelected())
 			{
-				_selectedColGrid.clearSelection();
+				this._selectedColGrid.clearSelection();
 				return;
 			}
 
-			var insertIdx = _getInsertIdx($(document.elementFromPoint(e.clientX, e.clientY)));
+			var insertIdx = this._getSelectedGridInsertIdx($(document.elementFromPoint(e.clientX, e.clientY)));
 
 			if (this.obLeftGridSelected())
 			{
-				var tmp = _obLeftGridSelectedUids().slice();
-				this._moveItem(_obLeftGridSelectedUids(), _availableColGrid.dataSource, _selectedColGrid.dataSource);
-				_obRightGridSelectedUids(tmp);
+				var tmp = this._obLeftGridSelectedUids().slice();
+				this._moveItem(this._obLeftGridSelectedUids(), this._availableColGrid.dataSource, this._selectedColGrid.dataSource);
+				this._obRightGridSelectedUids(tmp);
 				this._moveItemUpDown(insertIdx);
-			} else
+			}
+			else
 			{
 				this._moveItemUpDown(insertIdx);
 			}
-		} else
+		}
+		else
 		{
-			var insertIdx = _getInsertIdx($(document.elementFromPoint(e.clientX, e.clientY)));
+			var insertIdx = this._getSelectedGridInsertIdx($(document.elementFromPoint(e.clientX, e.clientY)));
 			var selectedUids = [e.draggable.currentTarget.data().kendoUid];
 			if (e.draggable.element.hasClass("availablecolumngrid-container"))
 			{
-				this._moveItem(selectedUids, _availableColGrid.dataSource, _selectedColGrid.dataSource);
+				this._moveItem(selectedUids, this._availableColGrid.dataSource, this._selectedColGrid.dataSource);
 			}
-			_obRightGridSelectedUids(selectedUids);
+			this._obRightGridSelectedUids(selectedUids);
 			this._moveItemUpDown(insertIdx);
 		}
 	};
 
-	var _getInsertIdx = function(dest)
+	EditKendoColumnViewModel.prototype._getSelectedGridInsertIdx = function(dest)
 	{
 		var insertIdx = 0;
 
 		if (dest.is("th"))
 		{
 			insertIdx = 0;
-		} else
+		}
+		else
 		{
-			destData = _selectedColGrid.dataSource.getByUid(dest.parent().data(_KendoUid));
-			var gridData = _selectedColGrid.dataSource.data();
+			var destData = this._selectedColGrid.dataSource.getByUid(dest.parent().data(_KendoUid));
+			var gridData = this._selectedColGrid.dataSource.data();
 
 			insertIdx = gridData.length;
 			if (destData && gridData)
@@ -961,7 +1106,7 @@
 		});
 	};
 
-	var _sortByDisplayName = function(a, b)
+	EditKendoColumnViewModel.prototype._sortByDisplayName = function(a, b)
 	{
 		var x, y;
 		x = a[_DataFiledName] ? a[_DataFiledName].toLowerCase() : '';
@@ -969,13 +1114,49 @@
 		return (x == y ? 0 : (x > y ? 1 : -1));
 	};
 
-	var _getSelectedRowIdxs = function()
+	EditKendoColumnViewModel.prototype._getSelectedRowIdxs = function()
 	{
-		var selectedRows = _getDataRowsBySelectedUids(_obRightGridSelectedUids(), _selectedColGrid.dataSource);
+		var self = this;
+		var selectedRows = _getDataRowsBySelectedUids(this._obRightGridSelectedUids(), this._selectedColGrid.dataSource);
 		return selectedRows.map(function(row)
 		{
-			return _selectedColGrid.dataSource.data().indexOf(row);
+			return self._selectedColGrid.dataSource.data().indexOf(row);
 		});
+	};
+
+	EditKendoColumnViewModel.prototype._sortAvailableGrid = function()
+	{
+		this._availableColGrid.dataSource.sort({ field: _DataFiledName, dir: "asc", compare: this._sortByDisplayName });
+		this._availableColGrid.dataSource.data().sort(this._sortByDisplayName);
+	};
+
+	EditKendoColumnViewModel.prototype._hightLightSelectedItems = function()
+	{
+		var self = this;
+		var items = this._selectedColGrid.items();
+		this._obRightGridSelectedUids().forEach(function(uid)
+		{
+			$.map(items, function(item)
+			{
+				if (item.dataset[_KendoUid] == uid)
+				{
+					self._selectedColGrid.select(item);
+					return;
+				}
+			});
+		});
+	};
+
+	EditKendoColumnViewModel.prototype._clearRightSelection = function()
+	{
+		this._obRightGridSelectedUids([]);
+		this._selectedColGrid.clearSelection();
+	};
+
+	EditKendoColumnViewModel.prototype._clearLeftSelection = function()
+	{
+		this._obLeftGridSelectedUids([]);
+		this._availableColGrid.clearSelection();
 	};
 
 	var _getUids = function(dataSource)
@@ -994,47 +1175,22 @@
 		return uids;
 	};
 
-	var _sortAvailableGrid = function()
-	{
-		_availableColGrid.dataSource.sort({
-			field: _DataFiledName,
-			dir: "asc"
-		});
-		_availableColGrid.dataSource.data().sort(_sortByDisplayName);
-	};
-
-	var _getDataRowsBySelectedUids = function(selectedUids, dataSource)
+	function _getDataRowsBySelectedUids(selectedUids, dataSource)
 	{
 		var dataRows = $.map(selectedUids, function(uid)
 		{
 			return dataSource.getByUid(uid);
 		}.bind(this));
 		return dataRows;
-	};
+	}
 
-	var _hightLightSelectedItems = function()
-	{
-		var items = _selectedColGrid.items();
-		_obRightGridSelectedUids().forEach(function(uid)
-		{
-			$.map(items, function(item)
-			{
-				if (item.dataset[_KendoUid] == uid)
-				{
-					_selectedColGrid.select(item);
-					return;
-				}
-			});
-		});
-	};
-
-	var _removeDropTargetCursorTriangle = function()
+	function _removeDropTargetCursorTriangle()
 	{
 		$('#left-triangle').remove();
 		$('#right-triangle').remove();
-	};
+	}
 
-	var _appendDropTargetCursorTriangle = function(targetItem, insertBeforeTarget)
+	function _appendDropTargetCursorTriangle(targetItem, insertBeforeTarget)
 	{
 		var leftTriangle = $('<div id="left-triangle"></div>').addClass('drag-target-cursor-left-triangle');
 		var rightTriangle = $('<div id="right-triangle"></div>').addClass('drag-target-cursor-right-triangle');
@@ -1050,9 +1206,9 @@
 
 		targetItem.find('td:first').append(leftTriangle);
 		targetItem.find('td:first').append(rightTriangle);
-	};
+	}
 
-	var _getHintElements = function(item, selectedColumns)
+	function _getHintElements(item, selectedColumns)
 	{
 		var hintElements = $('<div class="k-grid k-widget list-mover-drag-hint" style=""><table><tbody></tbody></table></div>');
 		hintElements.css({
@@ -1064,7 +1220,8 @@
 		if (selectedColumns == undefined)
 		{
 			hintElements.find('tbody').append('<tr>' + item.html() + '</tr>');
-		} else
+		}
+		else
 		{
 			for (var i = 0; i < selectedColumns.length; i++)
 			{
@@ -1073,19 +1230,7 @@
 		}
 
 		return hintElements;
-	};
-
-	var _clearRightSelection = function()
-	{
-		_obRightGridSelectedUids([]);
-		_selectedColGrid.clearSelection();
-	};
-
-	var _clearLeftSelection = function()
-	{
-		_obLeftGridSelectedUids([]);
-		_availableColGrid.clearSelection();
-	};
+	}
 
 	namespace.EditKendoColumnViewModel = EditKendoColumnViewModel;
 })();
