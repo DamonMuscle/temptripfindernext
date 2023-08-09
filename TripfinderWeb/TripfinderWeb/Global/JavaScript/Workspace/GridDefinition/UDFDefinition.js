@@ -383,12 +383,7 @@
 
 	function getItemType(item)
 	{
-		var type = item.Type;
-		if (item.TypeId === TF.DetailView.UserDefinedFieldHelper.DataTypeId.RollUp)
-		{
-			type = TF.DetailView.UserDefinedFieldHelper.valueFormatToType(item.ValueFormat);
-		}
-		return type;
+		return TF.DetailView.UserDefinedFieldHelper.getType(item, false);
 	}
 
 	function getGridDisplayType(type)
