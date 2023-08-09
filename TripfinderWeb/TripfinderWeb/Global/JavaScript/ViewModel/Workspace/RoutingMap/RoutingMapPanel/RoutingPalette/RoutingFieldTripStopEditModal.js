@@ -95,7 +95,7 @@
 		this.obIsLastStop = ko.observable(false);
 		// this.obSelectedSequenceDisable = ko.computed(() => (this.obIsSmartSequence() && (this.mode() == "new" || this.mode() === 'edit')) || this.isReadOnly());
 		this.obSelectedSequenceDisable = ko.computed(() => this.obIsFirstStop() || this.obIsLastStop() || this.isReadOnly());
-		this.obSelectedFieldTripDisable = ko.observable(false);
+		this.obSelectedFieldTripDisable = ko.computed(() => this.obIsFirstStop() || this.obIsLastStop());
 
 		// disable for future implementation
 		this.obSmartAssignmentDisable = ko.observable(true);
@@ -116,7 +116,18 @@
 	RoutingFieldTripStopEditModal.prototype.init = function(options)
 	{
 		var self = this;
-		this.availableTrips = Enumerable.From(self.dataModel.getEditTrips()).OrderBy("$.Name").ToArray();
+		self.isInitialModal = true;
+		this.availableTrips = self.dataModel.getEditTrips();
+		this.availableTrips.sort((a, b) =>
+		{
+			const v1 = a.Name && a.Name.toLowerCase();
+			const v2 = b.Name && b.Name.toLowerCase();
+			if(v1 === v2)
+			{
+				return a.id > b.id ? 1: -1;
+			}
+			return v1 > v2 ? 1 : -1;
+		});
 		this.obTrips(self.availableTrips);
 		this.obSelectedTrip(self.getSelectedTrip());
 		this.obIsSmartAssignment(false);
@@ -136,6 +147,7 @@
 			self._bindParamsChange("#includeNoStudStopCheckbox", "IncludeNoStudStop");
 			self.bindTag = true;
 		}
+		self.isInitialModal = false;
 		return TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.init.call(self, options);
 	};
 
@@ -157,35 +169,14 @@
 		{
 			return;
 		}
-		// init sequence source
-		var sequences = trip.FieldTripStops.map(x => x.Sequence);
-		var tripChanged = this.data.length == 1 && this.obSelectedTrip().id != this.original[0].FieldTripId;
-		if (this.mode() === 'new' || tripChanged)
-		{
-			sequences.push(sequences[sequences.length - 1] + 1);
-		}
-		sequences.sort((a,b) => a-b);
-		this.obSequenceSource(sequences.map((x, index, array) =>
-		{
-			if(index === 0 || _.last(array) === x)
-			{
-				return `[disable]${x}`
-			}
-			return `${x}`;
-		}));
-		// set sequence number
-		var lastSequence = _.last(sequences);
-		var defaultSequence = lastSequence - 1;
 
-		if(this.mode() === 'edit')
-		{
-			defaultSequence = TF.Helper.TripHelper.getTripStopInsertSequence(trip.FieldTripStops, trip.Session);
-		}
-		
-		var sequence = this.data[0].Sequence ? this.data[0].Sequence : defaultSequence;
-		this.obSelectedSequence(sequence);
-		this.obIsFirstStop(sequence==_.first(sequences));
-		this.obIsLastStop(sequence==_.last(sequences));
+		const sortedSequences = this._calculateSortedSequence(trip);
+		this._initSequenceSource(sortedSequences);
+		this._setSequenceNumber(sortedSequences);
+
+		const selectedSequence = this.obSelectedSequence();
+		this.obIsFirstStop(selectedSequence==_.first(sortedSequences));
+		this.obIsLastStop(selectedSequence==_.last(sortedSequences));
 	};
 
 	/**
@@ -595,6 +586,7 @@
 				return self.dataModel.changeStopPosition(tripStop, targetTripId, position).then(function()
 				{
 					self.viewModel.display.afterChangeStopPosition(tripStop, !tripChanged, tripId);
+					PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToLayers, self.dataModel.trips);
 					tf.loadingIndicator.tryHide()
 				});
 			}
@@ -690,6 +682,44 @@
 		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.hide.call(this);
 		this.removeStopSequenceGraphics();
 	};
+
+	RoutingFieldTripStopEditModal.prototype._calculateSortedSequence = function(trip)
+	{
+		var sequences = trip.FieldTripStops.map(x => x.Sequence);
+		var tripChanged = this.data.length == 1 && this.obSelectedTrip().id != this.original[0].FieldTripId;
+		if (this.mode() === 'new' || tripChanged)
+		{
+			sequences.push(sequences[sequences.length - 1] + 1);
+		}
+		sequences.sort((a,b) => a-b);
+
+		return sequences;
+	}
+
+	RoutingFieldTripStopEditModal.prototype._initSequenceSource = function(sortedSequences)
+	{
+		const source = sortedSequences.map((x, index, array) =>
+		{
+			if(index === 0 || _.last(array) === x)
+			{
+				return `[disable]${x}`
+			}
+			return `${x}`;
+		});
+
+		this.obSequenceSource(source);		
+	}
+
+	RoutingFieldTripStopEditModal.prototype._setSequenceNumber = function(sortedSequences)
+	{
+		const lastSequence = _.last(sortedSequences),
+			defaultSequence = lastSequence - 1,
+			dataSequence = this.data[0].Sequence,
+			disableLastStopSequence = this.isInitialModal ? (dataSequence && dataSequence <= lastSequence) : (dataSequence && dataSequence < lastSequence),
+			sequence = disableLastStopSequence ? dataSequence : defaultSequence;
+
+		this.obSelectedSequence(sequence);
+	}
 
 	function getDatePart(value, isUtc)
 	{

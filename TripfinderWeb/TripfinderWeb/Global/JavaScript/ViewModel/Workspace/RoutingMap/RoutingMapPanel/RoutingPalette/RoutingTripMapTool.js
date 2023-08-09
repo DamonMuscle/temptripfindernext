@@ -384,32 +384,8 @@
 
 	RoutingTripMapTool.prototype.redrawPath = function(trip)
 	{
-		var self = this;
-		self._deleteTripPath(trip);
-		var tripPaths = [];
-		trip.FieldTripStops.forEach(stop =>
-		{
-			var path = TF.Helper.TripHelper.getDrawTripPathGeometry(stop, trip);
-			if (path)
-			{
-				tripPaths.push(path)
-			}
-		})
-		self._addTripPath(tripPaths, trip);
-	};
-
-	RoutingTripMapTool.prototype._deleteTripPath = function(trip)
-	{
-		var self = this;
-		var graphics = self._polylineLayer.graphics.items;
-		for (var i = 0; i < graphics.length; i++)
-		{
-			if (graphics[i].attributes.FieldTripId == trip.id)
-			{
-				self._polylineLayer.remove(graphics[i]);
-				return;
-			}
-		}
+		console.log("WARNING: REPLACE WITH NEW MAP OPERATIONS FUNCTIONS!");
+		return;
 	};
 
 	RoutingTripMapTool.prototype.deleteTrip = function(trip)
@@ -686,18 +662,6 @@
 	RoutingTripMapTool.prototype.stopPreview = function()
 	{
 		this.stopPreviewTool._stopWalkoutPreview();
-	};
-
-	RoutingTripMapTool.prototype._addTripPath = function(paths, trip)
-	{
-		var self = this;
-		var unionPath = self._multiPolylinesToSinglePolyline(paths);
-		var graphic = this.createPathGraphic(unionPath, trip);
-		if (graphic.geometry.paths.length > 0)
-		{
-			self._polylineLayer.add(graphic);
-		}
-		self.refreshTripArrow(trip.id);
 	};
 
 	RoutingTripMapTool.prototype.createPathGraphic = function(paths, trip)

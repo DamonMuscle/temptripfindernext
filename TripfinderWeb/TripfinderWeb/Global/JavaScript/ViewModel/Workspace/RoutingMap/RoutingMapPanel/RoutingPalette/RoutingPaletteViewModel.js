@@ -43,6 +43,7 @@
 		PubSub.subscribe("on_MapCanvas_RefreshTripByStops", self.onMapCanvas_RefreshPathByStops.bind(self));
 
 		self.dataModel.onTripSequenceChangeEvent.subscribe(self.onTripSequenceChange.bind(this));
+		self.dataModel.fieldTripStopDataModel.onFieldTripStopUpdatedEvent.subscribe(self.onFieldTripStopUpdatedEvent.bind(this));
 	}
 
 	RoutingPaletteViewModel.prototype = Object.create(TF.RoutingMap.BasePaletteViewModel.prototype);
@@ -253,17 +254,12 @@
 	RoutingPaletteViewModel.prototype.onMapCanvas_RefreshPathByStops = function(_, data)
 	{
 		const { tripStops, deleteStops, isBestSequence } = data;
-		if (deleteStops && deleteStops.length == 1)
-		{
-			console.log("todo: refresh trip path by delete one stop")
-		}
-
 		if (tripStops && tripStops.length > 0)
 		{
 			const fieldTripId = tripStops[0].FieldTripId;
 			const fieldTrip = this.dataModel.trips.find(item => item.id === fieldTripId);
-			const effectSuquences = tripStops.map(s => s.Sequence);
-			this.fieldTripMap?.refreshFieldTripPath(fieldTrip, effectSuquences);
+			const effectSequences = tripStops.map(s => s.Sequence);
+			this.fieldTripMap?.refreshFieldTripPath(fieldTrip, effectSequences);
 		}
 	}
 
@@ -278,6 +274,11 @@
 		const fieldTrip = this.dataModel.trips.find(item => item.id === fieldTripId);
 		this.fieldTripMap?.updateStopSymbol(fieldTrip, items);
 	};
+
+	RoutingPaletteViewModel.prototype.onFieldTripStopUpdatedEvent = function(_, data)
+	{
+		this.fieldTripMap?.updateStopInfo(data);
+	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapMoveStopLocation = function(_, data)
 	{

@@ -12,6 +12,8 @@
 		self.tripPathFeatureData = dataModel.featureData.tripPathFeatureData;
 		self._viewModal = dataModel.viewModel._viewModal;
 		self.currentTripStudentsCount = 0;
+
+		self.onFieldTripStopUpdatedEvent = new TF.Events.Event();
 	}
 
 	RoutingFieldTripStopDataModel.prototype.create = function(newData, isFromRevert, insertToSpecialSequenceIndex, isDuplicate, notBroadcast)
@@ -188,9 +190,7 @@
 		{
 			tripStop.FieldTripId = trip.id;
 			if (tripStop.path) tripStop.path.FieldTripId = trip.id;
-			tripStop.boundary.FieldTripId = trip.id;
 			tripStop.routeStops = null;
-			tripStop.color = trip.color;
 		});
 	};
 
@@ -374,7 +374,6 @@
 			{
 				self.clearPreviousStopPathIfUnsolved(newTripStops, targetTrip);
 			}
-			self.updateAnotherTripStop(newTripStops);
 
 			if (isNotifyTripStopChangeEvent)
 			{
@@ -424,38 +423,6 @@
 			stop.Sequence = i + 1;
 		});
 		return this._sortTripStops(stops);
-	};
-
-	RoutingFieldTripStopDataModel.prototype.updateAnotherTripStop = function(newTripStops)
-	{
-		let exceptionMap = {};
-		this.dataModel.candidateStudents.forEach(s =>
-		{
-			if (s.RequirementID)
-			{
-				return;
-			}
-
-			let key = `${s.id}_${s.TripStopID}_${s.AnotherTripStopID}`,
-				list = exceptionMap[key] || [];
-			exceptionMap[key] = list;
-			list.push(s);
-		});
-
-		newTripStops.forEach(tripStop =>
-		{
-			tripStop.Students.forEach(s =>
-			{
-				let school = this.dataModel.findRealSchoolStops(tripStop, s),
-					key = `${s.id}_${s.TripStopID}_${s.AnotherTripStopID}`,
-					exceptionList = exceptionMap[key];
-				s.AnotherTripStopID = school.id;
-				if (exceptionList)
-				{
-					exceptionList.forEach(e => e.AnotherTripStopID = school.id);
-				}
-			});
-		});
 	};
 
 	RoutingFieldTripStopDataModel.prototype.update = function(modifyDataArray, isFromBroadCastSync, isNoStopChange)
@@ -648,38 +615,37 @@
 		});
 	};
 
-	RoutingFieldTripStopDataModel.prototype.reorderTripStopSequence = function(tripStop, tripId, newSequence)
+	RoutingFieldTripStopDataModel.prototype.reorderTripStopSequence = function(tripStop, fieldTripId, newSequence)
 	{
 		var self = this;
-		if (tripStop.FieldTripId == tripId)
+		if (tripStop.FieldTripId == fieldTripId)
 		{
 			return self._reorderTripStopSequenceInOneTrip(tripStop, newSequence);
 		}
-		return self.moveTripStopsToOtherTrip([tripStop], tripId, newSequence);
+
+		return self.moveTripStopsToOtherTrip([tripStop], fieldTripId, newSequence);
 	};
 
-	RoutingFieldTripStopDataModel.prototype.moveTripStopsToOtherTrip = function(tripStops, tripId, newSequence, isSequenceOptimize, isSmartSequence, isPreserve)
+	RoutingFieldTripStopDataModel.prototype.moveTripStopsToOtherTrip = async function(tripStops, fieldTripId, newSequence, isSequenceOptimize, isSmartSequence, isPreserve)
 	{
 		var self = this;
-		var trip = self.dataModel.getTripById(tripId);
-		var tripDeleteStop = self.dataModel.getTripById(tripStops[0].FieldTripId);
-		var stopAssignedStudentsDictionary = {};
-		tripStops.map(function(tripStop)
-		{
-			stopAssignedStudentsDictionary[tripStop.id] = tripStop.Students;
-		});
+		var addTrip = self.dataModel.getTripById(fieldTripId);
+		var removeStop = tripStops[0];
+		var removeStopTrip = self.dataModel.getTripById(removeStop.FieldTripId);
 		if (isSmartSequence)
 		{
-			self.viewModel.drawTool.redrawPath(tripDeleteStop);
+			console.log("TODO: Move field trip stop to another trip with smart sequence checked.");
+
+			self.viewModel.drawTool.redrawPath(removeStopTrip);
 			var getSequencePromise = Promise.resolve(tripStops);
-			if (isPreserve) getSequencePromise = self.viewModel.eventsManager.contiguousHelper.getSmartAssignment(tripStops, trip, self.viewModel.drawTool);
-			else { getSequencePromise = self.viewModel.eventsManager.vrpTool.getSmartAssignment_multi(tripStops, [trip], true, self.viewModel.drawTool); }
+			if (isPreserve) getSequencePromise = self.viewModel.eventsManager.contiguousHelper.getSmartAssignment(tripStops, addTrip, self.viewModel.drawTool);
+			else { getSequencePromise = self.viewModel.eventsManager.vrpTool.getSmartAssignment_multi(tripStops, [addTrip], true, self.viewModel.drawTool); }
 			return getSequencePromise.then(function(stops)
 			{
 				if (!stops || !$.isArray(stops) || stops.length == 0) return stops;
 				var sequences = newSequence ? [newSequence] : null;
 				if (stops && $.isArray(stops)) sequences = stops.map(function(stop) { return stop.Sequence; })
-				return self.moveTripStopsFromOtherTrip(stops, trip.FieldTripStops, sequences, false, isSequenceOptimize, isSmartSequence, isPreserve);
+				return self.moveTripStopsFromOtherTrip(stops, addTrip.FieldTripStops, sequences, false, isSequenceOptimize, isSmartSequence, isPreserve);
 			}).then(function(edits)
 			{
 				if (!edits || !$.isArray(edits) || edits.length == 0) return edits;
@@ -691,35 +657,28 @@
 						changedStudents = changedStudents.concat(stop.Students);
 					});
 					self.viewModel.drawTool.onTripStopsChangeEvent(null, { add: [], edit: edits, delete: [] });
-					self.viewModel.drawTool.redrawPath(trip);
+					self.viewModel.drawTool.redrawPath(addTrip);
 					return edits;
 				})
 			});
-		} else
-		{
-			return self.deleteTripStop(tripStops, false, false, true).then(function()
-			{
-				self.viewModel.drawTool.redrawPath(tripDeleteStop);
-				var getSequencePromise = Promise.resolve(tripStops);
-				return getSequencePromise.then(function(stops)
-				{
-					var sequences = newSequence ? [newSequence] : null;
-					return self.moveTripStopsFromOtherTrip(stops, trip.FieldTripStops, sequences, false, isSequenceOptimize, isSmartSequence, isPreserve);
-				})
-
-			}).then(function(edits)
-			{
-				var changedStudents = [];
-				edits.map(function(stop)
-				{
-					changedStudents = changedStudents.concat(stop.Students);
-				});
-				self.viewModel.drawTool.onTripStopsChangeEvent(null, { add: [], edit: edits, delete: [] });
-				self.viewModel.drawTool.redrawPath(trip);
-				return edits;
-			});
 		}
+		else
+		{
+			await self.deleteTripStop(tripStops, false, false, true);
 
+			var sequences = newSequence ? [newSequence] : null;
+			await self.moveTripStopsFromOtherTrip(tripStops, addTrip.FieldTripStops, sequences, false, isSequenceOptimize, isSmartSequence, isPreserve);
+
+			const updateData = {
+				DBID: removeStopTrip.DBID,
+				fromFieldTripId: removeStopTrip.id,
+				toFieldTripId: fieldTripId,
+				fieldTripStopId: removeStop.id,
+				toStopSequence: newSequence,
+				color: addTrip.color
+			};
+			self.onFieldTripStopUpdatedEvent.notify(updateData);
+		}
 	};
 
 	RoutingFieldTripStopDataModel.prototype._reorderTripStopSequenceInOneTrip = function(tripStop, newSequence, isFromBroadCastSync)
@@ -871,22 +830,9 @@
 
 	RoutingFieldTripStopDataModel.prototype._refreshTripPathByTripStops = function(tripStops, deleteStops, isBestSequence)
 	{
-		var self = this;
 		const data = { tripStops, deleteStops, isBestSequence };
 		PubSub.publish("on_MapCanvas_RefreshTripByStops", data);
 		return Promise.resolve(tripStops);
-
-		var tripStopsCopy = JSON.parse(JSON.stringify({ stops: tripStops }));
-		TF.loopCloneGeometry(tripStopsCopy, { stops: tripStops });
-
-		if (deleteStops && deleteStops.length == 1)
-		{
-			return self.viewModel.drawTool.NAtool.refreshTrip(deleteStops[0], "delete");
-		}
-		return self.viewModel.drawTool.NAtool.refreshTripByMultiStops(tripStopsCopy.stops, isBestSequence).then((stops) =>
-		{
-			return stops;
-		});
 	};
 
 	RoutingFieldTripStopDataModel.prototype.insertTripStopToTrip = function(data, positionIndex)
@@ -1019,4 +965,9 @@
 			IncludeNoStudStop: tf.storageManager.get("tripStop-IncludeNoStudStop") ? true : false,
 		};
 	};
+
+	RoutingFieldTripStopDataModel.prototype.dispose = function()
+	{
+		this.onFieldTripStopUpdatedEvent?.unsubscribeAll();
+	}
 })();

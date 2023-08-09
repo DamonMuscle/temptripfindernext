@@ -1241,10 +1241,10 @@
 		return this.fieldTripStopDataModel.calculateSmartSequence(trip, tripStop);
 	};
 
-	RoutingDataModel.prototype.changeStopPosition = function(tripStop, tripId, newPositionIndex)
+	RoutingDataModel.prototype.changeStopPosition = function(tripStop, fieldTripId, newPositionIndex)
 	{
 		var self = this;
-		return self.fieldTripStopDataModel.reorderTripStopSequence(tripStop, tripId, newPositionIndex + 1);
+		return self.fieldTripStopDataModel.reorderTripStopSequence(tripStop, fieldTripId, newPositionIndex + 1);
 	};
 
 	RoutingDataModel.prototype._removeNotOpenEditTrips = function(openTrips)
@@ -3037,6 +3037,7 @@
 		PubSub.unsubscribe(self.setUserProfileTripColor);
 		PubSub.unsubscribe(self.stopPathChange);
 		self.tripLockData.dispose();
+		self.fieldTripStopDataModel.dispose();
 		tfdispose(self);
 	};
 

@@ -1071,6 +1071,25 @@
 		return highlightStop;
 	}
 
+	FieldTripMap.prototype.updateStopInfo = function(data)
+	{
+		const self = this,
+			{ DBID, fieldTripStopId, fromFieldTripId, toFieldTripId, toStopSequence, color } = data,
+			stopFeatures = self._getStopFeatures().filter(f => f.attributes.DBID === DBID &&
+				f.attributes.FieldTripId === fromFieldTripId &&
+				f.attributes.id === fieldTripStopId);
+
+		if (stopFeatures.length === 1)
+		{
+			const feature = stopFeatures[0];
+			feature.attributes.DBID = DBID;
+			feature.attributes.FieldTripId = toFieldTripId;
+			feature.attributes.Color = color;
+			feature.attributes.Sequence = toStopSequence;
+			feature.symbol = self.fieldTripStopLayerInstance.getStopSymbol(toStopSequence, color);
+		}
+	}
+
 	//#endregion
 
 	//#endregion
