@@ -1401,7 +1401,12 @@
 		{
 			const dataTypeName = tf.dataTypeHelper.getFormalDataTypeName(dataType);
 
-			errorMessage = `Cannot create a new ${dataTypeName} with current layout, because ${blameMessage}!`;
+			if (layoutData)
+			{
+				updateTips = ' Do you want to update the current Layout?';
+			}
+
+			errorMessage = `Cannot create a new ${dataTypeName} with current layout, because ${blameMessage}. ${updateTips}`;
 		}
 
 		return errorMessage;

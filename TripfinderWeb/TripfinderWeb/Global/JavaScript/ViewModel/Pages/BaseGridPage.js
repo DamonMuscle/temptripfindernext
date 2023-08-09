@@ -1241,10 +1241,9 @@
 	{
 		var self = this;
 
-		self.clearSelection();
-
 		if(self.type == "fieldtrip") 
 		{
+			self.clearSelection();
 			var view = {
 				id: undefined,
 				documentType: "DataEntry",
@@ -1272,36 +1271,162 @@
 			ga('send', 'event', 'Area', 'Details');
 			var isReadOnly = !self.selectedItemEditable() && !self.obNewRequest(); // readonly if both Edit and Add are not allowed
 
-			if(self.detailView && self.obShowDetailPanel())
-			{
-				self.detailView.showDetailViewById(null, self.type, null, isReadOnly);
-			}
-			else
-			{
-				self.detailView = new TF.DetailView.DetailViewViewModel(null, this.pageLevelViewModel, isReadOnly, {}, self.type);	
+			const isSilent = false;
+			const newCopyContext = null;
+			const dataType = self.type;
+			const detailViewHelper = tf.helpers.detailViewHelper;
+			const detailView = self.detailView;
+			const getLayoutPromise = detailView ? detailView.getActiveLayoutData(false) : detailViewHelper.fetchActiveLayoutData(dataType);
 
-				self.detailView.onCloseDetailEvent.subscribe(
-					self.closeDetailClick.bind(this)
-				);
-				self.detailView.onCreateNewRecordSuccess.subscribe(
-					self.onCreateNewRecordSuccessHandler.bind(self)
-				);
-				self.detailView.onEditRecordSuccess.subscribe(
-					self.onEditRecordSuccessHandler.bind(self)
-				);
-
-				if (TF.isMobileDevice)
+			Promise.resolve(getLayoutPromise).then(layout =>
+			{
+				const errorMsg = tf.helpers.detailViewHelper.checkLayoutEligibilityToCreateNew(layout, dataType);
+				if (errorMsg)
 				{
-					tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
+					tf.promiseBootbox.yesNo({
+						title: "Confirmation Message",
+						message: errorMsg
+					}).then(shouldProceed =>
+					{
+						if (shouldProceed)
+						{
+							if (detailView)
+							{
+								self.loadCurrentDetailViewLayout(detailView);
+							}
+							else
+							{
+								// if no available layout then create new layout.
+								if (!layout)
+								{
+									const prepareDetailView = self.resetDetailView(null, dataType, isSilent, isReadOnly, true, data.newCopyContext);
+									Promise.resolve(prepareDetailView).then(() => self.detailView.handleModifyItemEvent({ isNew: true }));
+									return;
+								}
+
+								// if exists available layout and  the detail view is null or the detail view different with current grid type then reset and load it.
+								self.resetDetailView(null, dataType, isSilent, isReadOnly, false, newCopyContext).then(() =>
+								{
+									self.loadCurrentDetailViewLayout(self.detailView);
+								});
+							}
+						}
+					});
 				}
 				else
 				{
-					tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", self.detailView);
+					self.resetDetailView(null, dataType, isSilent, isReadOnly, false, newCopyContext);
 				}
-			}
-			
-			self.obShowDetailPanel(true);
+			});
 		}
+	};
+
+	/**
+	 * Reconstruct detail view when switching to a new entity.
+	 * (Currently, it is more safe to clean detail view and re-construct it, could be replaced when a better way is found)
+	 *
+	 * @param {Number} recordId null when trying to create a new record
+	 * @param {String} dataType data type
+	 * @param {Boolean} isSilentMode whether it should prompt warning
+	 * @param {Boolean} noDefaultLayout whether it should be initialized with a default layout
+	 * @param {Number} newCopyContext New copy context to store fields & base entity
+	 * @returns
+	 */
+	BaseGridPage.prototype.resetDetailView = function(recordId, dataType, isSilentMode, isReadOnly, noDefaultLayout, newCopyContext)
+	{
+		const self = this;
+		let detailView = self.detailView;
+		let proceedToCleanDetailView = true;
+		let closeDetailView = false;
+
+		if (detailView)
+		{
+			const message = `Do you want to stop ${detailView.recordId ? "editing" : "adding"} current record without saving?`;
+			proceedToCleanDetailView = detailView.exitEditing(message, isSilentMode, { switchRecord: !!recordId, noConfirmation: !!recordId }).then(res =>
+			{
+				if (res)
+				{
+					detailView.dispose();
+				}
+				return res;
+			});
+		}
+
+		return Promise.resolve(proceedToCleanDetailView).then(res =>
+		{
+			if (!res) return;
+
+			if (closeDetailView)
+			{
+				return detailView.closeDetailClick();
+			}
+
+			// dispose sub blocks
+			detailView && detailView.rootGridStack && detailView.rootGridStack.dataBlocks && detailView.rootGridStack.dataBlocks.forEach(function(block)
+			{
+				block.dispose && block.dispose();
+			});
+
+			return BuildNewDetailView();
+		});
+
+		function BuildNewDetailView()
+		{
+			detailView = self.initDetailView(recordId, dataType, isReadOnly, { noDefaultLayout: noDefaultLayout, newCopyContext: newCopyContext });
+
+			const initLayout = noDefaultLayout ? detailView.initDefaultLayout() : null;
+
+			return Promise.resolve(initLayout).then(() =>
+			{
+				return new Promise((resolve) =>
+				{
+					detailView.onInitComplete.subscribe(resolve);
+				});
+			});
+		}
+	};
+
+	BaseGridPage.prototype.initDetailView = function(recordId, dataType, isReadOnly, options)
+	{
+		const self = this;
+		const detailView = new TF.DetailView.DetailViewViewModel(recordId, self.pageLevelViewModel, isReadOnly, options, dataType);
+
+		detailView.onCloseDetailEvent.subscribe(
+			self.closeDetailClick.bind(self)
+		);
+		detailView.onCreateNewRecordSuccess.subscribe(
+			self.onCreateNewRecordSuccessHandler.bind(self)
+		);
+		detailView.onEditRecordSuccess.subscribe(
+			self.onEditRecordSuccessHandler.bind(self)
+		);
+
+		if (TF.isMobileDevice)
+		{
+			tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView);
+		}
+		else
+		{
+			tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", detailView);
+		}
+
+		self.detailView = detailView;
+		return detailView;
+	};
+
+	BaseGridPage.prototype.loadCurrentDetailViewLayout = function(detailView)
+	{
+		detailView.exitEditing().then(result =>
+		{
+			if (!result) return;
+
+			detailView.dataPointPanel.updateDataPoints().then(() =>
+			{
+				detailView.handleModifyItemEvent({
+					id: detailView.layoutTemplateBeforeEditing.Id
+				});
+			});
+		})
 	};
 
 	/**

@@ -147,7 +147,7 @@
 			prepareDefaultLayout = self.initDefaultLayout()
 				.then(() =>
 				{
-					self.applyLayoutTemplate({ isReadMode: true, layoutId: self.getEffectiveDetailLayoutId() })
+					return self.applyLayoutTemplate({ isReadMode: true, layoutId: self.getEffectiveDetailLayoutId() })
 						.then(() =>
 						{
 							self.updateDetailViewTitle();

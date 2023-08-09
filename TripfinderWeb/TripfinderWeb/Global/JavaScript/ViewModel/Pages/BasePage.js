@@ -151,13 +151,17 @@
 		self.obShowDetailPanel(true);
 	};
 
-	BasePage.prototype.closeDetailClick = function (filter)
+	BasePage.prototype.closeDetailClick = function (filter, options)
 	{
-		var self = this,
-			isReadRecordMode = self.detailView.isReadMode(),
-			exitEditing = isReadRecordMode
+		var self = this;
+		let exitEditing = true;
+
+		if((!options || !options.forceClose) && self.detailView.isReadMode)
+		{
+			exitEditing = self.detailView.isReadMode()
 				? self.detailView.exitEditing()
 				: self.detailView.checkLayoutChangeAndClose();
+		}
 
 		return Promise.resolve(exitEditing)
 			.then(function (result)
