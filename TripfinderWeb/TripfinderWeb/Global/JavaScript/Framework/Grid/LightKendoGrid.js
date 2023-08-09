@@ -3394,6 +3394,7 @@
 		switch (definition.type)
 		{
 			case "string":
+			case "select":
 				column.filterable = {
 					cell: {
 						operator: "contains",
