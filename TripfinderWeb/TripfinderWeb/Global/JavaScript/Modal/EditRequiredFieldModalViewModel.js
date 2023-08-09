@@ -17,7 +17,9 @@
 	{
 		var self = this,
 			type = self.options ? self.options.gridType : "[Type]",
-			title = String.format("Add {0} Required Fields", tf.dataTypeHelper.getDisplayNameByDataType(type));
+			typeName = tf.dataTypeHelper.getDisplayNameByDataType(type),
+			typeSingularName = tf.applicationTerm.getApplicationTermSingularByName(typeName),
+			title = String.format("Add {0} Required Fields", typeSingularName);
 		self.sizeCss = "modal-lg";
 		self.title(title);
 		self.contentTemplate('modal/RequiredField');
