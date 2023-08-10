@@ -451,7 +451,7 @@
 			self.insertBehindSpecialStop = null;
 			this.fileOpenOption = null;
 		}
-		return self._createFromSearchResult(option).then(function(data)
+		return self.createFromSearchResult(option).then(function(data)
 		{
 			self._viewModal.setMode("Routing", "Normal");
 			return data;

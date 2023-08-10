@@ -372,7 +372,7 @@
 			authorization: "location",
 			hasDBID: true,
 			enableDetailView: true
-		},		
+		},
 		other: {
 			name: "Other"
 		}

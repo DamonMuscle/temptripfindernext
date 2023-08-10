@@ -1407,7 +1407,7 @@
 		stopTool.reverseGeocodeStop(data.geometry, data.address).then((result) =>
 		{
 			data.address = result;
-			this.dataModel.viewModel.eventsManager.createTripStopFromSearchResult([data], { trip: this.trip, operate: "CreateNewTrip" }).then(function(trip)
+			this.dataModel.viewModel.eventsManager.createFieldTripStopFromSearchResult([data], { trip: this.trip, operate: "CreateNewTrip" }).then(function(trip)
 			{
 				if (trip)
 				{

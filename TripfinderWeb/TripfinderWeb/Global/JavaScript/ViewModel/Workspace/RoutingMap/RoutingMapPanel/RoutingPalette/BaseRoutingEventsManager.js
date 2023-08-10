@@ -26,16 +26,23 @@
 		return null;
 	};
 
-	BaseRoutingEventsManager.prototype._createFromSearchResult = function(option)
+	BaseRoutingEventsManager.prototype.createFromSearchResult = function(option)
 	{
 		var self = this;
 		var map = this._viewModal._map;
 		var options = {
 			onChoseFromFileEvent: self.createChangeEvent.bind(self)
 		};
+		self.routingSearchViewmodel = new TF.RoutingMap.RoutingPalette.RoutingSearchModalViewModel(map, options);
+		return tf.modalManager.showModal(self.routingSearchViewmodel)
+			.then(function(data)
+			{
+				self.routingSearchViewmodel = null;
+				self.createFieldTripStopFromSearchResult(data, option);
+			});
 	};
 
-	BaseRoutingEventsManager.prototype.createTripStopFromSearchResult = function(data, option)
+	BaseRoutingEventsManager.prototype.createFieldTripStopFromSearchResult = function(data, option)
 	{
 		var self = this;
 		if (!data || data.length == 0)
@@ -59,8 +66,9 @@
 		{
 			if (data.length == 1)
 			{
-				self.createFromSingle(data[0], data[0].geometry, isCreateFromStopSearch, true);
-			} else
+				self.createFromSingle(data[0], isCreateFromStopSearch, true);
+			}
+			else
 			{
 				self.createFromMultiple(data, {
 					isCreateFromStopSearch: isCreateFromStopSearch,
@@ -70,7 +78,7 @@
 		}
 	};
 
-	BaseRoutingEventsManager.prototype.createFromSingle = function(point, geometry, isCreateFromStopSearch, isCreateFromSearch)
+	BaseRoutingEventsManager.prototype.createFromSingle = function(point, isCreateFromStopSearch, isCreateFromSearch)
 	{
 		var self = this;
 		var map = this._viewModal._map;

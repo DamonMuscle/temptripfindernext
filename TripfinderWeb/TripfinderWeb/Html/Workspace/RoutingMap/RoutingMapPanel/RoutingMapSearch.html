@@ -1,0 +1,117 @@
+<div class="map-page search-container-modal">
+	<div data-bind="visible:isDisabled" class="overlay"></div>
+	<div class="navigation-container" data-bind="uiInit:init">
+		<div class="navigation-menu animate expand" data-bind="css:{'on-quick-search':obIsActive}">
+			<div class="navigation-quick-search" data-bind="css: obIsActive() ? 'focus':''">
+				<div class="quick-search-container">
+					<div class="search-header" data-bind="css: obIsLoading()? 'searching':''">
+						<div class="item-icon quick-search-spinner"></div>
+						<div class="item-icon quick-search search-btn" data-bind="click:onSearchIconClick"></div>
+						<input class="search-text font16" maxlength="50" autocomplete="off" autocorrect="off" data-bind="attr: {placeholder: searchBoxPlaceHolderText}" autocapitalize="off" spellcheck="false" placeholder="Search">
+						<div class="item-icon clear-btn quick-search-close" data-bind="click:clearSearchClick"></div>
+					</div>
+				</div>
+				<div class="search-control-row">
+					<div class="type-selector" data-bind="click:openTypesMenuClick">
+						<div class="select-type" data-bind="text:obSelectType().text"></div>
+						<div class="dropdown-btn"></div>
+						<div class="dropdown-menu">
+							<ul>
+								<!--ko foreach: obAllTypes-->
+								<li data-bind="text:text, click:$parent.selectTypeClick"></li>
+								<!--/ko -->
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="search-content" data-bind="css: obHasSearchBeenConducted() ? 'result' :''">
+					<div class="no-recent-search" data-bind="style: {display: !obHasSearchBeenConducted() ? 'block' : 'none'}">
+						<div class="no-recent-search-content">
+							Start by typing in a search term above.
+						</div>
+					</div>
+					<div class="search-result" data-bind="style: {display: obHasSearchBeenConducted() ? 'block' : 'none'}">
+						<div class="virtual-container">
+							<div class="virtual-content">
+								<!-- ko if: obSuggestedResult().length === 0 -->
+								<div class="no-result">
+									<div class="result-head">
+										<div class="head-label">Sorry, no results found for&nbsp;</div>
+										<div class="search-text" data-bind="text: obInputTextHint, attr: {title: obInputTextHint}" x-ms-format-detection="none"></div>
+									</div>
+								</div>
+								<!-- /ko -->
+								<!-- ko if: obSuggestedResult().length > 0 -->
+								<div class="result-content">
+									<div class="result-group">
+										<div class="overlay"></div>
+										<!--ko foreach: obSuggestedResult -->
+										<div class="section" data-bind="event:{mouseover:$parent.mouseOnSection,mouseout:$parent.mouseOnSection},click: $parent.viewAllClick">
+											<div class="section-title" data-bind="text: title.toUpperCase()"></div>
+											<div class="view-in-grid" data-bind="visible:count>3&&$parent.obSelectType().value=='all'">
+												<span class="icon right-caret small"></span>
+												<span data-bind="text:'All '+$parent.toSingleTitle(title)+' Results'"></span>
+											</div>
+										</div>
+										<div class="data-cards">
+											<!--ko foreach:cards -->
+											<div class="card" data-bind="style:{borderColor: $parent.color},css:{selected:$data.selected||false}, click:$parents[1].suggestedResultClick, attr:{'data-index': Id}">
+												<div class="card-left" data-bind="css:{'no-button':!$parents[1].obAddButtonVisible()}">
+													<div class="card-title" bind-field="title" data-bind="text: title, attr: {title: title}, css: {'full-height': !subtitle, 'no-content': !title}">
+													</div>
+													<div class="school-grade" data-bind=" visible:!!$data.schoolGrade, text: $data.schoolGrade"></div>
+													<div class="card-subtitle" bind-field="subtitle" data-bind="text: subtitle, attr: {title: subtitle}, css:{'no-content': !subtitle, 'full-height': !title}" x-ms-format-detection="none"></div>
+													<!--ko if: $data.rightInfo -->
+													<div class="card-right-info" data-bind="html:$data.rightInfo"></div>
+													<!--/ko -->
+												</div>
+												<div class="icon right-plus" data-bind="visible:$parents[1].obAddButtonVisible(),click:$parents[1].suggestedResultAddClick">
+												</div>
+											</div>
+											<!--/ko -->
+										</div>
+										<!--/ko -->
+									</div>
+								</div>
+								<!-- /ko -->
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<div class="result-count">
+					<pre class="titleNotify"><span data-bind="text:obAllResultsCount"></span> <span data-bind="text:obAllResultsCount()==1?'Record':'Records'"></span></pre>
+				</div>
+			</div>
+		</div>
+		<div class="upload-file-container hide">
+			<div class="geocode-label-container">
+				Geocode
+			</div>
+			<div class="geocode-list">
+				<div class="form-group small-form-group">
+					<div class="input-group" data-bind="">
+						<div id="GeocodeTypeDropDown" data-bind="typeahead:{source:obGeocodeTpyes,format:function(obj){return obj.text;},drowDownShow:true,notSort:true,selectedValue:obGeocodeSelectType}">
+							<!-- ko customInput:{type:"Select",value:obGeocodeSelectTypeText,attributes:{class:"form-control"}} -->
+							<!-- /ko -->
+						</div>
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default btn-sharp">
+								<span class="caret"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="drop-container">
+				Drop file to add stops or
+			</div>
+			<div class="upload-btn-wrapper">
+				<label for="fileCreateFromFile" class="upload-button btn">
+					Upload File
+				</label>
+				<input id="fileCreateFromFile" data-bind="event:{change:createFromFileChangeEvent}" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+			</div>
+		</div>
+	</div>
+</div>
