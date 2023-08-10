@@ -157,8 +157,8 @@
 		];
 
 		return {
-			Columns: columns.concat(tf.UDFDefinition.getAvailableWithCurrentDataSource("location")),
-			InvisibleUDFColumns: tf.UDFDefinition.getInvisibleUDFs("location")
+			Columns: columns.concat(tf.UDFDefinition.getAvailableWithCurrentDataSource("fieldtriplocation")),
+			InvisibleUDFColumns: tf.UDFDefinition.getInvisibleUDFs("fieldtriplocation")
 		};
 	};
 
