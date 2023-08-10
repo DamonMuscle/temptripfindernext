@@ -3143,6 +3143,9 @@
 		{
 			currentColumns = this._gridDefinition.Columns;
 		}
+
+		currentColumns = this.handleUDFColumns(currentColumns);
+
 		var columns = this.getKendoColumnsExtend(currentColumns, columnsdefalultColumnWidth);
 		if (this.obShowEyeColumn())
 		{
