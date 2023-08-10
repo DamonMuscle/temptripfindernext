@@ -54,6 +54,7 @@
 			}
 		};
 		this.defineReadOnlyProperty("PATH_LINE_TYPE", PATH_LINE_TYPE);
+		mapInstance.onMapViewExtentChangeEvent.subscribe(this.onMapViewExtentChangeHandler.bind(this));
 	}
 
 	//#region Property
@@ -168,8 +169,21 @@
 		}
 
 		const arrowRenderer = self._getArrowRenderer();
-		self.fieldTripPathArrowLayerInstance = self.arrowLayerHelper.create(RoutingPalette_FieldTripPathArrowLayerId, RoutingPalette_FieldTripPathArrowLayer_Index, arrowRenderer);
-		self.fieldTripSequenceLineArrowLayerInstance = self.arrowLayerHelper.create(RoutingPalette_FieldTripSequenceLineArrowLayerId, RoutingPalette_FieldTripSequenceLineArrowLayer_Index, arrowRenderer);
+		const pathArrowLayerOptions = {
+			id: RoutingPalette_FieldTripPathArrowLayerId,
+			index: RoutingPalette_FieldTripPathArrowLayer_Index,
+			renderer: arrowRenderer
+		};
+		self.fieldTripPathArrowLayerInstance = new TF.GIS.Layer.PathArrowLayer(self.mapInstance, pathArrowLayerOptions);
+		self.mapInstance.addLayerInstance(self.fieldTripPathArrowLayerInstance);
+
+		const sequenceArrowLayerOptions = {
+			id: RoutingPalette_FieldTripSequenceLineArrowLayerId,
+			index: RoutingPalette_FieldTripSequenceLineArrowLayer_Index,
+			renderer: arrowRenderer
+		};
+		self.fieldTripSequenceLineArrowLayerInstance = new TF.GIS.Layer.PathArrowLayer(self.mapInstance, sequenceArrowLayerOptions);
+		self.mapInstance.addLayerInstance(self.fieldTripSequenceLineArrowLayerInstance);
 	}
 
 	//#endregion
@@ -489,15 +503,15 @@
 		this.redrawFieldTripArrows([fieldTrip]);
 	}
 
-	FieldTripMap.prototype._updatePathArrowFeatureColor = function(layerInstance, condition, color)
+	FieldTripMap.prototype._updatePathArrowFeatureColor = function(arrowLayerInstance, condition, color)
 	{
 		const arrowOnPath = this._isArrowOnPath();
-		const layerRenderer = layerInstance.layer.renderer.clone();
+		const layerRenderer = arrowLayerInstance.getRenderer().clone();
 		const valueInfo = layerRenderer.uniqueValueInfos.filter(item => item.description === condition)[0];
 		valueInfo.value = color;
 		valueInfo.symbol = this.arrowLayerHelper.getArrowSymbol(arrowOnPath, color);
 
-		layerInstance.layer.renderer = layerRenderer;
+		arrowLayerInstance.setRenderer(layerRenderer);
 	}
 
 	//#endregion
@@ -681,7 +695,7 @@
 
 	//#region Refresh Field Trip Path
 
-	FieldTripMap.prototype.refreshFieldTripPath = async function(fieldTrip, effectSequences)
+	FieldTripMap.prototype.refreshFieldTripPath = async function(fieldTrip, effectSequences, callZoomToLayers = true)
 	{
 		this.clearFieldTripPath(fieldTrip);
 		await this.clearFieldTripPathArrow(fieldTrip);
@@ -693,7 +707,10 @@
 		await this.updateFieldTripPathVisibility([fieldTrip]);
 
 		this.orderFeatures();
-		this.zoomToFieldTripLayers([fieldTrip]);
+		if (callZoomToLayers)
+		{
+			this.zoomToFieldTripLayers([fieldTrip]);
+		}
 	}
 
 	FieldTripMap.prototype.clearFieldTripPath = function(fieldTrip)
@@ -1075,6 +1092,7 @@
 	{
 		const self = this,
 			{ DBID, fieldTripStopId, fromFieldTripId, toFieldTripId, toStopSequence, color } = data,
+			fieldTrip = self.fieldTripsData.find(item => item.id === toFieldTripId),
 			stopFeatures = self._getStopFeatures().filter(f => f.attributes.DBID === DBID &&
 				f.attributes.FieldTripId === fromFieldTripId &&
 				f.attributes.id === fieldTripStopId);
@@ -1087,6 +1105,7 @@
 			feature.attributes.Color = color;
 			feature.attributes.Sequence = toStopSequence;
 			feature.symbol = self.fieldTripStopLayerInstance.getStopSymbol(toStopSequence, color);
+			feature.visible = fieldTrip?.visible;
 		}
 	}
 
@@ -1098,7 +1117,7 @@
 
 	//#region Map Events
 
-	FieldTripMap.prototype.onMapCanvasMapExtentChangeEvent = function(fieldTrips)
+	FieldTripMap.prototype.onMapViewExtentChangeHandler = function()
 	{
 		const self = this;
 		if (self.mapExtentChangeTimeout !== null)
@@ -1111,6 +1130,7 @@
 		{
 			if (self.mapInstance?.map.mapView.stationary)
 			{
+				const fieldTrips = self.fieldTripsData;
 				self.redrawFieldTripArrows(fieldTrips);
 			}
 
@@ -1367,8 +1387,8 @@
 	FieldTripMap.prototype.updateArrowRenderer = function()
 	{
 		const arrowRenderer = this._getArrowRenderer();
-		this.fieldTripPathArrowLayerInstance.layer.renderer = arrowRenderer;
-		this.fieldTripSequenceLineArrowLayerInstance.layer.renderer = arrowRenderer;
+		this.fieldTripPathArrowLayerInstance.setRenderer(arrowRenderer);
+		this.fieldTripSequenceLineArrowLayerInstance.setRenderer(arrowRenderer);
 	}
 
 	FieldTripMap.prototype._showArrowLayer = function()

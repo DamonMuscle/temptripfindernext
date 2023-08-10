@@ -730,16 +730,16 @@
 	BaseFieldTripStopEditModal.prototype.applyClick = function()
 	{
 		var self = this;
-		var drawTool = self.dataModel.viewModel.drawTool;
+		// var drawTool = self.dataModel.viewModel.drawTool;
 		self.save().then(function(result)
 		{
 			if (result)
 			{
-				if (drawTool._newTripStopGraphic && self.data.length == 1 && !$.isArray(drawTool._newTripStopGraphic))
-				{
-					drawTool._newTripStopGraphic.geometry = self.data[0].geometry;
-				}
-				drawTool.stopTool.clearCandidateGraphics();
+				// if (drawTool._newTripStopGraphic && self.data.length == 1 && !$.isArray(drawTool._newTripStopGraphic))
+				// {
+				// 	drawTool._newTripStopGraphic.geometry = self.data[0].geometry;
+				// }
+				// drawTool.stopTool.clearCandidateGraphics();
 				self.hide();
 			}
 		});

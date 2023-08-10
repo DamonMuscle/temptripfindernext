@@ -23,42 +23,6 @@
 		});
 	};
 
-	ArrowLayerHelper.prototype.create = function(layerId, layerIndex, renderer)
-	{
-		const self = this;
-		const arrowLayer = self.mapInstance.addLayer({
-			id: layerId,
-			index: layerIndex,
-			geometryType: self.mapInstance.GEOMETRY_TYPE.POINT,
-			objectIdField: "oid",
-			spatialReference: {
-				wkid: self.mapInstance.WKID_WEB_MERCATOR
-			},
-			minScale: TF.Helper.MapHelper.zoomToScale(self.mapInstance.map, 13),
-			fields: [
-				{
-					name: "oid",
-					type: "oid"
-				}, {
-					name: "angle",
-					type: "double"
-				}, {
-					name: "DBID",
-					type: "integer"
-				}, {
-					name: "Id",
-					type: "integer"
-				}, {
-					name: "Color",
-					type: "string"
-				}],
-			source: [],
-			renderer: renderer
-		}, self.mapInstance.LAYER_TYPE.FEATURE);
-
-		return arrowLayer;
-	}
-
 	ArrowLayerHelper.prototype.createUniqueValueRenderer = function(uniqueValueInfos)
 	{
 		const renderer = {
