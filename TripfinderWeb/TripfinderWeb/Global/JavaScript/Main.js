@@ -261,8 +261,8 @@ createNamespace("TF").isMobileDevice = isMobileDevice();
 createNamespace("TF").isSafari = isSafari();
 createNamespace("TF").isIOS = isIOS();
 createNamespace("TF").isPhoneDevice = isPhoneDevice();
-createNamespace("TF").isPortrait = isPortrait();
-createNamespace("TF").isLandscape = isLandscape();
+createNamespace("TF").isPortrait = isPortrait;
+createNamespace("TF").isLandscape = isLandscape;
 createNamespace("TF").isAndroid = isAndroid();
 createNamespace("TF").getIOSVersion = getIOSVersion();
 

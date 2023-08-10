@@ -2236,7 +2236,7 @@
 				}
 				else if (item.udfId)
 				{
-					var udfField = recordEntity.UserDefinedFields.filter(function(udf) { return udf.Id === item.udfId });
+					var udfField = (recordEntity.UserDefinedFields || []).filter(function(udf) { return udf.Id === item.udfId });
 					if ((udfField.length > 0 && (udfField[0].RecordValue == null || udfField[0].RecordValue.length === 0))
 						|| udfField.length == 0)
 					{

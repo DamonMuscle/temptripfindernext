@@ -1391,7 +1391,7 @@
 				const isSingle = missingFields.length === 1;
 				const suffix = isSingle ? "" : "s";
 				const link = isSingle ? "is" : "are";
-				const fieldLabels = missingFields.map(field => `"${field.dataPointTitle}"`).join(", ");
+				const fieldLabels = missingFields.map(field => `"${field.dataPointTitle || field.title}"`).join(", ");
 
 				blameMessage = `required field${suffix} ${fieldLabels} ${link} missing`;
 			}
@@ -1400,13 +1400,14 @@
 		if (blameMessage)
 		{
 			const dataTypeName = tf.dataTypeHelper.getFormalDataTypeName(dataType);
+			const dataTypeSingularName = tf.applicationTerm.getApplicationTermSingularByName(dataTypeName);
 
 			if (layoutData)
 			{
 				updateTips = ' Do you want to update the current Layout?';
 			}
 
-			errorMessage = `Cannot create a new ${dataTypeName} with current layout, because ${blameMessage}. ${updateTips}`;
+			errorMessage = `Cannot create a new ${dataTypeSingularName} with current layout, because ${blameMessage}. ${updateTips}`;
 		}
 
 		return errorMessage;
