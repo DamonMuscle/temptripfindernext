@@ -1411,6 +1411,7 @@
 		}
 
 		self.detailView = detailView;
+		self.obShowDetailPanel(true);
 		return detailView;
 	};
 
