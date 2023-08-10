@@ -68,6 +68,8 @@
 		this.defineReadOnlyProperty('GEOMETRY_TYPE', GEOMETRY_TYPE);
 		this.defineReadOnlyProperty('WKID_WEB_MERCATOR', WKID_WEB_MERCATOR);
 		this.create($mapContainer);
+
+		this.onMapViewExtentChangeEvent = new TF.Events.Event();
 	}
 
 	/**
@@ -325,10 +327,10 @@
 			self.eventHandler.onMapViewCreatedPromise = mapView.when(self.settings.eventHandlers.onMapViewCreated);
 		}
 
-		if (self.settings.eventHandlers.onMapViewExtentChanges)
+		self.eventHandler.onMapViewExtentChanges = mapView.watch('extent', (previous, extent, _) =>
 		{
-			self.eventHandler.onMapViewExtentChanges = mapView.watch('extent', self.settings.eventHandlers.onMapViewExtentChanges);
-		}
+			self.onMapViewExtentChangeEvent.notify({previous, extent});
+		});
 
 		if (self.settings.eventHandlers.onMapViewKeyUp)
 		{
@@ -367,6 +369,8 @@
 
 			self.settings.eventHandlers[name] = null;
 		}
+
+		this.onMapViewExtentChangeEvent?.unsubscribeAll();
 	}
 
 	Map.prototype.setMapCursor = function(cursorType)

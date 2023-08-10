@@ -246,7 +246,7 @@
 				stop.Sequence = i + 1;
 			});
 			stops = self._sortTripStops(stops);
-			solvePromise = self._refreshTripPathByTripStops(stops);
+			solvePromise = self._refreshTripPathByTripStops(stops, false);
 		}
 		else if (isSmartSequence)
 		{
@@ -597,7 +597,8 @@
 		});
 		tripStops = self._sortTripStops(tripStops);
 		trip.FieldTripStops = tripStops;
-		return self._refreshTripPathByTripStops(tripStops, deleteTripStops).then(function(tripStops)
+		const callZoomToLayers = !isMoveToOtherTrip;
+		return self._refreshTripPathByTripStops(tripStops, callZoomToLayers).then(function(tripStops)
 		{
 			editTripStops.forEach(function(stop)
 			{
@@ -828,9 +829,9 @@
 		})
 	}
 
-	RoutingFieldTripStopDataModel.prototype._refreshTripPathByTripStops = function(tripStops, deleteStops, isBestSequence)
+	RoutingFieldTripStopDataModel.prototype._refreshTripPathByTripStops = function(tripStops, callZoomToLayers = true)
 	{
-		const data = { tripStops, deleteStops, isBestSequence };
+		const data = { tripStops, callZoomToLayers };
 		PubSub.publish("on_MapCanvas_RefreshTripByStops", data);
 		return Promise.resolve(tripStops);
 	};

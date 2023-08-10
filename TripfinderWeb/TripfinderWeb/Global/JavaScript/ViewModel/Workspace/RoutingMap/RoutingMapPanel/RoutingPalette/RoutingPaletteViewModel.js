@@ -34,7 +34,6 @@
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocation, self.onFieldTripMapDeleteStopLocation.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.HighlightFieldTripStop, self.onFieldTripMapHighlightFieldTripStop.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.ClearHighlightFieldTripStop, self.onFieldTripMapClearHighlightFieldTripStop.bind(self));
-		mapCanvasPage.onMapViewExtentChangeEvent.subscribe(self.onMapCanvasMapExtentChangeHandler.bind(self));
 		mapCanvasPage.onMapViewClickEvent.subscribe(self.onMapCanvasMapViewClickHandler.bind(self));
 		mapCanvasPage.onMapViewKeyUpEvent.subscribe(self.onMapCanvasMapViewKeyUpHandler.bind(self));
 		mapCanvasPage.onMapViewMouseWheelEvent.subscribe(self.onMapCanvasMapViewMouseWheelHandler.bind(self));
@@ -253,13 +252,13 @@
 
 	RoutingPaletteViewModel.prototype.onMapCanvas_RefreshPathByStops = function(_, data)
 	{
-		const { tripStops, deleteStops, isBestSequence } = data;
+		const { tripStops, callZoomToLayers } = data;
 		if (tripStops && tripStops.length > 0)
 		{
 			const fieldTripId = tripStops[0].FieldTripId;
 			const fieldTrip = this.dataModel.trips.find(item => item.id === fieldTripId);
 			const effectSequences = tripStops.map(s => s.Sequence);
-			this.fieldTripMap?.refreshFieldTripPath(fieldTrip, effectSequences);
+			this.fieldTripMap?.refreshFieldTripPath(fieldTrip, effectSequences, callZoomToLayers);
 		}
 	}
 
@@ -400,12 +399,6 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapClearHighlightFieldTripStop = function(_, data)
 	{
 		this.fieldTripMap?.clearHighlightFeatures();
-	}
-
-	RoutingPaletteViewModel.prototype.onMapCanvasMapExtentChangeHandler = function(_, data)
-	{
-		const fieldTrips = this.dataModel.trips;
-		this.fieldTripMap?.onMapCanvasMapExtentChangeEvent(fieldTrips);
 	}
 
 	RoutingPaletteViewModel.prototype.onMapCanvasMapViewClickHandler = function(_, data)
