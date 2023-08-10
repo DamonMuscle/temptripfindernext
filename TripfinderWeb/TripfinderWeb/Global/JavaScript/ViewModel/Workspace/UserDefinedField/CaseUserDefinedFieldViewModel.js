@@ -360,6 +360,9 @@
 			case "report":
 				columns = tf.reportGridDefinition.gridDefinition().Columns;
 				break;
+			case "fieldtriplocation":
+				columns = tf.fieldtripLocationGridDefinition.gridDefinition().Columns;
+				break;
 		}
 
 		var result = columns.slice().map(c => ({
