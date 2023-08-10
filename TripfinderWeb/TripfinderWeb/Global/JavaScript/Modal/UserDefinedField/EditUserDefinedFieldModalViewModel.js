@@ -19,7 +19,9 @@
 			type = self.options ? self.options.gridType : "[Type]",
 			isNew = !self.options.dataEntity,
 			isCopy = self.options.dataEntity && self.options.dataEntity.isCopy,
-			title = (isNew || isCopy ? "Add " : "Edit ") + tf.dataTypeHelper.getDisplayNameByDataType(type) + (self.options.isUDFGroup ? " Question" : " User Defined Field");
+			dataTypeName = tf.dataTypeHelper.getDisplayNameByDataType(type),
+			dataTypeSingularName = tf.applicationTerm.getApplicationTermSingularByName(dataTypeName),
+			title = (isNew || isCopy ? "Add " : "Edit ") + dataTypeSingularName + (self.options.isUDFGroup ? " Question" : " User Defined Field");
 		self.sizeCss = "modal-lg";
 		self.title(title);
 		self.contentTemplate('modal/UserDefinedField/Base');

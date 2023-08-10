@@ -3,7 +3,7 @@
 	createNamespace("TF.Page").UserDefinedFieldsPage = UserDefinedFieldsPage;
 
 	var _REPORT_GRID_TYPE = "report",
-		_HIDDEN_GRID_TYPES = [_REPORT_GRID_TYPE, "document", "fieldtriplocation"],
+		_HIDDEN_GRID_TYPES = [_REPORT_GRID_TYPE],
 		_PRIMARY_GRID_COLUMNS = [
 			{
 				field: "Id",
