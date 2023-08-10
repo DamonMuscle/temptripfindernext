@@ -70,6 +70,7 @@
 		this.create($mapContainer);
 
 		this.onMapViewExtentChangeEvent = new TF.Events.Event();
+		this.onMapViewScaleChangeEvent = new TF.Events.Event();
 	}
 
 	/**
@@ -329,7 +330,12 @@
 
 		self.eventHandler.onMapViewExtentChanges = mapView.watch('extent', (previous, extent, _) =>
 		{
-			self.onMapViewExtentChangeEvent.notify({previous, extent});
+			self.onMapViewExtentChangeEvent.notify({ previous, extent });
+		});
+
+		self.eventHandler.onMapViewScaleChanges = mapView.watch('scale', (previous, scale, _) =>
+		{
+			self.onMapViewScaleChangeEvent.notify({ previous, scale });
 		});
 
 		if (self.settings.eventHandlers.onMapViewKeyUp)
@@ -371,6 +377,7 @@
 		}
 
 		this.onMapViewExtentChangeEvent?.unsubscribeAll();
+		this.onMapViewScaleChangeEvent?.unsubscribeAll();
 	}
 
 	Map.prototype.setMapCursor = function(cursorType)

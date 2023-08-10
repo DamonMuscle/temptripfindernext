@@ -54,7 +54,6 @@
 			}
 		};
 		this.defineReadOnlyProperty("PATH_LINE_TYPE", PATH_LINE_TYPE);
-		mapInstance.onMapViewExtentChangeEvent.subscribe(this.onMapViewExtentChangeHandler.bind(this));
 	}
 
 	//#region Property
@@ -162,9 +161,11 @@
 		if (self.fieldTripPathArrowLayerInstance && self.fieldTripSequenceLineArrowLayerInstance)
 		{
 			self.mapInstance.removeLayer(RoutingPalette_FieldTripPathArrowLayerId);
+			self.fieldTripPathArrowLayerInstance.dispose();
 			self.fieldTripPathArrowLayerInstance = null;
 
 			self.mapInstance.removeLayer(RoutingPalette_FieldTripSequenceLineArrowLayerId);
+			self.fieldTripSequenceLineArrowLayerInstance.dispose();
 			self.fieldTripSequenceLineArrowLayerInstance = null;
 		}
 
@@ -172,7 +173,10 @@
 		const pathArrowLayerOptions = {
 			id: RoutingPalette_FieldTripPathArrowLayerId,
 			index: RoutingPalette_FieldTripPathArrowLayer_Index,
-			renderer: arrowRenderer
+			renderer: arrowRenderer,
+			eventHandlers: {
+				redraw: self.redrawPathArrowLayer.bind(self)
+			}
 		};
 		self.fieldTripPathArrowLayerInstance = new TF.GIS.Layer.PathArrowLayer(self.mapInstance, pathArrowLayerOptions);
 		self.mapInstance.addLayerInstance(self.fieldTripPathArrowLayerInstance);
@@ -180,7 +184,10 @@
 		const sequenceArrowLayerOptions = {
 			id: RoutingPalette_FieldTripSequenceLineArrowLayerId,
 			index: RoutingPalette_FieldTripSequenceLineArrowLayer_Index,
-			renderer: arrowRenderer
+			renderer: arrowRenderer,
+			eventHandlers: {
+				redraw: self.redrawSequenceArrowLayer.bind(self)
+			}
 		};
 		self.fieldTripSequenceLineArrowLayerInstance = new TF.GIS.Layer.PathArrowLayer(self.mapInstance, sequenceArrowLayerOptions);
 		self.mapInstance.addLayerInstance(self.fieldTripSequenceLineArrowLayerInstance);
@@ -500,7 +507,8 @@
 		const condition = this._extractArrowCondition(DBID, FieldTripId);
 		this._updatePathArrowFeatureColor(this.fieldTripPathArrowLayerInstance, condition, color);
 		this._updatePathArrowFeatureColor(this.fieldTripSequenceLineArrowLayerInstance, condition, color);
-		this.redrawFieldTripArrows([fieldTrip]);
+		this.redrawPathArrowLayer(null, {}, [fieldTrip]);
+		this.redrawSequenceArrowLayer(null, {}, [fieldTrip]);
 	}
 
 	FieldTripMap.prototype._updatePathArrowFeatureColor = function(arrowLayerInstance, condition, color)
@@ -520,13 +528,17 @@
 
 	FieldTripMap.prototype.switchPathType = async function(fieldTrips)
 	{
+		this.fieldTripPathArrowLayerInstance.hide();
+		this.fieldTripSequenceLineArrowLayerInstance.hide();
+
 		this.updateArrowRenderer();
 		await this.updateFieldTripPathVisibility(fieldTrips);
 	}
 
 	FieldTripMap.prototype.updateFieldTripPathVisibility = async function(fieldTrips)
 	{
-		await this.redrawFieldTripArrows(fieldTrips);
+		await this.redrawPathArrowLayer(null, {}, fieldTrips);
+		await this.redrawSequenceArrowLayer(null, {}, fieldTrips);
 
 		this.setFieldTripPathVisibility(fieldTrips);
 		this.setFieldTripSequenceLineVisibility(fieldTrips);
@@ -1117,27 +1129,6 @@
 
 	//#region Map Events
 
-	FieldTripMap.prototype.onMapViewExtentChangeHandler = function()
-	{
-		const self = this;
-		if (self.mapExtentChangeTimeout !== null)
-		{
-			window.clearTimeout(self.mapExtentChangeTimeout);
-			self.mapExtentChangeTimeout = null;
-		}
-
-		self.mapExtentChangeTimeout = window.setTimeout(() =>
-		{
-			if (self.mapInstance?.map.mapView.stationary)
-			{
-				const fieldTrips = self.fieldTripsData;
-				self.redrawFieldTripArrows(fieldTrips);
-			}
-
-			self.mapExtentChangeTimeout = null;
-		}, 500);
-	}
-
 	FieldTripMap.prototype.onMapClickEvent = async function(data)
 	{
 		const self = this, event = data.event;
@@ -1391,13 +1382,6 @@
 		this.fieldTripSequenceLineArrowLayerInstance.setRenderer(arrowRenderer);
 	}
 
-	FieldTripMap.prototype._showArrowLayer = function()
-	{
-		const self = this;
-		self.fieldTripPathArrowLayerInstance.show();
-		self.fieldTripSequenceLineArrowLayerInstance.show();
-	}
-
 	FieldTripMap.prototype.hideArrowLayer = function()
 	{
 		const self = this;
@@ -1405,26 +1389,7 @@
 		self.fieldTripSequenceLineArrowLayerInstance.hide();
 	}
 
-	FieldTripMap.prototype.redrawFieldTripArrows = async function(fieldTrips)
-	{
-		const self = this;
-		self.hideArrowLayer();
-
-		for (let i = 0; i < fieldTrips.length; i++)
-		{
-			const fieldTrip = fieldTrips[i];
-			// update path arrow position no matter whether field trip is visible or not.
-			await self.drawFieldTripPathArrow(fieldTrip);
-			await self.drawSequenceLineArrow(fieldTrip);
-		}
-
-		await self.setFieldTripPathArrowVisibility(fieldTrips);
-		await self.setFieldTripSequenceLineArrowVisibility(fieldTrips);
-
-		self._showArrowLayer();
-	}
-
-	FieldTripMap.prototype.drawFieldTripPathArrow = async function(fieldTrip)
+	FieldTripMap.prototype.redrawPathArrowLayer = async function(_, data = {}, fieldTrips = null)
 	{
 		const self = this;
 		if (self.pathLineType === PATH_LINE_TYPE.Sequence)
@@ -1432,24 +1397,17 @@
 			return;
 		}
 
-		const edits = {};
-		const condition = self._extractArrowCondition(fieldTrip.DBID, fieldTrip.id);
-		const deleteArrows = await self._getPathArrowFeatures(condition);
-		if (deleteArrows.length > 0)
-		{
-			edits.deleteFeatures = deleteArrows;
-		}
+		const fieldTripsData = fieldTrips || self.fieldTripsData,
+			arrowLayerInstance = self.fieldTripPathArrowLayerInstance,
+			pathFeatures = self._getPathFeatures();
 
-		const arrows = self._computeStopPathArrowFeatures(fieldTrip);
-		if (arrows.length >= 0)
-		{
-			edits.addFeatures = arrows;
-		}
-
-		await self.fieldTripPathArrowLayerInstance.layer.applyEdits(edits);
+		arrowLayerInstance.hide();
+		await self._redrawArrowLayer(fieldTripsData, arrowLayerInstance, pathFeatures, data);
+		await self.setFieldTripPathArrowVisibility(fieldTripsData);
+		arrowLayerInstance.show();
 	}
 
-	FieldTripMap.prototype.drawSequenceLineArrow = async function(fieldTrip)
+	FieldTripMap.prototype.redrawSequenceArrowLayer = async function(_, data, fieldTrips = null)
 	{
 		const self = this;
 		if (self.pathLineType === PATH_LINE_TYPE.Path)
@@ -1457,23 +1415,65 @@
 			return;
 		}
 
-		const sequenceLineFeatures = self._getSequenceLineFeatures(),
-			lineFeature = sequenceLineFeatures.filter(feature => feature.attributes.DBID === fieldTrip.DBID && feature.attributes.FieldTripId === fieldTrip.id)[0],
-			arrows = self._computeArrowFeatures(lineFeature);
+		const fieldTripsData = fieldTrips || self.fieldTripsData,
+			arrowLayerInstance = self.fieldTripSequenceLineArrowLayerInstance,
+			sequenceLineFeatures = self._getSequenceLineFeatures();
 
-		const edits = {};
-		const condition = self._extractArrowCondition(fieldTrip.DBID, fieldTrip.id);
-		const deleteArrows = await self._getSequenceLineArrowFeatures(condition);
-		if (deleteArrows.length > 0)
-		{
-			edits.deleteFeatures = deleteArrows;
-		}
-		if (arrows.length >= 0)
-		{
-			edits.addFeatures = arrows;
-		}
+		arrowLayerInstance.hide();
+		await self._redrawArrowLayer(fieldTripsData, arrowLayerInstance, sequenceLineFeatures, data);
+		await self.setFieldTripSequenceLineArrowVisibility(fieldTripsData);
+		arrowLayerInstance.show();
+	}
 
-		await self.fieldTripSequenceLineArrowLayerInstance.layer.applyEdits(edits);
+	FieldTripMap.prototype._redrawArrowLayer = async function(fieldTrips, arrowLayerInstance, pathFeatures, data)
+	{
+		const self = this,
+			{ previous, extent, mapScaleChanged } = data;
+		
+		for (let i = 0; i < fieldTrips.length; i++)
+		{
+			const fieldTrip = fieldTrips[i];
+			const { DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip);
+			const features = pathFeatures.filter(feature => feature.attributes.DBID === DBID && feature.attributes.FieldTripId === FieldTripId);
+			
+			// extent
+			if (mapScaleChanged === false)
+			{
+				const withinExtent = arrowLayerInstance.verifyPathArrowsWithinExtent(features, extent);
+				if (withinExtent)
+				{
+					const withinPreviousExtent = arrowLayerInstance.verifyPathArrowsWithinExtent(features, previous);
+					if (withinPreviousExtent)
+					{
+						// console.log("skip redraw arrows");
+						continue;
+					}
+				}
+			}
+			
+			const edits = {};
+			const condition = self._extractArrowCondition(DBID, FieldTripId);
+			const arrowFeatures = await arrowLayerInstance.queryArrowFeatures(condition);
+			const deleteArrows = arrowFeatures;
+			if (deleteArrows.length > 0)
+			{
+				edits.deleteFeatures = deleteArrows;
+			}
+
+			let arrows = [];
+			for (let j = 0; j < features.length; j++)
+			{
+				const feature = features[j];
+				arrows = arrows.concat(self._computeArrowFeatures(feature));
+			}
+
+			if (arrows.length >= 0)
+			{
+				edits.addFeatures = arrows;
+			}
+
+			await arrowLayerInstance.layer.applyEdits(edits);
+		}
 	}
 
 	FieldTripMap.prototype._computeStopPathArrowFeatures = function(fieldTrip)
