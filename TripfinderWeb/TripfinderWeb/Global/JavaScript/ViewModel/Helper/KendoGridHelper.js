@@ -1234,7 +1234,7 @@
 	};
 	//#endregion
 
-	KendoGridHelper.getStringOfRecords = function (records, columns)
+	KendoGridHelper.getStringOfRecords = function (records, columns, isCopy)
 	{
 		var strRecords = "", strRecord = "";
 		for (var i = 0; i < columns.length; i++)
@@ -1256,14 +1256,14 @@
 				{
 					columnValue = theRecord[column.DisplayName];
 				}
-				columnValue = formatData(column, columnValue);
+				columnValue = formatData(column, columnValue, theRecord, isCopy);
 				strRecord += (columnValue == null ? "" : columnValue) + "\t";
 			}
 			strRecords += strRecord + "\n";
 		}
 		return strRecords;
 
-		function formatData(column, value)
+		function formatData(column, value, theRecord, isCopy)
 		{
 			if (column.formatCopyValue)
 			{
@@ -1272,7 +1272,7 @@
 
 			if ($.isFunction(column.template))
 			{
-				return column.template(theRecord);
+				return column.template(theRecord, isCopy);
 			}
 
 			if (column.type === "date" || column.type === "time" || column.type === "datetime")
