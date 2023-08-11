@@ -768,7 +768,7 @@
 					self.dataModel.viewModel.drawTool._clearTempDrawing();
 				}
 				self.dataModel.viewModel.drawTool.stopTool.clearCandidateGraphics();
-				if (self.mode() == "new")
+				if (self.mode() == "new" && !self.obIsSearchCreate())
 				{
 					PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMap);
 				}
