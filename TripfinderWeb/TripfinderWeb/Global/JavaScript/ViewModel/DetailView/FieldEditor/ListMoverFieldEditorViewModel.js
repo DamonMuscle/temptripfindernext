@@ -84,7 +84,9 @@
 			height: gridHeight,
 			change: function()
 			{
-				self.obLeftSelected(true);
+				var grid = self.$element.find(".left-grid").data("kendoGrid");
+				var selected = grid.select();
+				self.obLeftSelected(selected && selected.length > 0);
 				self.updateBottomBar.call(this, self.$element.find(".left-grid .k-pager-wrap"), self.totalItemCount);
 			},
 			pageable: {},
@@ -138,11 +140,9 @@
 						});
 					}
 				}
-				if (selected.length > 0)
-				{
-					self.obRightSelected(true);
-					self.updateBottomBar.call(this, self.$element.find(".right-grid .k-pager-wrap"), self.totalItemCount);
-				}
+
+				self.obRightSelected(selected && selected.length > 0);
+				self.updateBottomBar.call(this, self.$element.find(".right-grid .k-pager-wrap"), self.totalItemCount);
 			},
 			height: gridHeight,
 			pageable: {},
