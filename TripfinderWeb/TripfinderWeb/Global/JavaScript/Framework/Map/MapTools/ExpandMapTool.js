@@ -92,7 +92,7 @@
 			left: 0,
 			right: 0,
 			bottom: 0,
-			'z-index': this.containerIsBody ? FullScreenMapZIndex : 500,
+			'z-index': this.containerIsBody ? FullScreenMapZIndex : 110,
 			'background-color': 'white'
 		});
 	};
