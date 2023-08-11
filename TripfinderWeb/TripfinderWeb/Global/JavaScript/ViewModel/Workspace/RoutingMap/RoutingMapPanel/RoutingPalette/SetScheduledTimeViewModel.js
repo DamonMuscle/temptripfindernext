@@ -59,7 +59,7 @@
 	SetScheduledTimeViewModel.prototype.init = function(viewModel, element)
 	{
 		var self = this;
-		this.$element = $(element);
+		self.$element = $(element);
 		self.validateInit(viewModel, element);
 	};
 
@@ -89,14 +89,14 @@
 		var isValidating = false;
 		setTimeout(function()
 		{
-			validatorFields.arrivalTime = {
+			validatorFields.stopTime = {
 				trigger: "blur change",
 				validators:
 				{
-					// notEmpty:
-					// {
-					// 	message: "required"
-					// },
+					notEmpty:
+					{
+						message: "required"
+					},
 					callback:
 					{
 						message: " not a valid time.",
@@ -114,11 +114,22 @@
 				}
 			};
 
-			$(el).bootstrapValidator(
+			validatorFields.stopDate = {
+				trigger: "blur change",
+				validators:
+				{
+					notEmpty:
+					{
+						message: "required"
+					}
+				}
+			}
+
+			this.$form.bootstrapValidator(
 				{
 					excluded: [":hidden", ":not(:visible)"],
 					live: "enabled",
-					message: "This value is not valid",
+					message: "This value is not valid!!!",
 					fields: validatorFields
 				}).on("success.field.bv", function(e, data)
 				{
@@ -130,7 +141,8 @@
 					}
 				});
 
-			this.pageLevelViewModel.load(this.$form.data("bootstrapValidator"));
+			self.pageLevelViewModel.load(self.$form.data("bootstrapValidator"));
+			if (self.$form.data("bootstrapValidator")) self.$form.data("bootstrapValidator").validate();
 		}.bind(this));
 	};
 
@@ -153,21 +165,40 @@
 								|| (self.stopAffect() == self.stopAffectEnum.AllFollowing && tripStopTemp.Sequence > self.tripStop.Sequence)
 							)
 							{
+								if (tripStopTemp.PrimaryDeparture)
+								{
+									tripStopTemp.StopTime = tripStopTemp.StopTimeDepart;
+								}
+								else
+								{
+									tripStopTemp.StopTime = tripStopTemp.StopTimeArrive;
+								}
+
 								tripStopTemp.StopTime = (self.changeType() == self.changeTypeEnum.Add ?
 									(moment(tripStopTemp.StopTime, "HH:mm:ss").add(self.numOfMinutes(), "minutes"))
 									: (moment(tripStopTemp.StopTime, "HH:mm:ss").subtract(self.numOfMinutes(), "minutes")));
-								tripStopTemp.StopTime = tripStopTemp.StopTime.format("HH:mm:ss");
+								tripStopTemp.StopTime = tripStopTemp.StopTime.format("YYYY-MM-DDTHH:mm:ss");
+
+								if(!tripStopTemp.PrimaryDeparture && !tripStopTemp.PrimaryDestination)
+								{
+									tripStopTemp.StopTimeArrive = tripStopTemp.StopTime;
+									tripStopTemp.StopTimeDepart = moment(self.tripStop.StopTimeArrive)
+																		.add(Math.ceil(moment.duration(tripStopTemp.Duration).asMinutes()), "minutes")
+																		.format("YYYY-MM-DDTHH:mm:ss");
+								}
 							}
 						});
 					}
-
-					if (self.tripStop.Sequence == 1)
-					{
-						self.tripStop.StopTimeDepart = self.tripStop.StopTime;
-					}
 					else
 					{
-						self.tripStop.StopTimeArrive = self.tripStop.StopTime;
+						if (self.tripStop.PrimaryDepature)
+						{
+							self.tripStop.StopTimeDepart = self.tripStop.StopTime;
+						}
+						else
+						{
+							self.tripStop.StopTimeArrive = self.tripStop.StopTime;
+						}
 					}
 
 					var data = { isUpdatedRelatedTime: isUpdatedRelatedTime, trip: self.trip, tripStop: self.tripStop };
