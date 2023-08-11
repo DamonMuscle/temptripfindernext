@@ -16,7 +16,7 @@
 		self.onFieldTripStopUpdatedEvent = new TF.Events.Event();
 	}
 
-	RoutingFieldTripStopDataModel.prototype.create = function(newData, isFromRevert, insertToSpecialSequenceIndex, isDuplicate, notBroadcast)
+	RoutingFieldTripStopDataModel.prototype.create = function(newData, isFromRevert, insertToSpecialSequenceIndex, isDuplicate)
 	{
 		var self = this;
 		self._viewModal.revertMode = "create-TripStop";
@@ -25,7 +25,8 @@
 		data.OpenType = "Edit";
 		self.insertTripStopToTrip(data, insertToSpecialSequenceIndex);
 
-		self.viewModel.viewModel.fieldTripMap?.applyAddFieldTripStop({...data, Sequence: insertToSpecialSequenceIndex + 1, VehicleCurbApproach: data.vehicleCurbApproach}, function(prevStop){
+		self.viewModel.viewModel.fieldTripMap?.applyAddFieldTripStop({...data, Sequence: insertToSpecialSequenceIndex + 1, VehicleCurbApproach: data.vehicleCurbApproach}, function()
+		{
 			// set stop time to new trip stop by calculate
 			self.dataModel.setFieldTripActualStopTime([self.dataModel.getTripById(data.FieldTripId)]);
 			if (!isDuplicate) data.StopTime = data.ActualStopTime;
@@ -37,95 +38,52 @@
 				edit: []
 			});
 
-			// setTimeout(function()
-			// {
-			// 	self.dataModel.onTripStopsChangeEvent.notify({
-			// 		add: [],
-			// 		delete: [],
-			// 		edit: prevStop ? [prevStop] : []
-			// 	});
-			// });
 			self.dataModel.changeTripVisibility(data.FieldTripId, true);
 			self.changeRevertStack(data, isFromRevert);
 		});
 	};
 
-	RoutingFieldTripStopDataModel.prototype.createMultiple = function(tripStops, insertBehindSpecialSequences, resetScheduleTime)
+	RoutingFieldTripStopDataModel.prototype.createMultiple = function(tripStops, targetFieldTrip)
 	{
-		var self = this;
+		const self = this;
 		if (!tripStops)
 		{
 			return Promise.resolve();
 		}
-		var grouped = {};
-		var boundary = [];
-		var stops = [];
-		var id = TF.createId();
-		return self.viewModel.drawTool.stopTool.attachClosetStreetToStop(tripStops).then(function()
+
+		self._viewModal.revertMode = "create-TripStop";
+		self._viewModal.revertData = [];
+
+		const stops = tripStops.filter(Boolean).map(function(tripStop)
 		{
-			tripStops.forEach(function(tripStop)
+			tripStop = self.createNewData(tripStop);
+			tripStop.OpenType = "Edit";
+			tripStop.Sequence = _.last(targetFieldTrip.FieldTripStops).Sequence;
+			tripStop.VehicleCurbApproach = tripStop.vehicleCurbApproach;
+			self.insertTripStopToTrip(tripStop, tripStop.Sequence - 1);
+			return tripStop;
+		});
+
+		self.viewModel.viewModel.fieldTripMap?.applyAddFieldTripStops(stops, function()
+		{
+			// set stop time to new trip stop by calculate
+			const fieldTripId = stops[0].FieldTripId;
+			self.dataModel.setFieldTripActualStopTime([self.dataModel.getTripById(fieldTripId)]);
+
+			stops.forEach(data =>
 			{
-				if (!tripStop)
-				{
-					return;
-				}
-				if (!grouped[tripStop.FieldTripId])
-				{
-					grouped[tripStop.FieldTripId] = {
-						tripId: tripStop.FieldTripId,
-						existsStops: self.dataModel.getTripById(tripStop.FieldTripId).FieldTripStops,
-						newStops: []
-					};
-				}
-				tripStop.id = id++;
-				tripStop = self.createNewData(tripStop, true);
-				tripStop.OpenType = "Edit";
-				boundary.push(tripStop.boundary);
-				stops.push(tripStop);
-				grouped[tripStop.FieldTripId].newStops.push(tripStop);
+				data.StopTime = data.ActualStopTime;
+				self.insertToRevertData(data);
 			});
 
-			var index = 0;
-			var stopCreatePromises = [];
-			for (var key in grouped)
-			{
-				var data = grouped[key];
-				var sequences = getSequence(data.newStops);// insertBehindSpecialSequences.length > 1 ? insertBehindSpecialSequences.slice(index, index + data.newStops.length) : (insertBehindSpecialSequences.length == 1 ? [insertBehindSpecialSequences[0]] : null);
-				index = index + data.newStops.length;
-				var createPromise = self.moveTripStopsFromOtherTrip(data.newStops, data.existsStops, sequences, true, null, null, null, resetScheduleTime, true);
-				stopCreatePromises.push(createPromise);
-
-			}
-			function getSequence(newStops)
-			{
-				if (!insertBehindSpecialSequences || insertBehindSpecialSequences.length == 0) return null;
-				if (insertBehindSpecialSequences.length == 1) return [insertBehindSpecialSequences[0]];
-				var sequences = [];
-				newStops.forEach(function(stop)
-				{
-					for (var i = 0; i < tripStops.length; i++)
-					{
-						if (tripStops[i].id == stop.id)
-						{
-							sequences.push(insertBehindSpecialSequences[i]);
-							break;
-						}
-					}
-				});
-				return sequences;
-			}
-			self.dataModel.onTripsChangeEventCalled = false;
-			return Promise.all(stopCreatePromises).then(function()
-			{
-				return self._runAfterPathChanged(stops, null, true, true);
-			}).then(function()
-			{
-				if (!self.dataModel.onTripsChangeEventCalled)
-				{
-					// refresh trips in case assign student not occur for the trip refresh
-					self.refreshTripByStops(stops);
-				}
+			self.dataModel.onTripStopsChangeEvent.notify({
+				add: stops,
+				delete: [],
+				edit: []
 			});
+
+			self.dataModel.changeTripVisibility(fieldTripId, true);
+			self.changeRevertStack(stops, false);
 		});
 	};
 
@@ -194,7 +152,7 @@
 		});
 	};
 
-	RoutingFieldTripStopDataModel.prototype.createNewData = function(newData, isKeepStopId, ignoreBoundary)
+	RoutingFieldTripStopDataModel.prototype.createNewData = function(newData, isKeepStopId)
 	{
 		var data = this.getDataModel();
 		if ($.isArray(newData))

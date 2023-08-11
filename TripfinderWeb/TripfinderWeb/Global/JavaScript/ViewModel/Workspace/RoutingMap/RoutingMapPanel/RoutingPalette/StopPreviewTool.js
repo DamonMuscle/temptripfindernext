@@ -229,7 +229,7 @@
 		var ps = [], previewGraphics = [];
 		evtArray.forEach(function(evt)
 		{
-			if (evt.walkoutZone && evt.isDoorToDoor)
+			if (evt.walkoutZone)
 			{
 				promises.push(new Promise(function(resolve) { resolve({ walkoutZone: new self._arcgis.Graphic(evt.walkoutZone) }) }))
 			} else
@@ -290,7 +290,7 @@
 		if (items.edit && items.edit.length > 0)
 		{
 			item = items.edit[0];
-			if (item.isDoorToDoor) return;
+
 			//update walkout
 			graphics = self._previewLayer.graphics.items;
 			walkoutGraphic = graphics.filter(function(graphic)

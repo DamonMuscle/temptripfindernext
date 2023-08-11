@@ -598,19 +598,19 @@
 		callback();
 	}
 
-	FieldTripMap.prototype.applyAddFieldTripStops = async function(data, callback = ()=>{})
+	FieldTripMap.prototype.applyAddFieldTripStops = async function(stops, callback = ()=>{})
 	{
-		if (!data?.length >= 1)
+		if (!stops?.length >= 1)
 		{
-			console.warn(`No data for applyAddFieldTripStops. RETURN`);
+			console.warn(`No stops for applyAddFieldTripStops. RETURN`);
 			return;
 		}
-		console.log(data);
+		console.log(stops);
 
 		this.showLoadingIndicator();
-		this._refreshStopsSequenceLabel(data);
-		this._drawNewStopsFromMap(data);
-		await this._drawNewStopPathsFromMap(data);
+		this._refreshStopsSequenceLabel(stops);
+		this._drawNewStopsFromMap(stops);
+		await this._drawNewStopPathsFromMap(stops);
 		this.hideLoadingIndicator();
 
 		callback();

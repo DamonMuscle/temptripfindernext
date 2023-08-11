@@ -15,7 +15,6 @@
 		this.obIsSmartAssignment = ko.observable(false);
 
 		this.isCopied = ko.observable(false);
-		this.isDoorToDoor = ko.observable(false);
 		//stop types
 		this.multipleTypes = this.canCopyBoundary ? ["Door-to-Door", "Walkout", "Current Stop Boundary"] : ["Door-to-Door", "Walkout"];
 		this.obStopTypes = ko.observableArray(this.multipleTypes);
@@ -192,7 +191,7 @@
 			data.walkoutBuffer = self.walkoutBuffer();
 			data.BufferUnit = self.obSelectedBufferUnitText();
 			data.walkoutType = self.walkoutType() == 0 ? 'Street Path' : 'Radius';
-			data = self.dataModel.fieldTripStopDataModel.createNewData(data, self.isEditModal ? true : false, true);
+			data = self.dataModel.fieldTripStopDataModel.createNewData(data, self.isEditModal ? true : false);
 			return Promise.resolve(data);
 		});
 	};
@@ -214,14 +213,7 @@
 		var self = this;
 		return self.validator.validate().then(function(result)
 		{
-			if (result)
-			{
-				return self._createMultipleStops().then(function(stops)
-				{
-					return Promise.resolve(stops);
-				});
-			}
-			return false;
+			return result? self._createMultipleStops() : false;
 		});
 	};
 

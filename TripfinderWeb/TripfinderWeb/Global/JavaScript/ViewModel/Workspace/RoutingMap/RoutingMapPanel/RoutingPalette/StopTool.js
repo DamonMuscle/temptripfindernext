@@ -621,9 +621,7 @@
 	StopTool.prototype.addStopAddressAndBoundary = function(pointGraphic, theOptions)
 	{
 		var defaultOptions = {
-			isDoorToDoor: false,
 			student: null,
-			isCreateFromUnassignStudent: false,
 			isCreateFromStopSearch: false,
 			isCreateFromSearch: false,
 			boundary: null,
@@ -679,31 +677,8 @@
 					self.drawTool.createStopBoundaryResolve = resolve;
 					self.drawTool.createStopBoundaryreject = reject;
 				});
-			} else if (stopType.toLowerCase() == "door-to-door")
-			{
-				var promise = null;
-				if (options.isDoorToDoor)
-				{
-					promise = Promise.resolve(options.student.geometry);
-				} else
-				{
-					promise = Promise.resolve(stopGraphic.geometry);
-				}
-				return promise.then(function(midPoint)
-				{
-					var graphic = self.createDoorToDoorPolygon(midPoint, stopGraphic.geometry);
-					return Promise.resolve({
-						geometry: graphic.geometry,
-						graphic: graphic,
-						BdyType: 0
-					});
-				});
-				// return new Promise(function(resolve, reject)
-				// {
-				// 	self.drawTool.createStopBoundaryResolve = resolve;
-				// 	self.drawTool.createStopBoundaryreject = reject;
-				// });
 			}
+
 			// self._generateWalkoutGuide(stopGraphic, travelScenario).then(function()
 			// {
 			self.drawTool.create(stopType.toLowerCase());
@@ -800,80 +775,6 @@
 		}
 		return minSegment;
 	}
-
-	StopTool.prototype.addMultipleStopAddressAndBoundary = function(data, theOptions)
-	{
-		var self = this;
-
-		var defaultOptions = {
-			isCreateFromUnassignStudent: false,
-			isCreateFromSelection: false,
-			isCreateFromStopSearch: false,
-			isCreateFromSearch: false,
-			isCreateFromTrialStop: false,
-			insertBehindSpecialStop: null,
-			isAllCreateFromPoints: false,
-			isContainsPoints: false
-		};
-		var options = $.extend(defaultOptions, theOptions);
-
-		data.forEach(function(point)
-		{
-			point.City = point.City || TF.RoutingMap.GeocodeHelper.getCityName(point.geometry);
-		});
-
-		return self.editModal.createMultiple(data, function(stopType, stop)
-		{
-			// if (stopType.toLowerCase() != "door-to-door")
-			// {
-			// 	if (!self.drawTool.overlapCheck(stop))
-			// 	{
-			// 		return Promise.resolve(false)
-			// 	}
-
-			// }
-			self.drawTool.sketchTool.stop();
-			if (stop.type == "student" && !self.editModal.studentSelectionCreate() && options.isCreateFromSelection && !options.isCreateFromUnassignStudent)
-			{
-				return Promise.resolve(false);
-			}
-			if (stop.boundary && stop.boundary.geometry && self.editModal.copyStopBoundarySelectionCreate() && (options.isCreateFromSelection || options.isCreateFromStopSearch))
-			{
-				return Promise.resolve(new self._arcgis.Graphic(stop.boundary.geometry, self._polygonSymbol, { "id": TF.createId() }));
-			}
-			if (stopType.toLowerCase() == "walkout")
-			{
-				return self._generateWalkoutZone(stop);
-			} else if (stopType.toLowerCase() == "door-to-door")
-			{
-				var _polygonGraphic = self.createDoorToDoorPolygon(stop.geometry, stop.geometry);
-				if (stop.unassignStudent)
-				{
-					_polygonGraphic = self.createDoorToDoorPolygon(stop.unassignStudent.geometry, stop.geometry);
-				}
-				_polygonGraphic.BdyType = 0;
-				return Promise.resolve(_polygonGraphic);
-			} else if (stopType == "Copy Boundaries for Selected Stop(s)" && stop.unassignStudent.geometry && !stop.boundary.geometry)
-			{
-				var _polygonGraphic = self.createDoorToDoorPolygon(stop.geometry, stop.unassignStudent.geometry);
-				return Promise.resolve(_polygonGraphic);
-			}
-
-			return Promise.resolve(stop.boundary);
-		}, options).then(function()
-		{
-			// if (data && $.isArray(data))
-			// {
-			// 	self.drawTool._boundaryGraphic = data.map(function(c) { return c.graphic; });
-			// }
-			self.drawTool._clearTempDrawing();
-			// self.drawTool._newTripStopBoundaryType = null;
-			return Promise.resolve(true);
-		}, function(error)
-		{
-			console.log(error);
-		});
-	};
 
 	StopTool.prototype.getStopStreetAddress = function(geometry)
 	{

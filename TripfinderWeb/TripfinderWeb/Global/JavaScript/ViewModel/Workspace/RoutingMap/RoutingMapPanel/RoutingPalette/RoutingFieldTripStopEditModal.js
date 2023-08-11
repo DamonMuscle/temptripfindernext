@@ -31,7 +31,6 @@
 		}, this);
 		this.obIsOpenMultipleTrips = ko.observable(false);
 		this.isCopied = ko.observable(false);
-		this.isDoorToDoor = ko.observable(false);
 
 		this.disabled = ko.computed(function() { return this.showWalkout() == false && this.obSelectedStopType() != "Walkout"; }, this);
 
@@ -328,22 +327,22 @@
 
 	RoutingFieldTripStopEditModal.prototype._create = function()
 	{
-		var self = this;
-		self.createdTripBoundary = [];
-		var promise;
+		const self = this;
+		let promise;
 		if (self.data.length == 1)
 		{
 			self.obIsMultipleCreate(false);
 			promise = self._createStop(self.data[0]);
-		} else if (self.data.length > 1)
+		}
+		else if (self.data.length > 1)
 		{
 			self.obIsMultipleCreate(true);
 			promise = self._createMultipleStops(self.data);
 		}
 
-		return promise && promise.then(function()
+		return Promise.resolve(promise).then(function()
 		{
-			self.resolve(self.createdTripBoundary);
+			self.resolve();
 		}).catch(e =>
 		{
 			self.viewModel.display.arcgisError(e.message);
@@ -358,10 +357,6 @@
 			if (!tripStop)
 			{
 				return Promise.reject();
-			}
-			if (self.dataModel.getRemoveOverlappingSetting() && tripStop.boundary.BdyType != 0)
-			{
-				return self.dataModel.fieldTripStopDataModel.viewModel.drawTool.removeOverlapBoundaries([tripStop]);
 			}
 
 			return tripStop;
@@ -392,45 +387,15 @@
 		var createTripBoundaryAndAssignPromises = [], promises = [];
 		if (self.obIsSmartAssignment())
 		{
-			if (self.availableTrips.length == 1)
-			{
-				promises.push(self.vrpTool.getSmartAssignment_multi(tripStops, self.availableTrips, self.obIsSmartSequence(), self.viewModel.drawTool));
-			} else
-			{
-				var canVrp = true;
-				var start = self.availableTrips[0].FieldTripStops[0].geometry.x;
-				var end = self.availableTrips[0].FieldTripStops[self.availableTrips[0].FieldTripStops.length - 1].geometry.x;
-				for (var i = 1; i < self.availableTrips.length; i++)
-				{
-					if (self.availableTrips[i].FieldTripStops[0].geometry.x.toFixed(4) != start.toFixed(4) ||
-						self.availableTrips[i].FieldTripStops[self.availableTrips[i].FieldTripStops.length - 1].geometry.x.toFixed(4) != end.toFixed(4))
-					{
-						canVrp = false;
-						break;
-					}
-				}
-				if (canVrp)
-				{
-					promises.push(self.vrpTool.getSmartAssignment_multi(tripStops, self.availableTrips, self.obIsSmartSequence(), self.viewModel.drawTool));
-				} else
-				{
-					tripStops.forEach(function(tripStop)
-					{
-						promises.push(self.viewModel.drawTool.NAtool.getSmartAssignment(tripStop, self.availableTrips));
-					});
-				}
-			}
-		} else
+			// support smart assignment
+		}
+		else
 		{
 			if (self.obIsSmartSequence())
 			{
-				tripStops.forEach(function(tripStop)
-				{
-					if (!tripStop.id) tripStop.id = TF.createId(100000);
-					//promises.push(self.viewModel.drawTool.NAtool.getSmartAssignment(tripStop, [self.obSelectedTrip()]));
-				});
-				promises.push(self.vrpTool.getSmartAssignment_multi(tripStops, [self.obSelectedTrip()], self.obIsSmartSequence(), self.viewModel.drawTool));
-			} else
+				// support smart sequence
+			}
+			else
 			{
 				tripStops.forEach(function(stop)
 				{
@@ -441,8 +406,6 @@
 		}
 		return Promise.all(promises).then(function(res)
 		{
-			// if (tripIds)
-			// {
 			var outTripStops = $.isArray(res[0]) ? res[0] : res;
 			if (!outTripStops[0])
 			{
@@ -456,48 +419,21 @@
 			{
 				outTripStops.forEach(function(tripStop)
 				{
-					// tripStops[index].FieldTripId = tripId;
 					createTripBoundaryAndAssignPromises.push(self._createOneStop(tripStop));
-
 				});
 			}
 
-			// }
-			// else
-			// {
-			// 	tripStops.map(function(tripStop)
-			// 	{
-			// 		tripStop.FieldTripId = self.obSelectedTrip().id;
-			// 		createTripBoundaryAndAssignPromises.push(self._createOneStop(tripStop));
-			// 	});
-			// }
-			return Promise.all(createTripBoundaryAndAssignPromises)
-				.then(function(stops)
+			return Promise.all(createTripBoundaryAndAssignPromises).then(function(stops)
+			{
+				if (stops)
 				{
-					if (self.dataModel.getRemoveOverlappingSetting())
+					self.dataModel.fieldTripStopDataModel.createMultiple(stops, self.obSelectedTrip()).then(() =>
 					{
-						return self.dataModel.fieldTripStopDataModel.viewModel.drawTool.removeOverlapBoundaries(stops);
-					}
-					return stops;
-				}).then(function(stops)
-				{
-					if (stops)
-					{
-						var sequences = [];
-						if (self.insertBehindSpecialStop)
-						{
-							sequences.push(self.insertBehindSpecialStop.Sequence + 1);
-						} else
-						{
-							sequences = stops.filter(function(stop) { return stop.Sequence; }).map(function(stop) { return stop.Sequence; });
-						}
-						self.dataModel.fieldTripStopDataModel.createMultiple(stops, sequences).then(() =>
-						{
-							tf.loadingIndicator.tryHide();
-						});
-					}
-					if (res.err) { tf.promiseBootbox.alert(res.err); tf.loadingIndicator.tryHide(); }
-				});
+						tf.loadingIndicator.tryHide();
+					});
+				}
+				if (res.err) { tf.promiseBootbox.alert(res.err); tf.loadingIndicator.tryHide(); }
+			});
 		});
 	};
 
@@ -515,14 +451,16 @@
 		{
 			if (self.obIsSmartAssignment())
 			{
-				tripStopPromise = self.viewModel.drawTool.NAtool.getSmartAssignment(data, self.availableTrips);
-				//tripStopPromise = self.vrpTool.getSmartAssignment([data], self.availableTrips, self.obIsSmartSequence(), self.viewModel.drawTool);
-			} else
+				// tripStopPromise = self.viewModel.drawTool.NAtool.getSmartAssignment(data, self.availableTrips);
+				// tripStopPromise = self.vrpTool.getSmartAssignment([data], self.availableTrips, self.obIsSmartSequence(), self.viewModel.drawTool);
+			}
+			else
 			{
 				data.FieldTripId = self.obSelectedTrip().id;
 				tripStopPromise = Promise.resolve(data);
 			}
-		} else if (self.obIsInsertToSpecialStop())
+		}
+		else if (self.obIsInsertToSpecialStop())
 		{
 			data.FieldTripId = self.obSelectedTrip().id;
 			tripStopPromise = Promise.resolve(data);
@@ -530,13 +468,11 @@
 
 		return tripStopPromise.then(function(tripStop)
 		{
-
 			if (tripStop == false)
 			{
 				return false;
 			}
 			data.FieldTripId = tripStop.FieldTripId;
-			// data.boundary = tripBoundary;
 			data.color = self.obSelectedTrip().color;
 			data.Sequence = tripStop.Sequence;
 			return data;

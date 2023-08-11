@@ -164,22 +164,6 @@
 		}
 	};
 
-	RoutingTripMapTool.prototype.addPolygonToLayer = function(graphic)
-	{
-		var self = this;
-
-		if (!self._stopInBoundaryCheck(self._newTripStopGraphic.geometry, graphic.geometry))
-		{
-			graphic = self.removeOverlapBoundaryWithEditTrips(graphic);
-			graphic.geometry = self._cutResultHandler(graphic.geometry, self._newTripStopGraphic.geometry);
-			self.createStopBoundaryResolve({
-				geometry: graphic.geometry,
-				graphic: graphic,
-				BdyType: self.editModal.isDoorToDoor() ? 0 : 1
-			});
-		}
-	};
-
 	RoutingTripMapTool.prototype.removeOverlapBoundaryWithEditTrips = function(graphic, centroid)
 	{
 		const self = this;

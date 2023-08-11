@@ -2663,7 +2663,7 @@
 			autoRefresh: { key: "autoRefreshRouting", default: false },
 			moveDuplicateNodes: { key: "moveDuplicateNodesRouting", default: false },
 			removeOverlapping: { key: "removeOverlappingRouting", default: true },
-			smartSequence: { key: "smartSequenceRouting", default: true },
+			smartSequence: { key: "smartSequenceRouting", default: false },
 			fillPattern: { key: "fillPatternRouting", default: "Semi" },
 			uTurnPolicy: { key: "uTurnPolicyRouting", default: 1 },
 			impedanceAttribute: { key: "impedanceAttrRouting", default: "Time" },

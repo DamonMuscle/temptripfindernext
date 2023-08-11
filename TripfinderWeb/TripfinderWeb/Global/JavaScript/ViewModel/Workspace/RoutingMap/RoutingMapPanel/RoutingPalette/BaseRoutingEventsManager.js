@@ -53,7 +53,6 @@
 
 		const isCreateFromStopSearch = data[0].type == "tripstop" || data[0].type == "poolStops",
 			options = {
-				isDoorToDoor: false,
 				student: null,
 				isCreateFromStopSearch,
 				isCreateFromSearch:true,
@@ -85,28 +84,13 @@
 	{
 	};
 
-	BaseRoutingEventsManager.prototype.isDoorToDoorType = function(type)
-	{
-		return type == "student" ||
-			type == "unassignedStudentsRouting" ||
-			type == "addressPoint" ||
-			type == "school" ||
-			type == "altsite" ||
-			type == "georegion" ||
-			type == "mapAddress";
-	};
-
 	/**
 	* only address point need to offset and inset on map
 	* if other case and within 1 meter to street and 5 meters to junction, force stop to snap onto the junction
 	*/
 	BaseRoutingEventsManager.prototype.offsetInsetPoint = function(point, geometry, type, streets)
 	{
-		if (this.isDoorToDoorType(type))
-		{
-			return self.fieldTripPaletteSectionVM.drawTool.stopTool.getDoorToDoorLocationForStudent({ geometry: point.geometry, address: point.address }, streets);
-		}
-		else if (type == "addressPoint")
+		if (type == "addressPoint")
 		{
 			return Promise.resolve(geometry); //self.fieldTripPaletteSectionVM.drawTool.stopTool.offsetInsetPoint(point, geometry);
 		}

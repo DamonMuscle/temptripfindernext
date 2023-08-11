@@ -22,8 +22,8 @@
 		this.insertBehindSpecialStop = null;
 		this.isNewStop = ko.observable(false);
 		// stop type selector
-		this.singleTypes = ["Polygon", "Rectangle", "Draw", "Circle", "Door-to-Door", "Walkout"];
-		this.multipleTypes = ["Door-to-Door", "Walkout"];
+		this.singleTypes = ["Polygon", "Rectangle", "Draw", "Circle", "Walkout"];
+		this.multipleTypes = ["Walkout"];
 		this.copyBoundariesText = "Copy Boundaries for Selected Stop(s)";
 		this.obStopTypes = ko.computed(this.computeObStopTypes.bind(this));
 		this.obSelectedStopType = ko.observable(self.obStopTypes()[0]);
@@ -55,8 +55,6 @@
 		}, this);
 
 		this.checkImplement();
-
-		this.createFromUnassignStudent = ko.observable(false);
 
 		this.walkoutDistanceDisable = ko.computed(function()
 		{
@@ -148,7 +146,6 @@
 	{
 		var self = this;
 		options = $.extend({
-			isCreateFromUnassignStudent: false,
 			isCreateFromTrialStop: false,
 			isCreateFromSelection: false,
 			isCreateFromSearch: false,
@@ -159,14 +156,7 @@
 		this.obRecordsCount(this.data.length);
 		this.isCopied(options.isCopied);
 		this.obIsMultipleCreate(this.data.length > 1 && this.mode() == "new");
-		this.createFromUnassignStudent(options.isCreateFromUnassignStudent);
-		if (options.isCreateFromUnassignStudent)
-		{
-			this.obSelectedStopType(this.obStopTypes().filter(function(type) { return type == "Door-to-Door" })[0]);
-		} else
-		{
-			this.obSelectedStopType(this.obStopTypes()[0]);
-		}
+		this.obSelectedStopType(this.obStopTypes()[0]);
 		this.obIsSelectionCreate(options.isCreateFromSelection);
 		this.obIsStopSearchCreate(options.isCreateFromStopSearch);
 		this.obIsSearchCreate(options.isCreateFromSearch);
@@ -183,7 +173,7 @@
 		this.obShowStopLocationMap(false);
 		this.isJunction(false);
 
-		if (self.data.length == 1 && !this.createFromUnassignStudent())
+		if (self.data.length == 1)
 		{
 			var stop = self.data[0];
 			self.initMap(stop);
@@ -266,20 +256,12 @@
 
 		return self.beforeChangeData().then(function()
 		{
-			if (self.isCreateUseLastSetting(options.isCopied, options.isDoorToDoor, options.tryUseLastSettings))
+			if (self.isCreateUseLastSetting(options.isCopied, options.tryUseLastSettings))
 			{
 				return self.createUseLastSetting(data);
 			}
 			self.initing = true;
 			var dataModel = $.extend(self.getDataModel(), data);
-			if (options.isDoorToDoor)
-			{
-				dataModel.isFromDTD = true;
-				if (self.dataModel.schoolLocationDictionary && self.dataModel.schoolLocationDictionary[options.student.SchoolCode])
-				{
-					dataModel.doorToDoorSchoolId = options.student.SchoolId;
-				}
-			}
 
 			if (options.selectLastSelectedTrip)
 			{
@@ -294,7 +276,7 @@
 			self.init(options).then(function()
 			{
 				self._setTripsByOption(options);
-				self.afterCreateInit(options.isDoorToDoor);
+				self.afterCreateInit();
 				self.studentSelectionCreate(options.isContainsPoints);
 				self.insertBehindSpecialStop = options.insertBehindSpecialStop;
 				if (options.insertBehindSpecialStop)
@@ -342,8 +324,8 @@
 			{
 				var dataModel = $.extend(self.getDataModel(), {
 					Street: stop.address,
-					XCoord: stop.x,
-					YCoord: stop.y,
+					XCoord: stop.XCoord,
+					YCoord: stop.YCoord,
 					geometry: stop.geometry,
 					City: stop.city || stop.City,
 					unassignStudent: stop.unassignStudent,
@@ -356,7 +338,6 @@
 
 				stopsModel.push(dataModel);
 			});
-			self.obOverlayVisible(true);
 			self.normalizeData(stopsModel);
 			self.initTitle(true);
 			self.init(options).then(function()
@@ -391,16 +372,13 @@
 		});
 	};
 
-	BaseFieldTripStopEditModal.prototype.afterCreateInit = function(isDoorToDoor)
+	BaseFieldTripStopEditModal.prototype.afterCreateInit = function()
 	{
-		if (isDoorToDoor)
-		{
-			this.isDoorToDoor(true);
-			this.obSelectedStopType(this.obStopTypes().filter(function(c) { return c.indexOf("Door") >= 0; })[0]);
-		} else if (this.obStopTypes().indexOf(this.copyBoundariesText) >= 0)
+		if (this.obStopTypes().indexOf(this.copyBoundariesText) >= 0)
 		{
 			this.obSelectedStopType(this.copyBoundariesText);
-		} else
+		}
+		else
 		{
 			this.setLastStopBoundaryType();
 		}
@@ -441,9 +419,9 @@
 		return types;
 	};
 
-	BaseFieldTripStopEditModal.prototype.isCreateUseLastSetting = function(isCopied, isDoorToDoor, tryUseLastSettings)
+	BaseFieldTripStopEditModal.prototype.isCreateUseLastSetting = function(isCopied, tryUseLastSettings)
 	{
-		if (isCopied || isDoorToDoor || !this.lastCreateData)
+		if (isCopied || !this.lastCreateData)
 		{
 			return false;
 		}
@@ -564,67 +542,70 @@
 			}
 		};
 
-		validatorFields.stopTimeArriveDate = {
-			trigger: "blur change",
-			validators: {
-				notEmpty: {
-					message: "required"
-				}
-			}
-		};
-
-		validatorFields.stopTimeArriveTime = {
-			trigger: "blur change",
-			validators: {
-				notEmpty: {
-					message: "required"
-				}
-			}
-		};
-
-		validatorFields.stopTimeArriveDisplay = {
-			trigger: "change",
-			validators: {
-				callback: {
-					message: "Stop arrive time should before departure time",
-					callback: function(value, validator, $field)
-					{
-						return self.validateStopTimeArriveAndDepart();
+		if (!self.obIsMultipleCreate())
+		{
+			validatorFields.stopTimeArriveDate = {
+				trigger: "blur change",
+				validators: {
+					notEmpty: {
+						message: "required"
 					}
 				}
-			}
-		};
+			};
 
-		validatorFields.stopTimeDepartDate = {
-			trigger: "blur change",
-			validators: {
-				notEmpty: {
-					message: "required"
-				}
-			}
-		};
-
-		validatorFields.stopTimeDepartTime = {
-			trigger: "blur change",
-			validators: {
-				notEmpty: {
-					message: "required"
-				}
-			}
-		};
-
-		validatorFields.stopTimeDepartDisplay = {
-			trigger: "change",
-			validators: {
-				callback: {
-					message: "Stop departure time should after arrive time",
-					callback: function(value, validator, $field)
-					{
-						return self.validateStopTimeArriveAndDepart();
+			validatorFields.stopTimeArriveTime = {
+				trigger: "blur change",
+				validators: {
+					notEmpty: {
+						message: "required"
 					}
 				}
-			}
-		};
+			};
+
+			validatorFields.stopTimeArriveDisplay = {
+				trigger: "change",
+				validators: {
+					callback: {
+						message: "Stop arrive time should before departure time",
+						callback: function(value, validator, $field)
+						{
+							return self.validateStopTimeArriveAndDepart();
+						}
+					}
+				}
+			};
+
+			validatorFields.stopTimeDepartDate = {
+				trigger: "blur change",
+				validators: {
+					notEmpty: {
+						message: "required"
+					}
+				}
+			};
+
+			validatorFields.stopTimeDepartTime = {
+				trigger: "blur change",
+				validators: {
+					notEmpty: {
+						message: "required"
+					}
+				}
+			};
+
+			validatorFields.stopTimeDepartDisplay = {
+				trigger: "change",
+				validators: {
+					callback: {
+						message: "Stop departure time should after arrive time",
+						callback: function(value, validator, $field)
+						{
+							return self.validateStopTimeArriveAndDepart();
+						}
+					}
+				}
+			};
+		}
 
 		self.$form.bootstrapValidator({
 			excluded: [":disabled", function(field)

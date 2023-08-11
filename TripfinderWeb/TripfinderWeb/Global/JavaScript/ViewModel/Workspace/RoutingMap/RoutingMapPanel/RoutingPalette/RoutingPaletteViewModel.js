@@ -451,9 +451,7 @@
 	RoutingPaletteViewModel.prototype.onAddStopFromMapCompleted = function (stop)
 	{
 		var defaultOptions = {
-			isDoorToDoor: false,
 			student: null,
-			isCreateFromUnassignStudent: false,
 			isCreateFromStopSearch: false,
 			isCreateFromSearch: false,
 			boundary: null,
