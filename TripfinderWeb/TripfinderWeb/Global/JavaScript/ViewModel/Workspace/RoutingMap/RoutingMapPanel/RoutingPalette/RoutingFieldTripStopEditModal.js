@@ -132,6 +132,7 @@
 			return v1 > v2 ? 1 : -1;
 		});
 		this.obTrips(self.availableTrips);
+		this.obSelectedSequence(INIT_SEQUENCE_VALUE);
 		this.obSelectedTrip(self.getSelectedTrip());
 		this.obIsSmartAssignment(false);
 		this.obIsSmartSequence(this.mode() !== 'edit' && this.dataModel.getSmartSequenceSetting());
@@ -198,6 +199,11 @@
 	 */
 	RoutingFieldTripStopEditModal.prototype.updateStopGraphicSequence = function()
 	{
+		if (this.obSelectedSequence() === INIT_SEQUENCE_VALUE)
+		{
+			return;
+		}
+
 		// update stop point sequence when user manually set stop sequence
 		var stopSequence = 0;
 		if (this.data.length == 1 && !this.obIsMultipleCreate())
@@ -733,18 +739,6 @@
 			sequence = disableLastStopSequence ? dataSequence : defaultSequence;
 
 		this.obSelectedSequence(sequence);
-	}
-
-	RoutingFieldTripStopEditModal.prototype.applyClick = function()
-	{
-		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.applyClick.call(this);
-		this.obSelectedSequence(INIT_SEQUENCE_VALUE);
-	}
-
-	RoutingFieldTripStopEditModal.prototype.cancelClick = function(modal, e)
-	{
-		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.cancelClick.call(this, modal, e);
-		this.obSelectedSequence(INIT_SEQUENCE_VALUE);
 	}
 
 	function getDatePart(value, isUtc)
