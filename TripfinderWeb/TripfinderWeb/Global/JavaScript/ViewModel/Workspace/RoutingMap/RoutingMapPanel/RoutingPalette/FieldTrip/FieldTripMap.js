@@ -997,6 +997,11 @@
 		{
 			// beforeStop and afterStop must be existing for new stop.
 			const highlightStop = self.getHighlightStop();
+			if (highlightStop === null)
+			{
+				return;
+			}
+
 			const midStop = {
 				XCoord: highlightStop.geometry.longitude,
 				YCoord: highlightStop.geometry.latitude,
