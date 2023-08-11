@@ -53,9 +53,16 @@
 					DisplayName: "Field Trip Status",
 					Width: '250px',
 					type: "string",
-					template: function (item)
+					template: function(item, isCopy)
 					{
-						return item.FieldTripStageName ? `<div style='height:15px;width:15px;margin-right:.5em;border:1px solid rgb(213, 213, 213);background-color:${tf.fieldTripGridDefinition.gridDefinition().stageFormatter(item.FieldTripStageID)};float:left'></div><span>${item.FieldTripStageName}</span>` : ""
+						if (!isCopy)
+						{
+							return item.FieldTripStageName ? `<div style='height:15px;width:15px;margin-right:.5em;border:1px solid rgb(213, 213, 213);background-color:${tf.fieldTripGridDefinition.gridDefinition().stageFormatter(item.FieldTripStageID)};float:left'></div><span>${item.FieldTripStageName}</span>` : ""
+						}
+						else
+						{
+							return item.FieldTripStageName ?? '';
+						}
 					}
 				},
 				{
