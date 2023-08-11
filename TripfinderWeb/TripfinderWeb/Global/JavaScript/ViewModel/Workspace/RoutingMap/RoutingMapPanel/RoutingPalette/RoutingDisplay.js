@@ -1206,9 +1206,6 @@
 
 	function scheduledTimeClick(e)
 	{
-		console.log("Tripfinder Next TODO: scheduledTimeClick");
-		return;
-
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();

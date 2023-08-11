@@ -1,9 +1,19 @@
 <div class="row"  data-bind="uiInit:init">
-	<div class="col-xs-12">
-		<div class="form-group">
-			<label style="margin-bottom: 10px;">Time:</label>
-			<!-- ko customInput:{type:"Time",value:arrivalTime,attributes:{class:"form-control",name:"arrivalTime",placeholder:"hh:mm"}} --><!-- /ko -->
+	<div class="col-xs-8" >
+		<div class="form-group small-form-group">
+			<label>Date Time:</label>
+			<!-- ko customInput:{type:"Date",value:arrivalDate,attributes:{class:"form-control",name:"stopTimeArrivalDate",'data-bv-error-name':"Stop departure time (date part)"}} -->
+			<!-- /ko -->
 		</div>
+	</div>
+	<div class="col-xs-8">
+		<div class="form-group small-form-group">
+			<label></label>
+			<!-- ko customInput:{type:"Time",value:arrivalTime,attributes:{class:"form-control",name:"stopTimeArrivalTime",'data-bv-error-name':"Stop departure time (time part)"}} -->
+			<!-- /ko -->
+		</div>
+	</div>
+	<div class="col-xs-12">
 		<div class="checkbox">
 			<label>
 				<input type="checkbox" name="updateRelated" data-bind="checked:updateDisabled"> Update Related Times
