@@ -73,7 +73,11 @@
 				{
 					title: self.options.title,
 					field: "text",
-					width: 100
+					width: 100,
+					template: function(dataItem)
+					{
+						return kendo.htmlEncode(dataItem.text);
+					}
 				}
 			],
 			selectable: "multiple",
@@ -96,7 +100,11 @@
 				{
 					title: self.options.title,
 					field: "text",
-					width: 100
+					width: 100,
+					template: function(dataItem)
+					{
+						return kendo.htmlEncode(dataItem.text);
+					}
 				}
 			],
 			selectable: "multiple",
