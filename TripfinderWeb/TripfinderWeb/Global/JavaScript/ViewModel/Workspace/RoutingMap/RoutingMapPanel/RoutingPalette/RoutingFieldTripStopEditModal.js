@@ -2,6 +2,8 @@
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").RoutingFieldTripStopEditModal = RoutingFieldTripStopEditModal;
 
+	const INIT_SEQUENCE_VALUE = -1;
+
 	function RoutingFieldTripStopEditModal(fieldTripPaletteSectionVM)
 	{
 		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.call(this, fieldTripPaletteSectionVM, "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/EditRoutingFieldTripStop");
@@ -86,6 +88,7 @@
 		this.stopSequenceGraphics = [];
 		this.obSequenceSource = ko.observableArray();
 		this.obSelectedSequence = ko.observable();
+		this.obSelectedSequence(INIT_SEQUENCE_VALUE);
 		this.obSelectedSequenceText = ko.computed(() =>
 		{
 			return this.obSelectedSequence();
@@ -172,9 +175,20 @@
 
 		const sortedSequences = this._calculateSortedSequence(trip);
 		this._initSequenceSource(sortedSequences);
-		this._setSequenceNumber(sortedSequences);
 
-		const selectedSequence = this.obSelectedSequence();
+		let selectedSequence = this.obSelectedSequence();
+		if (selectedSequence === INIT_SEQUENCE_VALUE ||
+			selectedSequence >= _.last(sortedSequences))
+		{
+			this._setSequenceNumber(sortedSequences);
+			selectedSequence = this.obSelectedSequence();
+		}
+		else
+		{
+			// trigger update stop graphic when switch trips.
+			this.obSelectedSequence(selectedSequence);
+		}
+
 		this.obIsFirstStop(selectedSequence==_.first(sortedSequences));
 		this.obIsLastStop(selectedSequence==_.last(sortedSequences));
 	};
@@ -719,6 +733,18 @@
 			sequence = disableLastStopSequence ? dataSequence : defaultSequence;
 
 		this.obSelectedSequence(sequence);
+	}
+
+	RoutingFieldTripStopEditModal.prototype.applyClick = function()
+	{
+		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.applyClick.call(this);
+		this.obSelectedSequence(INIT_SEQUENCE_VALUE);
+	}
+
+	RoutingFieldTripStopEditModal.prototype.cancelClick = function(modal, e)
+	{
+		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.cancelClick.call(this, modal, e);
+		this.obSelectedSequence(INIT_SEQUENCE_VALUE);
 	}
 
 	function getDatePart(value, isUtc)
