@@ -611,12 +611,16 @@
 		else
 		{
 			var selected = self.obSelectedOption();
-			if (selected.ID !== -1)
+			if (selected && selected.ID !== -1)
 			{
 				self.pickListOptions.map(function(option)
 				{
 					option.IsDefaultItem = (option.PickList === selected.PickList);
 				});
+
+				selected = self.obAvailableSelectOptions()[0];
+				self.obSelectedOption(selected);
+				self.obSelectedOptionLabel(selected.PickList);
 			}
 		}
 
