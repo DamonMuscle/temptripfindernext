@@ -43,7 +43,7 @@
 		});
 	};
 
-	RoutingFieldTripStopDataModel.prototype.createMultiple = function(tripStops, targetFieldTrip)
+	RoutingFieldTripStopDataModel.prototype.createMultiple = function(tripStops)
 	{
 		const self = this;
 		if (!tripStops)
@@ -54,6 +54,7 @@
 		self._viewModal.revertMode = "create-TripStop";
 		self._viewModal.revertData = [];
 
+		const targetFieldTrip = self.dataModel.getTripById(tripStops[0].FieldTripId);
 		const stops = tripStops.filter(Boolean).map(function(tripStop)
 		{
 			tripStop = self.createNewData(tripStop);
@@ -64,7 +65,7 @@
 			return tripStop;
 		});
 
-		self.viewModel.viewModel.fieldTripMap?.applyAddFieldTripStops(stops, function()
+		return self.viewModel.viewModel.fieldTripMap?.applyAddFieldTripStops(stops, function()
 		{
 			// set stop time to new trip stop by calculate
 			const fieldTripId = stops[0].FieldTripId;

@@ -427,7 +427,7 @@
 			{
 				if (stops)
 				{
-					self.dataModel.fieldTripStopDataModel.createMultiple(stops, self.obSelectedTrip()).then(() =>
+					self.dataModel.fieldTripStopDataModel.createMultiple(stops).then(() =>
 					{
 						tf.loadingIndicator.tryHide();
 					});
