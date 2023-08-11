@@ -467,7 +467,7 @@
 		this.fieldTripPaletteSection.editFieldTripStopModal.create({
 			Street: stop.Name,
 			...stop
-		}, null, defaultOptions);
+		}, defaultOptions);
 	}
 
 	RoutingPaletteViewModel.prototype.close = function()

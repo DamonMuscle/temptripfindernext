@@ -210,14 +210,7 @@
 			data.id = TF.createId();
 		}
 		data.FieldTripStopId = data.id;
-		if (!ignoreBoundary)
-		{
-			data.boundary = this.createTripBoundary(data);
-		} else
-		{
-			data.boundary.FieldTripId = data.FieldTripId;
-			data.boundary.FieldTripStopId = data.id;
-		}
+
 		data.routeStops = null;
 		return data;
 	};
@@ -900,19 +893,6 @@
 	RoutingFieldTripStopDataModel.prototype.insertToRevertData = function(data)
 	{
 		this._viewModal.revertData.push($.extend({}, data, { geometry: data && data.geometry ? TF.cloneGeometry(data.geometry) : null }));
-	};
-
-	RoutingFieldTripStopDataModel.prototype.createTripBoundary = function(tripStop)
-	{
-		return {
-			OBJECTID: 0,
-			id: TF.createId(),
-			FieldTripId: tripStop.FieldTripId,
-			FieldTripStopId: tripStop.id,
-			geometry: tripStop.boundary ? tripStop.boundary.geometry : null,
-			type: "tripBoundary",
-			BdyType: tripStop.boundary ? tripStop.boundary.BdyType : 1
-		};
 	};
 
 	RoutingFieldTripStopDataModel.prototype._sortTripStops = function(stops)

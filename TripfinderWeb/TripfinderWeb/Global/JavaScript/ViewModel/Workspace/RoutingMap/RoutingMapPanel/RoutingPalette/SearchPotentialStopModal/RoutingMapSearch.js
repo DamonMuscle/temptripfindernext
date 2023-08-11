@@ -819,8 +819,9 @@
 								type: type,
 								whereQuery: data.Items[0].WhereQuery,
 								address: item.Address || item.Title,
-								x: item.Xcoord,
-								y: item.Ycoord,
+								XCoord: item.Xcoord,
+								YCoord: item.Ycoord,
+								Street: item.Title
 							};
 
 							return entity;

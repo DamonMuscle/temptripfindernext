@@ -13,7 +13,6 @@
 		this.dataModel = viewModel.dataModel;
 		this.obIsMultipleCreate = ko.observable(false);
 		this.lastCreateData = null;
-		this.createTripBoundary = null;
 		this.isReadOnly = ko.observable(false);
 		this.obIsSelectionCreate = ko.observable(false);
 		this.obIsSearchCreate = ko.observable(false);
@@ -261,13 +260,12 @@
 		}
 	};
 
-	BaseFieldTripStopEditModal.prototype.create = function(data, createTripBoundary, options)
+	BaseFieldTripStopEditModal.prototype.create = function(data, options)
 	{
 		var self = this;
 
 		return self.beforeChangeData().then(function()
 		{
-			self.createTripBoundary = createTripBoundary;
 			if (self.isCreateUseLastSetting(options.isCopied, options.isDoorToDoor, options.tryUseLastSettings))
 			{
 				return self.createUseLastSetting(data);
@@ -333,7 +331,7 @@
 		}
 	};
 
-	BaseFieldTripStopEditModal.prototype.createMultiple = function(data, createTripBoundary, options)
+	BaseFieldTripStopEditModal.prototype.createMultiple = function(data, options)
 	{
 		var self = this;
 		return self.beforeChangeData().then(function()
@@ -356,18 +354,10 @@
 					TotalStopTime: stop.TotalStopTime
 				});
 
-				if (stop.type == "student" && options.isCreateFromUnassignStudent)
-				{
-					//add this tag for easy calculate cross street status when create multiple dtd stops from unassigned.
-					//will delete this tag when calculate cross done. 
-					dataModel.isFromDTD = true;
-				}
-
 				stopsModel.push(dataModel);
 			});
 			self.obOverlayVisible(true);
 			self.normalizeData(stopsModel);
-			self.createTripBoundary = createTripBoundary;
 			self.initTitle(true);
 			self.init(options).then(function()
 			{

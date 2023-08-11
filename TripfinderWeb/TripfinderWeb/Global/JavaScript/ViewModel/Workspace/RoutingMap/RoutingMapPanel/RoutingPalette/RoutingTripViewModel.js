@@ -1400,33 +1400,6 @@
 		this.trip.TripStops = tripStops;
 	};
 
-	RoutingTripViewModel.prototype.addStopsFromSearch = function(data)
-	{
-		var self = this;
-		var stopTool = self.dataModel.viewModel.drawTool.stopTool;
-		stopTool.reverseGeocodeStop(data.geometry, data.address).then((result) =>
-		{
-			data.address = result;
-			this.dataModel.viewModel.eventsManager.createFieldTripStopFromSearchResult([data], { trip: this.trip, operate: "CreateNewTrip" }).then(function(trip)
-			{
-				if (trip)
-				{
-					self.fixStopTime(trip);
-					self.trip = trip;
-					self.obTripStops([]);
-					self.addStopExtendAttributes(self.trip.TripStops);
-					self.obTripStops(self.trip.TripStops);
-				}
-			});
-		});
-	};
-
-	RoutingTripViewModel.prototype.addStopsFromFile = function(file, param)
-	{
-		this.dataModel.viewModel.eventsManager.fileOpenOption = { trip: this.trip, operate: "CreateNewTrip" };
-		this.dataModel.viewModel.eventsManager.openFile(file, param);
-	};
-
 	RoutingTripViewModel.prototype.fileOpenComplete = function(e, trip)
 	{
 		var self = this;

@@ -5,6 +5,7 @@
 	function BaseRoutingEventsManager(fieldTripPaletteSectionVM, viewModal)
 	{
 		this.viewModel = fieldTripPaletteSectionVM;
+		this.fieldTripPaletteSectionVM = fieldTripPaletteSectionVM;
 		this._viewModal = viewModal;
 		this.copyFromObject = ko.computed(this.getCopyFrom.bind(this));
 		this.fileOpenCompleteEvent = new TF.Events.Event();
@@ -38,180 +39,50 @@
 			.then(function(data)
 			{
 				self.routingSearchViewmodel = null;
-				self.createFieldTripStopFromSearchResult(data, option);
+				self.createFieldTripStopFromSearchResult(data);
 			});
 	};
 
-	BaseRoutingEventsManager.prototype.createFieldTripStopFromSearchResult = function(data, option)
+	BaseRoutingEventsManager.prototype.createFieldTripStopFromSearchResult = function(data)
 	{
 		var self = this;
 		if (!data || data.length == 0)
 		{
 			return;
 		}
-		var isCreateFromStopSearch = false;
 
-		if (data[0].type == "tripstop" || data[0].type == "poolStops")
-		{
-			isCreateFromStopSearch = true;
-		}
+		const isCreateFromStopSearch = data[0].type == "tripstop" || data[0].type == "poolStops",
+			options = {
+				isDoorToDoor: false,
+				student: null,
+				isCreateFromStopSearch,
+				isCreateFromSearch:true,
+				boundary: null,
+				insertBehindSpecialStop: null,
+				streetName: "",
+				isCopied: false,
+				selectLastSelectedTrip: true,
+				tryUseLastSettings: false
+			};
 
-		if (option && option.operate == 'CreateNewTrip')
+
+		if (data.length == 1)
 		{
-			option.isCreateFromStopSearch = isCreateFromStopSearch;
-			option.isCreateFromSearch = true;
-			return self.createFromMultiple(data, option);
+			self.fieldTripPaletteSectionVM.editFieldTripStopModal.create(data[0], options);
 		}
 		else
 		{
-			if (data.length == 1)
-			{
-				self.createFromSingle(data[0], isCreateFromStopSearch, true);
-			}
-			else
-			{
-				self.createFromMultiple(data, {
-					isCreateFromStopSearch: isCreateFromStopSearch,
-					isCreateFromSearch: true
-				});
-			}
+			self.fieldTripPaletteSectionVM.editFieldTripStopModal.createMultiple(data, options);
 		}
 	};
 
 	BaseRoutingEventsManager.prototype.createFromSingle = function(point, isCreateFromStopSearch, isCreateFromSearch)
 	{
-		var self = this;
-		var map = this._viewModal._map;
-		geometry = geometry ? geometry : TF.xyToGeometry(point.x, point.y);
 
-		self.offsetInsetPoint(point, geometry, point.type).then(function(geometry)
-		{
-			if (geometry)
-			{
-				var stopTool = self.viewModel.drawTool.stopTool;
-				stopTool.reverseGeocodeStop(point.geometry, point.address).then(function(result)
-				{
-					self.viewModel.drawTool.drawTempTripStopsOnMap([geometry]);
-					if (self.isDoorToDoorType(point.type))
-					{
-						self.viewModel.drawTool.addStopAddressAndBoundary({ geometry: geometry }, {
-							isDoorToDoor: true,
-							student: point,
-							isCreateFromStopSearch: isCreateFromStopSearch,
-							isCreateFromSearch: isCreateFromSearch,
-							insertBehindSpecialStop: self.insertBehindSpecialStop,
-							streetName: result || "",
-							addStopGraphic: false
-						});
-					}
-					else
-					{
-						self.viewModel.drawTool.addStopAddressAndBoundary({ geometry: geometry },
-							{
-								isDoorToDoor: false,
-								boundary: point.boundary,
-								isCreateFromStopSearch: isCreateFromStopSearch,
-								isCreateFromSearch: isCreateFromSearch,
-								insertBehindSpecialStop: self.insertBehindSpecialStop,
-								streetName: result || ""
-							});
-					}
-				});
-				map.mapView.goTo(geometry);
-			} else
-			{
-				return tf.promiseBootbox.dialog({
-					message: "Stop cannot be created here!",
-					title: "Warning",
-					closeButton: true,
-					buttons: {
-						yes: {
-							label: "OK",
-							className: "btn-primary btn-sm btn-primary-black"
-						}
-					}
-				});
-			}
-		});
 	};
 
-	BaseRoutingEventsManager.prototype.createFromMultiple = function(pointArray, option)
+	BaseRoutingEventsManager.prototype.createFromMultiple = function(pointArray, options)
 	{
-		var self = this,
-			points = [],
-			extents = [],
-			promises = [];
-		self.viewModel.drawTool._mode = "createPoint";
-
-		option = option || {};
-		pointArray.forEach(function(point)
-		{
-			point.geometry = point.geometry || TF.xyToGeometry(point.x, point.y);
-		});
-		var streetPromise = Promise.resolve();
-		if (Enumerable.From(pointArray).Any(function(c) { return self.isDoorToDoorType(c.type); }))
-		{
-			streetPromise = TF.StreetHelper.getStreetInExtent(pointArray.map((c) => { return c.geometry; }), "file");
-		}
-		return streetPromise.then(function(streets)
-		{
-			pointArray.forEach(function(point)
-			{
-				var oldGeometry = point.geometry;
-				oldGeometry = new tf.map.ArcGIS.Point(oldGeometry.x, oldGeometry.y, self._viewModal._map.mapView.spatialReference);
-				promises.push(self.offsetInsetPoint(point, oldGeometry, point.type, streets).then(function(geometry)
-				{
-					if (geometry)
-					{
-						if (self.isDoorToDoorType(point.type))
-						{
-							var p = $.extend(point, { geometry: geometry, unassignStudent: point.unassignStudent });
-							if (option.isCreateFromSearch)
-							{
-								p = $.extend(point, { geometry: geometry, unassignStudent: point.unassignStudent, sourceStudentGeom: oldGeometry });
-							}
-							if (!p.unassignStudent) { p.unassignStudent = { geometry: oldGeometry.clone() }; }
-							points.push(p);
-							extents.push({ geometry: geometry });
-						} else
-						{
-							points.push($.extend(point, { geometry: geometry, boundary: point.boundary }));
-							extents.push({ geometry: point.boundary ? point.boundary.geometry : geometry });
-						}
-					}
-				}));
-			});
-
-			return Promise.all(promises).then(function()
-			{
-				tf.loadingIndicator.tryHide();
-				if (option && option.operate === 'CreateNewTrip')
-				{
-					return tf.modalManager.showModal(new TF.RoutingMap.RoutingPalette.NewRoutingTripStopModalViewModel(points, option.trip, self.dataModel))
-						.then(function(data)
-						{
-							if (data)
-							{
-								return self.dataModel.viewModel.drawTool.stopTool.attachClosetStreetToStop(data).then(function()
-								{
-									return data;
-								}).then(function()
-								{
-									return self.dataModel.fieldTripStopDataModel.addTripStopsToNewTrip(data, option.trip.TripStops, option.trip);
-								}).then(function(trip)
-								{
-									return Promise.resolve(trip);
-								});
-							}
-						});
-				}
-				else  
-				{
-					self.viewModel.drawTool.drawTempTripStopsOnMap(points.map(function(c) { return c.geometry; }));
-					self.viewModel.drawTool.stopTool.addMultipleStopAddressAndBoundary(points, option);
-				}
-			});
-		});
 	};
 
 	BaseRoutingEventsManager.prototype.isDoorToDoorType = function(type)
@@ -233,15 +104,15 @@
 	{
 		if (this.isDoorToDoorType(type))
 		{
-			return this.viewModel.drawTool.stopTool.getDoorToDoorLocationForStudent({ geometry: point.geometry, address: point.address }, streets);
+			return self.fieldTripPaletteSectionVM.drawTool.stopTool.getDoorToDoorLocationForStudent({ geometry: point.geometry, address: point.address }, streets);
 		}
 		else if (type == "addressPoint")
 		{
-			return Promise.resolve(geometry); //this.viewModel.drawTool.stopTool.offsetInsetPoint(point, geometry);
+			return Promise.resolve(geometry); //self.fieldTripPaletteSectionVM.drawTool.stopTool.offsetInsetPoint(point, geometry);
 		}
 		else
 		{
-			return this.viewModel.drawTool.forceStopToJunction(point).then(function(point) { return Promise.resolve(point.geometry) })
+			return self.fieldTripPaletteSectionVM.drawTool.forceStopToJunction(point).then(function(point) { return Promise.resolve(point.geometry) })
 		}
 	};
 
@@ -322,7 +193,7 @@
 			stop.city = stop.city || "";
 		});
 
-		return this.viewModel.drawTool.stopTool.createStopGeometry(stops, param);
+		return self.fieldTripPaletteSectionVM.drawTool.stopTool.createStopGeometry(stops, param);
 	};
 
 	BaseRoutingEventsManager.prototype.fileOpenComplete = function(stops)
@@ -335,7 +206,7 @@
 		}
 		if (self.fileOpenOption || stops.length > 1)
 		{
-			tf.modalManager.showModal(new TF.RoutingMap.RoutingPalette.CreateStopsFromFileModalViewModel(stops, this.viewModel)).then(function(result)
+			tf.modalManager.showModal(new TF.RoutingMap.RoutingPalette.CreateStopsFromFileModalViewModel(stops, self.fieldTripPaletteSectionVM)).then(function(result)
 			{
 				if (result == undefined || result === false)
 				{
