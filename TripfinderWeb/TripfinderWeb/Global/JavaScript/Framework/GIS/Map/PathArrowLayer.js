@@ -31,8 +31,6 @@
 	function PathArrowLayer(mapInstance, options)
 	{
 		const self = this;
-		self.onRedrawEvent = new TF.Events.Event();
-
 		const baseArrowOptions = {
 			geometryType: mapInstance.GEOMETRY_TYPE.POINT,
 			spatialReference: {
@@ -43,10 +41,10 @@
 		const layerOptions = Object.assign({}, defaultOptions, baseArrowOptions, options);
 		TF.GIS.Layer.call(self, layerOptions);
 		
-		// self.arrowLayerHelper = new TF.GIS.ArrowLayerHelper(mapInstance);
-		// self.symbolHelper = new TF.Map.Symbol();
-		
 		self.previousMapScale = null;
+		self.onRedrawEvent = new TF.Events.Event();
+		self.onRedrawEvent.subscribe(self.settings.eventHandlers?.redraw.bind(self));
+
 		mapInstance.onMapViewExtentChangeEvent.subscribe(self.onMapViewExtentChangeHandler.bind(self));
 		mapInstance.onMapViewScaleChangeEvent.subscribe(self.onMapViewScaleChangeHandler.bind(self));
 		self.mapInstance = mapInstance;
@@ -58,7 +56,6 @@
 	PathArrowLayer.prototype.create = function()
 	{
 		TF.GIS.Layer.prototype.create.call(this, this.LAYER_TYPE.FEATURE);
-		this.onRedrawEvent.subscribe(this.settings.eventHandlers?.redraw.bind(self));
 	}
 
 	PathArrowLayer.prototype.getRenderer = function()
@@ -113,6 +110,26 @@
 	{
 		const queryResult = await this.queryFeatures(null, condition);
 		return queryResult.features || [];
+	}
+
+	PathArrowLayer.prototype.isPathWithinMapExtentChanged = function(pathFeatures, data)
+	{
+		const { previous, extent, mapScaleChanged } = data;
+		let result = true;
+		if (mapScaleChanged === false)
+		{
+			const withinExtent = this.verifyPathArrowsWithinExtent(pathFeatures, extent);
+			if (withinExtent)
+			{
+				const withinPreviousExtent = this.verifyPathArrowsWithinExtent(pathFeatures, previous);
+				if (withinPreviousExtent)
+				{
+					result = false;
+				}
+			}
+		}
+
+		return result;
 	}
 
 	PathArrowLayer.prototype.verifyPathArrowsWithinExtent = function(arrowFeatures, extent)

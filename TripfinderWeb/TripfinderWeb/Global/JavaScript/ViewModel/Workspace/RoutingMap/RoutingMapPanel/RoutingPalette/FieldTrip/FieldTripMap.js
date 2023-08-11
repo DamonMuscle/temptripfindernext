@@ -978,7 +978,15 @@
 		const vertex = [],
 			stops = [],
 			{ DBID, FieldTripId, beforeStop, currentStop, afterStop, stopSequence} = data,
+			fieldTrip = self.fieldTripsData.find(item => item.id === FieldTripId),
+			isFieldTripVisible = fieldTrip?.visible,
 			isEditStop = !!currentStop;
+
+		if (!isFieldTripVisible)
+		{
+			// don't show highlight features for hidden trips.
+			return;
+		}
 
 		let stopObjects = null;
 		if (isEditStop)
@@ -1427,28 +1435,16 @@
 
 	FieldTripMap.prototype._redrawArrowLayer = async function(fieldTrips, arrowLayerInstance, pathFeatures, data)
 	{
-		const self = this,
-			{ previous, extent, mapScaleChanged } = data;
-		
+		const self = this;
+
 		for (let i = 0; i < fieldTrips.length; i++)
 		{
 			const fieldTrip = fieldTrips[i];
 			const { DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip);
 			const features = pathFeatures.filter(feature => feature.attributes.DBID === DBID && feature.attributes.FieldTripId === FieldTripId);
-			
-			// extent
-			if (mapScaleChanged === false)
+			if (!arrowLayerInstance.isPathWithinMapExtentChanged(features, data))
 			{
-				const withinExtent = arrowLayerInstance.verifyPathArrowsWithinExtent(features, extent);
-				if (withinExtent)
-				{
-					const withinPreviousExtent = arrowLayerInstance.verifyPathArrowsWithinExtent(features, previous);
-					if (withinPreviousExtent)
-					{
-						// console.log("skip redraw arrows");
-						continue;
-					}
-				}
+				continue;
 			}
 			
 			const edits = {};
@@ -1474,23 +1470,6 @@
 
 			await arrowLayerInstance.layer.applyEdits(edits);
 		}
-	}
-
-	FieldTripMap.prototype._computeStopPathArrowFeatures = function(fieldTrip)
-	{
-		const self = this,
-			{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
-			pathFeatures =  self._getPathFeatures(),
-			stopPathFeatures = pathFeatures.filter(feature => feature.attributes.DBID === DBID && feature.attributes.FieldTripId === FieldTripId);
-
-		let arrows = [];
-		for (let i = 0; i < stopPathFeatures.length; i++)
-		{
-			const stopPathFeature = stopPathFeatures[i];
-			arrows = arrows.concat(self._computeArrowFeatures(stopPathFeature));
-		}
-
-		return arrows;
 	}
 
 	FieldTripMap.prototype._computeArrowFeatures = function(polylineFeature)
@@ -1523,59 +1502,48 @@
 	FieldTripMap.prototype.setFieldTripPathArrowVisibility = async function(fieldTrips)
 	{
 		const self = this;
-		const pathArrowFeatures = await self._getPathArrowFeatures();
-		let updateFeatures = [];
-		for (let i = 0; i < fieldTrips.length; i++)
-		{
-			const fieldTrip = fieldTrips[i],
-				Color = fieldTrip.color,
-				visible = this.pathLineType === PATH_LINE_TYPE.Path && fieldTrip.visible,
-				updateColor = visible ? Color : null;
-
-			updateFeatures = updateFeatures.concat(self._computeUpdateArrow(fieldTrip, pathArrowFeatures, updateColor));
-		}
-
-		if (updateFeatures.length > 0)
-		{
-			const edits = { updateFeatures };
-			await self.fieldTripPathArrowLayerInstance.layer.applyEdits(edits);
-		}
+		const precondition = this.pathLineType === PATH_LINE_TYPE.Path;
+		await self._setArrowLayerVisibility(self.fieldTripPathArrowLayerInstance, fieldTrips, precondition);
 	}
 
 	FieldTripMap.prototype.setFieldTripSequenceLineArrowVisibility = async function(fieldTrips)
 	{
 		const self = this;
-		const sequenceLineArrowFeatures = await self._getSequenceLineArrowFeatures();
+		const precondition = this.pathLineType === PATH_LINE_TYPE.Sequence;
+		await self._setArrowLayerVisibility(self.fieldTripSequenceLineArrowLayerInstance, fieldTrips, precondition);
+	}
+
+	FieldTripMap.prototype._setArrowLayerVisibility = async function(arrowLayerInstance, fieldTrips, precondition)
+	{
+		const self = this;
 		let updateFeatures = [];
+
 		for (let i = 0; i < fieldTrips.length; i++)
 		{
 			const fieldTrip = fieldTrips[i],
+				{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
 				Color = fieldTrip.color,
-				visible = this.pathLineType === PATH_LINE_TYPE.Sequence && fieldTrip.visible,
-				updateColor = visible ? Color : null;
+				visible = precondition && fieldTrip.visible,
+				updateColor = visible ? Color : null,
+				condition = self._extractArrowCondition(DBID, FieldTripId),
+				filterArrows = await self._getArrowFeatures(arrowLayerInstance, condition);
 
-			updateFeatures = updateFeatures.concat(self._computeUpdateArrow(fieldTrip, sequenceLineArrowFeatures, updateColor));
+			updateFeatures = updateFeatures.concat(self._computeUpdateArrow(filterArrows, updateColor));
 		}
 
 		if (updateFeatures.length > 0)
 		{
 			const edits = { updateFeatures };
-			await self.fieldTripSequenceLineArrowLayerInstance.layer.applyEdits(edits);
+			await arrowLayerInstance.layer.applyEdits(edits);
 		}
-
-		// self.fieldTripSequenceLineArrowLayerInstance.layer.refresh();
 	}
 
-	FieldTripMap.prototype._computeUpdateArrow = function(fieldTrip, baseArrowFeatures, updateColor)
+	FieldTripMap.prototype._computeUpdateArrow = function(filterArrows, updateColor)
 	{
-		const self = this,
-			{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip),
-			filterArrows = self._queryArrowFeatures(baseArrowFeatures, DBID, FieldTripId),
-			updateFeatures = [];
-
-		for (let j = 0; j < filterArrows.length; j++)
+		const updateFeatures = [];
+		for (let i = 0; i < filterArrows.length; i++)
 		{
-			const arrowFeature = filterArrows[j];
+			const arrowFeature = filterArrows[i];
 			if (updateColor !== arrowFeature.attributes.Color)
 			{
 				arrowFeature.attributes.Color = updateColor;
@@ -2079,8 +2047,7 @@
 
 	FieldTripMap.prototype._getPathArrowFeatures = async function(condition = '1 = 1')
 	{
-		const queryResult = await this.fieldTripPathArrowLayerInstance?.queryFeatures(null, condition);
-		return queryResult.features || [];
+		return await this._getArrowFeatures(this.fieldTripPathArrowLayerInstance, condition);
 	}
 
 	FieldTripMap.prototype._getSequenceLineFeatures = function()
@@ -2090,7 +2057,12 @@
 
 	FieldTripMap.prototype._getSequenceLineArrowFeatures = async function(condition = '1 = 1')
 	{
-		const queryResult = await this.fieldTripSequenceLineArrowLayerInstance?.queryFeatures(null, condition);
+		return await this._getArrowFeatures(this.fieldTripSequenceLineArrowLayerInstance, condition);
+	}
+
+	FieldTripMap.prototype._getArrowFeatures = async function(arrowLayerInstance, condition = '1 = 1')
+	{
+		const queryResult = await arrowLayerInstance?.queryFeatures(null, condition);
 		return queryResult.features || [];
 	}
 
