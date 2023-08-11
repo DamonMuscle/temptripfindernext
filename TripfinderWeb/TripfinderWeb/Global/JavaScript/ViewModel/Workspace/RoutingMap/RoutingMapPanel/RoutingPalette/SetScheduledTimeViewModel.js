@@ -5,15 +5,25 @@
 	function SetScheduledTimeViewModel(tripStop, trip)
 	{
 		var self = this;
+		
+		this.momentHelper = new TF.Document.MomentHelper();
+
 		this.tripStop = tripStop;
 		this.trip = trip;
-		this.arrivalTime = ko.observable(tripStop.StopTime);
+		this.arrivalDate = ko.observable();
+		this.arrivalTime = ko.observable();
 		this.numOfMinutes = ko.observable(0);
 		this.changeType = ko.observable(0);
+
+		self.convertStopTimeArrive(tripStop);
+
+
 		this.arrivalDateTime = ko.computed(function()
 		{
-			var result = moment(self.arrivalTime()).format("HH:mm:ss").toLowerCase() == "invalid date" ? moment(self.arrivalTime(), "HH:mm:ss") : moment(self.arrivalTime()).format("HH:mm:ss");
-			var minutesDiff = moment(result, "HH:mm:ss").diff(moment(self.tripStop.StopTime, "HH:mm:ss"), "minutes");
+			const arrivalDateTime = self.momentHelper.getDateTime(self.arrivalDate(), self.arrivalTime(), true);
+			const stopTime = self.tripStop.StopTimeArrive || self.tripStop.StopTimeDepart;
+
+			var minutesDiff = moment(arrivalDateTime).diff(stopTime, "minutes");
 			if (minutesDiff >= 0)
 			{
 				self.changeType(0);
@@ -22,7 +32,8 @@
 				self.changeType(1);
 			}
 			self.numOfMinutes(Math.abs(minutesDiff));
-			return result;
+
+			return arrivalDateTime;
 		});
 
 		this.stopAffect = ko.observable(0);
@@ -36,6 +47,13 @@
 			return !self.updateDisabled();
 		});
 		this.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
+	}
+
+	SetScheduledTimeViewModel.prototype.convertStopTimeArrive = function(tripStop)
+	{
+		const stopTime = tripStop.StopTimeArrive || tripStop.StopTimeDepart;
+		this.arrivalDate(this.momentHelper.getDatePart(stopTime, true));
+		this.arrivalTime(this.momentHelper.getTimePart(stopTime, true));
 	}
 
 	SetScheduledTimeViewModel.prototype.init = function(viewModel, element)
@@ -128,7 +146,7 @@
 					var isUpdatedRelatedTime = self.updateDisabled();
 					if (isUpdatedRelatedTime)
 					{
-						self.trip.TripStops.map(function(tripStopTemp)
+						self.trip.FieldTripStops.map(function(tripStopTemp)
 						{
 							if ((self.stopAffect() == self.stopAffectEnum.AllStops && tripStopTemp.id != self.tripStop.id)
 								|| (self.stopAffect() == self.stopAffectEnum.AllPrevious && tripStopTemp.Sequence < self.tripStop.Sequence)
@@ -139,27 +157,21 @@
 									(moment(tripStopTemp.StopTime, "HH:mm:ss").add(self.numOfMinutes(), "minutes"))
 									: (moment(tripStopTemp.StopTime, "HH:mm:ss").subtract(self.numOfMinutes(), "minutes")));
 								tripStopTemp.StopTime = tripStopTemp.StopTime.format("HH:mm:ss");
-								if (tripStopTemp.Sequence == 1)
-								{
-									self.trip.StartTime = tripStopTemp.StopTime;
-								}
-								else if (tripStopTemp.Sequence == self.trip.TripStops.length)
-								{
-									self.trip.FinishTime = tripStopTemp.StopTime;
-								}
 							}
 						});
 					}
 
 					if (self.tripStop.Sequence == 1)
 					{
-						self.trip.StartTime = self.tripStop.StopTime;
+						self.tripStop.StopTimeDepart = self.tripStop.StopTime;
 					}
-					else if (self.tripStop.Sequence == self.trip.TripStops.length)
+					else
 					{
-						self.trip.EndTime = self.tripStop.StopTime;
+						self.tripStop.StopTimeArrive = self.tripStop.StopTime;
 					}
+
 					var data = { isUpdatedRelatedTime: isUpdatedRelatedTime, trip: self.trip, tripStop: self.tripStop };
+
 					return Promise.resolve(data);
 				}
 			});
@@ -172,5 +184,4 @@
 	{
 		return Promise.resolve(true);
 	};
-
 })();

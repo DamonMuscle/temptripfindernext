@@ -104,6 +104,67 @@
 		return [days, hours, minutes];
 	}
 
+	MomentHelper.prototype.getDatePart = function (value, isUtc)
+	{
+		if (!value)
+		{
+			return null;
+		}
+
+		const dt = isUtc ? utcToClientTimeZone(value) : moment(value);
+		return dt.format("MM/DD/YYYY");
+	}
+
+	MomentHelper.prototype.getTimePart = function (value, isUtc)
+	{
+		if (!value)
+		{
+			return null;
+		}
+
+		const dt = isUtc ? utcToClientTimeZone(value) : moment(value);
+		return dt.format("hh:mm A");
+	}
+
+	MomentHelper.prototype.getDateTime = function (datePart, timePart, isUtc)
+	{
+		if (!datePart || !timePart)
+		{
+			return null;
+		}
+
+		const tDateIndex = datePart.indexOf("T");
+		if (tDateIndex > -1)
+		{
+			datePart = datePart.substring(0, tDateIndex);
+		}
+
+		const tTimeIndex = timePart.indexOf("T")
+		if (tTimeIndex > -1)
+		{
+			timePart = timePart.substring(tTimeIndex + 1);
+		}
+
+		const dtDate = moment(`${datePart} ${timePart}`);
+		if (!dtDate.isValid())
+		{
+			return null;
+		}
+
+		let dtString = dtDate.format("YYYY-MM-DDTHH:mm:ss");
+		if (isUtc)
+		{
+			const dt = clientTimeZoneToUtc(dtString);
+			if (!dt.isValid)
+			{
+				return null;
+			}
+			dtString = dt.format("YYYY-MM-DDTHH:mm:ss");
+		}
+
+		return dtString;
+	}	
+
 	/**
 	 * Dispose
 	 *
