@@ -1806,7 +1806,7 @@
 			let $inputGroupElem = $inputElem.find('.input-group');
 			if ($inputGroupElem.length === 1)
 			{
-				$inputGroupElem.css('display', 'block');
+				$inputGroupElem.css('display', 'table');
 				let $input = $inputGroupElem.find('.k-input');
 				if ($input.length > 0)
 				{
