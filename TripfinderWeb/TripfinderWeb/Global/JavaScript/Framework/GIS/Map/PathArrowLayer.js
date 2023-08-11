@@ -41,7 +41,12 @@
 		const layerOptions = Object.assign({}, defaultOptions, baseArrowOptions, options);
 		TF.GIS.Layer.call(self, layerOptions);
 		
-		self.previousMapScale = null;
+		const previousMapState = {
+			scale: null,
+			extent: null
+		};
+		self.defineReadOnlyProperty('previousMapState', previousMapState);
+
 		self.onRedrawEvent = new TF.Events.Event();
 		self.onRedrawEvent.subscribe(self.settings.eventHandlers?.redraw.bind(self));
 
@@ -71,10 +76,9 @@
 	PathArrowLayer.prototype.onMapViewExtentChangeHandler = function(_, data)
 	{
 		const self = this, DELAY_MILLISECONDS = 500;
-		if (self.previousMapScale === null)
+		if (self.previousMapState.scale === null)
 		{
-			self.previousMapScale = self._getMapScale();
-			self.previousExtent = data.previous.clone();
+			self._setPreviousMapState(self.mapInstance.getScale(), data.previous.clone());
 		}
 		
 		self._clearOnMapViewExtentChangeHandlerTimeout();
@@ -84,9 +88,9 @@
 			if (self.mapInstance?.map.mapView.stationary)
 			{
 				data.mapScaleChanged = self._verifyMapScaleChanged();
-				data.previous = self.previousExtent.clone();
+				data.previous = self.previousMapState.extent.clone();
 				self.redraw(data);
-				self.previousMapScale = null;
+				self._setPreviousMapState(null, null);
 			}
 
 			self._clearOnMapViewExtentChangeHandlerTimeout();
@@ -157,18 +161,27 @@
 		}
 	}
 
-	PathArrowLayer.prototype._getMapScale = function()
-	{
-		return this.mapInstance.map.mapView.scale;
-	}
-
 	PathArrowLayer.prototype._verifyMapScaleChanged = function()
 	{
-		const mapScale = this._getMapScale();
-		const mapScaleChanged = !(this.previousMapScale && this.previousMapScale === mapScale);
-		this.previousMapScale = mapScale;
+		const mapScale = this.mapInstance.getScale();
+		const mapScaleChanged = !(this.previousMapState.scale && this.previousMapState.scale === mapScale);
+		this._setPreviousMapState(mapScale)
 
 		return mapScaleChanged;
+	}
+
+	PathArrowLayer.prototype._setPreviousMapState = function(scale, extent)
+	{
+		const self = this;
+		if (scale !== undefined)
+		{
+			self.previousMapState.scale = scale;
+		}
+
+		if (extent !== undefined)
+		{
+			self.previousMapState.extent = extent;
+		}
 	}
 
 	PathArrowLayer.prototype.dispose = function()

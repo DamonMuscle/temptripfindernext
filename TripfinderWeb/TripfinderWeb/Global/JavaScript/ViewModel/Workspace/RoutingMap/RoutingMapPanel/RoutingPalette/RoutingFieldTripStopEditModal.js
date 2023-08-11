@@ -562,16 +562,18 @@
 		const isSetSmartSequence = !self.obIsSmartAssignment() && self.obIsSmartSequence();
 		var sequenceChanged = self.data.length == 1 && (self.obSelectedSequence() != self.original[0].Sequence || isSetSmartSequence);
 		var tripChanged = self.data.length == 1 && self.obSelectedTrip().id != self.original[0].FieldTripId;
-		if (sequenceChanged || tripChanged)
+		var curbApproachChanged = self.data.length === 1 && self.data[0].vehicleCurbApproach !== self.original[0].vehicleCurbApproach;
+		if (sequenceChanged || tripChanged || curbApproachChanged)
 		{
 			// use changeStopPosition to change sequence, so revert it to original here.
 			data[0].Sequence = self.original[0].Sequence;
 			data[0].FieldTripId = self.original[0].FieldTripId;
 			data[0].DBID = self.obSelectedTrip().DBID;
+			data[0].VehicleCurbApproach = self.original[0].VehicleCurbApproach;
 		}
 		return this.dataModel.fieldTripStopDataModel.update(data).then(async function()
 		{
-			if (!data[0].SchoolCode && (sequenceChanged || tripChanged || self.obIsSmartAssignment()))
+			if (!data[0].SchoolCode && (sequenceChanged || tripChanged || curbApproachChanged || self.obIsSmartAssignment()))
 			{
 				var tripId = data[0].FieldTripId, targetTripId = self.obSelectedTrip().id;
 				var tripStop = self.data[0];

@@ -621,6 +621,11 @@
 		this.map.mapView.scale = scale;
 	}
 
+	Map.prototype.getScale = function()
+	{
+		return this.map.mapView.scale;
+	}
+
 	Map.prototype.restrictPanOutside = function()
 	{
 		const self = this;
