@@ -18,7 +18,8 @@
 		this.obIsEnable = ko.observable(true);
 		var self = this;
 		self.dataEntity = options.dataEntity;
-		self.pickListOptions = self.dataEntity ? self.dataEntity.UDFPickListOptions : [];
+		var pickListOptions = self.dataEntity ? self.dataEntity.UDFPickListOptions : [];
+		self.pickListOptions = JSON.parse(JSON.stringify(pickListOptions));
 		self.isUDFGroup = !!options.isUDFGroup;
 		self.kendoGrid = null;
 		self.gridColumns = [
