@@ -175,23 +175,6 @@
 									: (moment(tripStopTemp.StopTime, "HH:mm:ss").subtract(self.numOfMinutes(), "minutes")));
 								tripStopTemp.StopTime = tripStopTemp.StopTime.format("YYYY-MM-DDTHH:mm:ss");
 
-								// update the Arrive and Depart StopTime
-								if(tripStopTemp.PrimaryDeparture)
-								{
-									tripStopTemp.StopTimeDepart = tripStopTemp.StopTime;
-								}
-								else if(tripStopTemp.PrimaryDestination)
-								{
-									tripStopTemp.StopTimeArrive = tripStopTemp.StopTime;
-								}
-								else
-								{
-									tripStopTemp.StopTimeArrive = tripStopTemp.StopTime;
-									tripStopTemp.StopTimeDepart = moment(tripStopTemp.StopTimeArrive)
-																		.add(Math.ceil(moment.duration(tripStopTemp.Duration).asMinutes()), "minutes")
-																		.format("YYYY-MM-DDTHH:mm:ss");
-								}
-
 								// update Trip's depart time
 								if (tripStopTemp.Sequence == 1)
 								{
@@ -204,14 +187,24 @@
 							}
 						});
 					}
-					
-					if (self.tripStop.PrimaryDeparture)
+
+					// update the Arrive and Depart StopTime
+					if(self.tripStop.PrimaryDeparture)
 					{
 						self.tripStop.StopTimeDepart = self.tripStop.StopTime;
 					}
-					else
+					else if(self.tripStop.PrimaryDestination)
 					{
 						self.tripStop.StopTimeArrive = self.tripStop.StopTime;
+					}
+					else
+					{
+						const pauseDuration = moment.duration(moment(self.tripStop.StopTimeArrive).diff(moment(self.tripStop.StopTimeDepart))).asMinutes();
+
+						self.tripStop.StopTimeArrive = self.tripStop.StopTime;
+						self.tripStop.StopTimeDepart = moment(self.tripStop.StopTimeArrive)
+															.add(Math.ceil(pauseDuration), "minutes")
+															.format("YYYY-MM-DDTHH:mm:ss");
 					}
 
 					var data = { isUpdatedRelatedTime: isUpdatedRelatedTime, trip: self.trip, tripStop: self.tripStop };
