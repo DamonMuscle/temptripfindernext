@@ -165,40 +165,53 @@
 								|| (self.stopAffect() == self.stopAffectEnum.AllFollowing && tripStopTemp.Sequence > self.tripStop.Sequence)
 							)
 							{
-								if (tripStopTemp.PrimaryDeparture)
-								{
-									tripStopTemp.StopTime = tripStopTemp.StopTimeDepart;
-								}
-								else
-								{
-									tripStopTemp.StopTime = tripStopTemp.StopTimeArrive;
-								}
-
+								// set StopTime of 1st Stop by StopTimeDepart, the rest by StopTimeArrive
+								tripStopTemp.StopTime = tripStopTemp.PrimaryDeparture ? tripStopTemp.StopTimeDepart :
+																						tripStopTemp.StopTimeArrive;
+								
+								// update StopTime
 								tripStopTemp.StopTime = (self.changeType() == self.changeTypeEnum.Add ?
 									(moment(tripStopTemp.StopTime, "HH:mm:ss").add(self.numOfMinutes(), "minutes"))
 									: (moment(tripStopTemp.StopTime, "HH:mm:ss").subtract(self.numOfMinutes(), "minutes")));
 								tripStopTemp.StopTime = tripStopTemp.StopTime.format("YYYY-MM-DDTHH:mm:ss");
 
-								if(!tripStopTemp.PrimaryDeparture && !tripStopTemp.PrimaryDestination)
+								// update the Arrive and Depart StopTime
+								if(tripStopTemp.PrimaryDeparture)
+								{
+									tripStopTemp.StopTimeDepart = tripStopTemp.StopTime;
+								}
+								else if(tripStopTemp.PrimaryDestination)
 								{
 									tripStopTemp.StopTimeArrive = tripStopTemp.StopTime;
-									tripStopTemp.StopTimeDepart = moment(self.tripStop.StopTimeArrive)
+								}
+								else
+								{
+									tripStopTemp.StopTimeArrive = tripStopTemp.StopTime;
+									tripStopTemp.StopTimeDepart = moment(tripStopTemp.StopTimeArrive)
 																		.add(Math.ceil(moment.duration(tripStopTemp.Duration).asMinutes()), "minutes")
 																		.format("YYYY-MM-DDTHH:mm:ss");
+								}
+
+								// update Trip's depart time
+								if (tripStopTemp.Sequence == 1)
+								{
+									self.trip.startTime = tripStopTemp.StopTime;
+								}
+								else if (tripStopTemp.Sequence == self.trip.FieldTripStops.length)
+								{
+									self.trip.endTime = tripStopTemp.StopTime;
 								}
 							}
 						});
 					}
+					
+					if (self.tripStop.PrimaryDeparture)
+					{
+						self.tripStop.StopTimeDepart = self.tripStop.StopTime;
+					}
 					else
 					{
-						if (self.tripStop.PrimaryDepature)
-						{
-							self.tripStop.StopTimeDepart = self.tripStop.StopTime;
-						}
-						else
-						{
-							self.tripStop.StopTimeArrive = self.tripStop.StopTime;
-						}
+						self.tripStop.StopTimeArrive = self.tripStop.StopTime;
 					}
 
 					var data = { isUpdatedRelatedTime: isUpdatedRelatedTime, trip: self.trip, tripStop: self.tripStop };
