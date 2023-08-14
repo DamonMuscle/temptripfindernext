@@ -1176,10 +1176,10 @@
 		return this.fieldTripStopDataModel.calculateSmartSequence(trip, tripStop);
 	};
 
-	RoutingDataModel.prototype.changeStopPosition = function(tripStop, fieldTripId, newPositionIndex)
+	RoutingDataModel.prototype.changeStopPosition = function(tripStop, fieldTripId, newPositionIndex, callZoomToLayers = true)
 	{
 		var self = this;
-		return self.fieldTripStopDataModel.reorderTripStopSequence(tripStop, fieldTripId, newPositionIndex + 1);
+		return self.fieldTripStopDataModel.reorderTripStopSequence(tripStop, fieldTripId, newPositionIndex + 1, callZoomToLayers);
 	};
 
 	RoutingDataModel.prototype._removeNotOpenEditTrips = function(openTrips)

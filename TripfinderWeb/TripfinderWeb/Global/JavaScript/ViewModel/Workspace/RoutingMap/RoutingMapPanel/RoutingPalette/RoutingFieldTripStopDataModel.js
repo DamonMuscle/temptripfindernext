@@ -568,12 +568,12 @@
 		});
 	};
 
-	RoutingFieldTripStopDataModel.prototype.reorderTripStopSequence = function(tripStop, fieldTripId, newSequence)
+	RoutingFieldTripStopDataModel.prototype.reorderTripStopSequence = function(tripStop, fieldTripId, newSequence, callZoomToLayers = true)
 	{
 		var self = this;
 		if (tripStop.FieldTripId == fieldTripId)
 		{
-			return self._reorderTripStopSequenceInOneTrip(tripStop, newSequence);
+			return self._reorderTripStopSequenceInOneTrip(tripStop, newSequence, callZoomToLayers);
 		}
 
 		return self.moveTripStopsToOtherTrip([tripStop], fieldTripId, newSequence);
@@ -634,7 +634,7 @@
 		}
 	};
 
-	RoutingFieldTripStopDataModel.prototype._reorderTripStopSequenceInOneTrip = function(tripStop, newSequence, isFromBroadCastSync)
+	RoutingFieldTripStopDataModel.prototype._reorderTripStopSequenceInOneTrip = function(tripStop, newSequence, callZoomToLayers = true)
 	{
 		var self = this;
 		self._viewModal.revertMode = "";
@@ -642,7 +642,6 @@
 		var oldSequence = tripStop.Sequence;
 		var editTripPathStops = [];
 		var trip = self.dataModel.getTripById(tripStop.FieldTripId);
-		if (!isFromBroadCastSync) self.dataModel.fieldTripEditBroadcast.moveTripStop(trip, tripStop, newSequence);
 		var newPrevStop = newSequence > 1 ? self.dataModel.getFieldTripStopBySequence(trip, newSequence - 1) : null;
 		var oldPrevStop = oldSequence > 1 ? self.dataModel.getFieldTripStopBySequence(trip, oldSequence - 1) : null;
 		if (oldSequence < newSequence)
@@ -687,7 +686,7 @@
 				stop.StopTimeDepart = stop.StopTimeDepart || stop.StopTimeArrive;
 			}
 		});
-		return self._refreshTripPathByTripStops(trip.FieldTripStops).then(function(tripStops)
+		return self._refreshTripPathByTripStops(trip.FieldTripStops, callZoomToLayers).then(function(tripStops)
 		{
 			editTripPathStops.forEach(function(stop)
 			{

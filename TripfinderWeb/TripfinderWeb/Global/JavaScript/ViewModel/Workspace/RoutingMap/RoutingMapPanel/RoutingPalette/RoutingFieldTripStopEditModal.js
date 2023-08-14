@@ -496,9 +496,10 @@
 		});
 		var self = this;
 		const isSetSmartSequence = !self.obIsSmartAssignment() && self.obIsSmartSequence();
-		var sequenceChanged = self.data.length == 1 && (self.obSelectedSequence() != self.original[0].Sequence || isSetSmartSequence);
-		var tripChanged = self.data.length == 1 && self.obSelectedTrip().id != self.original[0].FieldTripId;
-		var curbApproachChanged = self.data.length === 1 && self.data[0].vehicleCurbApproach !== self.original[0].vehicleCurbApproach;
+		const sequenceChanged = self.data.length == 1 && (self.obSelectedSequence() != self.original[0].Sequence || isSetSmartSequence);
+		const tripChanged = self.data.length == 1 && self.obSelectedTrip().id != self.original[0].FieldTripId;
+		const curbApproachChanged = self.data.length === 1 && self.data[0].vehicleCurbApproach !== self.original[0].vehicleCurbApproach;
+		const callZoomToLayers = sequenceChanged || tripChanged;
 		if (sequenceChanged || tripChanged || curbApproachChanged)
 		{
 			// use changeStopPosition to change sequence, so revert it to original here.
@@ -543,10 +544,13 @@
 					}
 				}
 
-				return self.dataModel.changeStopPosition(tripStop, targetTripId, position).then(function()
+				return self.dataModel.changeStopPosition(tripStop, targetTripId, position, callZoomToLayers).then(function()
 				{
 					self.viewModel.display.afterChangeStopPosition(tripStop, !tripChanged, tripId);
-					PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToLayers, self.dataModel.trips);
+					if (callZoomToLayers)
+					{
+						PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToLayers, self.dataModel.trips);
+					}
 					tf.loadingIndicator.tryHide()
 				});
 			}
