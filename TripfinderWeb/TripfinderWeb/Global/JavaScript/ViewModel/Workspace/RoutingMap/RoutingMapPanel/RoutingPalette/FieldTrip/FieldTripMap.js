@@ -586,12 +586,11 @@
 
 	FieldTripMap.prototype.applyAddFieldTripStop = async function(data, callback = ()=>{})
 	{
-		console.log(data);
 		this.showLoadingIndicator();
-		this._refreshStopSequenceLabel(data);
-		this._drawNewStopFromMap(data);
+		this._refreshStopsSequenceLabel([data]);
+		this._drawNewStopsFromMap([data]);
 		this.clearHighlightFeatures();
-		await this._drawNewStopPathFromMap(data);
+		await this._drawNewStopPathsFromMap([data]);
 		this.startAddFieldTripStop();
 		this.hideLoadingIndicator();
 
@@ -605,7 +604,6 @@
 			console.warn(`No stops for applyAddFieldTripStops. RETURN`);
 			return;
 		}
-		console.log(stops);
 
 		this.showLoadingIndicator();
 		this._refreshStopsSequenceLabel(stops);
@@ -658,25 +656,6 @@
 		return { Name, City, RegionAbbr, CountryCode, newStop, XCoord: +longitude.toFixed(6), YCoord: +latitude.toFixed(6) };
 	}
 
-	FieldTripMap.prototype._refreshStopSequenceLabel = function(data)
-	{
-		const self = this,
-			{ DBID, FieldTripId, Sequence } = data,
-			fieldTripStops = self._getStopFeatures(),
-			stopGraphics = fieldTripStops.filter(item => item.attributes.DBID === DBID && item.attributes.FieldTripId === FieldTripId);
-
-		for (let i = 0; i < stopGraphics.length; i++)
-		{
-			const stop = stopGraphics[i],
-				attributes = stop.attributes;
-			if (attributes.Sequence >= Sequence)
-			{
-				attributes.Sequence += 1;
-				self._updateStopGraphicSequenceLabel(stop);
-			}
-		}
-	}
-
 	FieldTripMap.prototype._refreshStopsSequenceLabel = function(data)
 	{
 		const self = this,
@@ -684,38 +663,22 @@
 			fieldTripStops = self._getStopFeatures(),
 			stopGraphics = fieldTripStops.filter(item => item.attributes.DBID === DBID && item.attributes.FieldTripId === FieldTripId);
 
-		for (let i = 0; i < stopGraphics.length; i++)
+		for (let j = 0, jCount = data.length; j < jCount; j++)
 		{
-			const stop = stopGraphics[i],
+			const Sequence = data[j].Sequence;
+			for (let i = 0, iCount = stopGraphics.length; i < iCount; i++)
+			{
+				const stop = stopGraphics[i],
 				attributes = stop.attributes,
 				stopSequence = attributes.Sequence;
-			for (let j = 0; j < data.length; j++)
-			{
-				const Sequence = data[j].Sequence;
+
 				if (stopSequence >= Sequence)
 				{
 					attributes.Sequence += 1;
+					self._updateStopGraphicSequenceLabel(stop);
 				}
 			}
-
-			if (stopSequence < attributes.Sequence)
-			{
-				self._updateStopGraphicSequenceLabel(stop);
-			}
 		}
-	}
-
-	FieldTripMap.prototype._drawNewStopFromMap = function(data)
-	{
-		const self = this,
-			stopLayerInstance = self.fieldTripStopLayerInstance,
-			{ id, DBID, FieldTripId, Name, Notes, Sequence, VehicleCurbApproach, XCoord, YCoord } = data,
-			CurbApproach = VehicleCurbApproach,
-			Color = self.fieldTripsData.find(item => item.id === FieldTripId)?.color || INFO_STOP_COLOR,  // prevent Color is undefined
-			attributes = { DBID, FieldTripId, id, Name, CurbApproach, Sequence, Color},
-			newStopGraphic = stopLayerInstance.createStop(XCoord, YCoord, attributes);
-
-		stopLayerInstance.addStops([newStopGraphic]);
 	}
 
 	FieldTripMap.prototype._drawNewStopsFromMap = function(data)
@@ -745,16 +708,6 @@
 			attributes = stopGraphic.attributes;
 
 		stopGraphic.symbol = stopLayerInstance.getStopSymbol(attributes.Sequence, attributes.Color);
-	}
-
-	FieldTripMap.prototype._drawNewStopPathFromMap = async function(data)
-	{
-		const self = this,
-			{ DBID, FieldTripId, Sequence } = data,
-			fieldTrip = self.fieldTripsData.find(item => item.DBID === DBID && item.id === FieldTripId),
-			effectSequences = self._computeEffectSequences(fieldTrip, { addStop: { Sequence } });
-
-		await self.refreshFieldTripPath(fieldTrip, effectSequences);
 	}
 
 	FieldTripMap.prototype._drawNewStopPathsFromMap = async function(data)
