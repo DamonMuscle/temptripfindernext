@@ -125,6 +125,25 @@
 				}
 			}
 
+			validatorFields.numOfMinutes = {
+				trigger: "blur change",
+				validators:
+				{
+					notEmpty:
+					{
+						message: "required"
+					},
+					callback:
+					{
+						message: " not a valid number of minutes.",
+						callback: function(value)
+						{
+							return parseInt(Number(value)) == value && value >= 0;
+						}.bind(this)
+					}
+				}
+			}
+
 			this.$form.bootstrapValidator(
 				{
 					excluded: [":hidden", ":not(:visible)"],
