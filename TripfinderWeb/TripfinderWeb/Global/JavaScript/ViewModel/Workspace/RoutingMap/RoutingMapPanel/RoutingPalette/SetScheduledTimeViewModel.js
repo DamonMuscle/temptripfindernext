@@ -165,14 +165,16 @@
 								|| (self.stopAffect() == self.stopAffectEnum.AllFollowing && tripStopTemp.Sequence > self.tripStop.Sequence)
 							)
 							{
+								const numOfMinutes = Number(self.numOfMinutes());
+
 								// set StopTime of 1st Stop by StopTimeDepart, the rest by StopTimeArrive
 								tripStopTemp.StopTime = tripStopTemp.PrimaryDeparture ? tripStopTemp.StopTimeDepart :
 																						tripStopTemp.StopTimeArrive;
 								
 								// update StopTime
 								tripStopTemp.StopTime = (self.changeType() == self.changeTypeEnum.Add ?
-									(moment(tripStopTemp.StopTime, "HH:mm:ss").add(self.numOfMinutes(), "minutes"))
-									: (moment(tripStopTemp.StopTime, "HH:mm:ss").subtract(self.numOfMinutes(), "minutes")));
+									(moment(tripStopTemp.StopTime).add(numOfMinutes, "minutes"))
+									: (moment(tripStopTemp.StopTime).subtract(numOfMinutes, "minutes")));
 								tripStopTemp.StopTime = tripStopTemp.StopTime.format("YYYY-MM-DDTHH:mm:ss");
 
 								// update Trip's depart time
