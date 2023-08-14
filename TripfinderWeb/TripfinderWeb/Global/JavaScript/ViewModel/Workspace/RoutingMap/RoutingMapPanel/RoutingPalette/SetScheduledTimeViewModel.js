@@ -184,35 +184,43 @@
 								{
 									self.trip.endTime = tripStopTemp.StopTime;
 								}
+
+								// update the Arrive and Depart StopTime
+								self.updateDepartArrive(tripStopTemp);
 							}
 						});
 					}
 
-					// update the Arrive and Depart StopTime
-					if(self.tripStop.PrimaryDeparture)
-					{
-						self.tripStop.StopTimeDepart = self.tripStop.StopTime;
-					}
-					else if(self.tripStop.PrimaryDestination)
-					{
-						self.tripStop.StopTimeArrive = self.tripStop.StopTime;
-					}
-					else
-					{
-						const pauseDuration = moment.duration(moment(self.tripStop.StopTimeArrive).diff(moment(self.tripStop.StopTimeDepart))).asMinutes();
-
-						self.tripStop.StopTimeArrive = self.tripStop.StopTime;
-						self.tripStop.StopTimeDepart = moment(self.tripStop.StopTimeArrive)
-															.add(Math.ceil(pauseDuration), "minutes")
-															.format("YYYY-MM-DDTHH:mm:ss");
-					}
-
+					self.updateDepartArrive(self.tripStop);
+					
 					var data = { isUpdatedRelatedTime: isUpdatedRelatedTime, trip: self.trip, tripStop: self.tripStop };
 
 					return Promise.resolve(data);
 				}
 			});
 	};
+
+	SetScheduledTimeViewModel.prototype.updateDepartArrive = function(tripStop) 
+	{
+		if(tripStop.PrimaryDeparture)
+		{
+			tripStop.StopTimeDepart = tripStop.StopTime;
+		}
+		else if(tripStop.PrimaryDestination)
+		{
+			tripStop.StopTimeArrive = tripStop.StopTime;
+		}
+		else
+		{
+			const pauseDuration = moment.duration(moment(tripStop.StopTimeDepart).diff(moment(tripStop.StopTimeArrive))).asMinutes();
+
+			tripStop.StopTimeArrive = tripStop.StopTime;
+			tripStop.StopTimeDepart = moment(tripStop.StopTimeArrive)
+											.add(Math.ceil(pauseDuration), "minutes")
+											.format("YYYY-MM-DDTHH:mm:ss");
+		}
+
+	}
 
 	SetScheduledTimeViewModel.prototype.changeTypeEnum = { "Add": 0, "Subtract": 1 };
 	SetScheduledTimeViewModel.prototype.stopAffectEnum = { "AllPrevious": 0, "AllFollowing": 1, "AllStops": 2 };
