@@ -608,16 +608,42 @@
 		this.showLoadingIndicator();
 		this._refreshStopsSequenceLabel(stops);
 		this._drawNewStopsFromMap(stops);
+		this.clearHighlightFeatures();
 		await this._drawNewStopPathsFromMap(stops);
 		this.hideLoadingIndicator();
 
 		callback();
 	}
 
-	FieldTripMap.prototype._addNewStop = async function(stopLayerInstance, mapPoint)
+	FieldTripMap.prototype.highlightQuickAddStops = function(stops)
 	{
 		const self = this,
-			newStopData = await self._createNewStop(stopLayerInstance, mapPoint),
+			NEW_STOP_ID = 0,
+			NEW_STOP_SEQUENCE = 0,
+			highlightStopLayerInstance =  self.fieldTripHighlightStopLayerInstance,
+			graphics = [];
+		for (let index = 0; index < stops.length; index++)
+		{
+			const stop = stops[index];
+			const longitude = stop.XCoord;
+			const latitude = stop.YCoord;
+			const attributes = {
+				id: NEW_STOP_ID,
+				NAME: stop.Street,
+				Sequence: NEW_STOP_SEQUENCE
+			};
+			const graphic = highlightStopLayerInstance.createStop(longitude, latitude, attributes, NEW_STOP_SEQUENCE);
+			graphics.push(graphic);
+		}
+
+		highlightStopLayerInstance.addStops(graphics);
+	}
+
+	FieldTripMap.prototype.addHighlightStops = async function(longitude, latitude)
+	{
+		const self = this,
+			stopLayerInstance = self.fieldTripHighlightStopLayerInstance,
+			newStopData = await self._createNewStop(stopLayerInstance, longitude, latitude),
 			{ Name, City, RegionAbbr, CountryCode, XCoord, YCoord } = newStopData,
 			highlightStop = self.getHighlightStop(),
 			addGraphic = newStopData.newStop;
@@ -638,12 +664,11 @@
 		return { Name, City, RegionAbbr, CountryCode, XCoord, YCoord };
 	}
 
-	FieldTripMap.prototype._createNewStop = async function(stopLayerInstance, mapPoint)
+	FieldTripMap.prototype._createNewStop = async function(stopLayerInstance, longitude, latitude)
 	{
 		const NEW_STOP_ID = 0,
 			NEW_STOP_SEQUENCE = 0,
 			UNNAMED_ADDRESS = "unnamed",
-			{ longitude, latitude } = mapPoint,
 			{ Address, City, RegionAbbr, CountryCode } = await stopLayerInstance.getGeocodeStop(longitude, latitude),
 			Name = Address || UNNAMED_ADDRESS,
 			attributes = {
@@ -1189,7 +1214,7 @@
 			{
 				const mapPoint = data.event.mapPoint;
 				self.showLoadingIndicator();
-				const newStopData = await self._addNewStop(self.fieldTripHighlightStopLayerInstance, mapPoint);
+				const newStopData = await self.addHighlightStops(mapPoint.longitude, mapPoint.latitude);
 				self.hideLoadingIndicator();
 
 				this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMapCompleted, data: newStopData });

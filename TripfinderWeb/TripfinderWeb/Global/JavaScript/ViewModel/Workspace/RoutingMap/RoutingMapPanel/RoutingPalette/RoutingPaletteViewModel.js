@@ -468,6 +468,19 @@
 		}, defaultOptions);
 	}
 
+	RoutingPaletteViewModel.prototype.onQuickAddStops = async function(stops)
+	{
+		if (stops.length === 1)
+		{
+			const stop = stops[0];
+			const newStopData = await this.fieldTripMap?.addHighlightStops(stop.XCoord, stop.YCoord);
+		}
+		else
+		{
+			this.fieldTripMap?.highlightQuickAddStops(stops);
+		}
+	}
+
 	RoutingPaletteViewModel.prototype.close = function()
 	{
 		var self = this;

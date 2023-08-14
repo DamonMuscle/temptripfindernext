@@ -43,7 +43,7 @@
 			});
 	};
 
-	BaseRoutingEventsManager.prototype.createFieldTripStopFromSearchResult = function(data)
+	BaseRoutingEventsManager.prototype.createFieldTripStopFromSearchResult = async function(data)
 	{
 		var self = this;
 		if (!data || data.length == 0)
@@ -65,6 +65,7 @@
 			};
 
 
+		await self.fieldTripPaletteSectionVM.viewModel.onQuickAddStops(data);
 		if (data.length == 1)
 		{
 			self.fieldTripPaletteSectionVM.editFieldTripStopModal.create(data[0], options);
