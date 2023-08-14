@@ -487,8 +487,6 @@
 	{
 		if (target.customData.isTrip && position == "over")
 		{
-
-
 			if (!target.items || target.items.length == 0)
 			{
 				return Promise.resolve(0);
@@ -496,7 +494,8 @@
 			else if (isSameTrip)
 			{
 				return Promise.resolve(target.items.length - 1);
-			} else
+			}
+			else
 			{
 				return this.routingDisplay.dataModel.calculateTripStopSequence(destTrip, tripStop).then(function(sequence)
 				{
@@ -506,9 +505,6 @@
 		}
 		else if (target.customData.isStop)
 		{
-
-
-
 			if (position == "before")
 			{
 				if (isSameTrip && source.customData.sequence < target.customData.sequence)

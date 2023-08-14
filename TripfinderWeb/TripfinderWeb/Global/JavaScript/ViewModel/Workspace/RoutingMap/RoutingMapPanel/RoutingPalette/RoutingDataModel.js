@@ -11,14 +11,9 @@
 		self.fieldTripPaletteSectionVM = fieldTripPaletteSectionVM;
 		self.routeState = self.mapCanvasPage.routeState;
 		self.trips = [];
-		self.candidateStudents = [];
 		self.tripStopDictionary = {};
-		self.studentsDictionary = {};
-		self.prohibitStreets = [];
 		self.tripStopOriginalData = [];
 		self.tripOriginalData = [];
-		self.studentTripOriginalData = [];
-		self.tripStudentOriginalData = [];
 		self.originalTripAssignment = {};
 		self.schoolLocationDictionary = {};
 		self.tripOriginalRestrictions = {};
@@ -34,16 +29,13 @@
 		self.onSettingChangeEvent = new TF.Events.Event();
 		self.onTripSequenceChangeEvent = new TF.Events.Event();
 		self.onTripDisplayRefreshEvent = new TF.Events.Event();
-		self.onStudentCrossStreetStopChangeEvent = new TF.Events.Event();
 		self.onWalkTSRestrictionChangeEvent = new TF.Events.Event();
 		self.onTripSaveEvent = new TF.Events.Event();
-		self.onStudentChangeEvent = new TF.Events.Event();
 		self.onTripStopTimeChangeEvent = new TF.Events.Event();
 		self.onTrialStopWalkoutPreviewChange = new TF.Events.Event();
 		self.onOptimizeSequenceDiffRateChange = new TF.Events.Event();
 		self.onShowChartChangeEvent = new TF.Events.Event();
 		self.onSchoolLocationChangeEvent = new TF.Events.Event();
-		self.onStopCandidateStudentChangeEvent = new TF.Events.Event();
 		self.onTripTreeColorChangeEvent = new TF.Events.Event();
 		self.onTripPathLineDisplayChangeEvent = new TF.Events.Event();
 
@@ -451,26 +443,7 @@
 				{
 					delete self.tripStopOriginalData[tripStop.id];
 				}
-				if (self.tripStudentOriginalData[trip.id])
-				{
-					self.tripStudentOriginalData[trip.id].map(function(key)
-					{
-						var value = self.studentTripOriginalData[key];
-						if (value)
-						{
-							value = value.filter(e => { return e != trip.id; });
-							if (value.length == 0)
-							{
-								delete self.studentTripOriginalData[key];
-							}
-						}
-					});
-				}
 			});
-			if (self.tripStudentOriginalData[trip.id])
-			{
-				delete self.tripStudentOriginalData[trip.id];
-			}
 		});
 	};
 
@@ -557,27 +530,6 @@
 										}
 									}
 								});
-							});
-						}
-					});
-				}
-
-				if (self.tripStudentOriginalData[trip.id])
-				{
-					self.tripStudentOriginalData[trip.id].map(function(key)
-					{
-						if (key && key.split("_").length > 0)
-						{
-							var keySplit = key.split("_");
-							var requirementID = keySplit[0];
-							var previousScheduleID = keySplit[1];
-							var weekDayName = keySplit[2];
-							self.trips.map(function(tripTemp)
-							{
-								if (self.tripStudentOriginalData[tripTemp.id] && self.tripStudentOriginalData[tripTemp.id].includes(key))
-								{
-									return;
-								}
 							});
 						}
 					});
@@ -1142,25 +1094,8 @@
 							existTrip[key] = trip[key];
 						}
 					}
-
-					// existTrip.FieldTripStops.forEach(function(fieldTripStop)
-					// {
-					// 	allTripStops.push(fieldTripStop);
-					// 	fieldTripStop.geometry = TF.xyToGeometry(fieldTripStop.XCoord, fieldTripStop.YCoord);
-					// 	fieldTripStop.color = existTrip.color;
-					// 	fieldTripStop.Students = fieldTripStop.Students || [];
-					// 	fieldTripStop.Students.forEach(function(student)
-					// 	{
-					// 		student.geometry = TF.xyToGeometry(student.XCoord, student.YCoord);
-					// 	});
-					// 	fieldTripStop.originalStudents = fieldTripStop.Students.map(function(c) { return $.extend({ InCriteriaUnassigned: true }, c); });// save students data to trip stop to get the original students bind on the trip stop
-					// 	existTrip.originalStudents = existTrip.originalStudents.concat(fieldTripStop.originalStudents);
-					// 	// self.viewModel.drawTool && self.viewModel.drawTool._addTripStop(fieldTripStop, existTrip.id);
-					// 	assignedStudents = assignedStudents.concat(fieldTripStop.originalStudents);
-					// });
 				}
 			});
-			// tripsData.CandidateStudents = (tripsData.CandidateStudents || []).concat(assignedStudents.filter(function(c) { return c.CanBeCandidate; }));
 			tripsData.AllTripStops = allTripStops;
 			return tripsData;
 		});

@@ -112,16 +112,6 @@
 					delete self.dataModel.tripStopDictionary[stop.oldId];
 				}
 			}
-			for (var key in self.dataModel.studentsDictionary)
-			{
-				self.dataModel.studentsDictionary[key].forEach(function(s)
-				{
-					if (s.id == stop.oldId)
-					{
-						s.id = stop.id;
-					}
-				});
-			}
 		});
 	};
 

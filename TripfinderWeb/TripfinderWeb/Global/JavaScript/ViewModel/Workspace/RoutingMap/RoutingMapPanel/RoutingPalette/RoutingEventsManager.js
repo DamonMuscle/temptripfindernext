@@ -789,10 +789,7 @@
 				{
 					if (items[1][result.id]) return result;
 				});
-
-				self.dataModel.onStudentCrossStreetStopChangeEvent.notify(results);
 			}
-
 		});
 	};
 
