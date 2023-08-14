@@ -397,7 +397,7 @@
 			.then(function (response)
 			{
 				var el = document.createElement('textarea');
-				el.value = TF.Helper.KendoGridHelper.getStringOfRecords(response.Items, self.searchGrid._obSelectedColumns());
+				el.value = TF.Helper.KendoGridHelper.getStringOfRecords(response.Items, self.searchGrid._obSelectedColumns(), true);
 				document.body.appendChild(el);
 				el.select();
 				document.execCommand('copy');
