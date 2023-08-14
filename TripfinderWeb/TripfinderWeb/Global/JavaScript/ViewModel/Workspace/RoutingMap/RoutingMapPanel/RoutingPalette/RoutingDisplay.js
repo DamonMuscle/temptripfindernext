@@ -1192,8 +1192,6 @@
 					self.dataModel.setFieldTripActualStopTime(trips);
 					self.dataModel.copyFieldTripStopTimeWithActualTime(trips);
 
-					// self.dataModel.setActualStopTime(trips);
-					// self.dataModel.copyStopTimeWithActualTime(trips);
 					var tripNode = self.routingDisplayHelper.getExpandedTreeNode(data.id, 'trip', self.treeview.dataSource);
 					var tripElement = self.treeview.findByUid(tripNode.uid);
 					self.setTripNodeProperty(tripNode, tripElement);
@@ -1927,7 +1925,6 @@
 	RoutingDisplay.prototype.newTripStop = function(tripStop, session, tripName)
 	{
 		var self = this,
-			trip = self.dataModel.trips.find(function(i) { return i.Name === tripName; }),
 			isLast = self.isLastStop(tripStop);
 		return {
 			id: tripStop.id,
@@ -1961,7 +1958,7 @@
 			},
 			items: []//this.newStudentData(tripStop)
 		}
-	}
+	};
 
 	RoutingDisplay.prototype.tripStopDeletable = function(tripStop)
 	{

@@ -690,7 +690,7 @@
 					newTrip.FieldTripStops[j].TotalStopTime = tripData.FieldTripStops[j].TotalStopTime;
 					newTrip.FieldTripStops[j].Duration = tripData.FieldTripStops[j].Duration;
 				}
-				self.setActualStopTime([newTrip]);
+				self.setFieldTripActualStopTime([newTrip]);
 				if (!inactiveHideLocator)
 				{
 					tf.loadingIndicator.tryHide();
@@ -1423,67 +1423,6 @@
 			}
 		}
 		this.onTripStopTimeChangeEvent.notify({});
-	};
-
-	RoutingDataModel.prototype.setActualStopTime = function(trips, reset)
-	{
-		var j = 0;
-		for (var i = 0; i < trips.length; i++)
-		{
-			let lockStop;
-			let lockStopIndex;
-			if (!reset)
-			{
-				for (j = 0; j < trips[i].FieldTripStops.length; j++)
-				{
-					if (trips[i].FieldTripStops[j].LockStopTime)
-					{
-						trips[i].FieldTripStops[j].ActualStopTime = trips[i].FieldTripStops[j].StopTime;
-						lockStop = trips[i].FieldTripStops[j];
-						lockStopIndex = j;
-						break;
-					}
-				}
-				if (!lockStopIndex && trips[i].FieldTripStops.length > 0)
-				{
-					trips[i].FieldTripStops[0].LockStopTime = true;
-					trips[i].FieldTripStops[0].ActualStopTime = trips[i].FieldTripStops[0].StopTime;
-					lockStop = trips[i].FieldTripStops[0];
-					lockStopIndex = 0;
-				}
-			}
-			else
-			{
-				lockStop = trips[i].FieldTripStops[0];
-				lockStopIndex = 0;
-				for (j = 0; j < trips[i].FieldTripStops.length; j++)
-				{
-					if (trips[i].FieldTripStops[j].id == lockStop.id)
-					{
-						trips[i].FieldTripStops[j].LockStopTime = true;
-					}
-					else
-					{
-						trips[i].FieldTripStops[j].LockStopTime = false;
-					}
-				}
-			}
-			for (j = lockStopIndex + 1; j < trips[i].FieldTripStops.length; j++)
-			{
-				trips[i].FieldTripStops[j].ActualStopTime = moment(trips[i].FieldTripStops[j - 1].ActualStopTime, "HH:mm:ss")
-					.add(Math.ceil(moment.duration(moment(trips[i].FieldTripStops[j - 1].Duration, "HH:mm:ss")).asMinutes()), "minutes").format("HH:mm:ss");
-			}
-			for (j = lockStopIndex - 1; j > -1; j--)
-			{
-				trips[i].FieldTripStops[j].ActualStopTime = moment(trips[i].FieldTripStops[j + 1].ActualStopTime, "HH:mm:ss")
-					.subtract(Math.ceil(moment.duration(moment(trips[i].FieldTripStops[j].Duration, "HH:mm:ss")).asMinutes()), "minutes").format("HH:mm:ss");
-			}
-			if (trips[i].FieldTripStops.length > 0)
-			{
-				trips[i].ActualStartTime = trips[i].FieldTripStops[0].ActualStopTime;
-				trips[i].ActualEndTime = trips[i].FieldTripStops[trips[i].FieldTripStops.length - 1].ActualStopTime;
-			}
-		}
 	};
 
 	RoutingDataModel.prototype.setFieldTripActualStopTime = function(trips, reset, resetDateTime)

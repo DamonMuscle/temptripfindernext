@@ -69,7 +69,9 @@
 		{
 			// set stop time to new trip stop by calculate
 			const fieldTripId = stops[0].FieldTripId;
-			self.dataModel.setFieldTripActualStopTime([self.dataModel.getTripById(fieldTripId)]);
+			const newFieldTrips = [self.dataModel.getTripById(fieldTripId)];
+			self.dataModel.setFieldTripActualStopTime(newFieldTrips);
+			self.dataModel.copyFieldTripStopTimeWithActualTime(newFieldTrips);
 
 			stops.forEach(data =>
 			{

@@ -716,7 +716,7 @@
 					newTrip.FieldTripStops[j].TotalStopTime = tripData.FieldTripStops[j].TotalStopTime;
 					newTrip.FieldTripStops[j].Duration = tripData.FieldTripStops[j].Duration;
 				}
-				self.dataModel.setActualStopTime([newTrip]);
+				self.dataModel.setFieldTripActualStopTime([newTrip]);
 				return newTrip;
 			});
 		});
@@ -1110,7 +1110,7 @@
 					newTrip.FieldTripStops[j].TotalStopTime = tripData.FieldTripStops[j].TotalStopTime;
 					newTrip.FieldTripStops[j].Duration = tripData.FieldTripStops[j].Duration;
 				}
-				self.dataModel.setActualStopTime([newTrip], true);
+				self.dataModel.setFieldTripActualStopTime([newTrip], true);
 				// if (oldTrips.filter(function(trip) { return trip.id == newTrip.id }).length == 0)
 				// {
 				// 	self.dataModel.resetCopyTripValue(newTrip);
@@ -1430,7 +1430,7 @@
 					unassignedStopsTrip.FieldTripStops[j].TotalStopTime = tripData.FieldTripStops[j].TotalStopTime;
 					unassignedStopsTrip.FieldTripStops[j].Duration = tripData.FieldTripStops[j].Duration;
 				}
-				self.dataModel.setActualStopTime([unassignedStopsTrip], true);
+				self.dataModel.setFieldTripActualStopTime([unassignedStopsTrip], true);
 				self.dataModel.resetCopyTripValue(unassignedStopsTrip);
 				self.dataModel.copyStopTimeWithActualTime([unassignedStopsTrip]);
 				unassignedStopsTrip.color = "#000000";

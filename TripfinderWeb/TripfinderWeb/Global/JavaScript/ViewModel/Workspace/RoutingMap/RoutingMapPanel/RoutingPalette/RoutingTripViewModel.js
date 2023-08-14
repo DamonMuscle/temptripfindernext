@@ -1513,7 +1513,7 @@
 						newTrip.TripStops[j].Duration = tripData.TripStops[j].Duration;
 						newTrip.TripStops[j].OpenType = newTrip.OpenType;
 					}
-					self.dataModel.setActualStopTime([newTrip]);
+					self.dataModel.setFieldTripActualStopTime([newTrip]);
 					return self.setTripOptimizeInfo(newTrip).then(function()
 					{
 						tf.loadingIndicator.tryHide();

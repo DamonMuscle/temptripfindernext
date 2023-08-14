@@ -265,7 +265,7 @@
 						// 		newTrip.FieldTripStops[j].TotalStopTime = fieldTripData.FieldTripStops[j].TotalStopTime;
 						// 		newTrip.FieldTripStops[j].Duration = fieldTripData.FieldTripStops[j].Duration;
 						// 	}
-						// 	self.dataModel.setActualStopTime([newTrip]);
+						// 	self.dataModel.setFieldTripActualStopTime([newTrip]);
 						// });
 						
 						if (self.obCreateTrip() && self.obOpenType() == 1)
