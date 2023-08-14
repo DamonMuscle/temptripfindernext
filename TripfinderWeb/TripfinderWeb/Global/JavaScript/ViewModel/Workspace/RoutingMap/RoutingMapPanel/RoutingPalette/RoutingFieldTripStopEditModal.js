@@ -494,6 +494,7 @@
 		{
 			data[0][field] = tripStopData[field];
 		});
+
 		var self = this;
 		const isSetSmartSequence = !self.obIsSmartAssignment() && self.obIsSmartSequence();
 		const sequenceChanged = self.data.length == 1 && (self.obSelectedSequence() != self.original[0].Sequence || isSetSmartSequence);
@@ -508,6 +509,12 @@
 			data[0].DBID = self.obSelectedTrip().DBID;
 			data[0].VehicleCurbApproach = self.original[0].VehicleCurbApproach;
 		}
+
+		if (tripChanged && data[0].LockStopTime === true)
+		{
+			data[0].LockStopTime = false;
+		}
+
 		return this.dataModel.fieldTripStopDataModel.update(data).then(async function()
 		{
 			if (!data[0].SchoolCode && (sequenceChanged || tripChanged || curbApproachChanged || self.obIsSmartAssignment()))
