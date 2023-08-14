@@ -40,7 +40,7 @@
 		var trip = self.dataModel.getTripById(tripId);
 		var tripPaths = [];
 		var tripBoundaries = [];
-		trip.TripStops.forEach(function(stop)
+		trip.FieldTripStops.forEach(function(stop)
 		{
 			if (stop.path && stop.path.geometry)
 			{
@@ -64,7 +64,7 @@
 	{
 		var self = this;
 		var tripStopIdMap = {};
-		oldTrip.TripStops.forEach(function(stop)
+		oldTrip.FieldTripStops.forEach(function(stop)
 		{
 			tripStopIdMap[stop.id] = self.dataModel.getFieldTripStopBySequence(newTrip, stop.Sequence).id;
 		});
@@ -72,37 +72,25 @@
 		{
 			featureData.updateItems.concat(featureData.addItems).forEach(function(item)
 			{
-				item.TripId = newTrip.id;
-				item.TripStopId = tripStopIdMap[item.TripStopId];
+				item.FieldTripId = newTrip.id;
+				item.FieldTripStopId = tripStopIdMap[item.FieldTripStopId];
 			});
 		});
 
 		oldTrip.id = newTrip.id;
 		oldTrip.Id = newTrip.id;
-		oldTrip.TripStops.forEach(function(stop)
+		oldTrip.FieldTripStops.forEach(function(stop)
 		{
 			stop.oldId = stop.id;
-			stop.TripId = newTrip.id;
+			stop.FieldTripId = newTrip.id;
 			stop.id = tripStopIdMap[stop.id];
-			stop.TripStopId = stop.id;
+			stop.FieldTripStopId = stop.id;
 			if (stop.path)
 			{
-				stop.path.TripId = newTrip.id;
-				stop.path.TripStopId = stop.id;
+				stop.path.FieldTripId = newTrip.id;
+				stop.path.FieldTripStopId = stop.id;
 				stop.path.DBID = tf.datasourceManager.databaseId;
 			}
-			if (stop.boundary)
-			{
-				stop.boundary.TripId = newTrip.id;
-				stop.boundary.TripStopId = stop.id;
-				stop.boundary.DBID = tf.datasourceManager.databaseId;
-			}
-			stop.Students.forEach(function(student)
-			{
-				student.TripID = stop.TripId;
-				student.TripStopID = stop.id;
-				student.AnotherTripStopID = tripStopIdMap[student.AnotherTripStopID];
-			});
 			if (self.dataModel.tripStopDictionary[stop.oldId])
 			{
 				var data = self.dataModel.tripStopDictionary[stop.oldId];
