@@ -2190,112 +2190,6 @@
 		return null;
 	};
 
-	RoutingDataModel.prototype.getArrayOfRemoveElement = function(arr)
-	{
-		var what, a = arguments, L = a.length;
-		var result = arr;
-		while (L > 1 && arr.length)
-		{
-			what = a[--L];
-			result = result.filter(function(element) { return element !== what; });
-		}
-		return result;
-	};
-
-	RoutingDataModel.prototype.getStudentSchoolCode = function(student, tripStop, isSelf)
-	{
-		var self = this;
-		if (isSelf)
-		{
-			var _tripStop = self.getFieldTripStopByStopId(student.TripStopID);
-			if (_tripStop)
-			{
-				return _tripStop.SchoolCode;
-			}
-			else
-			{
-				return '';
-			}
-		}
-		else
-		{
-			return student.IsAssigned ? self.getSchoolCodeOfAssignedStudents(student) : self.getSchoolCodeOfUnassignedStudents(student, tripStop);
-		}
-	};
-
-	RoutingDataModel.prototype.getSchoolCodeOfAssignedStudents = function(student)
-	{
-		return (student.Session == TF.Helper.TripHelper.Sessions.ToSchool || student.Session == TF.Helper.TripHelper.Sessions.Shuttle) ? student.DOSchoolCode : (student.Session == TF.Helper.TripHelper.Sessions.FromSchool ? student.PUSchoolCode : '');
-	};
-
-	RoutingDataModel.prototype.getSchoolCodeOfUnassignedStudents = function(student, tripStop)
-	{
-		var self = this;
-
-		var tripId;
-		if (tripStop)
-		{
-			tripId = tripStop.FieldTripId;
-		}
-		else
-		{
-			var _tripStop = self.getFieldTripStopByStopId(student.TripStopID);
-			tripId = _tripStop.FieldTripId;
-		}
-		var schoolStops = self.getSchoolStopsByTripId(tripId);
-		if (schoolStops.length > 0)
-		{
-			if (schoolStops.some(function(school) { return school.SchoolCode == student.SchoolCode; }))
-			{
-				return student.SchoolCode;
-			}
-			// school
-			else if (tripStop && tripStop.SchoolCode && tripStop.SchoolCode != student.SchoolCode)
-			{
-				return tripStop.SchoolCode;
-			}
-			var firstSchoolCode = schoolStops[0].SchoolCode;
-			return schoolStops.some(function(school) { return school.SchoolCode != firstSchoolCode; }) ? '' : firstSchoolCode;
-		}
-		else
-		{
-			return '';
-		}
-	};
-
-	RoutingDataModel.prototype.findRealSchoolStops = function(tripStop, student)
-	{
-		var self = this;
-		var trip = self.getTripById(tripStop.FieldTripId);
-		var _schoolCode = self.getStudentSchoolCode(student, tripStop, false);
-		if (!_schoolCode)
-		{
-			return { id: 0 };
-		}
-		var allSchools = Enumerable.From(trip.FieldTripStops).Where(function(c) { return c.SchoolCode == _schoolCode; }).ToArray();
-		var session = $.isNumeric(student.Session) ? student.Session : trip.Session;
-		if (allSchools.length == 0)
-		{
-			return { id: 0 };
-		}
-		else
-		{
-			var validSchool = Enumerable.From(allSchools).Where(function(c)
-			{
-				return (session == TF.Helper.TripHelper.Sessions.ToSchool && c.Sequence > tripStop.Sequence)
-					|| (session == TF.Helper.TripHelper.Sessions.FromSchool && c.Sequence < tripStop.Sequence);
-			}).ToArray();
-			if (validSchool.length == 0)
-			{
-				return allSchools[0];
-			}
-			else
-			{
-				return validSchool[0];
-			}
-		}
-	};
-
 	RoutingDataModel.prototype.saveRoutingFieldTrips = function(fieldTrips)
 	{
 		var self = this;
@@ -2885,11 +2779,6 @@
 		}
 	}
 
-	RoutingDataModel.prototype.getWeekdayAttributeNameByIndex = function(dayIndex)
-	{
-		return RoutingDataModel.weekdays[dayIndex];
-	};
-
 	RoutingDataModel.prototype.getVRPSetting = function()
 	{
 		return {
@@ -2934,27 +2823,6 @@
 	RoutingDataModel.prototype.syncEditTripStops = function(tripStops)
 	{
 	};
-
-	RoutingDataModel.prototype.isMidTrip = function()
-	{
-		var editTrips = this.getEditTrips();
-		return editTrips.length > 0 ? editTrips[0].Session == TF.Helper.TripHelper.Sessions.Both : false;
-	};
-
-	RoutingDataModel.prototype._getFeatureFieldTripStops = function(fieldTripStops, features)
-	{
-		var featureStops = fieldTripStops.map((stop) => {
-			var feature = features.find(feature => feature.strings.some((str => str.stringType == "esriDSTStreetName" && str.string == stop.Sequence)) && 
-													feature.attributes.maneuverType == "esriDMTStop");
-			if (feature)
-			{
-				feature.Sequence = stop.Sequence - 1;
-				return feature;
-			}
-		});
-		
-		return featureStops.filter(featureStop => !!featureStop);
-	}
 
 	RoutingDataModel.prototype.dispose = function()
 	{
