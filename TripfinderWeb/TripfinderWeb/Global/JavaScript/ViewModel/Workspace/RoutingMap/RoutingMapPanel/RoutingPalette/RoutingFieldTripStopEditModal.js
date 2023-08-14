@@ -641,6 +641,7 @@
 	{
 		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.hide.call(this);
 		this.removeStopSequenceGraphics();
+		this.obIsMultipleCreate(false);
 	};
 
 	RoutingFieldTripStopEditModal.prototype._calculateSortedSequence = function(trip)
