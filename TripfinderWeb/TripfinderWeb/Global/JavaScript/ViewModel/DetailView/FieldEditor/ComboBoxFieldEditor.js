@@ -307,10 +307,7 @@
 	ComboBoxFieldEditor.prototype.dispose = function()
 	{
 		var self = this;
-		$(self.comboBox).off("change");
 		$(document).off(self._eventNamespace);
-		self.comboBox.destroy();
-		$(self.comboBox).remove();
 
 		if (self._$parent)
 		{
