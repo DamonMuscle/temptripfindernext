@@ -169,7 +169,8 @@
 			return;
 		}
 
-		if (self.RoutingMapTool && self.RoutingMapTool.measurementTool && self.RoutingMapTool.measurementTool.isActive)
+		if (self.RoutingMapTool?.measurementTool?.isActive ||
+			self.RoutingMapTool?.googleStreetTool?.isActive)
 		{
 			const cursor = "crosshair";
 			mapInstance.setMapCursor(cursor);
