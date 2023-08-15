@@ -273,4 +273,9 @@
 		var self = this;
 		self.result = self.obSelectedAddress();
 	};
+
+	GeocodeFinderViewModel.prototype.getMapInstance = function()
+	{
+		return this.mapInstance;
+	}
 })();
