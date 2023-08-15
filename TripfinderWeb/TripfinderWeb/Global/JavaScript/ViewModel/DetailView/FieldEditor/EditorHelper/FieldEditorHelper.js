@@ -593,7 +593,7 @@
 		if (self._editor)
 		{
 			// dispose event initialized last time
-			self._editor.dispose();
+			self._editor.editStop();
 		}
 		self._editor = self._createEditor(options.format);
 		options.editFieldList = self.editFieldList;
