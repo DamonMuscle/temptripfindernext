@@ -2640,7 +2640,7 @@
 			{
 				records = [data];
 			}
-			return self.getTripId(records[0]) != tripId;
+			return self.getFieldTripId(records[0]) != tripId;
 		}));
 	};
 
@@ -2657,7 +2657,7 @@
 			}
 			records.forEach(function(record)
 			{
-				tripIdObj[self.getTripId(record)] = record;
+				tripIdObj[self.getFieldTripId(record)] = record;
 			});
 		});
 
@@ -2675,12 +2675,11 @@
 		return self.getChangeTripIds().length;
 	};
 
-	RoutingDataModel.prototype.getTripId = function(data)
+	RoutingDataModel.prototype.getFieldTripId = function(data)
 	{
 		switch (data.type)
 		{
 			case "tripStop":
-			case "tripBoundary":
 				return data.FieldTripId;
 			case "trip":
 				return data.id;

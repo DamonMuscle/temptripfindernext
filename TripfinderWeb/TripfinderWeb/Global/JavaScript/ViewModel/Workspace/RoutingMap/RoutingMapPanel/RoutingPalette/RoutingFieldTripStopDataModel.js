@@ -23,6 +23,7 @@
 		self._viewModal.revertData = [];
 		var data = self.createNewData(newData);
 		data.OpenType = "Edit";
+		data.type = "tripStop";
 		self.insertTripStopToTrip(data, insertToSpecialSequenceIndex);
 
 		self.viewModel.viewModel.fieldTripMap?.applyAddFieldTripStops([{...data, Sequence: insertToSpecialSequenceIndex + 1, VehicleCurbApproach: data.vehicleCurbApproach}], function()
@@ -67,6 +68,7 @@
 			tripStop.Sequence = _.last(targetFieldTrip.FieldTripStops).Sequence;
 			tripStop.VehicleCurbApproach = tripStop.vehicleCurbApproach;
 			self.insertTripStopToTrip(tripStop, tripStop.Sequence - 1);
+			tripStop.type = "tripStop";
 			return tripStop;
 		});
 
