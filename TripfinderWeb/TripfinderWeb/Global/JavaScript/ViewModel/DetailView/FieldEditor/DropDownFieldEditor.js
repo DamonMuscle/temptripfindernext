@@ -57,7 +57,10 @@
 	{
 		var $currentItem = this._findElement(index);
 
-		this._findElement(this._selectedIndex).removeClass("document-hover");
+		if (this._selectedIndex !== null)
+		{
+			this._findElement(this._selectedIndex).removeClass("document-hover");
+		}
 
 		$currentItem.focus();
 		$currentItem.addClass("document-hover");
@@ -164,17 +167,17 @@
 			if (self.obStopped()) return;
 
 			dropDownSource = dropDownSource.map(item =>
+			{
+				if (!(item instanceof Object))
 				{
-					if (!(item instanceof Object))
-					{
-						return {
-							text: item,
-							value: item
-						};
-					}
-	
-					return item;
-				});	
+					return {
+						text: item,
+						value: item
+					};
+				}
+
+				return item;
+			});
 
 			self.dropDownSource = self._sortByAlphaOrderWithTitles(dropDownSource);
 
@@ -196,9 +199,11 @@
 
 			self._createDropDown(self.dropDownSource, selectedValue);
 		});
-	
-		if (TF.isMobileDevice && $(".grid-stack-container").length) {
-			$(".grid-stack-container").on('touchmove' + self._eventNamespace, function (e) {
+
+		if (TF.isMobileDevice && $(".grid-stack-container").length)
+		{
+			$(".grid-stack-container").on('touchmove' + self._eventNamespace, function(e)
+			{
 				e.preventDefault();
 				e.stopPropagation();
 				return false;
@@ -235,6 +240,50 @@
 
 			$menu.find("li.menu-item-checked").focus();
 			self._$menu = $menu;
+			dropDownMenuViewModel.scrollToSelected && dropDownMenuViewModel.scrollToSelected();
+
+			var $content = self.getContentElement();
+			$menu.off(`keydown${self._eventNamespace}`).on(`keydown${self._eventNamespace}`, function(e)
+			{
+				if ($content.css('display') === 'none')
+				{
+					return;
+				};
+				var keyCode = e.keyCode || e.which;
+
+				if (self._contextMenu && keyCode !== $.ui.keyCode.UP && keyCode !== $.ui.keyCode.DOWN)
+				{
+					self.quickSearchHelper.quickSearch(e);
+				}
+
+				switch (keyCode)
+				{
+					case $.ui.keyCode.ESCAPE:
+						self.cancel();
+						break;
+					case $.ui.keyCode.UP:
+						self.nextActiveItem(true);
+						e.preventDefault();
+						e.stopPropagation();
+						break;
+					case $.ui.keyCode.DOWN:
+						self.nextActiveItem(false);
+						e.preventDefault();
+						e.stopPropagation();
+						break;
+					case $.ui.keyCode.ENTER:
+						if (self._selectedIndex != null)
+						{
+							self._findElement(self._selectedIndex).trigger("click");
+						}
+						else
+						{
+							self.toggleDropDown();
+						}
+						e.stopPropagation();
+						break;
+				}
+			});
 		});
 
 		tf.contextMenuManager.showMenu(self.getContentElement(), self._contextMenu);
@@ -277,18 +326,20 @@
 		var self = this,
 			$content = self.getContentElement();
 
-		$(document).on("click" + self._eventNamespace, function(e)
+		$(document).off(`click${self._eventNamespace}`).on(`click${self._eventNamespace}`, function(e)
 		{
 			if ($content.css('display') === 'none')
 			{
 				return;
 			};
-			//if (self._$menu != null && $.contains(self._$menu[0], e.target)) return;
 
-			self.editStop();
+			if (self._$menu && self._$menu.has($(e.target)).length === 0)
+			{
+				self.editStop();
+			}
 		});
 
-		self._$parent.on('click' + self._eventNamespace, function(e)
+		self._$parent.off(`click${self._eventNamespace}`).on(`click${self._eventNamespace}`, function(e)
 		{
 			if ($content.css('display') === 'none')
 			{
@@ -296,45 +347,6 @@
 			};
 			e.stopPropagation();
 			self.toggleDropDown();
-		});
-
-		$(document).on("keydown" + self._eventNamespace, function(e)
-		{
-			if ($content.css('display') === 'none')
-			{
-				return;
-			};
-			var keyCode = e.keyCode || e.which;
-
-			if (self._contextMenu && keyCode !== $.ui.keyCode.UP && keyCode !== $.ui.keyCode.DOWN)
-			{
-				self.quickSearchHelper.quickSearch(e);
-			}
-
-			switch (keyCode)
-			{
-				case $.ui.keyCode.ESCAPE:
-					self.cancel();
-					break;
-				case $.ui.keyCode.UP:
-					self.nextActiveItem(true);
-					e.preventDefault();
-					break;
-				case $.ui.keyCode.DOWN:
-					self.nextActiveItem(false);
-					e.preventDefault();
-					break;
-				case $.ui.keyCode.ENTER:
-					if (self._selectedIndex != null)
-					{
-						self._findElement(self._selectedIndex).trigger("click");
-					}
-					else
-					{
-						self.toggleDropDown();
-					}
-					break;
-			}
 		});
 
 		$(window).on("resize" + self._eventNamespace, function()
@@ -429,7 +441,8 @@
 		if (this._contextMenu)
 		{
 			this._contextMenu.$menuContainer.trigger("contextMenuClose");
-			if (TF.isMobileDevice && $(".grid-stack-container").length) {
+			if (TF.isMobileDevice && $(".grid-stack-container").length)
+			{
 				$(".grid-stack-container").off('touchmove' + this._eventNamespace);
 			}
 		}
@@ -523,8 +536,9 @@
 		$(window).off(this._eventNamespace);
 		$(document).off(this._eventNamespace);
 		this._$parent.off(this._eventNamespace);
-		if (TF.isMobileDevice) {
+		if (TF.isMobileDevice)
+		{
 			$(".grid-stack-container").off('touchmove' + this._eventNamespace);
-		}		
+		}
 	};
 })();
