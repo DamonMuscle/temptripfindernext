@@ -408,7 +408,7 @@
 					sequenceIndex = parseInt(self.obSelectedSequence() - 1);
 				}
 
-				return self.dataModel.fieldTripStopDataModel.create(tripStop, null, sequenceIndex);
+				return self.dataModel.fieldTripStopDataModel.create(tripStop, null, sequenceIndex, self.obIsSearchCreate());
 			}
 		}, function() { });
 	};

@@ -16,7 +16,7 @@
 		self.onFieldTripStopUpdatedEvent = new TF.Events.Event();
 	}
 
-	RoutingFieldTripStopDataModel.prototype.create = function(newData, isFromRevert, insertToSpecialSequenceIndex, isDuplicate)
+	RoutingFieldTripStopDataModel.prototype.create = function(newData, isFromRevert, insertToSpecialSequenceIndex, isSearchCreate)
 	{
 		var self = this;
 		self._viewModal.revertMode = "create-TripStop";
@@ -25,11 +25,16 @@
 		data.OpenType = "Edit";
 		self.insertTripStopToTrip(data, insertToSpecialSequenceIndex);
 
-		self.viewModel.viewModel.fieldTripMap?.applyAddFieldTripStop({...data, Sequence: insertToSpecialSequenceIndex + 1, VehicleCurbApproach: data.vehicleCurbApproach}, function()
+		self.viewModel.viewModel.fieldTripMap?.applyAddFieldTripStops([{...data, Sequence: insertToSpecialSequenceIndex + 1, VehicleCurbApproach: data.vehicleCurbApproach}], function()
 		{
+			if (!isSearchCreate)
+			{
+				self.viewModel.viewModel.fieldTripMap?.startAddFieldTripStop();
+			}
+
 			// set stop time to new trip stop by calculate
 			self.dataModel.setFieldTripActualStopTime([self.dataModel.getTripById(data.FieldTripId)]);
-			if (!isDuplicate) data.StopTime = data.ActualStopTime;
+
 			self.insertToRevertData(data);
 
 			self.dataModel.onTripStopsChangeEvent.notify({

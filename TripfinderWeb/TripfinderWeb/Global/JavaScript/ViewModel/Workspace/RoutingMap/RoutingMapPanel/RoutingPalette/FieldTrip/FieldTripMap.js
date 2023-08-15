@@ -585,19 +585,6 @@
 		}
 	}
 
-	FieldTripMap.prototype.applyAddFieldTripStop = async function(data, callback = ()=>{})
-	{
-		this.showLoadingIndicator();
-		this._refreshStopsSequenceLabel([data]);
-		this._drawNewStopsFromMap([data]);
-		this.clearHighlightFeatures();
-		await this._drawNewStopPathsFromMap([data]);
-		this.startAddFieldTripStop();
-		this.hideLoadingIndicator();
-
-		callback();
-	}
-
 	FieldTripMap.prototype.applyAddFieldTripStops = async function(stops, callback = ()=>{})
 	{
 		if (!stops?.length >= 1)
