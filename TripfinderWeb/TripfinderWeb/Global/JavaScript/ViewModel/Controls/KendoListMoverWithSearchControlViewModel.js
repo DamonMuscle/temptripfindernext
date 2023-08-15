@@ -1766,7 +1766,11 @@
 
 	};
 
-	KendoListMoverWithSearchControlViewModel.prototype.cancel = function() { };
+	KendoListMoverWithSearchControlViewModel.prototype.cancel = function()
+	{
+		this.leftSearchGrid?.dispose();
+		this.rightSearchGrid?.dispose();
+	};
 
 	KendoListMoverWithSearchControlViewModel.prototype.clearSelectCursor = function()
 	{

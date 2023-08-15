@@ -40,7 +40,7 @@ ShortCutKeys is a simple keyboard shortcut library for Javascript with no extern
 
 		/*
 		Object: mapping for special characters so they can support.
-		This dictionary is only used incase you want to bind akeyup or keydown event to one of these keys.
+		This dictionary is only used incase you want to bind a keyup or keydown event to one of these keys.
 		*/
 		this._SYMBOL_KEYCODE_MAP = {
 			106: '*',
@@ -146,6 +146,16 @@ ShortCutKeys is a simple keyboard shortcut library for Javascript with no extern
 			Object: variable to store the setTimeout call.
 			*/
 			this._resetTimer,
+
+			/*
+			Object: scope name of the ShortCutKeys event scope.
+			*/
+			//this._scopeName,
+
+			/*
+			Object: scope name list of the ShortCutKeys event scope.
+			*/
+			//this._scopeNameList = [],
 
 			/*
 			Object: temporary state where we will ignore the next keyup.
@@ -1003,12 +1013,14 @@ ShortCutKeys is a simple keyboard shortcut library for Javascript with no extern
 		}
 		else
 		{
-			this.addChildKey(hashKey);
+			this.addChildKey(hashKey, options ? options.isLastKey : false, options ? options.isDetailGrid : false);
 		}
+
 		if (this._baseHashKey === this._currentHashKey)
 		{
 			this._keyboardKeysHashMap[hashKey] = this._keyboardKeysHashMap[hashKey] || {};
 			this._keyboardKeysHashMap[hashKey].name = hashKey;
+			this._keyboardKeysHashMap[hashKey].isDetailGrid = options ? options.isDetailGrid : false;
 			hashMap = this._keyboardKeysHashMap[hashKey];
 		}
 		else
@@ -1019,7 +1031,7 @@ ShortCutKeys is a simple keyboard shortcut library for Javascript with no extern
 				return false;
 			}
 		}
-		keys = keys instanceof Array ? keys : [keys];
+		keys = $.isArray(keys) ? keys : [keys];
 		this._bindMultipleKeys(hashMap, keys, callback, action, options);
 		return this;
 	};
@@ -1085,7 +1097,7 @@ ShortCutKeys is a simple keyboard shortcut library for Javascript with no extern
 		{
 			return false;
 		}
-		if (key == "tab")
+		if (key.indexOf("tab") > -1)
 		{
 			return false;
 		}
@@ -1168,13 +1180,17 @@ ShortCutKeys is a simple keyboard shortcut library for Javascript with no extern
 	Func: add the child key in hash map;
 	Return: {boolean} the result of success
 	*/
-	ShortCutKeys.prototype.addChildKey = function(key)
+	ShortCutKeys.prototype.addChildKey = function(key, isLastKey, isDetailGrid)
 	{
 		if (key != this._currentHashKey)
 		{
 			this._keyboardKeysHashMap[this._baseHashKey] = this._keyboardKeysHashMap[this._baseHashKey] || {};
 			this._keyboardKeysHashMap[this._baseHashKey].name = this._baseHashKey;
-			var hashMap = this._getChildHashMap(this._keyboardKeysHashMap[this._baseHashKey], this._currentHashKey);
+			var hashMap = isLastKey ? this._getLastChildHashMap(this._keyboardKeysHashMap[this._baseHashKey]) : this._getChildHashMap(this._keyboardKeysHashMap[this._baseHashKey], this._currentHashKey);
+			if (hashMap.isDetailGrid && !isLastKey)
+			{
+				hashMap = this._getLastChildHashMap(this._keyboardKeysHashMap[this._baseHashKey]);
+			}
 			if (hashMap === this._NO_FIND)
 			{
 				return false;
@@ -1182,6 +1198,7 @@ ShortCutKeys is a simple keyboard shortcut library for Javascript with no extern
 
 			hashMap.ChildKey = hashMap.ChildKey || {};
 			hashMap.ChildKey.name = key;
+			hashMap.ChildKey.isDetailGrid = isDetailGrid;
 			this.changeHashKey(key);
 			this._addUsingGolbal();
 		}
@@ -1197,8 +1214,8 @@ ShortCutKeys is a simple keyboard shortcut library for Javascript with no extern
 	ShortCutKeys.prototype.removeChildKey = function(key, notDeep)
 	{
 		var self = this,
-			hashMap = self._getParentHashMap(self._keyboardKeysHashMap[self._baseHashKey], key);
-		if (hashMap !== self._NO_FIND)
+			hashMap = key ? self._getParentHashMap(self._keyboardKeysHashMap[self._baseHashKey], key) : self._keyboardKeysHashMap[self._baseHashKey];
+		if (hashMap != null && hashMap !== self._NO_FIND)
 		{
 			var childKey = hashMap.ChildKey;
 			if (notDeep && childKey && childKey.ChildKey)
@@ -1338,4 +1355,14 @@ ShortCutKeys is a simple keyboard shortcut library for Javascript with no extern
 		var self = this;
 		this._shutdown = status;
 	}
+
+	/*
+	Func: exposes _keyHandle publicly so it can be overwritten by extensions;
+	*/
+	//keyHandle: this._keyHandle
+
+	/*
+	expose ShortCutKeys to the global object;
+	*/
+	//window.ShortCutKeys = ShortCutKeys;
 })();

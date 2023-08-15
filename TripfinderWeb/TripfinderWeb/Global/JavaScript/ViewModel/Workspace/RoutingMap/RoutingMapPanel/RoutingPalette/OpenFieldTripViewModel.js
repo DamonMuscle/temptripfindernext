@@ -235,6 +235,7 @@
 
 	OpenFieldTripViewModel.prototype.cancel = function()
 	{
+		TF.Control.KendoListMoverWithSearchControlViewModel.prototype.cancel.call(this);
 		return new Promise(function(resolve)
 		{
 			resolve(true);

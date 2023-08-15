@@ -5290,6 +5290,11 @@
 
 	LightKendoGrid.prototype.scrollToSelection = function ()
 	{
+		if (!this.kendoGrid)
+		{
+			return;
+		}
+
 		var index = this.obSelectedIndex(),
 			itemHeight = this.getItemHeight(),
 			newScrollTop = index * itemHeight,
