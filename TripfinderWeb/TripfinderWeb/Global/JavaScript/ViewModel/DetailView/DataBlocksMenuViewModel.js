@@ -47,7 +47,8 @@
 			isConditionalAppearanceEnable = ["number", "string", "date", "time", "geodistance", "boolean"].includes(self.type.toLowerCase());
 		if (itemData.UDFId)
 		{
-			var udfItem = self.detailView.recordEntity.UserDefinedFields.find(function(udf) { return udf.Id == itemData.UDFId; });
+			const udFields = self.detailView.recordEntity?.UserDefinedFields || tf.UDFDefinition.get(self.gridType)?.userDefinedFields || [];
+			var udfItem = udFields.find(function(udf) { return udf.Id == itemData.UDFId; });
 			if (!self.detailView.userDefinedFieldHelper.isShowInCurrentDataSource(udfItem))
 			{
 				isEditAppearanceEnable = false;
