@@ -6,6 +6,8 @@
 	{
 		TF.ShortcutExtender.call(this, options.grid.element, options.forceFocusable != null ? options.forceFocusable : true);
 		this.grid = options.grid;
+		this.tfGrid = options.tfGrid;
+		this.pageSize = options.pageSize || 16;
 		this.keyFieldName = options.keyFieldName || 'kendoUid';
 		this.addShortcuts();
 	}
@@ -108,6 +110,12 @@
 
 	KendoGridNavigator.prototype.setSelectedIndex = function(value)
 	{
+		if (this.tfGrid)
+		{
+			this.tfGrid.setSelectedIndex(value);
+			return;
+		}
+
 		var length = this.getItemsCount();
 		if (!length) return;
 
@@ -118,6 +126,11 @@
 
 	KendoGridNavigator.prototype.getSelectedIndex = function()
 	{
+		if (this.tfGrid)
+		{
+			return this.tfGrid.obSelectedIndex();
+		}
+
 		var first = this.grid.select()[0];
 		if (!first) return -1;
 
