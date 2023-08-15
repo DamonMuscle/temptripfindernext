@@ -27,7 +27,8 @@
 	const INFO_STOP_COLOR = "#FFFFFF";
 	const FIELD_TRIP_LAYER_TYPE = {
 		PATH: "PathLayer",
-		STOP: "StopLayer"
+		STOP: "StopLayer",
+		HIGHLIGHT_STOP: "HighlightStopLayer"
 	};
 
 	//#endregion
@@ -130,7 +131,7 @@
 		}, {
 			id: RoutingPalette_FieldTripHighlightStopLayerId,
 			index: RoutingPalette_FieldTripHighlightStopLayer_Index,
-			layerType: FIELD_TRIP_LAYER_TYPE.STOP
+			layerType: FIELD_TRIP_LAYER_TYPE.HIGHLIGHT_STOP
 		}];
 		const layerInstances = await self.layerManager.createLayerInstances(layerOptions);
 
@@ -1074,7 +1075,7 @@
 		{
 			const { XCoord, YCoord, id } = stop,
 				attributes = { DBID, FieldTripId, id },
-				graphic = self.fieldTripStopLayerInstance.createHighlightStop(XCoord, YCoord, attributes);
+				graphic = self.fieldTripHighlightStopLayerInstance.createBackgroundStop(XCoord, YCoord, attributes);
 			stops.push(graphic);
 
 			vertex.push([XCoord, YCoord]);
@@ -1152,7 +1153,7 @@
 				highlightStop.geometry = stopGraphic.geometry;
 				highlightStop.attributes = stopGraphic.attributes;
 			}
-			highlightStop.symbol = self.fieldTripHighlightStopLayerInstance.getStopSymbol(stopSequence, INFO_STOP_COLOR);
+			highlightStop.symbol = self.fieldTripHighlightStopLayerInstance.getStopSymbol(stopSequence);
 		}
 		else
 		{
