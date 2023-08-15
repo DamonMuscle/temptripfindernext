@@ -5,7 +5,7 @@
 	function SetScheduledTimeModalViewModel(tripStop, trip)
 	{
 		TF.Modal.BaseModalViewModel.call(this);
-		this.title("Update Stop time");
+		this.title("Update Stop Time");
 		this.sizeCss = "set-schedule-time-dialog";
 		this.modalClass = "update-stop-time-body";
 		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/SetScheduledTime");
