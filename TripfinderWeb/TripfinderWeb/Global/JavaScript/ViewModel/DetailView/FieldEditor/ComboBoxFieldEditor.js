@@ -74,6 +74,22 @@
 		var self = this;
 		self.options = options;
 		TF.DetailView.FieldEditor.InputFieldEditor.prototype.editStart.call(self, $parent, options);
+		self.onComboBoxInit = comboBox =>
+		{
+			comboBox.open();
+			if (self._$parent)
+			{
+				self._$parent.on(`keydown${self._eventNamespace}`, function(e)
+				{
+					const keyCode = e.keyCode || e.which;
+					if ([$.ui.keyCode.ENTER, $.ui.keyCode.UP, $.ui.keyCode.DOWN].some(code => code === keyCode))
+					{
+						e.preventDefault();
+						e.stopPropagation();
+					}
+				});
+			}
+		}
 	}
 
 	ComboBoxFieldEditor.prototype.bindEvents = function()
@@ -168,6 +184,7 @@
 						var bottomRestHeight = windowHeight - itemOffset - comboxHeight;
 						self.comboBox.setOptions({ height: Math.max(bottomRestHeight, itemOffset) });
 					});
+					self.onComboBoxInit && self.onComboBoxInit(self.comboBox);
 				});
 		}
 		else
@@ -184,6 +201,11 @@
 		if (this.comboBox)
 		{
 			this.comboBox.close();
+		}
+
+		if (self._$parent)
+		{
+			self._$parent.off(`keydown${self._eventNamespace}`);
 		}
 	}
 
@@ -285,10 +307,20 @@
 	ComboBoxFieldEditor.prototype.dispose = function()
 	{
 		var self = this;
-		$(self.comboBox).off("change");
 		$(document).off(self._eventNamespace);
-		self.comboBox.destroy();
-		$(self.comboBox).remove();
+
+		if (self._$parent)
+		{
+			self._$parent.off(`keydown${self._eventNamespace}`);
+		}
+
+		if (self.comboBox)
+		{
+			$(self.comboBox).off("change");
+			self.comboBox.destroy();
+			$(self.comboBox).remove();
+		}
+
 		TF.DetailView.FieldEditor.InputFieldEditor.prototype.dispose.call(self);
 	};
 

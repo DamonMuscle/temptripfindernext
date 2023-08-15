@@ -375,6 +375,7 @@
 	{
 		var self = this;
 		$(document).off(self.eventNameSpace);
+		$(document.body).off(self.eventNameSpace);
 		if (self._detailView)
 		{
 			$(self._detailView.$element.find(".right-container")).off(self.eventNameSpace);
@@ -589,6 +590,11 @@
 
 		$content.css({ border: 'none', outline: 'none' });
 
+		if (self._editor)
+		{
+			// dispose event initialized last time
+			self._editor.dispose();
+		}
 		self._editor = self._createEditor(options.format);
 		options.editFieldList = self.editFieldList;
 		self._editor.editStart($element, options);
@@ -1861,7 +1867,7 @@
 	FieldEditorHelper.prototype._bindKeyDownEvent = function()
 	{
 		var self = this;
-		$(document).on('keydown' + self.eventNameSpace, function(e)
+		$(document.body).on('keydown' + self.eventNameSpace, function(e)
 		{
 			var keyCode = e.keyCode || e.which,
 				detailView = self._detailView;
@@ -1887,6 +1893,27 @@
 					//shift + tab -> move back
 					self._switchToNextEditableBlock(!e.shiftKey);
 				}
+			}
+
+			if (detailView.isReadMode() && keyCode === $.ui.keyCode.DOWN)
+			{
+				const $currentBlock = self.getEditingFieldElement()
+				const editTypeFormat = $currentBlock.data()?.editType?.format;
+				if ($currentBlock.length > 0 && (editTypeFormat === "DropDown" || editTypeFormat === "BooleanDropDown" || editTypeFormat === "GroupDropDown"))
+				{
+					let $target = $currentBlock.find(".grid-stack-item-content .item-content");
+					let $element = $currentBlock.find(".grid-stack-item-content");
+					if (editTypeFormat === "GroupDropDown")
+					{
+						$target = $currentBlock.find(".editable-field-value");
+						$element = $currentBlock;
+					}
+
+					self.editStart($target, $element, "click", true, false);
+					e.preventDefault();
+					e.stopPropagation();
+				}
+
 			}
 		});
 	};
