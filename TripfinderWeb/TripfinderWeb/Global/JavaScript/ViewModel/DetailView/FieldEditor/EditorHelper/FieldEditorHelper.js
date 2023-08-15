@@ -1899,7 +1899,7 @@
 			{
 				const $currentBlock = self.getEditingFieldElement()
 				const editTypeFormat = $currentBlock.data()?.editType?.format;
-				if ($currentBlock && (editTypeFormat === "DropDown" || editTypeFormat === "BooleanDropDown" || editTypeFormat === "GroupDropDown"))
+				if ($currentBlock.length > 0 && (editTypeFormat === "DropDown" || editTypeFormat === "BooleanDropDown" || editTypeFormat === "GroupDropDown"))
 				{
 					let $target = $currentBlock.find(".grid-stack-item-content .item-content");
 					let $element = $currentBlock.find(".grid-stack-item-content");
