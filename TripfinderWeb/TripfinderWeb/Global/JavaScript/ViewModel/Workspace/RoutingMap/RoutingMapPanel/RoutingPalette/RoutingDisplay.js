@@ -2091,7 +2091,7 @@
 			const v2 = b.text && b.text.toLowerCase();
 			if(v1 === v2)
 			{
-				return v1.id > v2.id ? 1: -1;
+				return a.id > b.id ? 1: -1;
 			}
 			return v1 > v2 ? 1 : -1;
 		}

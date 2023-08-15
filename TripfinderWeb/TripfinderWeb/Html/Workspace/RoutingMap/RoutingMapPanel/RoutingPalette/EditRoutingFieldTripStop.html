@@ -61,7 +61,7 @@
 								</div>
 								<div class="input-group" data-bind="visible:!obIsSmartAssignment()">
 									<div data-bind="style:{background:obSelectedTrip()&&obSelectedTrip().color}" style="position: absolute;background: red;width: 10px;height: 22px;top: 0;left: 0;z-index: 10;"></div>
-									<div data-bind="typeahead:{source:obTrips,drowDownShow:true,template:tripSelectTemplate,format:function(obj){return obj.Name;},notSort:true,selectedValue:obSelectedTrip}">
+									<div data-bind="typeahead:{source:obTrips,drowDownShow:true,template:tripSelectTemplate,matchByFormatText:true,displayText:tripDisplayText,format:tripFormatText,notSort:true,selectedValue:obSelectedTrip}">
 										<!-- ko customInput:{type:"Select",value:obSelectedTripText,disable:obSelectedFieldTripDisable,attributes:{class:"form-control",style:"padding-left:16px"}} -->
 										<!-- /ko -->
 									</div>

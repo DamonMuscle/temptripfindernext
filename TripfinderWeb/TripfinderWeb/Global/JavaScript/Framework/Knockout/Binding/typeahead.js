@@ -121,7 +121,8 @@
 								// Open the dropdown, it should scroll to selected item.
 								setTimeout(function()
 								{
-									jumpToItem(input.val());
+									var matchText =  option.matchByFormatText ? option.format(option.selectedValue()) : input.val();
+									jumpToItem(matchText);
 								}, 100);
 							}
 							else
@@ -225,6 +226,8 @@
 				showEmpty: bindingValue.showEmpty,
 				optionDefault: bindingValue.optionDefault,
 				template: bindingValue.template,
+				displayText: bindingValue.displayText,
+				matchByFormatText: bindingValue.matchByFormatText,
 				format: (function(oranginFormat)
 				{
 					if ($.isFunction(oranginFormat))
@@ -312,6 +315,7 @@
 			input.typeahead({
 				source: this.formatDataToTypeaheadSource(option.source, option.format, option.notSort, option.sortWithOutFirstValue),
 				mustMatch: option.mustMatch,
+				displayText: option.displayText,
 				minLength: 0,
 				items: 'all',
 				appendTo: "body",
@@ -336,7 +340,14 @@
 							i.addClass("disable");
 						}
 						i.find('a').html(self.highlighter(text));
-						if (text == self.$element.val())
+
+						let isMatched = text == self.$element.val();
+						if (option.matchByFormatText)
+						{
+							isMatched = item == option.format(option.selectedValue());
+						}
+
+						if (isMatched)
 						{
 							i.addClass('active selected');
 							self.$element.data('active', item);

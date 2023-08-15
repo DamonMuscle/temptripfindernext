@@ -21,6 +21,8 @@
 		this.obTrips = ko.observableArray([]);
 		this.obSelectedTrip = ko.observable({});
 		this.tripSelectTemplate = this.tripSelectTemplate.bind(this);
+		this.tripDisplayText = this.tripDisplayText.bind(this);
+		this.tripFormatText = this.tripFormatText.bind(this);
 		this.obSelectedTripText = ko.computed(function()
 		{
 			if (this.obSelectedTrip())
@@ -315,9 +317,40 @@
 
 	RoutingFieldTripStopEditModal.prototype.tripSelectTemplate = function(tripName)
 	{
+		let trip;
+		const leftIndex = tripName.lastIndexOf("("), rightIndex = tripName.lastIndexOf(")");
+		if (leftIndex === -1 || rightIndex === -1)
+		{
+			trip = this.availableTrips.find((t) => t.Name === tripName);
+		}
+		else
+		{
+			const tripId = +tripName.substring(leftIndex + 1, rightIndex);
+			tripName = tripName.substring(0, leftIndex);
+			trip = this.availableTrips.find((t) => t.id === tripId );
+		}
 
-		var trip = Enumerable.From(this.availableTrips).FirstOrDefault({}, function(c) { return c.Name == tripName; });
-		return "<a href=\"#\" role=\"option\" style=\"line-height: 22px\"><div style=\"float: left; width: 10px; height: 22px; background: " + trip.color + "; margin-right: 10px\"></div>" + tripName + "</a>";
+		const tripColor = trip? trip.color : "transparent";
+		if (trip)
+		{
+			tripName = trip.Name;
+		}
+		return "<a href=\"#\" role=\"option\" style=\"line-height: 22px\"><div style=\"float: left; width: 10px; height: 22px; background: " + tripColor + "; margin-right: 10px\"></div>" + tripName + "</a>";
+	};
+
+	RoutingFieldTripStopEditModal.prototype.tripDisplayText = function(tripName)
+	{
+		const leftIndex = tripName.lastIndexOf("("), rightIndex = tripName.lastIndexOf(")");
+		if (leftIndex !== -1 && rightIndex !== -1)
+		{
+			tripName = tripName.substring(0, leftIndex);
+		}
+		return tripName;
+	};
+
+	RoutingFieldTripStopEditModal.prototype.tripFormatText = function(trip)
+	{
+		return trip ? `${trip.Name}(${trip.id})` : "";
 	};
 
 	RoutingFieldTripStopEditModal.prototype.initTitle = function(isNew, openType)
