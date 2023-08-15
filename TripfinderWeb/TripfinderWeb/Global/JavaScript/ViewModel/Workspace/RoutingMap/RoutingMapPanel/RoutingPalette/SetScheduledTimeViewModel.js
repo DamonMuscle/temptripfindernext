@@ -243,6 +243,18 @@
 
 	}
 
+	SetScheduledTimeViewModel.prototype.onNumOfMinutesChanges = function(numberBox, e)
+	{
+		var value = numberBox.$input.val();
+
+		if (parseInt(Number(value)) != value)
+		{
+			return;
+		}
+
+		numberBox.$input.val(Number(value));
+	};
+
 	SetScheduledTimeViewModel.prototype.changeTypeEnum = { "Add": 0, "Subtract": 1 };
 	SetScheduledTimeViewModel.prototype.stopAffectEnum = { "AllPrevious": 0, "AllFollowing": 1, "AllStops": 2 };
 
