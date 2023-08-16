@@ -732,8 +732,15 @@
 		this.obSelectedSequence(sequence);
 	}
 
-	RoutingFieldTripStopEditModal.prototype.onStopPauseMinutesChanged = function(contrl)
+	RoutingFieldTripStopEditModal.prototype.onStopPauseMinutesChanged = function(numberBox)
 	{
-		this.obStopPauseMinutes(Number(contrl.obRawValue()));
+		let value = numberBox.obRawValue();
+		if (typeof value === "number")
+		{
+			value = `${value}`;
+			// Number(011) ---> 9
+			// Number('011') ---> 11
+		}
+		this.obStopPauseMinutes(Number(value));
 	}
 })();
