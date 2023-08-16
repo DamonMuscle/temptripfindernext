@@ -2142,4 +2142,6 @@
 			return filledBlocks;
 		}
 	};
+
+	DetailViewHelper.ExpandClassName = "field-expanded";
 })();
