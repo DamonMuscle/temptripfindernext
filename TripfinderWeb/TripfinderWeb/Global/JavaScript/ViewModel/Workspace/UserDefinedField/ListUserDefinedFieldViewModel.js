@@ -413,17 +413,7 @@
 	ListUserDefinedFieldViewModel.prototype.onAddBtnClick = function(evt)
 	{
 		var self = this;
-		tf.modalManager.showModal(new TF.Modal.MultipleInputModalViewModel(
-			{
-				title: "Add List Item",
-				field: "Label",
-				validatorFields: self.listItemInputValidationFields,
-				existingItems: self.getExistingItems(),
-				ignoreCaseWhenDetermineUnique: true,
-				autoHeight: true,
-				maxTextLines: 20,
-				maxLength: self.isUDFGroup ? 100 : 20
-			}))
+		tf.modalManager.showModal(self.getMultipleInputModalViewModel())
 			.then(function(text)
 			{
 				if (!!text)
@@ -438,6 +428,21 @@
 				}
 			});
 	};
+
+	ListUserDefinedFieldViewModel.prototype.getMultipleInputModalViewModel = function()
+	{
+		return new TF.Modal.MultipleInputModalViewModel(
+		{
+				title: "Add List Item",
+				field: "Label",
+				validatorFields: this.listItemInputValidationFields,
+				existingItems: this.getExistingItems(),
+				ignoreCaseWhenDetermineUnique: true,
+				autoHeight: true,
+				maxTextLines: 20,
+				maxLength: this.isUDFGroup ? 100 : 20
+		});
+	}
 
 	ListUserDefinedFieldViewModel.prototype.getExistingItems = function()
 	{
@@ -473,11 +478,12 @@
 			{
 				if (!!text)
 				{
-					var idx = $(evt.target).closest("tr").index(),
-						newItem = self.pickListOptions[idx];
+					var	$tr = $(evt.currentTarget).closest("tr"),
+						dataItem = self.kendoGrid.dataItem($tr[0]);
 
-					newItem.PickList = text;
-					self.pickListOptions.splice(idx, 1, newItem);
+					var idx = self.pickListOptions.findIndex((item) => dataItem.ID == item.ID);
+					dataItem.PickList = text;
+					self.pickListOptions.splice(idx, 1, dataItem);
 					self.updateListItems(self.pickListOptions);
 				}
 			});
