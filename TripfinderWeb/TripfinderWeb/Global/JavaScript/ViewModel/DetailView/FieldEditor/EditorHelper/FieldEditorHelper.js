@@ -22,6 +22,7 @@
 			CONTENT: "editable-field-value"
 		}
 	};
+	const EDITOR_ICON_SELECTOR = ".editor-icon";
 
 	function FieldEditorHelper(detailView)
 	{
@@ -590,14 +591,20 @@
 
 		$content.css({ border: 'none', outline: 'none' });
 
-		if (self._editor)
+		Promise.resolve(() =>
 		{
-			// dispose event initialized last time
-			self._editor.editStop();
-		}
-		self._editor = self._createEditor(options.format);
-		options.editFieldList = self.editFieldList;
-		self._editor.editStart($element, options);
+			if (self._editor)
+			{
+				// dispose event initialized last time
+				return self._editor.editStop();
+			}
+			return Promise.resolve();
+		}).then(() =>
+		{
+			self._editor = self._createEditor(options.format);
+			options.editFieldList = self.editFieldList;
+			self._editor.editStart($element, options);
+		});
 	};
 
 	/**
@@ -1820,7 +1827,8 @@
 				var fieldElement, contentElement,
 					showWidget = false,
 					$curTarget = $(e.currentTarget),
-					isMulti = $curTarget.hasClass(FIELD_ELEMENT_CLASS.GROUP.CONTAINER);
+					isMulti = $curTarget.hasClass(FIELD_ELEMENT_CLASS.GROUP.CONTAINER),
+					isEditorIconClicked = $(e.target).hasClass(EDITOR_ICON_SELECTOR.substring(1));
 
 				if (isMulti)
 				{
@@ -1831,10 +1839,10 @@
 				{
 					fieldElement = $curTarget.closest(".grid-stack-item");
 					contentElement = fieldElement.find(".grid-stack-item-content");
-					showWidget = fieldElement.find(ITEM_CONTENT_SELECTOR).hasClass(EDITOR_ICON_CLASS_NAME);
+					showWidget = !!fieldElement.find(EDITOR_ICON_SELECTOR).length;
 				}
 
-				self.initFieldEditor(e.target, fieldElement, contentElement, 'click', showWidget);
+				self.initFieldEditor(e.target, fieldElement, contentElement, 'click', showWidget, isEditorIconClicked);
 			});
 	};
 
