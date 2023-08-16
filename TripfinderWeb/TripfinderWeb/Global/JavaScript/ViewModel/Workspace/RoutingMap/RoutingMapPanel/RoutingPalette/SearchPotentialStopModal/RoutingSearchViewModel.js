@@ -19,7 +19,11 @@
 		{
 			return Promise.resolve(this.routingMapSearch.selectedItems.map(function(item)
 			{
-				return {...item};
+				return {
+					XCoord: item.XCoord,
+					YCoord: item.YCoord,
+					Street: item.Street,
+				}
 			}));
 		}
 		return Promise.resolve(false);

@@ -323,7 +323,7 @@
 			data.map(function(stop)
 			{
 				var dataModel = $.extend(self.getDataModel(), {
-					Street: stop.address,
+					Street: stop.Street,
 					XCoord: stop.XCoord,
 					YCoord: stop.YCoord,
 					geometry: stop.geometry,
