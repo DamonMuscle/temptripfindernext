@@ -1115,7 +1115,7 @@
 				// {
 				// 	self.dataModel.resetCopyTripValue(newTrip);
 				// }
-				self.dataModel.copyStopTimeWithActualTime([newTrip]);
+				self.dataModel.copyFieldTripStopTimeWithActualTime([newTrip]);
 				self.dataModel.setStudentTravelTimeVRP([newTrip]);
 				newTrips.push(newTrip);
 				return Promise.resolve(newTrip);
@@ -1432,7 +1432,7 @@
 				}
 				self.dataModel.setFieldTripActualStopTime([unassignedStopsTrip], true);
 				self.dataModel.resetCopyTripValue(unassignedStopsTrip);
-				self.dataModel.copyStopTimeWithActualTime([unassignedStopsTrip]);
+				self.dataModel.copyFieldTripStopTimeWithActualTime([unassignedStopsTrip]);
 				unassignedStopsTrip.color = "#000000";
 				return unassignedStopsTrip;
 			});

@@ -1383,18 +1383,6 @@
 		return tripStops;
 	};
 
-	RoutingDataModel.prototype.copyStopTimeWithActualTime = function(trips)
-	{
-		for (var i = 0; i < trips.length; i++)
-		{
-			for (var j = 0; j < trips[i].FieldTripStops.length; j++)
-			{
-				trips[i].FieldTripStops[j].StopTime = trips[i].FieldTripStops[j].ActualStopTime;
-			}
-		}
-		this.onTripStopTimeChangeEvent.notify({});
-	};
-
 	RoutingDataModel.prototype.copyFieldTripStopTimeWithActualTime = function(trips)
 	{
 		var stopTimeFormat = "YYYY-MM-DDTHH:mm:ss";
@@ -1416,7 +1404,8 @@
 				}
 				else
 				{
-					let pauseDuration = moment.duration(moment(trips[i].FieldTripStops[j].StopTimeDepart).diff(moment(trips[i].FieldTripStops[j].StopTimeArrive))).asMinutes();
+					let pauseDuration = trips[i].FieldTripStops[j].StopPauseMinutes || moment.duration(moment(trips[i].FieldTripStops[j].StopTimeDepart).diff(moment(trips[i].FieldTripStops[j].StopTimeArrive))).asMinutes();
+					trips[i].FieldTripStops[j].StopPauseMinutes = null;
 					trips[i].FieldTripStops[j].StopTimeArrive = actualStopTime;
 					trips[i].FieldTripStops[j].StopTimeDepart = moment(actualStopTime).add(Math.ceil(pauseDuration), "minutes").format(stopTimeFormat);
 				}

@@ -911,6 +911,7 @@
 			StreetSegment: null,
 			StreetSpeed: 0,
 			IncludeNoStudStop: tf.storageManager.get("tripStop-IncludeNoStudStop") ? true : false,
+			StopPauseMinutes: null
 		};
 	};
 

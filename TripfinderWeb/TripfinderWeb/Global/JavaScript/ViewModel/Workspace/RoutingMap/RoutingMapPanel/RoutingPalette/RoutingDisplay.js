@@ -458,7 +458,7 @@
 				self.dataModel.setStopTimeForEmptyRecords(fieldTrips[i]);
 				if (resetScheduleTime)
 				{
-					self.dataModel.copyStopTimeWithActualTime([fieldTrips[i]]);
+					self.dataModel.copyFieldTripStopTimeWithActualTime([fieldTrips[i]]);
 				}
 				if (!notReset)
 				{

@@ -107,8 +107,11 @@
 		this.obCornerStopVisible = ko.observable(false);
 
 		this.initSequenceSubscribe();
-		
+
 		this.momentHelper = new TF.Document.MomentHelper();
+
+		this.obStopPauseMinutes = ko.observable();
+		this.onStopPauseMinutesChanged = this.onStopPauseMinutesChanged.bind(this);
 	}
 
 	RoutingFieldTripStopEditModal.prototype = Object.create(TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype);
@@ -460,6 +463,9 @@
 			{
 				if (stops)
 				{
+					stops.forEach(stop => {
+						stop.StopPauseMinutes = self.obStopPauseMinutes() || 0;
+					});
 					self.dataModel.fieldTripStopDataModel.createMultiple(stops).then(() =>
 					{
 						tf.loadingIndicator.tryHide();
@@ -724,5 +730,10 @@
 			sequence = disableLastStopSequence ? dataSequence : defaultSequence;
 
 		this.obSelectedSequence(sequence);
+	}
+
+	RoutingFieldTripStopEditModal.prototype.onStopPauseMinutesChanged = function(contrl)
+	{
+		this.obStopPauseMinutes(Number(contrl.obRawValue()));
 	}
 })();
