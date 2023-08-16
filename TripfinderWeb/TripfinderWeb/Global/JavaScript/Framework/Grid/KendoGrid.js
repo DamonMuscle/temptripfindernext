@@ -87,10 +87,8 @@
 		{
 			tf.loadingIndicator.showImmediately();
 		}
-		self.loadRelatedFilterData().then(function ()
-		{
-			return self.loadPresetData();
-		}).then(function ()
+		self.loadRelatedFilterData();
+		self.loadPresetData().then(function ()
 		{
 			this.createGrid();
 			this._setCustomizetimePickerborderradius();
@@ -151,23 +149,15 @@
 
 	KendoGrid.prototype.loadRelatedFilterData = function ()
 	{
-		const openRelatedData = this.options.openRelatedData;
+		//the filter will sticky once open a new grid, so save the sticky information in DB
+		const storageFilterDataKey = `grid.currentfilter.${this.pageType}.id`;
+		const openRelatedData = tf.storageManager.get(storageFilterDataKey, true);
 		if (!openRelatedData)
 		{
-			return Promise.resolve();
+			return;
 		}
 
-		//the filter will sticky once open a new grid, so save the sticky information in DB
-		var storageFilterDataKey = `grid.currentfilter.${openRelatedData.pageType}.id`;
-		return Promise.all([
-			TF.Grid.FilterHelper.clearQuickFilter(openRelatedData.gridType),
-			// tf.storageManager.save(`grid.currentlayout.${openRelatedData.pageType}.id`, ''),
-			tf.storageManager.save(storageFilterDataKey,
-				{
-					"filteredIds": openRelatedData.selectedIds,
-					"filterName": openRelatedData.filterName
-				}, true)
-		]);
+		TF.Grid.FilterHelper.clearQuickFilter(openRelatedData.gridType);
 	};
 
 	KendoGrid.prototype.loadPresetData = function ()
