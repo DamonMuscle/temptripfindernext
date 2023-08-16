@@ -451,6 +451,9 @@
 
 				const filterName = `${toGridType} (${fromMenu} for Selected ${fromGridType})`;
 				var storageFilterDataKey = "grid.currentfilter." + pageType + ".id";
+
+				// because updateLocalStorage() reads old data, and convert json to string, so delete old data from the database
+				tf.storageManager.delete(storageFilterDataKey);
 				tf.storageManager.save(storageFilterDataKey, {
 					"filteredIds": ids,
 					"filterName": filterName,
