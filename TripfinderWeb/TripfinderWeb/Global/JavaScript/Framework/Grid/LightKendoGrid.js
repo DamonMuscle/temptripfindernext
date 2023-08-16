@@ -3641,26 +3641,32 @@
 				break;
 
 			case "boolean":
-				column.filterable = {
-					cell: {
-						template: function (args)
-						{
-							args.element.kendoDropDownList({
-								dataSource: new kendo.data.DataSource({
-									data: [
-										{ someField: "(not specified)", valueField: "null" },
-										{ someField: "True", valueField: "true" },
-										{ someField: "False", valueField: "false" }
-									]
-								}),
-								dataTextField: "someField",
-								dataValueField: "valueField",
-								valuePrimitive: true
-							});
-						},
-						showOperators: false
+					// udf filterable definition is in UDFDefinition.js
+					if (column.UDFId == null)
+					{
+						column.filterable = {
+							positiveLabel: column.filterablePositiveLabel || "True",
+							negativeLabel: column.filterableNegativeLabel || "False",
+							cell: {
+								template: function(args)
+								{
+									args.element.kendoDropDownList({
+										dataSource: new kendo.data.DataSource({
+											data: [
+												{ someField: "(not specified)", valueField: "null" },
+												{ someField: column.filterable.positiveLabel, valueField: "true" },
+												{ someField: column.filterable.negativeLabel, valueField: "false" }
+											]
+										}),
+										dataTextField: "someField",
+										dataValueField: "valueField",
+										valuePrimitive: true
+									});
+								},
+								showOperators: false
+							}
+						};
 					}
-				};
 				break;
 			case "image":
 				column.filterable = {
@@ -3829,7 +3835,10 @@
 				});
 				column.locked = lockColumn && lockColumn.length > 0;
 			}
-			self.setColumnFilterableCell(column, definition, "lightKendoGrid");
+			if (JSON.stringify(column.filterable.cell) === '{}')
+			{
+				self.setColumnFilterableCell(column, definition, "lightKendoGrid");
+			}
 			if (definition.AllowFiltering === false)
 			{
 				column.filterable = false;

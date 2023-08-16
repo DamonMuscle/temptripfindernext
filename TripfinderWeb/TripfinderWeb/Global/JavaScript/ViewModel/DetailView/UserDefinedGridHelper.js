@@ -140,7 +140,7 @@
 					negLabel = (negLabel == null || negLabel == '') ? "false" : negLabel;
 					if (item !== null)
 					{
-						dataItem[col.FieldName] = item == "true" ? posLabel : negLabel;
+						dataItem[col.FieldName] = (item === true || item === "true") ? posLabel : negLabel;
 					}
 					else
 					{
@@ -460,7 +460,7 @@
 					let value = item[col.Guid];
 					if (IsEmptyString(value)) { return ""; }
 
-					return (value === 'true' || value === true) ? col.positiveLabel : col.negativeLabel || value;
+					return (value === true || value.toString().toLowerCase() === 'true') ? col.positiveLabel : col.negativeLabel || value;
 				};
 				break;
 			case "signatureblock":
