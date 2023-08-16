@@ -490,19 +490,21 @@
 
 	LocationPage.prototype.onMapViewPointerMove = function(event)
 	{
-		if (!this.mapInstance)
+		const self = this;
+		if (!self.mapInstance)
 		{
 			return;
 		}
 
-		if (this.RoutingMapTool.measurementTool && this.RoutingMapTool.measurementTool.isActive)
+		if (self.RoutingMapTool?.measurementTool?.isActive ||
+			self.RoutingMapTool?.googleStreetTool?.isActive)
 		{
 			const cursor = "crosshair";
-			this.mapInstance.setMapCursor(cursor);
+			self.mapInstance.setMapCursor(cursor);
 			return;
 		}
 
-		this.mapInstance.hitTest(event).then((response) =>
+		self.mapInstance.hitTest(event).then((response) =>
 		{
 			let graphics = null, cursor = "default";
 			if (response && response.results.length > 0)
@@ -515,7 +517,7 @@
 				}
 			}
 			
-			this.mapInstance.setMapCursor(cursor);
+			self.mapInstance.setMapCursor(cursor);
 		});
 	}
 
