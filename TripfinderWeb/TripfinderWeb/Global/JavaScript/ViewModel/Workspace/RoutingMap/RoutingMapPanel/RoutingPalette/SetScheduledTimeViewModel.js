@@ -23,7 +23,13 @@
 			const arrivalDateTime = self.momentHelper.getDateTime(self.arrivalDate(), self.arrivalTime(), true);
 			const stopTime = self.tripStop.StopTimeArrive || self.tripStop.StopTimeDepart;
 
-			var minutesDiff = moment(arrivalDateTime).diff(stopTime, "minutes");
+			var minutesDiff = 0;
+
+			if (arrivalDateTime)
+			{
+				minutesDiff = moment(arrivalDateTime).diff(stopTime, "minutes");
+			}
+
 			if (minutesDiff >= 0)
 			{
 				self.changeType(0);
