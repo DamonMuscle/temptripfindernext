@@ -382,4 +382,12 @@
 			return [];
 		}		
 	}
+
+	Layer.prototype.setLayerDefinitionExpression = function(expression)
+	{
+		if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
+		{
+			this.layer.definitionExpression = expression;
+		}
+	}
 })();

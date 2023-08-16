@@ -78,9 +78,9 @@
 		configurable: false
 	});
 
-	FieldTripMap.prototype.setPathLineType = function(isSequenceLine)
+	FieldTripMap.prototype.setPathLineType = function(type)
 	{
-		this.pathLineType = isSequenceLine ? PATH_LINE_TYPE.Sequence : PATH_LINE_TYPE.Path;
+		this.pathLineType = type;
 	}
 
 	Object.defineProperty(FieldTripMap.prototype, 'fieldTripsData', {
@@ -356,11 +356,12 @@
 	{
 		this.setFieldTripStopVisibility(fieldTrips);
 
+		const expression = this._calculateArrowLayerExpression();
 		this.setFieldTripPathVisibility(fieldTrips);
-		await this.setFieldTripPathArrowVisibility(fieldTrips);
+		this.setFieldTripPathArrowVisibility(expression);
 
 		this.setFieldTripSequenceLineVisibility(fieldTrips);
-		await this.setFieldTripSequenceLineArrowVisibility(fieldTrips);
+		this.setFieldTripSequenceLineArrowVisibility(expression);
 
 		this.setFieldTripHighlightLayerVisibility(fieldTrips);
 	}
@@ -1464,7 +1465,8 @@
 
 		arrowLayerInstance.hide();
 		await self._redrawArrowLayer(fieldTripsData, arrowLayerInstance, pathFeatures, data);
-		await self.setFieldTripPathArrowVisibility(fieldTripsData);
+		const expression = self._calculateArrowLayerExpression();
+		self.setFieldTripPathArrowVisibility(expression);
 		arrowLayerInstance.show();
 	}
 
@@ -1482,7 +1484,8 @@
 
 		arrowLayerInstance.hide();
 		await self._redrawArrowLayer(fieldTripsData, arrowLayerInstance, sequenceLineFeatures, data);
-		await self.setFieldTripSequenceLineArrowVisibility(fieldTripsData);
+		const expression = self._calculateArrowLayerExpression();
+		self.setFieldTripSequenceLineArrowVisibility(expression);
 		arrowLayerInstance.show();
 	}
 
@@ -1552,59 +1555,29 @@
 		return arrows;
 	}
 
-	FieldTripMap.prototype.setFieldTripPathArrowVisibility = async function(fieldTrips)
+	FieldTripMap.prototype.setFieldTripPathArrowVisibility = function(expression)
 	{
-		const self = this;
-		const precondition = this.pathLineType === PATH_LINE_TYPE.Path;
-		await self._setArrowLayerVisibility(self.fieldTripPathArrowLayerInstance, fieldTrips, precondition);
+		this.fieldTripPathArrowLayerInstance.setLayerDefinitionExpression(expression);
 	}
 
-	FieldTripMap.prototype.setFieldTripSequenceLineArrowVisibility = async function(fieldTrips)
+	FieldTripMap.prototype._getVisibleFieldTrips = function()
 	{
-		const self = this;
-		const precondition = this.pathLineType === PATH_LINE_TYPE.Sequence;
-		await self._setArrowLayerVisibility(self.fieldTripSequenceLineArrowLayerInstance, fieldTrips, precondition);
+		return this.fieldTripsData.filter(item => item.visible);
 	}
 
-	FieldTripMap.prototype._setArrowLayerVisibility = async function(arrowLayerInstance, fieldTrips, precondition)
+	FieldTripMap.prototype.setFieldTripSequenceLineArrowVisibility = function(expression)
 	{
-		const self = this;
-		let updateFeatures = [];
-
-		for (let i = 0; i < fieldTrips.length; i++)
-		{
-			const fieldTrip = fieldTrips[i],
-				{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
-				Color = fieldTrip.color,
-				visible = precondition && fieldTrip.visible,
-				updateColor = visible ? Color : null,
-				condition = self._extractArrowCondition(DBID, FieldTripId),
-				filterArrows = await self._getArrowFeatures(arrowLayerInstance, condition);
-
-			updateFeatures = updateFeatures.concat(self._computeUpdateArrow(filterArrows, updateColor));
-		}
-
-		if (updateFeatures.length > 0)
-		{
-			const edits = { updateFeatures };
-			await arrowLayerInstance.layer.applyEdits(edits);
-		}
+		this.fieldTripSequenceLineArrowLayerInstance.setLayerDefinitionExpression(expression);
 	}
 
-	FieldTripMap.prototype._computeUpdateArrow = function(filterArrows, updateColor)
+	FieldTripMap.prototype._calculateArrowLayerExpression = function()
 	{
-		const updateFeatures = [];
-		for (let i = 0; i < filterArrows.length; i++)
-		{
-			const arrowFeature = filterArrows[i];
-			if (updateColor !== arrowFeature.attributes.Color)
-			{
-				arrowFeature.attributes.Color = updateColor;
-				updateFeatures.push(arrowFeature);
-			}
-		}
-
-		return updateFeatures;
+		const self = this,
+			visibleFieldTrips = self._getVisibleFieldTrips(),
+			conditions = visibleFieldTrips.map(item => this._extractArrowCondition(item.DBID, item.id)),
+			expression = (conditions.length > 1) ? `(${conditions.join(") OR (")})` :
+				(conditions.length === 0) ? "1 = 0" : conditions;
+		return expression;
 	}
 
 	FieldTripMap.prototype._isArrowOnPath = function()

@@ -224,7 +224,13 @@
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapTripPathTypeChange = function(_, isSequenceLine)
 	{
-		this.fieldTripMap?.setPathLineType(isSequenceLine);
+		const type = isSequenceLine ? this.fieldTripMap?.PATH_LINE_TYPE.Sequence : this.fieldTripMap?.PATH_LINE_TYPE.Path;
+		if (type === this.fieldTripMap?.pathLineType)
+		{
+			return;
+		}
+
+		this.fieldTripMap?.setPathLineType(type);
 		this.fieldTripMap?.switchPathType(this.dataModel.trips);
 	}
 
