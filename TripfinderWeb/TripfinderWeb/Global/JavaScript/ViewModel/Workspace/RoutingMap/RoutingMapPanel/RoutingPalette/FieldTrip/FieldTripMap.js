@@ -440,8 +440,7 @@
 
 	FieldTripMap.prototype.zoomToFieldTripStop = function({longitude, latitude})
 	{
-		const DEFAULT_MAP_SCALE = 5000;
-		this.mapInstance.centerAndZoom(longitude, latitude, DEFAULT_MAP_SCALE);
+		this.mapInstance.centerAndZoom(longitude, latitude);
 	}
 
 	//#endregion

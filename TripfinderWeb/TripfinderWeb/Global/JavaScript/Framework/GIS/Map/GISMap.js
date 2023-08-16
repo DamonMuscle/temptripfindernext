@@ -591,8 +591,16 @@
 
 	Map.prototype.zoomToFullVisibleExtent = async function()
 	{
-		const fullExtent = await this.getFullVisibleFeatures();
-		await this.setExtent(fullExtent);
+		const visibleFeatures = await this.getFullVisibleFeatures();
+		if (visibleFeatures.length === 1 &&
+			visibleFeatures[0].geometry.type === GEOMETRY_TYPE.POINT)
+		{
+			const point = visibleFeatures[0].geometry;
+			this.centerAndZoom(point.longitude, point.latitude);
+			return;
+		}
+
+		await this.setExtent(visibleFeatures);
 	}
 
 	Map.prototype.setExtent = async function(target)
@@ -614,7 +622,7 @@
 		return visibleFeatures;
 	}
 
-	Map.prototype.centerAndZoom = function(longitude, latitude, scale)
+	Map.prototype.centerAndZoom = function(longitude, latitude, scale = 5000)
 	{
 		const point = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(new TF.GIS.SDK.Point({ x: longitude, y: latitude }));
 		this.centerAtPoint(point);
