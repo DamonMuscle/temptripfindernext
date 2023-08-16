@@ -55,6 +55,7 @@
 			}
 		};
 		this.defineReadOnlyProperty("PATH_LINE_TYPE", PATH_LINE_TYPE);
+		mapInstance.onMapViewKeyUpEvent.subscribe(this.onMapKeyUpEvent.bind(this));
 	}
 
 	//#region Property
@@ -1249,7 +1250,7 @@
 		}
 	}
 
-	FieldTripMap.prototype.onMapKeyUpEvent = async function(data)
+	FieldTripMap.prototype.onMapKeyUpEvent = async function(_, data)
 	{
 		const keyName = data.event.key;
 		switch (keyName)

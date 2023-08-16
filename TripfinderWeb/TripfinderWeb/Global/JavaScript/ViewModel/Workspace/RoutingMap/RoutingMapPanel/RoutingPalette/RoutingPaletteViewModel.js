@@ -35,7 +35,6 @@
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.HighlightFieldTripStop, self.onFieldTripMapHighlightFieldTripStop.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.ClearHighlightFieldTripStop, self.onFieldTripMapClearHighlightFieldTripStop.bind(self));
 		mapCanvasPage.onMapViewClickEvent.subscribe(self.onMapCanvasMapViewClickHandler.bind(self));
-		mapCanvasPage.onMapViewKeyUpEvent.subscribe(self.onMapCanvasMapViewKeyUpHandler.bind(self));
 		mapCanvasPage.onMapViewMouseWheelEvent.subscribe(self.onMapCanvasMapViewMouseWheelHandler.bind(self));
 		mapCanvasPage.onMapViewCustomizedEvent.subscribe(self.onMapCanvasMapViewCustomizedEventHandler.bind(self));
 		PubSub.subscribe("on_MapCanvas_RecalculateTripMove", self.onMapCanvas_RecalculateTripMove.bind(self));
@@ -416,11 +415,6 @@
 		}
 
 		this.fieldTripMap?.onMapClickEvent(data);
-	}
-
-	RoutingPaletteViewModel.prototype.onMapCanvasMapViewKeyUpHandler = function(_, data)
-	{
-		this.fieldTripMap?.onMapKeyUpEvent(data);
 	}
 
 	RoutingPaletteViewModel.prototype.onMapCanvasMapViewMouseWheelHandler = function(_, data)

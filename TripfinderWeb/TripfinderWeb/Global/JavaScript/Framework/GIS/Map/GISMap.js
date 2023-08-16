@@ -41,7 +41,6 @@
 			onMapViewUpdated: null,
 			onMapViewUpdating: null,
 			onMapViewExtentChanges: null,
-			onMapViewKeyUp: null,
 			onMapViewMouseWheel: null,
 			onMapViewCustomizedEventHandler: null,
 		}
@@ -71,6 +70,7 @@
 
 		this.onMapViewExtentChangeEvent = new TF.Events.Event();
 		this.onMapViewScaleChangeEvent = new TF.Events.Event();
+		this.onMapViewKeyUpEvent = new TF.Events.Event();
 	}
 
 	/**
@@ -338,10 +338,10 @@
 			self.onMapViewScaleChangeEvent.notify({ previous, scale });
 		});
 
-		if (self.settings.eventHandlers.onMapViewKeyUp)
+		self.eventHandler.onMapViewKeyUp = mapView.on('key-up', (event) =>
 		{
-			self.eventHandler.onMapViewKeyUp = mapView.on('key-up', self.settings.eventHandlers.onMapViewKeyUp);
-		}
+			self.onMapViewKeyUpEvent.notify({ event });
+		});
 
 		if (self.settings.eventHandlers.onMapViewMouseWheel)
 		{
@@ -378,6 +378,7 @@
 
 		this.onMapViewExtentChangeEvent?.unsubscribeAll();
 		this.onMapViewScaleChangeEvent?.unsubscribeAll();
+		this.onMapViewKeyUpEvent?.unsubscribeAll();
 	}
 
 	Map.prototype.setMapCursor = function(cursorType)
