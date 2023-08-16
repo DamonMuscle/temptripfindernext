@@ -7,6 +7,7 @@
 		var self = this;
 		TF.DetailView.FieldEditor.InputFieldEditor.call(self, type);
 		self.obValue = ko.observable();
+		self.editStopOnWheel = true;
 	};
 
 	DateTimeFieldEditor.prototype = Object.create(TF.DetailView.FieldEditor.InputFieldEditor.prototype);
@@ -17,17 +18,14 @@
 
 	DateTimeFieldEditor.prototype.format = "MM/DD/YYYY hh:mm A";
 
-	DateTimeFieldEditor.prototype._initElement = function(options)
+	DateTimeFieldEditor.prototype._initElement = function()
 	{
 		var self = this;
-		self._$element = $("<div class='custom-field-input datetime'><!-- ko customInput:{type:\"" + self.type + "\",value:obValue,attributes:{class:\"form-control\",format:'" + self.format + "'}} --><!-- /ko --></div>");
+		self._$element = $(`<div class="custom-field-input datetime">
+								<!-- ko customInput:{type: "${self.type}",value:obValue,attributes:{class:"form-control",placeholder:"${self.format.toLocaleLowerCase()}",format:"${self.format}",disablePosition:1}} -->
+								<!-- /ko -->
+							</div>`);
 		ko.applyBindings(self, self._$element[0]);
-
-		const $button = self._$element.find(".input-group-addon.datepickerbutton");
-		$button.on('dp.show', function(e)
-		{
-			self.adjustWidgetPosition();
-		});
 	};
 
 	DateTimeFieldEditor.prototype.getFormatedValue = function(value)
@@ -38,10 +36,8 @@
 	DateTimeFieldEditor.prototype.togglePicker = function()
 	{
 		var dateTimePicker = this.getPicker();
-		if (dateTimePicker)
-		{
-			dateTimePicker.toggle();
-		}
+
+		dateTimePicker && dateTimePicker.toggle();
 	};
 
 	DateTimeFieldEditor.prototype.shouldTriggerEditBlur = function(target)
@@ -62,10 +58,30 @@
 			if (e.target === self._$element[0])
 			{
 				self.togglePicker();
-				self.adjustWidgetPosition();
+				self.adjustWidgetPosition(e.target);
 				e.stopPropagation();
 				return;
 			}
+
+			var picker = self.getPicker();
+			var $container = picker && picker.dateView && picker.dateView.calendar && picker.dateView.calendar.element.closest(".k-animation-container");
+			if ($container && $container.length > 0)
+			{
+				if ($.contains($container[0], e.target))
+				{
+					return;
+				}
+				let $table = $(e.target).closest("table.k-century");
+				if (!$table.length)
+				{
+					$table = $(e.target).closest("table.k-decade");
+				}
+				if ($table.length && !$table.parent().length)
+				{
+					return;
+				}
+			}
+			if (!$(e.target).closest("body").length && $(e.target).hasClass("glyphicon-calendar")) return;
 
 			setTimeout(function()
 			{
@@ -77,7 +93,7 @@
 		{
 			self._$element.find("input").focus();
 			self.togglePicker();
-			self.adjustWidgetPosition();
+			self.adjustWidgetPosition(e.target);
 			e.stopPropagation();
 		});
 
@@ -96,15 +112,16 @@
 		$(document).off(self._eventNamespace);
 	};
 
-	DateTimeFieldEditor.prototype._getWidget = function()
+	DateTimeFieldEditor.prototype._getWidget = function(element)
 	{
-		return $("body>.bootstrap-datetimepicker-overlay>.bootstrap-datetimepicker-widget:last");
+		var kendoDatePicker = $(element).parent().find(".custom-field-input input").data("kendoDateTimePicker");
+		return kendoDatePicker && kendoDatePicker.dateView.div.closest(".k-animation-container");
 	};
 
-	DateTimeFieldEditor.prototype.adjustWidgetPosition = function()
+	DateTimeFieldEditor.prototype.adjustWidgetPosition = function(element)
 	{
 		var self = this,
-			widget = self._getWidget(),
+			widget = self._getWidget(element),
 			widgetWidth = widget.width(),
 			bodyWidth = $("body").width(),
 			bodyHeight = $("body").height(),
@@ -126,7 +143,9 @@
 			top = $editorIcon.offset().top - widget.outerHeight();
 		}
 
-		widget.css('top', top);
+		var zindex = Math.max(...Array.from($(element).parents()).map(el => parseInt($(el).css("z-index"))).filter(x => !Number.isNaN(x)));
+
+		widget.css({ top: top, "z-index": zindex + 5 });
 	};
 
 	DateTimeFieldEditor.prototype.editStart = function($parent, options)
@@ -154,6 +173,7 @@
 				}
 
 				self.onValueChanged();
+				self.save();
 			});
 
 			self._setElementStyle();
@@ -305,15 +325,21 @@
 
 	DateTimeFieldEditor.prototype.closeWidget = function()
 	{
-		var widget = this.getPicker();
-		if (widget)
+		var self = this,
+			$input = self._$parent.find(".custom-field-input input");
+
+		if ($input.length)
 		{
-			widget.hide();
+			var datetimeBox = ko.dataFor($input[0]);
+			if (datetimeBox && datetimeBox.dispose)
+			{
+				datetimeBox.dispose();
+			}
 		}
 	};
 
 	DateTimeFieldEditor.prototype.getPicker = function()
 	{
-		return this._$element.find("input").data("DateTimePicker");
+		return this._$element.find("input").data("kendoDateTimePicker");
 	};
 })();

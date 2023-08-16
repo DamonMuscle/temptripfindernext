@@ -333,7 +333,8 @@
 				return;
 			};
 
-			if (self._$menu && self._$menu.has($(e.target)).length === 0)
+			// if dropdown list items already shown, it won't trigger dispose
+			if (!self._$menu || self._$menu.has($(e.target)).length === 0)
 			{
 				self.editStop();
 			}
