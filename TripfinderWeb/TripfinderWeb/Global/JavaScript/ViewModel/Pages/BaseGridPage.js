@@ -65,7 +65,6 @@
 		{
 			self.updateOptions();
 		}
-		self.setRelatedFilterData();
 		self.createGrid(self.options);
 		self.initSearchGridCompute();
 		self.bindButtonEvent();
@@ -182,33 +181,6 @@
 				tf.shortCutKeys.changeHashKey();
 			});
 		}
-	};
-
-	BaseGridPage.prototype.setRelatedFilterData = function ()
-	{
-		var self = this,
-			openRelatedData = sessionStorage.getItem("openRelated");
-		if (!openRelatedData)
-		{
-			return;
-		}
-
-		sessionStorage.removeItem("openRelated");
-		try
-		{
-			openRelatedData = JSON.parse(openRelatedData);
-		}
-		catch
-		{
-			return;
-		}
-
-		if (!openRelatedData || openRelatedData.pageType !== self.pageType)
-		{
-			return;
-		}
-
-		self.options.openRelatedData = openRelatedData;
 	};
 
 	BaseGridPage.prototype.sendEmailClick = function (viewModel, e)

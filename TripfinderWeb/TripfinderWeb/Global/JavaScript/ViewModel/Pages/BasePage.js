@@ -450,21 +450,19 @@
 				toGridType = toGridType || tf.applicationTerm.getApplicationTermPluralByName(dataType.name);
 
 				const filterName = `${toGridType} (${fromMenu} for Selected ${fromGridType})`;
-
-				sessionStorage.setItem("openRelated", JSON.stringify(
-					{
-						"gridType": gridType,
-						"type": self.type,
-						"pageType": pageType,
-						"filterName": filterName,
-						"selectedIds": ids,
-					}));
-
-				const location = "#/?pagetype=" + pageType;
-				const redirectWindow = window.open(location, "_blank");
-				redirectWindow.name = "new-pageWindow_" + $.now();
-
-				sessionStorage.removeItem("openRelated");
+				var storageFilterDataKey = "grid.currentfilter." + pageType + ".id";
+				tf.storageManager.save(storageFilterDataKey, {
+					"filteredIds": ids,
+					"filterName": filterName,
+					"gridType": gridType,
+					"type": self.type,
+					"pageType": pageType,
+				}, true).then(function()
+				{
+					const location = "#/?pagetype=" + pageType;
+					const redirectWindow = window.open(location, "_blank");
+					redirectWindow.name = "new-pageWindow_" + $.now();
+				}.bind(this));
 			}.bind(self));
 		}
 		else
@@ -495,7 +493,7 @@
 	{
 		var redirectWindow = window.open('', '_blank');
 		redirectWindow.blur();
-		this._openSelected(this.pageType, e, redirectWindow);
+		this._openSelected(this.pageType || this._gridType, e, redirectWindow);
 	};
 
 	BasePage.prototype._openSelected = function (gridType, e, redirectWindow)
@@ -506,20 +504,18 @@
 		var filterName = $(e.currentTarget).find(".menu-label").text().trim() + ' (Selected Records)';
 		if (selectedIds.length > 0)
 		{
-			// TODO-temp
-			Promise.all([
-				TF.Grid.FilterHelper.clearQuickFilter(gridType),
-				tf.storageManager.save("grid.currentlayout." + gridType + ".id", ''),
-				tf.storageManager.save(storageFilterDataKey,
-					{
-						"filteredIds": selectedIds,
-						"filterName": filterName
-					})
-			]).then(function ()
-			{
-				redirectWindow.location = "#/?pagetype=" + this.pageType, redirectWindow.name = "new-pageWindow_" + $.now();
+			var storageFilterDataKey = "grid.currentfilter." + gridType + ".id";
+				tf.storageManager.save(storageFilterDataKey, {
+					"filteredIds": selectedIds,
+					"filterName": filterName,
+					"gridType": gridType,
+					"type": this.type,
+					"pageType": gridType,
+				}, true).then(function()
+				{
+					redirectWindow.location = "#/?pagetype=" + gridType, redirectWindow.name = "new-pageWindow_" + $.now();
 
-			}.bind(this));
+				}.bind(this));
 		}
 		else
 		{
