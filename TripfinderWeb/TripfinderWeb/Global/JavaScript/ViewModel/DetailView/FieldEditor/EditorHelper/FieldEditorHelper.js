@@ -591,20 +591,14 @@
 
 		$content.css({ border: 'none', outline: 'none' });
 
-		Promise.resolve(() =>
+		if (self._editor)
 		{
-			if (self._editor)
-			{
-				// dispose event initialized last time
-				return self._editor.editStop();
-			}
-			return Promise.resolve();
-		}).then(() =>
-		{
-			self._editor = self._createEditor(options.format);
-			options.editFieldList = self.editFieldList;
-			self._editor.editStart($element, options);
-		});
+			// dispose event initialized last time
+			self._editor.dispose();
+		}
+		self._editor = self._createEditor(options.format);
+		options.editFieldList = self.editFieldList;
+		self._editor.editStart($element, options);
 	};
 
 	/**
