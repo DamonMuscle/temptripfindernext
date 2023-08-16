@@ -490,7 +490,7 @@
 	{
 		var redirectWindow = window.open('', '_blank');
 		redirectWindow.blur();
-		this._openSelected(this.pageType || this._gridType, e, redirectWindow);
+		this._openSelected(this.pageType, e, redirectWindow);
 	};
 
 	BasePage.prototype._openSelected = function (gridType, e, redirectWindow)
