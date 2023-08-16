@@ -694,6 +694,11 @@
 			self.exitAddingFieldTripStop();
 		}
 
+		if (this.measurementTool?.isMeasurementActive())
+		{
+			this.deactivateMeasurementTool();
+		}
+
 		if (!self.googleStreetTool)
 			self.googleStreetTool = new TF.Map.GoogleStreetTool(self.routingMapDocumentViewModel._map, tf.map.ArcGIS, self.getRouteState(), this);
 
@@ -1063,6 +1068,11 @@
 		{
 			var routeState = this.getRouteState();
 			this.measurementTool = new TF.Map.RoutingMapMeasureTool(this.routingMapDocumentViewModel._map, tf.map.ArcGIS, this.routingMapDocumentViewModel.element, routeState, this);
+		}
+
+		if (this.googleStreetTool?.isGoogleStreetActive())
+		{
+			this.deactivateGoogleStreetTool();
 		}
 
 		var isActive = this.measurementTool.isMeasurementActive();
