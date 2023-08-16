@@ -454,9 +454,6 @@
 				tf.storageManager.save(storageFilterDataKey, {
 					"filteredIds": ids,
 					"filterName": filterName,
-					"gridType": gridType,
-					"type": self.type,
-					"pageType": pageType,
 				}, true).then(function()
 				{
 					const location = "#/?pagetype=" + pageType;
@@ -508,9 +505,6 @@
 				tf.storageManager.save(storageFilterDataKey, {
 					"filteredIds": selectedIds,
 					"filterName": filterName,
-					"gridType": gridType,
-					"type": this.type,
-					"pageType": gridType,
 				}, true).then(function()
 				{
 					redirectWindow.location = "#/?pagetype=" + gridType, redirectWindow.name = "new-pageWindow_" + $.now();
