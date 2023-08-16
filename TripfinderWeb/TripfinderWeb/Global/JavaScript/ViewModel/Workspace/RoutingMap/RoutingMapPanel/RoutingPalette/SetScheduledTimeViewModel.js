@@ -42,6 +42,12 @@
 			return arrivalDateTime;
 		});
 
+		this.numOfMinutes.subscribe(() => {
+			setTimeout(() => {
+				self.$element.find("input[name='numOfMinutes']").trigger('blur'); // trigger the validation
+			});
+		});
+
 		this.stopAffect = ko.observable(0);
 		// this.numOfMinutes = ko.computed(function()
 		// {
