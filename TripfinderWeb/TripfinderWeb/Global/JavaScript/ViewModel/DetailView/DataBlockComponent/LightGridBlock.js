@@ -185,7 +185,7 @@
 			this.$originalContainer.prepend(this.$el);
 		}
 		this.expandContainer.children().css({ "visibility": "visible" });
-		this.expandContainer.css("overflow-y", "auto");
+		this.expandContainer.css("overflow-y", "auto").removeClass(TF.DetailView.DetailViewHelper.ExpandClassName);
 		this.expandedDom && this.expandedDom.remove();
 		this._fitExpandGridHeight();
 	};
@@ -205,7 +205,7 @@
 		this.expandContainer.children().css({ "visibility": "hidden" });
 		this.expandContainer.css("overflow-y", "hidden");
 		this.expandContainer.append(this.expandedDom);
-		this.expandContainer.css({ position: "relative" });
+		this.expandContainer.css({ position: "relative" }).addClass(TF.DetailView.DetailViewHelper.ExpandClassName);
 		this.expandedDom.css({
 			position: "absolute",
 			top: this.expandContainer.scrollTop(),

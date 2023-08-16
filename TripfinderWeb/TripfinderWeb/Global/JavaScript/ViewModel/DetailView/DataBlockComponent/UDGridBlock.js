@@ -132,7 +132,7 @@
 		this.expandedDom = $(`<div class="grid-stack"></div>`);
 		this.expandContainer.children().hide();
 		this.expandContainer.append(this.expandedDom);
-		this.expandContainer.css({ position: "relative" });
+		this.expandContainer.css({ position: "relative" }).addClass(TF.DetailView.DetailViewHelper.ExpandClassName);
 		this.expandedDom.css({
 			position: "absolute",
 			top: 0,
@@ -167,6 +167,7 @@
 			this.$originalContainer.prepend(this.$el);
 		}
 		this.expandContainer.children().show();
+		this.expandContainer.removeClass(TF.DetailView.DetailViewHelper.ExpandClassName);
 		this.expandedDom && this.expandedDom.remove();
 		this._fitExpandGridHeight();
 

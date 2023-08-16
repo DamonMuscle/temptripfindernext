@@ -84,7 +84,7 @@
 			this.expandContainer.children().hide();
 		}
 		this.expandContainer.append(mapElement);
-		this.expandContainer.css({ position: 'relative' });
+		this.expandContainer.css({ position: 'relative' }).addClass(TF.DetailView.DetailViewHelper.ExpandClassName);
 		this.button.attr("title", "restore");
 		mapElement.css({
 			position: 'absolute',
@@ -104,6 +104,7 @@
 		{
 			this.expandContainer.children().show();
 		}
+		this.expandContainer.removeClass(TF.DetailView.DetailViewHelper.ExpandClassName);
 		this.originalContainer.append(mapElement);
 		this.button.attr("title", "expand");
 		mapElement.css({
