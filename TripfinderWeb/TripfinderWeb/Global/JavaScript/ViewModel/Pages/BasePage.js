@@ -457,7 +457,6 @@
 				{
 					tf.storageManager.delete(storageFilterDataKey);
 				}
-				tf.storageManager.delete(storageFilterDataKey);
 				tf.storageManager.save(storageFilterDataKey, {
 					"filteredIds": ids,
 					"filterName": filterName,
