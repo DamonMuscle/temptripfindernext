@@ -977,6 +977,7 @@
 					return;
 				}
 
+				delete data.routePathAttributes;
 				self.onTripsChangeEvent.notify({ add: [data], edit: [], delete: [], options: { resetScheduleTime: true } });
 				if (data.OpenType === 'Edit')
 				{
@@ -2093,7 +2094,6 @@
 			{
 				self.showSaveSuccessToastMessage();
 				self.updateTripOriginalData(fieldTrips);
-				self.onTripDisplayRefreshEvent.notify(self.trips);
 				self.tripLockData.lockIds(fieldTrips.filter(function(trip)
 				{
 					return trip.Id && trip.OpenType != "View";
@@ -2201,28 +2201,20 @@
 									return result.concat({ ...st, copyFromTripId: matched.copyFromTripId })
 								}, []);
 								
-								var promises = [];
-								var unSuccessAssignStudents = [];
 								fieldTrips.forEach(function(trip)
 								{
 									self.deleteChangeDataStackByTripId(trip.oldId);
 									var savedTrip = Enumerable.From(savedTrips).FirstOrDefault({}, function(c) { return c.Name == trip.Name; });
 									// change id from local create to match the create after save 
 									self.featureData.changeId(trip, savedTrip);
-									self.viewModel.drawTool.updateTripId(trip.oldId, trip.id);
-	
-									// save trip geometry data
-									// promises.push(self.featureData.save(trip.id));
 								});
 	
-								return Promise.all(promises).then(function()
-								{
-									self.onTripSaveEvent.notify(fieldTrips);
-									self.tripLockData.saveData(fieldTrips);
-									self.saving = false;
-									tf.loadingIndicator.tryHide();
-									return Promise.resolve(true);
-								});
+								self.onTripSaveEvent.notify(fieldTrips);
+								self.tripLockData.saveData(fieldTrips);
+								self.saving = false;
+								tf.loadingIndicator.tryHide();
+								return Promise.resolve(true);
+
 							}).catch(function(error)
 							{
 								tf.loadingIndicator.tryHide();

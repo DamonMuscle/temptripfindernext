@@ -220,65 +220,22 @@
 	CopyFieldTripViewModel.prototype.apply = function()
 	{
 		var self = this;
-		return self.saveValidate().then(function(result)
+		return self.copyFieldTrip().then(function(newTrip)
 		{
-			if (result)
+			tf.loadingIndicator.showImmediately();
+
+			let newTrips = [newTrip];
+
+			const departureDateTime = moment(self.obDepartureDateTime()).format("YYYY-MM-DDTHH:mm:ss");
+			self.dataModel.setFieldTripActualStopTime(newTrips, true, clientTimeZoneToUtc(departureDateTime));
+			self.dataModel.copyFieldTripStopTimeWithActualTime(newTrips);
+
+			if (self.obCreateTrip() && self.obOpenType() == 1)
 			{
-				return self.copyFieldTrip().then(function(newTrip){
-
-					tf.loadingIndicator.showImmediately();
-					let fieldTripPathPromise = Promise.resolve(false);
-
-					if (newTrip.FieldTripStops.length > 1)
-					{
-					}
-
-					let newTrips = [newTrip];
-
-					const departureDateTime = moment(self.obDepartureDateTime()).format("YYYY-MM-DDTHH:mm:ss");
-					self.dataModel.setFieldTripActualStopTime(newTrips, true, clientTimeZoneToUtc(departureDateTime));
-					self.dataModel.copyFieldTripStopTimeWithActualTime(newTrips);
-
-					return fieldTripPathPromise.then(function()
-					{
-						for (var i = 0; i < newTrip.FieldTripStops.length - 1; i++)
-						{
-							// newTrip.FieldTripStops[i].StreetEndAfterCpoy = newTrip.FieldTripStops[i + 1].Street;
-						}
-
-						// newTrip.FieldTripStops.forEach(function(fieldTripStop)
-						// {
-						// 	for (var i = 0; i < self.fieldTrip.FieldTripStops.length - 1; i++)
-						// 	{
-						// 		if ((fieldTripStop.Street == self.fieldTrip.FieldTripStops[i].Street && fieldTripStop.StreetEndAfterCpoy == self.fieldTrip.TripStops[i].StreetEndBeforeCpoy))
-						// 		{
-						// 			fieldTripStop.Speed = self.fieldTrip.FieldTripStops[i].Speed;
-						// 		}
-						// 	}
-						// });
-						
-						// self.dataModel.recalculate([newTrip]).then(function(response)
-						// {
-						// 	var fieldTripData = response[0];
-						// 	for (var j = 0; j < newTrip.FieldTripStops.length; j++)
-						// 	{
-						// 		newTrip.FieldTripStops[j].TotalStopTime = fieldTripData.FieldTripStops[j].TotalStopTime;
-						// 		newTrip.FieldTripStops[j].Duration = fieldTripData.FieldTripStops[j].Duration;
-						// 	}
-						// 	self.dataModel.setFieldTripActualStopTime([newTrip]);
-						// });
-						
-						if (self.obCreateTrip() && self.obOpenType() == 1)
-						{
-							self.dataModel.saveFieldTrip(newTrips);
-							// self.dataModel.copyFieldTrip(newTrip);
-						}
-						tf.loadingIndicator.tryHide();
-						return newTrip;
-					});
-				
-				});
+				self.dataModel.saveFieldTrip(newTrips);
 			}
+			tf.loadingIndicator.tryHide();
+			return newTrip;
 		});
 	};
 

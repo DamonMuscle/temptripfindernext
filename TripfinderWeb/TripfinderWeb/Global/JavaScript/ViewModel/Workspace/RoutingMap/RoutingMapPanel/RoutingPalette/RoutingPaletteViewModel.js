@@ -202,7 +202,7 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapZoomToStop = function(_, data)
 	{
 		const { tripId, sequence } = data;
-		const fieldTrip = this.dataModel.trips.find(item => item.id === tripId);
+		const fieldTrip = this.dataModel.trips.find(item => item.id === tripId || item.oldId === tripId);
 		const stop = fieldTrip?.FieldTripStops.find(item => item.Sequence === sequence);
 		const coordinates = { longitude: stop?.XCoord, latitude: stop?.YCoord };
 
@@ -261,7 +261,7 @@
 		if (tripStops && tripStops.length > 0)
 		{
 			const fieldTripId = tripStops[0].FieldTripId;
-			const fieldTrip = this.dataModel.trips.find(item => item.id === fieldTripId);
+			const fieldTrip = this.dataModel.trips.find(item => item.id === fieldTripId || item.oldId === fieldTripId);
 			const effectSequences = tripStops.map(s => s.Sequence);
 			this.fieldTripMap?.refreshFieldTripPath(fieldTrip, effectSequences, callZoomToLayers);
 		}
@@ -275,7 +275,7 @@
 		}
 
 		const fieldTripId = items[0].FieldTripId;
-		const fieldTrip = this.dataModel.trips.find(item => item.id === fieldTripId);
+		const fieldTrip = this.dataModel.trips.find(item => item.id === fieldTripId || item.oldId === fieldTripId);
 		this.fieldTripMap?.updateStopSymbol(fieldTrip, items);
 	};
 
@@ -302,13 +302,12 @@
 			return;
 		}
 
-		
 		this.fieldTripMap?.moveStopLocation(fieldTrip, fieldTripStop, this.mapCanvasPage.sketchTool);
 	};
 
 	RoutingPaletteViewModel.prototype.onRefreshFieldTripPath = async function({fieldTripId})
 	{
-		const fieldTrip = this.dataModel.trips.find(item => item.id === fieldTripId);
+		const fieldTrip = this.dataModel.trips.find(item => item.id === fieldTripId || item.oldId === fieldTripId);
 		await this.fieldTripMap?.refreshFieldTripPath(fieldTrip);
 	};
 
