@@ -42,17 +42,7 @@
 			return arrivalDateTime;
 		});
 
-		this.numOfMinutes.subscribe(() => {
-			setTimeout(() => {
-				self.$element.find("input[name='numOfMinutes']").trigger('blur'); // trigger the validation
-			});
-		});
-
 		this.stopAffect = ko.observable(0);
-		// this.numOfMinutes = ko.computed(function()
-		// {
-		// 	return moment(self.arrivalDateTime()).diff(self.tripStop.StopTime, 'minutes');
-		// });
 		this.updateDisabled = ko.observable(false);
 		this.updateDisabledNumberBox = ko.computed(function()
 		{
@@ -77,7 +67,6 @@
 
 	SetScheduledTimeViewModel.prototype.minuMinutes = function()
 	{
-		// this.arrivalTime(moment.utc(this.arrivalTime()).subtract(1, 'minutes'));
 		var minute = Number(this.numOfMinutes());
 		if (minute > 0)
 		{
@@ -87,7 +76,6 @@
 
 	SetScheduledTimeViewModel.prototype.addMinutes = function()
 	{
-		// this.arrivalTime(moment.utc(this.arrivalTime()).add(1, 'minutes'));
 		var minute = Number(this.numOfMinutes());
 		this.numOfMinutes(minute + 1);
 	};
@@ -137,25 +125,6 @@
 				}
 			}
 
-			validatorFields.numOfMinutes = {
-				trigger: "blur change",
-				validators:
-				{
-					notEmpty:
-					{
-						message: "required"
-					},
-					callback:
-					{
-						message: " not a valid number of minutes.",
-						callback: function(value)
-						{
-							return parseInt(Number(value)) == value && value >= 0;
-						}.bind(this)
-					}
-				}
-			}
-
 			this.$form.bootstrapValidator(
 				{
 					excluded: [":hidden", ":not(:visible)"],
@@ -199,8 +168,7 @@
 								const numOfMinutes = Number(self.numOfMinutes());
 
 								// set StopTime of 1st Stop by StopTimeDepart, the rest by StopTimeArrive
-								tripStopTemp.StopTime = tripStopTemp.PrimaryDeparture ? tripStopTemp.StopTimeDepart :
-																						tripStopTemp.StopTimeArrive;
+								tripStopTemp.StopTime = tripStopTemp.PrimaryDeparture ? tripStopTemp.StopTimeDepart : tripStopTemp.StopTimeArrive;
 								
 								// update StopTime
 								tripStopTemp.StopTime = (self.changeType() == self.changeTypeEnum.Add ?
@@ -254,18 +222,6 @@
 		}
 
 	}
-
-	SetScheduledTimeViewModel.prototype.onNumOfMinutesChanges = function(numberBox, e)
-	{
-		var value = numberBox.$input.val();
-
-		if (parseInt(Number(value)) != value)
-		{
-			return;
-		}
-
-		numberBox.$input.val(Number(value));
-	};
 
 	SetScheduledTimeViewModel.prototype.changeTypeEnum = { "Add": 0, "Subtract": 1 };
 	SetScheduledTimeViewModel.prototype.stopAffectEnum = { "AllPrevious": 0, "AllFollowing": 1, "AllStops": 2 };

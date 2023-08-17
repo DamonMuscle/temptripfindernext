@@ -111,7 +111,6 @@
 		this.momentHelper = new TF.Document.MomentHelper();
 
 		this.obStopPauseMinutes = ko.observable();
-		this.onStopPauseMinutesChanged = this.onStopPauseMinutesChanged.bind(this);
 	}
 
 	RoutingFieldTripStopEditModal.prototype = Object.create(TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype);
@@ -730,17 +729,5 @@
 			sequence = disableLastStopSequence ? dataSequence : defaultSequence;
 
 		this.obSelectedSequence(sequence);
-	}
-
-	RoutingFieldTripStopEditModal.prototype.onStopPauseMinutesChanged = function(numberBox)
-	{
-		let value = numberBox.obRawValue();
-		if (typeof value === "number")
-		{
-			value = `${value}`;
-			// Number(011) ---> 9
-			// Number('011') ---> 11
-		}
-		this.obStopPauseMinutes(Number(value));
 	}
 })();
