@@ -2134,13 +2134,6 @@
 			{
 				treeview.setDataSource(homogeneous);
 			}
-
-			// if (data.options && data.options.resetScheduleTime)
-			// {
-			// 	promise = self.resetTripInfo(data.add, null, null, data.options.resetScheduleTime);
-			// }
-			//newAddList.forEach(function(trip) { self.dataModel.refreshOptimizeSequenceRate(trip.id) });
-			// this.refreshNextTripData(newAddList);
 		}
 
 		if (data.delete.length > 0)

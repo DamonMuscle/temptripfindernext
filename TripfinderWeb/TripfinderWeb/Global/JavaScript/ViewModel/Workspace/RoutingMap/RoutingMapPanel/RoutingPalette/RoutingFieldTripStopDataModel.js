@@ -33,9 +33,6 @@
 				self.viewModel.viewModel.fieldTripMap?.startAddFieldTripStop();
 			}
 
-			// set stop time to new trip stop by calculate
-			self.dataModel.setFieldTripActualStopTime([self.dataModel.getTripById(data.FieldTripId)]);
-
 			self.insertToRevertData(data);
 
 			self.dataModel.onTripStopsChangeEvent.notify({
@@ -76,9 +73,6 @@
 		{
 			// set stop time to new trip stop by calculate
 			const fieldTripId = stops[0].FieldTripId;
-			const newFieldTrips = [self.dataModel.getTripById(fieldTripId)];
-			self.dataModel.setFieldTripActualStopTime(newFieldTrips);
-			self.dataModel.copyFieldTripStopTimeWithActualTime(newFieldTrips);
 
 			stops.forEach(data =>
 			{

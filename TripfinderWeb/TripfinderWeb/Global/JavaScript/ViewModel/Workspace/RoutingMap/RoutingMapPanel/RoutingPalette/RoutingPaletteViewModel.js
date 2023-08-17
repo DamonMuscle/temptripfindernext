@@ -369,7 +369,7 @@
 		const trip = this.dataModel.getTripById(data.fieldTrip.id);
 
 		this.dataModel.update(trip.FieldTripStops, true); // pass true to stop calling onTripStopsChangeEvent
-		this.fieldTripPaletteSection.display.resetTripInfo([trip]);
+		this.fieldTripPaletteSection.display.resetTripInfo([trip], undefined, undefined, true);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapHighlightFieldTripStop = function(_, data)
