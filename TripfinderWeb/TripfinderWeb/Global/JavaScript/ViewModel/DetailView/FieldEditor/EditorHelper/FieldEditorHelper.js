@@ -1703,7 +1703,7 @@
 			return false;
 		}
 
-		if (editor && editor instanceof TF.DetailView.FieldEditor.DateFieldEditor && isForward)
+		if (editor && editor instanceof TF.DetailView.FieldEditor.DateFieldEditor && isForward && !isEnter)
 		{
 			// when on date filed editor, show calendar when tab key
 			var editIcon = editor._$parent.find(".editor-icon");
