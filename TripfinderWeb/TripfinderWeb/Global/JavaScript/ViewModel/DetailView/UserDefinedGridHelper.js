@@ -2744,12 +2744,14 @@
 		let precision = 0;
 		options = options || {};
 
+		// Currency uses maxLength to limit decimal places,
+		// Number and system field use NumberPrecision to limit decimal places
 		switch (type.toLowerCase())
 		{
 			case "currency":
 				precision = options.MaxLength;
 				break;
-			case "number":
+			default:
 				precision = options.NumberPrecision;
 				break;
 		}
