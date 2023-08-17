@@ -48,7 +48,7 @@
 				DBName: "Geo_Street",
 				Width: '190px',
 				type: "string"
-			},,
+			},
 			{
 				FieldName: "GeoCity",
 				DisplayName: "Geo City",
