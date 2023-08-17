@@ -338,6 +338,7 @@
 
 				stopsModel.push(dataModel);
 			});
+			self.addOverlayToPanels();
 			self.normalizeData(stopsModel);
 			self.initTitle(true);
 			self.init(options).then(function()
