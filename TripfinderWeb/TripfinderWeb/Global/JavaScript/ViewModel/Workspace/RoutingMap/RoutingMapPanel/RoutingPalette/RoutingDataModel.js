@@ -1950,25 +1950,8 @@
 	RoutingDataModel.prototype.update = function(items, isNoStopChange)
 	{
 		var self = this,
-			tripStops = [],
-			tripBoundary = [];
-		items = this.singleToArray(items);
-		items.forEach(function(item)
-		{
-			switch (item.type)
-			{
-				case "tripBoundary":
-					tripBoundary.push(item);
-					break;
-				case "tripStop":
-					tripStops.push(item);
-					break;
-			}
-		});
+			tripStops = self.singleToArray(items).filter(({type})=>type === "tripStop");
 
-		if (tripBoundary.length > 0)
-		{
-		}
 		if (tripStops.length > 0)
 		{
 			return self.fieldTripStopDataModel.update(tripStops, false, isNoStopChange);
