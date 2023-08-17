@@ -135,7 +135,7 @@
 			}
 		});
 
-		columns = columns.concat(onlyForFilterColumns);
+		columns = Enumerable.From(columns.concat(onlyForFilterColumns)).Distinct(function(c) { return c.FieldName; }).ToArray();
 
 		// Remove onlyForGrid columns
 		var toBeRemoved = {};
