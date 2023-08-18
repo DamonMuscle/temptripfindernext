@@ -212,7 +212,18 @@
 	CopyFieldTripViewModel.prototype.saveValidate = function()
 	{
 		var self = this;
-		return Promise.resolve(true);
+		return self.dataModel.validateName(self.obName()).then(function()
+		{
+			if (!self.obDepartureDateTime())
+			{
+				tf.promiseBootbox.alert("Field Trip departure time is required.");
+				return false;
+			}
+			return true;
+		}, function()
+		{
+			return false;
+		});
 	};
 
 	CopyFieldTripViewModel.prototype.fieldTripTypeEnum = { 'NotReverseAndToSchool': 0, 'ReverseAndToSchool': 1, 'ReverseAndFromSchool': 2, 'NotReverseAndFromSchool': 3 };
@@ -220,22 +231,30 @@
 	CopyFieldTripViewModel.prototype.apply = function()
 	{
 		var self = this;
-		return self.copyFieldTrip().then(function(newTrip)
+		return self.saveValidate().then(function(result)
 		{
-			tf.loadingIndicator.showImmediately();
-
-			let newTrips = [newTrip];
-
-			const departureDateTime = moment(self.obDepartureDateTime()).format("YYYY-MM-DDTHH:mm:ss");
-			self.dataModel.setFieldTripActualStopTime(newTrips, true, clientTimeZoneToUtc(departureDateTime));
-			self.dataModel.copyFieldTripStopTimeWithActualTime(newTrips);
-
-			if (self.obCreateTrip() && self.obOpenType() == 1)
+			if (!result)
 			{
-				self.dataModel.saveFieldTrip(newTrips);
+				return null;
 			}
-			tf.loadingIndicator.tryHide();
-			return newTrip;
+
+			return self.copyFieldTrip().then(function(newTrip)
+			{
+				tf.loadingIndicator.showImmediately();
+
+				let newTrips = [newTrip];
+
+				const departureDateTime = moment(self.obDepartureDateTime()).format("YYYY-MM-DDTHH:mm:ss");
+				self.dataModel.setFieldTripActualStopTime(newTrips, true, clientTimeZoneToUtc(departureDateTime));
+				self.dataModel.copyFieldTripStopTimeWithActualTime(newTrips);
+
+				if (self.obCreateTrip() && self.obOpenType() == 1)
+				{
+					self.dataModel.saveFieldTrip(newTrips);
+				}
+				tf.loadingIndicator.tryHide();
+				return newTrip;
+			});
 		});
 	};
 

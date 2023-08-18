@@ -2669,6 +2669,23 @@
 		}
 	};
 
+	RoutingDataModel.prototype.validateName = function(name, id)
+	{
+		if (name.trim() === '')
+		{
+			tf.promiseBootbox.alert("Field Trip name is required.");
+			return Promise.reject();
+		}
+
+		if (name.length > 200)
+		{
+			tf.promiseBootbox.alert("Field Trip name should be less than 201 characters.");
+			return Promise.reject();
+		}
+
+		return Promise.resolve();
+	};
+
 	RoutingDataModel.prototype.getKey = function(studentId, requirementId, tripStopId, anotherTripStopID, previousScheduleID)
 	{
 		if (requirementId)
