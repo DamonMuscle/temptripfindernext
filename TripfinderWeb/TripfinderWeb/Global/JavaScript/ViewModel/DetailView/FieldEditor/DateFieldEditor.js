@@ -57,14 +57,14 @@
 					weekDayCount = 7,
 					next = null;
 
-				if (keyCode == $.ui.keyCode.ENTER)
-				{
-					current.trigger("click");
-					return;
-				}
-
-				e.preventDefault();
-				e.stopPropagation();
+					e.preventDefault();
+					e.stopPropagation();
+	
+					if (keyCode == $.ui.keyCode.ENTER && current && current.length > 0)
+					{
+						current.trigger("click");
+						return;
+					}
 				
 				// find the next date by arrows keys
 				if (keyCode == $.ui.keyCode.UP || keyCode == $.ui.keyCode.DOWN)
