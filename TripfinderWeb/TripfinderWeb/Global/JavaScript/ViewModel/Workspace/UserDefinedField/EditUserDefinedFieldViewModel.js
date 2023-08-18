@@ -571,10 +571,33 @@
 				container: self.$element.find("div[name='udfListType']"),
 				validators: {
 					callback: {
-						message: "List Item is required",
+						message: "List Item is required and unique",
 						callback: function(value, validator, $field)
 						{
-							return (self.obTypeModalData().pickListOptions.length > 0);
+							const items = self.obTypeModalData().pickListOptions;
+							if (!items || items.length === 0)
+							{
+								return {valid: false, message: "List Item is required"};
+							}
+
+							const temp = [];
+							const hasDuplicate =  items.some(t => {
+								const pickList = (t.PickList || "").toLowerCase();
+								if (temp.indexOf(pickList) !== -1)
+								{
+									return true;
+								}
+
+								temp.push(pickList);
+								return false;
+							});
+
+							if (hasDuplicate)
+							{
+								return {valid: false, message: "has duplicate list item"};
+							}
+
+							return true;
 						}
 					}
 				}

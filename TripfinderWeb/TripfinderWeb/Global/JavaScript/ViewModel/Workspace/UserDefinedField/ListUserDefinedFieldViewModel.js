@@ -457,6 +457,7 @@
 	{
 		var self = this,
 			data = self.kendoGrid.dataSource.getByUid($(evt.target).closest("tr").attr("data-kendo-uid"));
+			const index = data.index, oldText = data.PickList;
 
 		tf.modalManager.showModal(new TF.Modal[self.isUDFGroup ? "SingleInputWithCounterModalViewModel" : "SingleInputModalViewModel"](
 			{
@@ -473,12 +474,17 @@
 			{
 				if (!!text)
 				{
-					var idx = $(evt.target).closest("tr").index(),
-						newItem = self.pickListOptions[idx];
+					let dataItem = self.pickListOptions[index];
+					if (!dataItem)
+					{
+						dataItem = self.pickListOptions.find(item  => item.PickList === oldText);
+					}
 
-					newItem.PickList = text;
-					self.pickListOptions.splice(idx, 1, newItem);
-					self.updateListItems(self.pickListOptions);
+					if (dataItem)
+					{
+						dataItem.PickList = text;
+						self.updateListItems(self.pickListOptions);
+					}
 				}
 			});
 	};
@@ -564,7 +570,11 @@
 			console.log(1);
 		}
 
-		self.kendoGrid.dataSource.data(options);
+		const dataItems = options.map((opt, index) =>
+		{
+			return {...opt, index};
+		});
+		self.kendoGrid.dataSource.data(dataItems);
 		self.obDefaultListString(text);
 	};
 
