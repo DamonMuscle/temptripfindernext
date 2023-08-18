@@ -13,7 +13,6 @@
 		self.UDGridFields = options.UDGridFields;
 		self.checkDuplicatesCallback = options.checkDuplicatesCallback;
 		self.public = options.public;
-		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 
 		self.TYPES = [
 			{
@@ -587,17 +586,6 @@
 					var validator = self.$element.data("bootstrapValidator");
 					validator.validate();
 				});
-			}
-
-			// check if list has duplicate value
-			var multipleInputModal = self.obTypeModalData().getMultipleInputModalViewModel();
-			
-			errMsg = multipleInputModal.viewModel.check();
-
-			if(errMsg)
-			{
-				self.pageLevelViewModel.clearError();
-				self.pageLevelViewModel.popupErrorMessage(self.dataEntity.DisplayName + errMsg.pageLevel);
 			}
 		}
 		else if (type === "List From Data")

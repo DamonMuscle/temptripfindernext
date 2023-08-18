@@ -56,7 +56,7 @@
 			return ERROR_MSG["DUPLICATE_WITH_EXISTING"];
 		}
 
-		if (self.hasDuplicateBetweenArrays(items, self.existingItems) || self.hasDuplicateInArray(self.existingItems))
+		if (self.hasDuplicateBetweenArrays(items, self.existingItems))
 		{
 			return ERROR_MSG["DUPLICATE"];
 		}
