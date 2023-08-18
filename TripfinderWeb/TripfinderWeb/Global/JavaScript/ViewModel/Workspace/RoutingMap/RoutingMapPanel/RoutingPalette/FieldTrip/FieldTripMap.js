@@ -960,6 +960,8 @@
 
 		self.showLoadingIndicator();
 
+		self.stopAddFieldTripStop();
+
 		const { DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
 			sequence = stop.Sequence,
 			fieldTripStops = self._getStopFeatures();

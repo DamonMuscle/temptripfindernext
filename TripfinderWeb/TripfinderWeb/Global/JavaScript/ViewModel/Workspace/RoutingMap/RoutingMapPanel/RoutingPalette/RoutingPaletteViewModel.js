@@ -377,7 +377,17 @@
 		const { FromTripId, ToTripId, StopId, AssignSequence } = data;
 		const fieldTrips = this.dataModel.trips;
 		const fromFieldTrip = fieldTrips.find(item => item.id === FromTripId);
+		if (fromFieldTrip === undefined)
+		{
+			console.warn(`!!Cannot find from field trip id = ${FromTripId}`);
+		}
+
 		const toFieldTrip = fieldTrips.find(item => item.id === ToTripId);
+		if (toFieldTrip === undefined)
+		{
+			console.warn(`!!Cannot find to field trip id = ${ToTripId}`);
+		}
+
 		const toFieldTripStops = toFieldTrip.FieldTripStops;
 		const lastStopIndex = toFieldTripStops.length - 1;
 		const INVALID_STOP_INDEX = -1;

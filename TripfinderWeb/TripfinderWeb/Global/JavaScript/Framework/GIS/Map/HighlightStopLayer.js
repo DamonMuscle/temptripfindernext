@@ -24,7 +24,7 @@
 		return graphic;
 	}
 
-	HighlightStopLayer.prototype.createStop = function(longitude, latitude, attributes, stopSequence)
+	HighlightStopLayer.prototype.createStop = function(longitude, latitude, attributes, stopSequence = null)
 	{
 		const DEFAULT_STOP_SEQUENCE = 0;
 		const Sequence = stopSequence || attributes.Sequence || DEFAULT_STOP_SEQUENCE;
