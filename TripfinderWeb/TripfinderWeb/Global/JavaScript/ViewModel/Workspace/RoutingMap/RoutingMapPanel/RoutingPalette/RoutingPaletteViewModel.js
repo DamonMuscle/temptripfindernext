@@ -374,30 +374,66 @@
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapHighlightFieldTripStop = function(_, data)
 	{
-		const { tripId, stopId, stopSequence } = data;
+		const { FromTripId, ToTripId, StopId, AssignSequence } = data;
 		const fieldTrips = this.dataModel.trips;
-		const fieldTrip = fieldTrips.find(item => item.id === tripId);
-		let fieldTripStops = fieldTrip.FieldTripStops;
-		const currentStop = fieldTripStops.find(item => item.id === stopId);
-		fieldTripStops = fieldTripStops.filter(x => x.id !== stopId);
-		let beforeStop = null, afterStop = null;
-		if (stopSequence > 1)
+		const fromFieldTrip = fieldTrips.find(item => item.id === FromTripId);
+		const toFieldTrip = fieldTrips.find(item => item.id === ToTripId);
+		const toFieldTripStops = toFieldTrip.FieldTripStops;
+		const lastStopIndex = toFieldTripStops.length - 1;
+		const INVALID_STOP_INDEX = -1;
+
+		// HighlightParametersClass
+		let params, currentStop, previousIndex, nextIndex;
+		if (StopId === 0)
 		{
-			beforeStop = fieldTripStops[stopSequence - 2];
+			// add new stop
+			currentStop = null;
+			previousIndex = AssignSequence - 2;
+			nextIndex = AssignSequence - 1;
+		}
+		else
+		{
+			currentStop = fromFieldTrip.FieldTripStops.find(item => item.id === StopId);
+			if (FromTripId === ToTripId)
+			{
+				if (AssignSequence === currentStop.Sequence)
+				{
+					previousIndex = AssignSequence - 2;
+					nextIndex = AssignSequence;
+				}
+				else if (AssignSequence < currentStop.Sequence)
+				{
+					previousIndex = AssignSequence - 2;
+					nextIndex = AssignSequence - 1;
+				}
+				else
+				{
+					previousIndex = AssignSequence - 1;
+					nextIndex = AssignSequence;
+				}
+			}
+			else
+			{
+				previousIndex = AssignSequence - 2;
+				nextIndex = AssignSequence - 1;
+			}
 		}
 
-		if (stopSequence <= fieldTripStops.length)
+		if (previousIndex < 0)
 		{
-			afterStop = fieldTripStops[stopSequence - 1];
+			previousIndex = INVALID_STOP_INDEX;
 		}
 
-		const DBID = fieldTrip.DBID,
-			FieldTripId = tripId,
-			Color = fieldTrip.color,
-			params = { DBID, FieldTripId, Color, beforeStop, currentStop, afterStop, stopSequence };
+		if (nextIndex > lastStopIndex)
+		{
+			nextIndex = INVALID_STOP_INDEX;
+		}
+
+		const previousStop = previousIndex === INVALID_STOP_INDEX ? null : toFieldTripStops[previousIndex];
+		const nextStop = nextIndex === INVALID_STOP_INDEX ? null : toFieldTripStops[nextIndex];
+		params = { fromFieldTrip, toFieldTrip, previousStop, currentStop, nextStop, AssignSequence };
 
 		this.fieldTripMap?.addHighlightFeatures(params);
-		this.fieldTripMap?.setFieldTripHighlightLayerVisibility(fieldTrips);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapClearHighlightFieldTripStop = function(_, data)

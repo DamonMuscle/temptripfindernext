@@ -1020,63 +1020,73 @@
 		const self = this;
 		if (!self.fieldTripStopLayerInstance ||
 			!self.fieldTripPathLayerInstance ||
-			!self.fieldTripHighlightLayerInstance)
+			!self.fieldTripHighlightLayerInstance ||
+			!self.fieldTripHighlightStopLayerInstance)
 		{
 			return;
 		}
 
 		// avoid add duplicate features.
 		await self.fieldTripHighlightLayerInstance.clearLayer();
-
-		const vertex = [],
-			stops = [],
-			{ DBID, FieldTripId, beforeStop, currentStop, afterStop, stopSequence} = data,
-			fieldTrip = self.fieldTripsData.find(item => item.id === FieldTripId),
-			isFieldTripVisible = fieldTrip?.visible,
-			isEditStop = !!currentStop;
-
-		if (!isFieldTripVisible)
+		
+		const { fromFieldTrip, toFieldTrip, previousStop, currentStop, nextStop, AssignSequence } = data;
+		const isFromFieldTripVisible = fromFieldTrip.visible,
+			isToFieldTripVisible = toFieldTrip.visible;
+		if (isFromFieldTripVisible || isToFieldTripVisible)
 		{
-			// don't show highlight features for hidden trips.
-			return;
-		}
-
-		let stopObjects = null;
-		if (isEditStop)
-		{
-			stopObjects = [beforeStop, currentStop, afterStop].filter(item => item);
-		}
-		else
-		{
-			// beforeStop and afterStop must be existing for new stop.
-			const highlightStop = self.getHighlightStop();
-			if (highlightStop === null)
+			// show highlight stop
+			if (!!currentStop)
 			{
-				return;
+				await self.fieldTripHighlightStopLayerInstance.clearLayer();
 			}
 
-			const midStop = {
-				XCoord: highlightStop.geometry.longitude,
-				YCoord: highlightStop.geometry.latitude,
-				id: 0
-			};
-			stopObjects = [beforeStop, midStop, afterStop].filter(item => item);
+			self.drawHighlightStop(data, currentStop, AssignSequence);
 		}
 
-		stopObjects.forEach(stop =>
+		if (isToFieldTripVisible)
 		{
-			const { XCoord, YCoord, id } = stop,
-				attributes = { DBID, FieldTripId, id },
-				graphic = self.fieldTripHighlightStopLayerInstance.createBackgroundStop(XCoord, YCoord, attributes);
-			stops.push(graphic);
+			// show highlight line
+			let fieldTripStops = null;
+			if (!!currentStop)
+			{
+				fieldTripStops = [previousStop, currentStop, nextStop].filter(item => item);
+			}
+			else
+			{
+				// create stop
+				const highlightStop = self.getHighlightStop();
+				if (highlightStop === null)
+				{
+					return;
+				}
 
-			vertex.push([XCoord, YCoord]);
-		});
+				const midStop = {
+					XCoord: highlightStop.geometry.longitude,
+					YCoord: highlightStop.geometry.latitude,
+					id: 0
+				};
+				fieldTripStops = [previousStop, midStop, nextStop].filter(item => item);
+			}
 
-		const paths = [vertex];
-		await self.drawHighlightFeatures(data, paths, stops);
+			const vertex = [],
+				stops = [],
+				DBID = toFieldTrip.DBID,
+				FieldTripId = toFieldTrip.id,
+				Color = toFieldTrip.color;
+			fieldTripStops.forEach(stop =>
+			{
+				const { XCoord, YCoord, id } = stop,
+					attributes = { DBID, FieldTripId, id },
+					graphic = self.fieldTripHighlightStopLayerInstance.createBackgroundStop(XCoord, YCoord, attributes);
+				stops.push(graphic);
+	
+				vertex.push([XCoord, YCoord]);
+			});
 
-		self.drawHighlightStop(data, currentStop, stopSequence, isEditStop);
+			const paths = [vertex];
+			const params = { DBID, FieldTripId, Color };
+			await self.drawHighlightFeatures(params, paths, stops);
+		}
 	}
 
 	FieldTripMap.prototype.clearHighlightFeatures = async function()
@@ -1116,9 +1126,9 @@
 		await self.fieldTripHighlightLayerInstance.addMany(highlightGraphics);
 	}
 
-	FieldTripMap.prototype.drawHighlightStop = function(data, currentStop, stopSequence, isEditStop)
+	FieldTripMap.prototype.drawHighlightStop = function(data, currentStop, sequence)
 	{
-		const self = this;
+		const self = this, isEditStop = !!currentStop;
 		let stopGraphic = null;
 		if (isEditStop)
 		{
@@ -1134,7 +1144,7 @@
 			longitude = currentStop.XCoord,
 			latitude = currentStop.YCoord;
 
-			stopGraphic = self.fieldTripHighlightStopLayerInstance.createStop(longitude, latitude, attributes, stopSequence);
+			stopGraphic = self.fieldTripHighlightStopLayerInstance.createStop(longitude, latitude, attributes, sequence);
 		}
 
 		const highlightStop = self.getHighlightStop();
@@ -1145,7 +1155,7 @@
 				highlightStop.geometry = stopGraphic.geometry;
 				highlightStop.attributes = stopGraphic.attributes;
 			}
-			highlightStop.symbol = self.fieldTripHighlightStopLayerInstance.getStopSymbol(stopSequence);
+			highlightStop.symbol = self.fieldTripHighlightStopLayerInstance.getStopSymbol(sequence);
 		}
 		else
 		{

@@ -234,15 +234,12 @@
 	/**
 	 * highlight current stop to previous and after
 	 */
-	RoutingFieldTripStopEditModal.prototype.highlightStopSequencePathAndPoint = function(sequence)
+	RoutingFieldTripStopEditModal.prototype.highlightStopSequencePathAndPoint = function(assignSequence)
 	{
 		const currentTrip = this.obSelectedTrip();
 		const currentStop = this.data[0];
-
-		currentStop.FieldTripId = currentTrip.id;
-
-		const data = { tripId: currentStop.FieldTripId, stopId: currentStop.id, stopSequence: sequence };
-
+		const fromFieldTripId =  currentStop.FieldTripId || currentTrip.id;
+		const data = { FromTripId: fromFieldTripId, ToTripId: currentTrip.id, StopId: currentStop.id, AssignSequence: +assignSequence };
 		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.HighlightFieldTripStop, data);
 	};
 
