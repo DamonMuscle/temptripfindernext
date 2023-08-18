@@ -1922,6 +1922,20 @@
 						e.stopPropagation();
 					}
 
+					// the page will loose response if press tab key always, so restrict the frequency to make it smoothly.
+					if (self.lastTriggerTime)
+					{
+						var currentTime = (new Date()).getTime()
+						if (currentTime - self.lastTriggerTime <= 150)
+						{
+							e.preventDefault();
+							e.stopPropagation();
+							return;
+						}
+					}
+					self.lastTriggerTime = (new Date()).getTime();
+
+
 					//tab -> move forward
 					//shift + tab -> move back
 					tabToNextFinished = false;

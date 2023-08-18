@@ -259,7 +259,7 @@
 				switch (keyCode)
 				{
 					case $.ui.keyCode.ESCAPE:
-						self.cancel();
+						self.closeWidget();
 						break;
 					case $.ui.keyCode.UP:
 						self.nextActiveItem(true);
