@@ -821,7 +821,8 @@
 								address: item.Address || item.Title,
 								XCoord: item.Xcoord,
 								YCoord: item.Ycoord,
-								Street: item.Street
+								Street: item.Street || item.Title,
+								City: item.City
 							};
 
 							return entity;

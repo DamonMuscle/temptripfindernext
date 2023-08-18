@@ -261,7 +261,12 @@
 				return self.createUseLastSetting(data);
 			}
 			self.initing = true;
-			var dataModel = $.extend(self.getDataModel(), data);
+
+			const isValidStreet = !!data.Street?.replaceAll(",", " ").trim(),
+				street = isValidStreet ? data.Street : '',
+				name = data.name?.trim(),
+				UNNAMED_ADDRESS = "unnamed";
+			var dataModel = $.extend(self.getDataModel(), { ...data, Street: street || name || UNNAMED_ADDRESS });
 
 			if (options.selectLastSelectedTrip)
 			{
@@ -322,8 +327,13 @@
 			var stopsModel = [];
 			data.map(function(stop)
 			{
+				const isValidAddress = !!stop.address?.replaceAll(",", " ").trim(),
+					address = isValidAddress ? stop.address : '',
+					name = stop.name?.trim(),
+					UNNAMED_ADDRESS = "unnamed";
+				
 				var dataModel = $.extend(self.getDataModel(), {
-					Street: stop.Street,
+					Street: address || name || UNNAMED_ADDRESS,
 					XCoord: stop.XCoord,
 					YCoord: stop.YCoord,
 					geometry: stop.geometry,

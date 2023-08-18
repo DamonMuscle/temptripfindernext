@@ -19,12 +19,13 @@
 		{
 			return Promise.resolve(this.routingMapSearch.selectedItems.map(function(item)
 			{
-				const isValidAddress = item.address?.replaceAll(",", " ").trim() !== '';
-				const address = isValidAddress ? item.address : '', title = item.title?.trim(), UNNAMED_ADDRESS = "unnamed";
 				return {
 					XCoord: item.XCoord,
 					YCoord: item.YCoord,
-					Street: address || title || UNNAMED_ADDRESS,
+					Street: item.Street,
+					City: item.City,
+					address: item.address,
+					name: item.Title
 				};
 			}));
 		}
