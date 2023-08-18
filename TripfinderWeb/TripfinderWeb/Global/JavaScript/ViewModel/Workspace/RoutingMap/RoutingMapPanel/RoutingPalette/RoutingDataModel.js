@@ -1505,14 +1505,35 @@
 				stop.StopTime = stop.ActualStopTime;
 				var prevStop = i == 0 ? null : trip.FieldTripStops[i - 1];
 				var nextStop = i == trip.FieldTripStops.length - 1 ? null : trip.FieldTripStops[i + 1];
-				if (prevStop && prevStop.StopTime != emptyValue && moment(stop.StopTime, "HH:mm:ss").diff(moment(prevStop.StopTime, "HH:mm:ss")) < 0)
+				if (prevStop && prevStop.StopTime != emptyValue && !!prevStop.StopTime && moment(stop.StopTime).diff(moment(prevStop.StopTime)) < 0)
 				{
 					stop.StopTime = prevStop.StopTime;
 				}
-				if (nextStop && nextStop.StopTime != emptyValue && moment(stop.StopTime, "HH:mm:ss").diff(moment(nextStop.StopTime, "HH:mm:ss")) > 0)
+				if (nextStop && nextStop.StopTime != emptyValue && !!nextStop.StopTime && moment(stop.StopTime).diff(moment(nextStop.StopTime)) > 0)
 				{
 					stop.StopTime = nextStop.StopTime;
 				}
+
+				if(!stop.StopTimeArrive && !stop.StopTimeDepart)
+				{
+					if(stop.PrimaryDeparture)
+					{
+						stop.StopTimeDepart = stop.StopTime;
+					}
+					else if(stop.PrimaryDestination)
+					{
+						stop.StopTimeArrive = stop.StopTime;
+					}
+					else
+					{
+						const pauseDuration = moment.duration(moment(stop.StopTimeDepart).diff(moment(stop.StopTimeArrive))).asMinutes();
+			
+						stop.StopTimeArrive = stop.StopTime;
+						stop.StopTimeDepart = moment(stop.StopTimeArrive)
+														.add(Math.ceil(pauseDuration), "minutes")
+														.format("YYYY-MM-DDTHH:mm:ss");
+					}	
+				}		
 			}
 		}
 	};
