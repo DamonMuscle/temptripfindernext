@@ -348,10 +348,27 @@
 			self.eventHandler.onMapViewMouseWheel = mapView.on('mouse-wheel', self.settings.eventHandlers.onMapViewMouseWheel);
 		}
 
-		const func = self.settings.eventHandlers.onMapViewCustomizedEventHandler ?? function() {
-			console.log("this method is available only when passing onMapViewCustomizedEventHandler"); 
-		};
-		this.defineReadOnlyProperty("fireCustomizedEvent", func, true);
+		this.defineReadOnlyProperty("fireCustomizedEvent", async function ({ eventType, data, options = {} })
+		{
+			if (typeof self.settings.eventHandlers.onMapViewCustomizedEventHandler !== "function")
+			{
+				console.log("this method is available only when passing onMapViewCustomizedEventHandler");
+				return;
+			}
+
+			if(options.isSync)
+			{
+				await new Promise(function(resolve)
+				{
+					data.onCompleted = resolve;
+					self.settings.eventHandlers.onMapViewCustomizedEventHandler({ eventType, data });
+				});
+			}
+			else
+			{
+				self.settings.eventHandlers.onMapViewCustomizedEventHandler({ eventType, data });
+			}
+		}, true)
 	}
 
 	Map.prototype.destroyMapEvents = function()
