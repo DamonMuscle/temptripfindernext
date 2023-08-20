@@ -143,14 +143,10 @@
 			this.fieldTripMap = new TF.RoutingPalette.FieldTripMap(this.mapInstance);
 			await this.fieldTripMap.initLayers();
 		}
-		const onCompleted = data.onCompleted;
-		delete data.onCompleted;
+
 		await this.displayFieldTripPath(data);
 
-		if (typeof onCompleted === "function")
-		{
-			onCompleted();
-		}
+		this.checkIfCompletedHandlerExists(data);
 	}
 
 	RoutingPaletteViewModel.prototype.displayFieldTripPath = async function(data)
@@ -369,7 +365,20 @@
 		const trip = this.dataModel.getTripById(data.fieldTrip.id);
 
 		this.dataModel.update(trip.FieldTripStops, true); // pass true to stop calling onTripStopsChangeEvent
-		this.fieldTripPaletteSection.display.resetTripInfo([trip]);
+		this.fieldTripPaletteSection.display.resetTripInfo([trip]).then(()=>
+		{
+			this.checkIfCompletedHandlerExists(data);
+		});
+	}
+
+	RoutingPaletteViewModel.prototype.checkIfCompletedHandlerExists = function(data)
+	{
+		if (typeof data.onCompleted === "function")
+		{
+			const onCompleted = data.onCompleted;
+			delete data.onCompleted;
+			onCompleted();
+		}
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapHighlightFieldTripStop = function(_, data)
@@ -469,7 +478,7 @@
 
 	RoutingPaletteViewModel.prototype.onMapCanvasMapViewCustomizedEventHandler = function(_, customData)
 	{
-		const { eventType, data } = customData, self = this;
+		const  self = this, { eventType, data } = customData;
 		switch (eventType)
 		{
 			case TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocationCompleted:
