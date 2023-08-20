@@ -522,12 +522,12 @@
 		}, defaultOptions);
 	}
 
-	RoutingPaletteViewModel.prototype.onQuickAddStops = async function(stops)
+	RoutingPaletteViewModel.prototype.onQuickAddStops = function(stops)
 	{
 		if (stops.length === 1)
 		{
-			const stop = stops[0];
-			const newStopData = await this.fieldTripMap?.addHighlightStops(stop.XCoord, stop.YCoord);
+			const newStop = this.fieldTripMap?.createNewStop(stops[0]);
+			this.fieldTripMap?.addHighlightStops(newStop);
 		}
 		else
 		{

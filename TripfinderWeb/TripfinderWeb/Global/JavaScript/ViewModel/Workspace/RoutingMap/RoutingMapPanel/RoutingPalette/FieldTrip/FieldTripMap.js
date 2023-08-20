@@ -632,14 +632,11 @@
 		highlightStopLayerInstance.addStops(graphics);
 	}
 
-	FieldTripMap.prototype.addHighlightStops = async function(longitude, latitude)
+	FieldTripMap.prototype.addHighlightStops = function(addGraphic)
 	{
 		const self = this,
 			stopLayerInstance = self.fieldTripHighlightStopLayerInstance,
-			newStopData = await self._createNewStop(stopLayerInstance, longitude, latitude),
-			{ Name, City, RegionAbbr, CountryCode, XCoord, YCoord } = newStopData,
-			highlightStop = self.getHighlightStop(),
-			addGraphic = newStopData.newStop;
+			highlightStop = self.getHighlightStop();
 
 		let newStopGraphic = null;
 		if (highlightStop)
@@ -653,11 +650,24 @@
 			newStopGraphic = addGraphic;
 			stopLayerInstance.addStops([newStopGraphic]);
 		}
-
-		return { Name, City, RegionAbbr, CountryCode, XCoord, YCoord };
 	}
 
-	FieldTripMap.prototype._createNewStop = async function(stopLayerInstance, longitude, latitude)
+	FieldTripMap.prototype.createNewStop = function(stop)
+	{
+		const NEW_STOP_ID = 0,
+			NEW_STOP_SEQUENCE = 0,
+			attributes = {
+				id: NEW_STOP_ID,
+				Name: stop.Street,
+				Sequence: NEW_STOP_SEQUENCE
+			};
+		const newStop = this.fieldTripHighlightStopLayerInstance.createStop(stop.XCoord, stop.YCoord, attributes);
+
+		return newStop;
+	}
+
+
+	FieldTripMap.prototype._createGeocodingNewStop = async function(stopLayerInstance, longitude, latitude)
 	{
 		const NEW_STOP_ID = 0,
 			NEW_STOP_SEQUENCE = 0,
@@ -1218,8 +1228,10 @@
 			if (this.editing.isAddingStop)
 			{
 				const mapPoint = data.event.mapPoint;
+				const { longitude, latitude } = mapPoint;
 				self.showLoadingIndicator();
-				const newStopData = await self.addHighlightStops(mapPoint.longitude, mapPoint.latitude);
+				const newStopData = await self._createGeocodingNewStop(self.fieldTripHighlightStopLayerInstance, longitude, latitude);
+				self.addHighlightStops(newStopData.newStop);
 				self.hideLoadingIndicator();
 
 				this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMapCompleted, data: newStopData });
