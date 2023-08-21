@@ -481,10 +481,19 @@
 	ListUserDefinedFieldViewModel.prototype.onDeleteBtnClick = function(evt)
 	{
 		var self = this,
-			idx = $(evt.target).closest("tr").index();
+			data = self.kendoGrid.dataSource.getByUid($(evt.target).closest("tr").attr("data-kendo-uid"));
+			idx = data.index;
 
-		self.pickListOptions.splice(idx, 1);
-		self.updateListItems(self.pickListOptions);
+		if (idx == undefined || idx < 0)
+		{
+			idx = self.pickListOptions.findIndex(o => o.PickList == data.PickList);
+		}
+
+		if (idx >= 0)
+		{
+			self.pickListOptions.splice(idx, 1);
+			self.updateListItems(self.pickListOptions);
+		}
 	};
 
 	/**
