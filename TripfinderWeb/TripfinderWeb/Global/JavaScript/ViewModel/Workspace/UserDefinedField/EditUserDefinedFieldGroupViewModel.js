@@ -217,7 +217,7 @@
 
 		if (self.selectedIds.length === 0 && !self.isEdit)
 		{
-			self.selectedIds.push(parseInt(localStorage.getItem("datasourceId")));
+			self.selectedIds.push(parseInt(tf.storageManager.get("datasourceId")));
 		}
 		let selectedList = self.allDataources.filter(function(item) { return self.selectedIds.includes(item.value); });
 		self.obSelectedDataSources = ko.observableArray(selectedList);

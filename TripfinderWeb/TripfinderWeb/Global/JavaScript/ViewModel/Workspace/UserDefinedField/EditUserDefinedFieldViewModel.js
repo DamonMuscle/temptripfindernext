@@ -246,7 +246,7 @@
 		self.selectedIds = Array.from((self.dataEntity || {}).UDFDataSources || []).map(function(i) { return i.DBID; });
 		if (self.selectedIds.length === 0 && (!self.isEdit && !self.isCopy))
 		{
-			self.selectedIds.push(parseInt(localStorage.getItem("datasourceId")));
+			self.selectedIds.push(parseInt(tf.storageManager.get("datasourceId")));
 		}
 		var selectedList = self.allDataources.filter(function(item) { return self.selectedIds.includes(item.value); });
 
