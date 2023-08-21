@@ -373,6 +373,7 @@
 		_tmpListTypeGridFields = [insertBefore, selectedRows, insertAfter].reduce(function(a, b) { return a.concat(b); }, [])
 		this.kendoGrid.dataSource.data(_tmpListTypeGridFields);
 		this.pickListOptions = _tmpListTypeGridFields;
+		this.updateListItems(this.pickListOptions);
 		this.createKendoDropTargetEvent();
 	};
 
