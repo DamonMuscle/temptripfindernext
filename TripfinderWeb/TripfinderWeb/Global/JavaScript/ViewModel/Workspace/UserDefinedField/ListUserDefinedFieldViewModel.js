@@ -120,6 +120,7 @@
 		self.updateListItems();
 		self.renderDefaultValueComponent(isMultipleAllowed);
 
+		self.obSelectedOption.subscribe(self.onSelectedOptionHandler, self);
 		self.obAllowMultiple.subscribe(self.onToggleAllowMultipleHandler, self);
 		self.obComponentLoaded(true);
 	};
@@ -195,25 +196,7 @@
 			isDropdown = self.obPickListIsDropdown(),
 			addOtherOption = self.obPickListAddOtherOption();
 
-		if (!allowMultiple)
-		{
-			let selected = self.obSelectedOption();
-			if (selected.ID == null)
-			{
-				// new UDF, check based on text.
-				self.pickListOptions.map(option =>
-				{
-					option.IsDefaultItem = selected.PickList === option.PickList;
-				});
-			}
-			else
-			{
-				self.pickListOptions.map(option =>
-				{
-					option.IsDefaultItem = selected.ID === option.ID;
-				});
-			}
-		}
+		self.setIsDefaultItemBySelected();
 
 		entity["UDFPickListOptions"] = self.pickListOptions;
 		entity["PickListMultiSelect"] = allowMultiple;
@@ -577,6 +560,35 @@
 		});
 		self.kendoGrid.dataSource.data(dataItems);
 		self.obDefaultListString(text);
+	};
+
+	ListUserDefinedFieldViewModel.prototype.onSelectedOptionHandler = function()
+	{
+		this.setIsDefaultItemBySelected();
+	};
+
+	ListUserDefinedFieldViewModel.prototype.setIsDefaultItemBySelected = function()
+	{
+		const self = this;
+		if (!self.obAllowMultiple())
+		{
+			let selected = self.obSelectedOption();
+			if (selected.ID == null)
+			{
+				// new UDF, check based on text.
+				self.pickListOptions.map(option =>
+				{
+					option.IsDefaultItem = selected.PickList === option.PickList;
+				});
+			}
+			else
+			{
+				self.pickListOptions.map(option =>
+				{
+					option.IsDefaultItem = selected.ID === option.ID;
+				});
+			}
+		}
 	};
 
 	/**
