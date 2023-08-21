@@ -1056,6 +1056,11 @@
 			self.drawHighlightStop(data, currentStop, AssignSequence);
 		}
 
+		if (isAllFieldTripsInvisible)
+		{
+			return;
+		}
+
 		// show highlight line
 		let fieldTripStops = null;
 		if (!!currentStop)
