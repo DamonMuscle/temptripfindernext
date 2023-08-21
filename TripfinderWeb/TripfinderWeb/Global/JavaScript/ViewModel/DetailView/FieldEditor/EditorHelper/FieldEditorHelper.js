@@ -1697,7 +1697,7 @@
 	 */
 	FieldEditorHelper.prototype.handleSpecificEventOnEditor = function(editor, isForward, isEnter)
 	{
-		if (editor && isEnter && editor instanceof TF.DetailView.FieldEditor.TextFieldEditor && !$.trim(editor._$element.find("input").val()))
+		if (editor && isEnter && editor instanceof TF.DetailView.FieldEditor.InputFieldEditor && !$.trim(editor._$element.find("input").val()))
 		{
 			// on string field, user click enter can not tab to next when they not type anything
 			return false;
