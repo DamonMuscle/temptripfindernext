@@ -32,7 +32,7 @@
 
 		$content.hide();
 
-		self.initElement($content)
+		return self.initElement($content)
 			.then(() =>
 			{
 				const initialValue = self.getFieldValue();
@@ -66,8 +66,15 @@
 				}
 
 				self._$parent.find("div.editor-icon").css("display", 'none');
+				return Promise.resolve();
 			});
 	};
+
+	ComboBoxFieldEditor.prototype.render = function(options)
+	{
+		const self = this;
+		self._initElement(options).then(() => self._initValidators(options));
+	}
 
 	ComboBoxFieldEditor.prototype.editStart = function($parent, options)
 	{
