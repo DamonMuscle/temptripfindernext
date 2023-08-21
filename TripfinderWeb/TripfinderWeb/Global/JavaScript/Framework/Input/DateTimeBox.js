@@ -573,7 +573,11 @@
 
 		setTimeout(function()
 		{
-			viewModel.$element.eq(0).blur();
+			var element = viewModel.$element.eq(0);
+			if (element.val())
+			{
+				viewModel.$element.eq(0).blur();
+			}
 		});
 	};
 
