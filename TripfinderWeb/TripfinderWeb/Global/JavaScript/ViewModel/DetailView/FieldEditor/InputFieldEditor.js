@@ -29,6 +29,7 @@
 			}
 			else if (keyCode === $.ui.keyCode.ESCAPE)
 			{
+				self._$parent?.removeClass('validateError');
 				self.cancel();
 			}
 		});
