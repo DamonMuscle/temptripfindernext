@@ -1042,9 +1042,10 @@
 		await self.fieldTripHighlightLayerInstance.clearLayer();
 		
 		const { fromFieldTrip, toFieldTrip, previousStop, currentStop, nextStop, AssignSequence } = data;
-		const isFromFieldTripVisible = fromFieldTrip.visible,
+		const isAllFieldTripsInvisible = self.fieldTripsData.map(item => item.visible).every(item => item === false),
+		 	isFromFieldTripVisible = fromFieldTrip.visible,
 			isToFieldTripVisible = toFieldTrip.visible;
-		if (isFromFieldTripVisible || isToFieldTripVisible)
+		if (!isAllFieldTripsInvisible)
 		{
 			// show highlight stop
 			if (!!currentStop)
@@ -1055,50 +1056,47 @@
 			self.drawHighlightStop(data, currentStop, AssignSequence);
 		}
 
-		if (isToFieldTripVisible)
+		// show highlight line
+		let fieldTripStops = null;
+		if (!!currentStop)
 		{
-			// show highlight line
-			let fieldTripStops = null;
-			if (!!currentStop)
-			{
-				fieldTripStops = [previousStop, currentStop, nextStop].filter(item => item);
-			}
-			else
-			{
-				// create stop
-				const highlightStop = self.getHighlightStop();
-				if (highlightStop === null)
-				{
-					return;
-				}
-
-				const midStop = {
-					XCoord: highlightStop.geometry.longitude,
-					YCoord: highlightStop.geometry.latitude,
-					id: 0
-				};
-				fieldTripStops = [previousStop, midStop, nextStop].filter(item => item);
-			}
-
-			const vertex = [],
-				stops = [],
-				DBID = toFieldTrip.DBID,
-				FieldTripId = toFieldTrip.id,
-				Color = toFieldTrip.color;
-			fieldTripStops.forEach(stop =>
-			{
-				const { XCoord, YCoord, id } = stop,
-					attributes = { DBID, FieldTripId, id },
-					graphic = self.fieldTripHighlightStopLayerInstance.createBackgroundStop(XCoord, YCoord, attributes);
-				stops.push(graphic);
-	
-				vertex.push([XCoord, YCoord]);
-			});
-
-			const paths = [vertex];
-			const params = { DBID, FieldTripId, Color };
-			await self.drawHighlightFeatures(params, paths, stops);
+			fieldTripStops = [previousStop, currentStop, nextStop].filter(item => item);
 		}
+		else
+		{
+			// create stop
+			const highlightStop = self.getHighlightStop();
+			if (highlightStop === null)
+			{
+				return;
+			}
+
+			const midStop = {
+				XCoord: highlightStop.geometry.longitude,
+				YCoord: highlightStop.geometry.latitude,
+				id: 0
+			};
+			fieldTripStops = [previousStop, midStop, nextStop].filter(item => item);
+		}
+
+		const vertex = [],
+			stops = [],
+			DBID = toFieldTrip.DBID,
+			FieldTripId = toFieldTrip.id,
+			Color = toFieldTrip.color;
+		fieldTripStops.forEach(stop =>
+		{
+			const { XCoord, YCoord, id } = stop,
+				attributes = { DBID, FieldTripId, id },
+				graphic = self.fieldTripHighlightStopLayerInstance.createBackgroundStop(XCoord, YCoord, attributes);
+			stops.push(graphic);
+
+			vertex.push([XCoord, YCoord]);
+		});
+
+		const paths = [vertex];
+		const params = { DBID, FieldTripId, Color };
+		await self.drawHighlightFeatures(params, paths, stops, isToFieldTripVisible);
 	}
 
 	FieldTripMap.prototype.clearHighlightFeatures = async function()
@@ -1114,7 +1112,7 @@
 		await self.fieldTripHighlightStopLayerInstance.clearLayer();
 	}
 
-	FieldTripMap.prototype.drawHighlightFeatures = async function(data, paths, stops)
+	FieldTripMap.prototype.drawHighlightFeatures = async function(data, paths, stops, isShowHighlightPath)
 	{
 		const self = this;
 		if (!self.fieldTripPathLayerInstance)
@@ -1123,14 +1121,17 @@
 		}
 
 		let highlightGraphics = [];
-		// add highlight sequence line
-		const { DBID, FieldTripId, Color } = data,
-			pathAttributes = { DBID, FieldTripId, Color },
-			basePathGraphic = self.fieldTripPathLayerInstance.createHighlightPath(paths, pathAttributes);
-		highlightGraphics.push(basePathGraphic);
-
-		const topPathGraphic = self.fieldTripPathLayerInstance.createPath(paths, pathAttributes);
-		highlightGraphics.push(topPathGraphic);
+		if (isShowHighlightPath)
+		{
+			// add highlight sequence line
+			const { DBID, FieldTripId, Color } = data,
+				pathAttributes = { DBID, FieldTripId, Color },
+				basePathGraphic = self.fieldTripPathLayerInstance.createHighlightPath(paths, pathAttributes);
+			highlightGraphics.push(basePathGraphic);
+	
+			const topPathGraphic = self.fieldTripPathLayerInstance.createPath(paths, pathAttributes);
+			highlightGraphics.push(topPathGraphic);
+		}
 
 		// add highlight stop
 		highlightGraphics = highlightGraphics.concat(stops);
