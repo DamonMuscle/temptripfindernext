@@ -29,7 +29,18 @@
 			}
 			else if (keyCode === $.ui.keyCode.ESCAPE)
 			{
-				self.cancel();
+				if (!self.obValue() && self.obValue() !== 0)
+				{
+					// to trigger bootstrap validator
+					self._$element.find("input").blur();
+				}
+
+				if (self.obValue() || self.obValue() === 0)
+				{
+					self._$parent?.removeClass('validateError');
+				}
+				self.cancel(); // to hide input text box
+				self.dispose(); // to unbind related events
 			}
 		});
 
