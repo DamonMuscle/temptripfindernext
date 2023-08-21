@@ -218,10 +218,6 @@
 		}
 		self.kendoGrid = self.$gridContainer
 			.kendoGrid({
-				dataSource: {
-					data: self.pickListOptions.slice(),
-					sort: { field: "Name", dir: "asc" }
-				},
 				scrollable: true,
 				sortable: true,
 				columns: self.gridColumns
