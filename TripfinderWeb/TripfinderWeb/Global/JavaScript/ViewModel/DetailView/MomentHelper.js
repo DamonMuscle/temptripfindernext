@@ -91,15 +91,15 @@
 		const minutesInDay = 24 * 60;
 		const minutesInHour = 60;
 
-		let days = Math.floor(mins_num / minutesInDay);
+		let days = mins_num / minutesInDay > 0 ? Math.floor(mins_num / minutesInDay) : Math.ceil(mins_num / minutesInDay);
 		let remainingMinutes = mins_num % minutesInDay;
-		let hours = Math.floor(remainingMinutes / minutesInHour);
+		let hours = remainingMinutes / minutesInHour > 0 ? Math.floor(remainingMinutes / minutesInHour) : Math.ceil(remainingMinutes / minutesInHour);
 		let minutes = remainingMinutes % minutesInHour;
 	
 		// Appends 0 when unit is less than 10
-		if (days    < 10) {days    = "0"+days;}
-		if (hours   < 10) {hours   = "0"+hours;}
-		if (minutes < 10) {minutes = "0"+minutes;}
+		if (Math.abs(days)    < 10) {days    = days    >= 0 ? `0${days}`    : `-0${Math.abs(days)}`;}
+		if (Math.abs(hours)   < 10) {hours   = hours   >= 0 ? `0${hours}`   : `-0${Math.abs(hours)}`;}
+		if (Math.abs(minutes) < 10) {minutes = minutes >= 0 ? `0${minutes}` : `-0${Math.abs(minutes)}`;}
 
 		return [days, hours, minutes];
 	}
