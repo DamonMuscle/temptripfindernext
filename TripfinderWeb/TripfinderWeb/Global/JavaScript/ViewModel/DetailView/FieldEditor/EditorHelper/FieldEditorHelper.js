@@ -507,10 +507,11 @@
 				break;
 			case "Money":
 			case "Number":
-				var decimalPlaces = self._editor.getCurrentPrecisionValue();
+			case "Integer":
+				var decimalPlaces = options.precision ?? 0;
 				value = parseFloat(value).toFixed(decimalPlaces);
 
-				value = isNaN(value) ? null : tf.helpers.detailViewHelper.formatDataContent(value, "Number", format, options.UDFItem || null);
+				value = isNaN(value) ? null : tf.helpers.detailViewHelper.formatDataContent(value, "Number", format, options.UDFItem || null, options.gridDefinition || null);
 				initParams.updateAll = true;
 
 				self._updateGeneralFieldsContent(fieldName, value, initParams);
@@ -654,9 +655,18 @@
 
 		result.UDFId ? self._onUDFEditorApplied(result) : self._onNonUDFEditorApplied(result);
 		var options = {};
+		var column = tf.dataTypeHelper.getGridDefinition(self._detailView.gridType).Columns.find(x => x.FieldName === result.fieldName);
+		if (column)
+		{
+			options['gridDefinition'] = column;
+		}
 		if (result.UDFId)
 		{
 			options['UDFItem'] = tf.UDFDefinition.getUDFById(result.UDFId);
+		}
+		if (editor.getCurrentPrecisionValue)
+		{
+			options['precision'] = editor.getCurrentPrecisionValue();
 		}
 
 		self._updateAllFieldsContent(result.blockName, format, editor._$parent, result.recordValue, result.text, !!result.errorMessages, undefined, options);
