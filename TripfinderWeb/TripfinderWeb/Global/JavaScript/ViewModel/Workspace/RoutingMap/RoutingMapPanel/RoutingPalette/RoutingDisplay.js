@@ -487,7 +487,7 @@
 		routingtreeview.kendoTreeView({
 			template: self.routingDisplayHelper.getTreeViewTemplate(),
 			dataSource: [],
-			dragAndDrop: false,
+			dragAndDrop: true,
 			sortable: true,
 			loadOnDemand: true,
 			animation: {
@@ -510,12 +510,6 @@
 				{
 					self.routingDisplayHelper.toggleLastStopStyle($(e.node).find('.sequence-line'), true);
 				}
-
-				var items = dataItem.children._data.length > 0 ? dataItem.children._data : (dataItem.items.length > 0 ? dataItem.items : (dataItem.children ? dataItem.children.options.data.items : dataItem.items));
-				items = items.filter(function(item)
-				{
-					return item.customData.crossToStop === null || item.customData.crossToStop === undefined;
-				});
 			},
 			collapse: function(e)
 			{
@@ -536,7 +530,8 @@
 			{
 				closeSchoolLocation(e.sourceNode);
 				var customData = e.sender.dataItem($(e.sourceNode)).customData;
-				if (isNullObj(customData) || customData.openType === 'View' || !customData.isStop)
+
+				if (isNullObj(customData) || customData.openType === 'View' || !customData.isStop || customData.isFirst || customData.isLast)
 				{
 					e.preventDefault();
 					return;
@@ -559,9 +554,8 @@
 					dragiconSpan.css('width', '16px');
 				}
 				var targetDataItem = e.sender.dataItem($(e.dropTarget));
-				var source = e.sender.dataItem(e.sourceNode);
 				if (isNullObj(targetDataItem) || !targetDataItem.customData || targetDataItem.customData.openType === 'View'
-					|| (targetDataItem.customData && source.customData && targetDataItem.customData.tripId != source.customData.tripId && source.customData.schoolCode))
+				|| targetDataItem.customData.isFirst || targetDataItem.customData.isLast)
 				{
 					var insertIcon = $('#insertRoutingTripTreeIcon');
 					if (insertIcon.length > 0) insertIcon.remove();
@@ -596,13 +590,16 @@
 						var top = treeViewInsertHint.css('top');
 						var left = treeViewInsertHint.css('left');
 						var img = insertIcon.css('background-image');
-						insertIcon.css('background-image', img.replace(/%3Csvg(.*?)%3C\/svg%3E/, iconSVG));
-						insertIcon.css('position', 'absolute');
-						insertIcon.css('left', (parseInt(left) - 9) + 'px');
-						insertIcon.css('top', (parseInt(top) - 11) + 'px');
-						insertIcon.css('z-index', 10000);
-						insertIcon.css('width', '222px');
-						insertIcon.css('height', '22px');
+
+						insertIcon.css({
+							'background-image': img.replace(/%3Csvg(.*?)%3C\/svg%3E/, iconSVG),
+							'position': 'absolute',
+							'left': `${(parseInt(left) - 9)}px`,
+							'top': `${(parseInt(top) - 11)}px`,
+							'z-index': 10000,
+							'width': '222px',
+							'height': '22px'
+						});
 					}.bind(self, targetDataItem), 0);
 				}
 				else
@@ -626,7 +623,10 @@
 				self.routingDisplayAutoScroll.onEnd(e);
 
 			},
-			drop: self.dropTreeNode.bind(self),
+			drop: function(e)
+			{
+				self.dropTreeNode(e);
+			},
 			dataBound: function(e)
 			{
 				if (self.treeviewDataBoundTimer != null)
@@ -1724,7 +1724,7 @@
 			}
 
 			var trip = self.dataModel.getTripById(nodeData.customData.tripId),
-				isLast = self.isLastStop(tripStopData);
+				isLast = tripStopData.PrimaryDestination;
 			if (tripStopData && tripStopData.TotalStudentCount != null)
 			{
 				nodeData.set('customData.totalStudentCount', tripStopData.TotalStudentCount);
@@ -1911,21 +1911,11 @@
 		return `${(speed ? self.convertToCurrentMeasurementUnit(speed).toLocaleString(undefined, { maximumFractionDigits: 2 }) : 0)} ${(self.isImperialUnit ? "mph" : "kph")}`;
 	}
 
-	/**
-	 * Perhaps, we can check the property PrimaryDestination to determine whether a stop is the terminal stop
-	 * @param {*} trip 
-	 * @param {*} tripStop 
-	 * @returns 
-	 */
-	RoutingDisplay.prototype.isLastStop = function(tripStop)
-	{
-		return tripStop.PrimaryDestination;
-	};
-
 	RoutingDisplay.prototype.newTripStop = function(tripStop, session, tripName)
 	{
 		var self = this,
-			isLast = self.isLastStop(tripStop);
+			isFirst = tripStop.PrimaryDeparture,
+			isLast = tripStop.PrimaryDestination;
 		return {
 			id: tripStop.id,
 			text: tripStop.Street,
@@ -1937,7 +1927,8 @@
 				transToTrans: tripStop.TransToTrans,
 				puTransToSchool: tripStop.PUTransToSchool,
 				doTransToSchool: tripStop.DOTransToSchool,
-				isLast: isLast,
+				isLast,
+				isFirst,
 				duration: TF.RoutingMap.RoutingPalette.RoutingDisplayHelper.durationToString(tripStop.Duration),
 				avgSpeed: self.speedToString(tripStop.Speed),
 				stopTime: tripStop.StopTimeArrive || tripStop.StopTimeDepart,
