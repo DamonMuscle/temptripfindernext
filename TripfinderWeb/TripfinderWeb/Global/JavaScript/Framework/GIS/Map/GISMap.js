@@ -348,7 +348,7 @@
 			self.eventHandler.onMapViewMouseWheel = mapView.on('mouse-wheel', self.settings.eventHandlers.onMapViewMouseWheel);
 		}
 
-		this.defineReadOnlyProperty("fireCustomizedEvent", function ({ eventType, data })
+		this.defineReadOnlyProperty("fireCustomizedEvent", function ({ eventType, data = {} })
 		{
 			if (typeof self.settings.eventHandlers.onMapViewCustomizedEventHandler !== "function")
 			{
