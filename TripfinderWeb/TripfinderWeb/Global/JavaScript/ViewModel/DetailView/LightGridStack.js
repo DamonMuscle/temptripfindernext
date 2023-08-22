@@ -855,7 +855,14 @@
 		var self = this,
 			dataBlockStyles = self.getDataBlockStyles(item),
 			isReadMode = self.detailView.isReadMode(),
-			udfItem = item.UDFId ? self.getUDFItem(item.UDFId) : null;
+			udfItem = item.UDFId ? self.getUDFItem(item.UDFId) : null,
+			gridDefinition = null;
+
+		var column = tf.dataTypeHelper.getGridDefinition(self.detailView.gridType).Columns.find(x => x.FieldName === item.field);
+		if (column)
+		{
+			gridDefinition = column;
+		}
 
 		if (item.UDFId && !self.detailView.userDefinedFieldHelper.isShowInCurrentDataSource(udfItem))
 		{
@@ -924,7 +931,7 @@
 				{
 					item.badgevalue = self.getBadgeValue(item);
 				}
-				content = [undefined, null, ""].includes(content) ? nullAvatar : self.detailViewHelper.formatDataContent(content, item.type, item.format, udfItem);
+				content = [undefined, null, ""].includes(content) ? nullAvatar : self.detailViewHelper.formatDataContent(content, item.type, item.format, udfItem, false, gridDefinition);
 				return new TF.DetailView.DataBlockComponent.GeneralBlock(content, item, dataBlockStyles, self.detailView.isCreateGridNewRecord);
 		}
 	};
@@ -1320,7 +1327,7 @@
 		{
 			case "UDGrid":
 			case "grid":
-				var $grid = $el.find(".kendo-grid-container");	
+				var $grid = $el.find(".kendo-grid-container");
 				if ($grid.length == 0)
 				{
 					$grid = $el.find(".kendo-grid");

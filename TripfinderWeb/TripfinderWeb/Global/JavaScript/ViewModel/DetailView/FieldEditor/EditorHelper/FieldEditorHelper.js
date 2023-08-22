@@ -280,39 +280,44 @@
 
 	};
 
-	FieldEditorHelper.prototype.getNextEditableBlock = function(currentIndex, parentKey, isForward)
+	FieldEditorHelper.prototype.getNextEditableBlock = function(isForward)
 	{
 		var self = this,
 			nextIndex,
-			parentId = parentKey ? Number(parentKey) : 0,
-			tabItemSelector = `[${CUSTOM_TAB_INDEX_ATTR}][parent-grid=${parentId}]`,
 			$container = self._getFieldEditorContainer(),
-			editableBlockCount = $container.find(tabItemSelector).length;
-		//if no seleced editable ele, start from top stackgrid. 
+			editableFields = $container.find(`[${CUSTOM_TAB_INDEX_ATTR}]:visible`).filter((_, item) => $(item).hasClass("editable") || $(item).find(".editable").length > 0),
+			editableBlockCount = editableFields.length,
+			editingFieldElement = self.getEditingFieldElement();
 
+		var currentIndex = editingFieldElement.length == 0 ? undefined : editableFields.index(editingFieldElement);
 		currentIndex = Number(currentIndex);
 
 		if (editableBlockCount == 0) return;
 
 		if (editableBlockCount == 1 && currentIndex == 0) return;
 
-		if (self.isNaN(currentIndex))
-		{
-			nextIndex = isForward ? 0 : editableBlockCount - 1;
-		}
-		else if (isForward)
-		{
-			nextIndex = currentIndex == editableBlockCount - 1 ? 0 : currentIndex + 1;
-		}
-		else
-		{
-			nextIndex = currentIndex == 0 ? editableBlockCount - 1 : currentIndex - 1;
-		}
+		nextIndex = getNextIndex(currentIndex);
+		return editableFields.eq(nextIndex);
 
-		//if there is  not a next, back to the top.
-		return $container.find(`[${CUSTOM_TAB_INDEX_ATTR}=${nextIndex}][parent-grid=${parentId}]`).length > 0 ?
-			$container.find(`[${CUSTOM_TAB_INDEX_ATTR}=${nextIndex}][parent-grid=${parentId}]`) :
-			$container.find(`[${CUSTOM_TAB_INDEX_ATTR}=0][parent-grid=${parentId}]`)
+		function getNextIndex(currIndex)
+		{
+			var nextIdx;
+			if (self.isNaN(currIndex))
+			{
+				nextIdx = isForward ? 0 : editableBlockCount - 1;
+			}
+			else if (isForward)
+			{
+				nextIdx = currIndex == editableBlockCount - 1 ? 0 : currIndex + 1;
+			}
+			else
+			{
+				nextIdx = currIndex == 0 ? editableBlockCount - 1 : currIndex - 1;
+			}
+
+			nextIdx = nextIdx < 0 || nextIdx >= editableBlockCount ? 0 : nextIdx;
+			return nextIdx;
+		}
 	};
 
 	/**
@@ -364,6 +369,8 @@
 	{
 		var self = this;
 		$(document).off(self.eventNameSpace);
+		$(document.body).off(self.eventNameSpace);
+
 		if (!self._detailView) return;
 		$(self._detailView.$element.find(".right-container")).off(self.eventNameSpace);
 
@@ -488,10 +495,11 @@
 				break;
 			case "Money":
 			case "Number":
-				var decimalPlaces = options.precision ?? 0,
-					value = parseFloat(value).toFixed(decimalPlaces);
+			case "Integer":
+				var decimalPlaces = options.precision ?? 0;
+				value = parseFloat(value).toFixed(decimalPlaces);
 
-				value = isNaN(value) ? null : tf.helpers.detailViewHelper.formatDataContent(value, "Number", format, options.UDFItem || null);
+				value = isNaN(value) ? null : tf.helpers.detailViewHelper.formatDataContent(value, "Number", format, options.UDFItem || null, options.gridDefinition || null);
 				initParams.updateAll = true;
 
 				self._updateGeneralFieldsContent(fieldName, value, initParams, options);
@@ -576,6 +584,11 @@
 			return;
 		}
 
+		if (self._editor)
+		{
+			// dispose event initialized last time
+			self._editor.dispose();
+		}
 		self._editor = self._createEditor(options.format);
 		options.editFieldList = self.editFieldList;
 		self._editor.editStart($element, options);
@@ -631,9 +644,18 @@
 
 		result.UDFId ? self._onUDFEditorApplied(result) : self._onNonUDFEditorApplied(result);
 		var options = {};
+		var column = tf.dataTypeHelper.getGridDefinition(self._detailView.gridType).Columns.find(x => x.FieldName === result.fieldName);
+		if (column)
+		{
+			options['gridDefinition'] = column;
+		}
 		if (result.UDFId)
 		{
 			options['UDFItem'] = tf.UDFDefinition.getUDFById(result.UDFId);
+		}
+		if (editor.getCurrentPrecisionValue)
+		{
+			options['precision'] = editor.getCurrentPrecisionValue();
 		}
 
 		self._updateAllFieldsContent(result.blockName, format, editor._$parent, result.recordValue, result.text, !!result.errorMessages, undefined, options);
@@ -1750,19 +1772,25 @@
 	 * @param {boolean} isForward
 	 * @returns
 	 */
-	FieldEditorHelper.prototype._switchToNextEditableBlock = function(isForward)
+	FieldEditorHelper.prototype._switchToNextEditableBlock = function(isForward, isEnter)
 	{
 		var self = this, promise,
 			$currentBlock = self.getEditingFieldElement(),
-			customizedTabIndex = $currentBlock.attr(CUSTOM_TAB_INDEX_ATTR),
-			parentGrid = $currentBlock.attr('parent-grid'),
-			$nextBlock = self.getNextEditableBlock(customizedTabIndex, parentGrid, isForward);
+			editor = self.getBlockEditElement($currentBlock).data("editor");
 
-		if (!$nextBlock) return;
+		if (this._detailView.$element.has("." + TF.DetailView.DetailViewHelper.ExpandClassName).length > 0
+			|| $("div#loadingindicator").is(":visible"))
+		{
+			return Promise.resolve();
+		}
+		if (!self.handleSpecificEventOnEditor(editor, isForward, isEnter))
+		{
+			return Promise.resolve();
+		}
 
-		self.scrollToNextBlock($nextBlock);
+		var $nextBlock = self.getNextEditableBlock(isForward);
+		if (!$nextBlock) return Promise.resolve();
 
-		var editor = self.getBlockEditElement($currentBlock).data("editor");
 		if (editor)
 		{
 			var $element = editor._$element;
@@ -1777,12 +1805,39 @@
 			promise = editor.editStop();
 		}
 
-		Promise.resolve(promise).then(function()
+		self.scrollToNextBlock($nextBlock);
+
+		return Promise.resolve(promise).then(function()
 		{
 			var $nextEditElement = self.getBlockEditElement($nextBlock);
 			self.editStart(null, $nextEditElement, "tab", false, false);
 		});
 	};
+
+	/**
+	 * some editor has specific requirement on tab key event.
+	 */
+	FieldEditorHelper.prototype.handleSpecificEventOnEditor = function(editor, isForward, isEnter)
+	{
+		if (editor && isEnter && editor instanceof TF.DetailView.FieldEditor.InputFieldEditor && !$.trim(editor._$element.find("input").val()))
+		{
+			// on string field, user click enter can not tab to next when they not type anything
+			return false;
+		}
+
+		if (editor && editor instanceof TF.DetailView.FieldEditor.DateFieldEditor && isForward && !isEnter)
+		{
+			// when on date filed editor, show calendar when tab key
+			var editIcon = editor._$parent.find(".editor-icon");
+			if (!editor._getWidget(editIcon).is(":visible"))
+			{
+				editIcon.trigger("click");
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 	/**
 	 * Get edit element in the block.
@@ -1804,22 +1859,19 @@
 	FieldEditorHelper.prototype.scrollToNextBlock = function($nextBlock)
 	{
 		var self = this, $container = self._detailView.$element.find(".right-container"),
-			nextBlockTop = $nextBlock.position().top,
+			nextBlockTop = $nextBlock.offset().top - $container.offset().top,
 			nextBlockHeight = $nextBlock.height(),
 			scrollPosition = $container.scrollTop(),
-			containerHeight = $container.height(),
-			visibleRange = {
-				top: scrollPosition,
-				bottom: scrollPosition + containerHeight
-			};
+			containerHeight = $container.height();
 
-		if (nextBlockTop < visibleRange.top)
+		if (nextBlockTop < 0)
 		{
-			$container.scrollTop(scrollPosition + (nextBlockTop - visibleRange.top));
+			$container.scrollTop(scrollPosition + nextBlockTop);
 		}
-		else if (nextBlockTop + nextBlockHeight > visibleRange.bottom)
+		else if (nextBlockTop + nextBlockHeight > containerHeight)
 		{
-			$container.scrollTop(scrollPosition + (nextBlockTop + nextBlockHeight - visibleRange.bottom));
+			const extraBuffer = 10; // extra buffer help to make the editor fully in view
+			$container.scrollTop(nextBlockTop + nextBlockHeight + scrollPosition + extraBuffer - containerHeight);
 		}
 	};
 
@@ -1970,8 +2022,8 @@
 	 */
 	FieldEditorHelper.prototype._bindKeyDownEvent = function()
 	{
-		var self = this;
-		$(document).on('keydown' + self.eventNameSpace, function(e)
+		var self = this, tabToNextFinished = true;;
+		$(document.body).on('keydown' + self.eventNameSpace, function(e)
 		{
 			if (!self._detailView)
 			{
@@ -1990,19 +2042,65 @@
 
 			if (detailView.$element.is(":visible") &&
 				detailView.isReadMode() &&
-				!self.checkIfDetailViewCoveredByAnotherModal())
+				!self.checkIfDetailViewCoveredByAnotherModal() && tabToNextFinished)
 			{
-				if (keyCode == $.ui.keyCode.TAB)
+				var isEnter = keyCode == $.ui.keyCode.ENTER;
+				if (keyCode == $.ui.keyCode.TAB || isEnter)
 				{
-					e.preventDefault();
-					e.stopPropagation();
+					if (!isEnter)
+					{
+						e.preventDefault();
+						e.stopPropagation();
+					}
+
+					// the page will loose response if press tab key always, so restrict the frequency to make it smoothly.
+					if (self.lastTriggerTime)
+					{
+						var currentTime = (new Date()).getTime()
+						if (currentTime - self.lastTriggerTime <= 150)
+						{
+							e.preventDefault();
+							e.stopPropagation();
+							return;
+						}
+					}
+					self.lastTriggerTime = (new Date()).getTime();
+
 
 					// if ($(".modal .list-mover-field-editor").is(":visible")) return;
 
 					//tab -> move forward
 					//shift + tab -> move back
-					self._switchToNextEditableBlock(!e.shiftKey);
+					tabToNextFinished = false;
+					self._switchToNextEditableBlock(!e.shiftKey, isEnter).then(() =>
+					{
+						tabToNextFinished = true;
+					}).catch(() =>
+					{
+						tabToNextFinished = true;
+					});
 				}
+			}
+
+			if (detailView.isReadMode() && keyCode === $.ui.keyCode.DOWN)
+			{
+				const $currentBlock = self.getEditingFieldElement()
+				const editTypeFormat = $currentBlock.data()?.editType?.format;
+				if ($currentBlock.length > 0 && (editTypeFormat === "DropDown" || editTypeFormat === "BooleanDropDown" || editTypeFormat === "GroupDropDown"))
+				{
+					let $target = $currentBlock.find(".grid-stack-item-content .item-content");
+					let $element = $currentBlock.find(".grid-stack-item-content");
+					if (editTypeFormat === "GroupDropDown")
+					{
+						$target = $currentBlock.find(".editable-field-value");
+						$element = $currentBlock;
+					}
+
+					self.editStart($target, $element, "click", true, false);
+					e.preventDefault();
+					e.stopPropagation();
+				}
+
 			}
 		});
 	};

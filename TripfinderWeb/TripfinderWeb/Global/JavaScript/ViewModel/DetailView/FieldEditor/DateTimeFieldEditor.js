@@ -22,7 +22,7 @@
 	{
 		var self = this;
 		self._$element = $(`<div class="custom-field-input datetime">
-								<!-- ko customInput:{type: "${self.type}",value:obValue,attributes:{class:"form-control",format:"${self.format}",disablePosition:1}} -->
+								<!-- ko customInput:{type: "${self.type}",value:obValue,attributes:{class:"form-control",placeholder:"${self.format.toLocaleLowerCase()}",format:"${self.format}",disablePosition:1}} -->
 								<!-- /ko -->
 							</div>`);
 		ko.applyBindings(self, self._$element[0]);

@@ -615,10 +615,6 @@
 				{
 					//open new grid in viewfinder is use local storage
 					selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey, true);
-					if (!TF.isPhoneDevice)
-					{
-						tf.storageManager.save(self._storageFilterDataKey, selectGridFilterEntityId);
-					}
 					tf.storageManager.delete(self._storageFilterDataKey, true);
 				}
 				else if (self.options.gridLayout)

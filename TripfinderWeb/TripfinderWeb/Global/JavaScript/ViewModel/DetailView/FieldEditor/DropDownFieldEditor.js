@@ -238,6 +238,16 @@
 
 			self._createDropDown(self.dropDownSource, selectedValue);
 		});
+
+		if (TF.isMobileDevice && $(".grid-stack-container").length)
+		{
+			$(".grid-stack-container").on('touchmove' + self._eventNamespace, function(e)
+			{
+				e.preventDefault();
+				e.stopPropagation();
+				return false;
+			});
+		}
 	};
 
 	DropDownFieldEditor.prototype._createDropDown = function(source, selectedValue)
@@ -290,7 +300,7 @@
 			dropDownMenuViewModel.scrollToSelected && dropDownMenuViewModel.scrollToSelected();
 
 			var $content = self.getContentElement();
-			$menu.on("keydown" + self._eventNamespace, function(e)
+			$menu.off(`keydown${self._eventNamespace}`).on(`keydown${self._eventNamespace}`, function(e)
 			{
 				if ($content.css('display') === 'none')
 				{
@@ -306,7 +316,7 @@
 				switch (keyCode)
 				{
 					case $.ui.keyCode.ESCAPE:
-						self.cancel();
+						self.closeWidget();
 						break;
 					case $.ui.keyCode.UP:
 						self.nextActiveItem(true);
@@ -374,18 +384,21 @@
 		var self = this,
 			$content = self.getContentElement();
 
-		$(document).on("click" + self._eventNamespace, function(e)
+		$(document).off(`click${self._eventNamespace}`).on(`click${self._eventNamespace}`, function(e)
 		{
 			if ($content.css('display') === 'none')
 			{
 				return;
 			};
-			//if (self._$menu != null && $.contains(self._$menu[0], e.target)) return;
 
-			self.editStop();
+			// if dropdown list items already shown, it won't trigger dispose
+			if (!self._$menu || self._$menu.has($(e.target)).length === 0)
+			{
+				self.editStop();
+			}
 		});
 
-		self._$parent.on('click' + self._eventNamespace, function(e)
+		self._$parent.off(`click${self._eventNamespace}`).on(`click${self._eventNamespace}`, function(e)
 		{
 			if ($content.css('display') === 'none')
 			{
@@ -487,6 +500,10 @@
 		if (this._contextMenu)
 		{
 			this._contextMenu.$menuContainer.trigger("contextMenuClose");
+			if (TF.isMobileDevice && $(".grid-stack-container").length)
+			{
+				$(".grid-stack-container").off('touchmove' + this._eventNamespace);
+			}
 		}
 	};
 
@@ -579,5 +596,9 @@
 		$(window).off(this._eventNamespace);
 		$(document).off(this._eventNamespace);
 		this._$parent.off(this._eventNamespace);
+		if (TF.isMobileDevice)
+		{
+			$(".grid-stack-container").off('touchmove' + this._eventNamespace);
+		}
 	};
 })();

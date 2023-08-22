@@ -165,18 +165,6 @@
 		self.onEnterPress = new TF.Events.Event();
 		tf.shortCutKeys.bind("enter", function (e, keyCombination) { self.onEnterPress.notify(keyCombination, e); }, self.options.routeState);
 
-		if (self.options.selectable)
-		{
-			tf.shortCutKeys.bind("up", function () { self.moveSelectedIndex(null, -1); }, self.options.routeState);
-			tf.shortCutKeys.bind("down", function () { self.moveSelectedIndex(null, 1); }, self.options.routeState);
-			tf.shortCutKeys.bind("right", function () { self.horizontalMoveScrollBar(false); }, self.options.routeState);
-			tf.shortCutKeys.bind("left", function () { self.horizontalMoveScrollBar(true); }, self.options.routeState);
-			tf.shortCutKeys.bind("ctrl+home", function () { self.moveSelectedIndex(0); }, self.options.routeState);
-			tf.shortCutKeys.bind("ctrl+end", function () { self.moveSelectedIndex(Number.MAX_VALUE); }, self.options.routeState);
-			tf.shortCutKeys.bind("pageup", function () { self.moveSelectedIndex(null, -self.viewPortPageSize); }, self.options.routeState);
-			tf.shortCutKeys.bind("pagedown", function () { self.moveSelectedIndex(null, self.viewPortPageSize); }, self.options.routeState);
-		}
-
 		self.obFilteredRecordCount = ko.observable(0);
 		self.obTotalRecordCount = ko.observable(0);
 		self.obIsScrollAtBottom = ko.observable(false);
@@ -492,7 +480,7 @@
 		})
 			.then(function ()
 			{
-				if ((!this.kendoGrid || !this.kendoGrid.wrapper || !this.kendoGrid.wrapper.data("kendoReorderable")) && !this.options.isMiniGrid) 
+				if ((!this.kendoGrid || !this.kendoGrid.wrapper || !this.kendoGrid.wrapper.data("kendoReorderable")) && !this.options.isMiniGrid)
 				{
 					tf.loadingIndicator.tryHide();
 					return Promise.resolve(false);
@@ -1471,7 +1459,7 @@
 		// handle date special filter
 		const isDateTimeNonParam = TF.FilterHelper.dateTimeNonParamFiltersOperator.includes(kendoFilterCellDomain.viewModel.operator);
 		const isDateTimeDateParam = TF.FilterHelper.dateTimeDateParamFiltersOperator.includes(kendoFilterCellDomain.viewModel.operator);
-		if (isDateTimeNonParam || isDateTimeDateParam) 
+		if (isDateTimeNonParam || isDateTimeDateParam)
 		{
 			const kendoFilterCellDomainField = kendoFilterCellDomain.options.field;
 			const currentlyColumn = hackDomain.options.gridDefinition.Columns.find(function (column) { return column.FieldName === kendoFilterCellDomainField; });
@@ -2824,7 +2812,7 @@
 								{
 									filterCellType = 'empty';
 								}
-								else if (TF.FilterHelper.dateTimeDateParamFiltersNames.indexOf(filter) > -1) 
+								else if (TF.FilterHelper.dateTimeDateParamFiltersNames.indexOf(filter) > -1)
 								{
 									// for avoid the flash the grid
 									filterDateCellInput.attr('reloadfilter', true);
@@ -3929,7 +3917,10 @@
 				});
 				column.locked = lockColumn && lockColumn.length > 0;
 			}
-			self.setColumnFilterableCell(column, definition, "lightKendoGrid");
+			if (JSON.stringify(column.filterable.cell) === '{}')
+			{
+				self.setColumnFilterableCell(column, definition, "lightKendoGrid");
+			}
 			if (definition.AllowFiltering === false)
 			{
 				column.filterable = false;
@@ -4084,7 +4075,7 @@
 	function isPhoneColumn(self, autoCompleteSelectedColumn)
 	{
 
-		const _isSystemFieldPhoneNumber = function (column) 
+		const _isSystemFieldPhoneNumber = function (column)
 		{
 			let fieldConfig = tf.systemFieldsConfig[column.questionFieldOptions?.DataTypeId];
 			if (fieldConfig)
@@ -5052,13 +5043,13 @@
 		var self = this, pageInfoList = [], pageInfo = "", omittedRecordsCount = 0;
 		if (!self.options.showOmittedCount && !self.options.showSelectedCount && self.options.gridTypeInPageInfo === "") { return; }
 
-		if (self.options.showSelectedCount && self.options.selectable) 
+		if (self.options.showSelectedCount && self.options.selectable)
 		{
 			if (!self.isBigGrid && this.kendoGrid && this.kendoGrid.select())
 			{
 				pageInfoList.push($.grep(this.kendoGrid.select(), function (item, index) { return $(item).closest(".k-grid-content-locked").length === 0 }).length + " selected");
 			}
-			if (self.isBigGrid && self.getSelectedIds().length > 0) 
+			if (self.isBigGrid && self.getSelectedIds().length > 0)
 			{
 				pageInfoList.push(self.getSelectedIds().length + " selected");
 			}
@@ -5232,20 +5223,6 @@
 		{
 			this.getSelectedIds(data);
 		}.bind(this));
-	};
-
-	LightKendoGrid.prototype.moveSelectedIndex = function (target, step)
-	{
-		target = target == null ? this.obSelectedIndex() : target;
-		step = step || 0;
-		this.setSelectedIndex(target + step);
-		if (TF.isIE)
-		{
-			setTimeout(this.scrollToSelection.bind(this), 100);
-			return;
-		}
-
-		this.scrollToSelection();
 	};
 
 	LightKendoGrid.prototype.setSelectedIndex = function (value)
@@ -5658,6 +5635,11 @@
 				self.onGridReadCompleted.notify();
 			});
 
+		if (self.options.selectable)
+		{
+			self.shortcutExtender = self.shortcutExtender || new TF.KendoGridNavigator({ grid: self.kendoGrid, tfGrid: self });
+		}
+
 		if (this.lazyloadFields.udf.length > 0)
 		{
 			self.lazyLoadUdf();
@@ -5717,7 +5699,7 @@
 		}
 		else
 		{
-			if (scrollLeft <= 40)	
+			if (scrollLeft <= 40)
 			{
 				scrollLeft = 0;
 			}
@@ -6733,18 +6715,6 @@
 		}
 
 		var routeState = this.options.routeState;
-		if (this.options.selectable)
-		{
-			tf.shortCutKeys.unbind("up", routeState);
-			tf.shortCutKeys.unbind("down", routeState);
-			tf.shortCutKeys.unbind("right", routeState);
-			tf.shortCutKeys.unbind("left", routeState);
-			tf.shortCutKeys.unbind("ctrl+home", routeState);
-			tf.shortCutKeys.unbind("ctrl+end", routeState);
-			tf.shortCutKeys.unbind("pageup", routeState);
-			tf.shortCutKeys.unbind("pagedown", routeState);
-		}
-
 		tf.shortCutKeys.unbind("enter", routeState);
 		tf.shortCutKeys.unbind("ctrl+s", routeState);
 		tf.shortCutKeys.unbind("ctrl+c", routeState);
