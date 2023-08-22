@@ -5,8 +5,8 @@
 	function FieldTripConfigsPage()
 	{
 		var self = this,
-			gridDefinitions = tf.FieldTripGridConfigs.gridDefinitions(),
-			availableGrids = gridDefinitions.filter(def => !def.disabled).map(function(def, idx)
+			gridDefinitions = tf.FieldTripGridConfigs.gridDefinitions().filter(def => !def.disabled),
+			availableGrids = gridDefinitions.map(function(def, idx)
 			{
 				return {
 					key: def.value,
@@ -385,7 +385,7 @@
 	{
 		var def = this.obSelectedDefinition();
 
-		return count + " " + (count <= 1 ? def.singular : def.plural);
+		return count + " " + ((count === 0 || count > 1) ? def.plural : def.singular);
 	};
 
 	FieldTripConfigsPage.prototype._verifyNextTripID = function(nextTripID)
