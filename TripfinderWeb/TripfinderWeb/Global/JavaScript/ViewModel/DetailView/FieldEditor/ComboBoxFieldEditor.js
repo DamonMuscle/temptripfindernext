@@ -84,6 +84,16 @@
 		self.onComboBoxInit = comboBox =>
 		{
 			comboBox.open();
+			$(comboBox.input).off("keydown").on(`keydown${self._eventNamespace}`, (e) =>
+			{
+				const keyCode = e.keyCode || e.which;
+				if ($.ui.keyCode.DOWN === keyCode && !comboBox.popup.visible())
+				{
+					comboBox.open();
+					return;
+				}
+				comboBox._keydown(e);
+			})
 			if (self._$parent)
 			{
 				self._$parent.on(`keydown${self._eventNamespace}`, function(e)
@@ -182,15 +192,19 @@
 
 					self.comboBox = $input.data("kendoComboBox");
 					self.comboBox.ul.addClass("custom_comboxUl");
-					self.comboBox.bind("open", () =>
+					self.comboBox.popup.bind("open", () =>
 					{
 						var $element = self._$parent.find('#comboBoxInputContainer');
 						var itemOffset = $element.offset().top;
 						var comboxHeight = $element.height();
 						var windowHeight = $(window).height();
 						var bottomRestHeight = windowHeight - itemOffset - comboxHeight;
-						self.comboBox.setOptions({ height: Math.max(bottomRestHeight, itemOffset) });
+						var height = Math.max(bottomRestHeight, self.comboBox.options.height);
+						self.comboBox.listView.element.closest(".k-animation-container").height(height + 2);
+						self.comboBox.listView.element.closest(".k-list-container").height(height);
+						self.comboBox.listView.element.closest(".k-list-scroller").height(height);
 					});
+
 					self.onComboBoxInit && self.onComboBoxInit(self.comboBox);
 				});
 		}
