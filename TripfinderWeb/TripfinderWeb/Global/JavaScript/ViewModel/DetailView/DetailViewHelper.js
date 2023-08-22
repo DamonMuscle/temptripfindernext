@@ -1015,7 +1015,7 @@
 	 * @param {String} content
 	 * @return {String}
 	 */
-	DetailViewHelper.prototype.formatDataContent = function(content, type, format, UDFItem)
+	DetailViewHelper.prototype.formatDataContent = function(content, type, format, UDFItem, gridDefinition)
 	{
 		if (content === null || content === undefined)
 		{
@@ -1032,7 +1032,7 @@
 				break;
 			case "Number":
 			case "Currency":
-				content = self.formatNumberContent(content, format, UDFItem);
+				content = self.formatNumberContent(content, format, UDFItem, gridDefinition);
 				break;
 			case "Date":
 				content = moment(content).format("MM/DD/YYYY");
@@ -1077,7 +1077,7 @@
 	 * @param {object} UDFItem
 	 * @returns
 	 */
-	DetailViewHelper.prototype.formatNumberContent = function(content, format, UDFItem)
+	DetailViewHelper.prototype.formatNumberContent = function(content, format, UDFItem, gridDefinition)
 	{
 		var value = parseFloat(content);
 
@@ -1085,7 +1085,7 @@
 
 		if (UDFItem)
 		{
-			var precision = UDFItem.Type === "Currency" ? UDFItem.MaxLength : UDFItem.NumberPrecision;
+			var precision = tf.udgHelper.getPrecisionByType(UDFItem.Type || UDFItem.type, UDFItem);
 			if (_.isNumber(UDFItem.Precision))
 			{
 				precision = UDFItem.Precision;
@@ -1108,18 +1108,25 @@
 				length = dotSplit[1].length;
 			}
 
-			content = value.toFixed(length);
+			content = tf.dataFormatHelper.numberFormatter(value, length);
 		}
 		else if (format === "Money")
 		{
-			content = "$" + value.toFixed(2);
+			content = "$" + tf.dataFormatHelper.numberFormatter(value, 2);
 		}
 		else
 		{
 			var contentNumber = Number(content);
+			var precision = contentNumber.toString().split(".")[1]?.length;
 			if (!isNaN(contentNumber))
 			{
-				content = contentNumber;
+				thousandSeparator = true;
+				// To maintain consistency with the main grid formatting, units of measure supported and years are not formatted
+				if (gridDefinition && (gridDefinition.format === "{0:####}"))
+				{
+					thousandSeparator = false;
+				}
+				content = tf.dataFormatHelper.numberFormatter(contentNumber, _.isNumber(precision) ? precision : 0, thousandSeparator);
 			}
 		}
 
