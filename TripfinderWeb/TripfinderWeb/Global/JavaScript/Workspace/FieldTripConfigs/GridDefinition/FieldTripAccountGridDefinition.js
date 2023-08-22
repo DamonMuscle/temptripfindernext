@@ -12,6 +12,7 @@
 				field: "Code",
 				title: "Code",
 				defaultValue: "",
+				unique: true,
 				type: "string"
 			},
 			{
@@ -21,6 +22,12 @@
 			},
 			{
 				field: "School",
+				defaultValue: null,
+				type: "string",
+				hidden: true
+			},
+			{
+				field: "SchoolName",
 				defaultValue: null,
 				type: "string"
 			},

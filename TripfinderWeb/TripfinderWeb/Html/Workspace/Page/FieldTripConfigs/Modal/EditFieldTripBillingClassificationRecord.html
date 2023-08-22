@@ -1,0 +1,117 @@
+<div class="document-dataentry" data-bind="uiInit:init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="row">
+		<div class="col-xs-24">
+			<h4><strong>Billing Classification Information</strong></h4>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="form-group tf-validate" style="height:56px">
+				<label class="requirestar" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Classification')"></label>
+				<input type="text" name="Classification" class="form-control" data-bind="value:obClassification" maxlength="50" />
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<h4><strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Trip Rates & Cost')"></strong></h4>
+		</div>
+		<div class="col-xs-12">
+			<h4><strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Vehicle Rates & Cost')"></strong></h4>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-6">
+			<div class="form-group tf-validate">
+				<label>Minimum Cost</label>
+				<!-- ko customInput:{type:"Decimal",value:obMinimumCost,attributes:{class:"form-control",name:"minimumCost", maxlength:"9"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+			</div>
+		</div>
+		<div class="col-xs-6">
+			<div class="form-group tf-validate">
+				<label>Fixed Cost</label>
+				<!-- ko customInput:{type:"Decimal",value:obFixedCost,attributes:{class:"form-control",name:"fixedCost", maxlength:"9"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+			</div>
+		</div>
+		<div class="col-xs-6">
+			<div class="form-group tf-validate">
+				<label data-bind="text:`Rate/${tf.measurementUnitConverter.getShortUnits()}`">Rate/km</label>
+				<!-- ko customInput:{type:"Decimal",value:obFuelConsumptionRate,attributes:{class:"form-control",name:"fuelConsumptionRate", maxlength:"9"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+			</div>
+		</div>
+		<div class="col-xs-6">
+			<div class="form-group tf-validate">
+				<label>Fixed Cost</label>
+				<!-- ko customInput:{type:"Decimal",value:obVehFixedCost,attributes:{class:"form-control",name:"vehFixedCost", maxlength:"9"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<h4><strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Driver Rates & Cost')"></strong></h4>
+		</div>
+		<div class="col-xs-12">
+			<h4><strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Bus Aide')+' Rates & Cost'"></strong></h4>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="form-group tf-validate">
+						<label>Rate</label>
+						<!-- ko customInput:{type:"Decimal",value:obDriverRate,attributes:{class:"form-control",name:"driverRate", maxlength:"9"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					</div>
+				</div>
+				<div class="col-xs-12">
+					<div class="form-group tf-validate">
+						<label>Fixed Cost</label>
+						<!-- ko customInput:{type:"Decimal",value:obDriverFixedCost,attributes:{class:"form-control",name:"driverFixedCost", maxlength:"9"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="form-group tf-validate">
+						<label>Overtime Rate</label>
+						<!-- ko customInput:{type:"Decimal",value:obDriverOTRate,attributes:{class:"form-control",name:"driverOTRate", maxlength:"9"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					</div>
+				</div>
+				<div class="col-xs-12">
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-12">
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="form-group tf-validate">
+						<label>Rate</label>
+						<!-- ko customInput:{type:"Decimal",value:obAideRate,attributes:{class:"form-control",name:"aideRate", maxlength:"9"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					</div>
+				</div>
+				<div class="col-xs-12">
+					<div class="form-group tf-validate">
+						<label>Fixed Cost</label>
+						<!-- ko customInput:{type:"Decimal",value:obAideFixedCost,attributes:{class:"form-control",name:"aideFixedCost", maxlength:"9"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="form-group tf-validate">
+						<label>Overtime Rate</label>
+						<!-- ko customInput:{type:"Decimal",value:obAideOTRate,attributes:{class:"form-control",name:"aideOTRate", maxlength:"9"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					</div>
+				</div>
+				<div class="col-xs-12">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+

@@ -1,0 +1,64 @@
+<div class="form document-dataentry field-trip-template-document" data-bind="uiInit: init, afterRender: afterRender">
+	<div class="row">
+		<div class="col-xs-24 description">
+			<pre class="titleNotify"><span>Browse and select the file you would like to upload, select a Classification, and enter a Description.</span></pre>
+		</div>
+	</div>
+
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="form-group tf-validate" style="margin-bottom:0px">
+				<label class="requirestar">Files</label>
+				<div class="input-group">
+					<input style="width:100%;height:22px;" id="uploadedFileInput" name="fileName" required class="form-control"
+						data-bind="value:obDisplayFileName, disable:(true)" />
+					<label style="width:64px;border:none;position:absolute;top:0px;right:0px;z-index:3;" for="inputFile"
+						title="Upload file" data-bind="visible: isNew">
+						<input class="sr-only" type="file" id="inputFile" name="file" multiple="multiple"
+							data-bind="event:{change:onFileChangeEvent}" />
+						<span style="height:21px;width:100%;line-height:22px;border:none;margin-top:-3px"
+							class="btn tf-btn-gray">Browse</span>
+					</label>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="form-group">
+				<div class="form-group tf-validate">
+					<label class="requirestar">Classification</label>
+					<div class="input-group">
+						<div
+							data-bind="typeahead:{source:obClassificationList,format:function(obj){return obj.value;},drowDownShow:true,selectedValue:obSelectedClassification}">
+							<!-- ko customInput:{type:"Select",value:obSelectedClassificationText,attributes:{name:"documentClassificationName",class:"form-control",required:"required"}} -->
+							<!-- /ko -->
+						</div>
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default">
+								<span class="caret"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<label>Description</label>
+				<textarea class="form-control verticalResize" style="height: 68px;resize: none;" name="description" data-bind="value:obDescription"></textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-xs-24">
+			<!-- ko foreach: obAttachedFiles -->
+			<div class="document-file">
+				<span data-bind="text:name"></span>
+				<button class="delete-file" data-bind="click:$parent.deleteFileClick">&times;</button>
+				<div style="clear:both;"></div>
+			</div>
+			<!-- /ko -->
+		</div>
+	</div>
+</div>

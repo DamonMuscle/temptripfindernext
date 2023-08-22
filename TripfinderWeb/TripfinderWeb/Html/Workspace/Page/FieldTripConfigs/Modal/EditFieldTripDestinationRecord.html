@@ -1,0 +1,98 @@
+<div class="form document-dataentry" data-bind="uiInit: init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->  <div class="row">
+		<div class="col-xs-24">
+			<h4><strong>Destination Information</strong></h4>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="form-group tf-validate">
+				<label class="requirestar">Destination</label>
+				<input type="text" name="Name" class="form-control" data-bind="value:obName" maxlength="200" />
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="form-group tf-validate">
+				<label>Street</label>
+				<input type="text" name="street" class="form-control" data-bind="value:obStreet" maxlength="200" />
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class='col-xs-12 '>
+			<div class="form-group tf-validate">
+				<label>City</label>
+				<input type="text" name="city" class="form-control" data-bind="value:obCity" maxlength="100" />
+			</div>
+		</div>
+		<div class='col-xs-6'>
+			<div class="form-group tf-validate">
+				<label>State</label>
+				<input type="text" name="state" class="form-control" data-bind="value:obState" maxlength="2" />
+			</div>
+		</div>
+		<div class='col-xs-6'>
+			<div class="form-group tf-validate">
+				<label>Postal Code</label>
+				<!-- ko customInput:{type:"Number",value:obZip,attributes:{class:"form-control",name:"zip",maxlength:"5"}} --><!-- /ko -->
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="form-group tf-validate">
+				<label>Contact</label>
+				<input type="text" name="contact" class="form-control" data-bind="value:obContact" maxlength="200" />
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="form-group tf-validate">
+				<label>Title</label>
+				<input type="text" name="title" class="form-control" data-bind="value:obTitle" maxlength="100" />
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class='col-xs-12'>
+			<div class="form-group tf-validate">
+				<label>Phone</label>
+				<!-- ko customInput:{type:"Phone",value:obPhone,attributes:{class:"form-control",name:"phone",maxlength:"18"}} --><!-- /ko -->
+			</div>
+		</div>
+		<div class="col-xs-12">
+			<div class="form-group tf-validate">
+				<label>Phone Ext</label>
+				<!-- ko customInput:{type:"Number",value:obPhoneExt,attributes:{class:"form-control",name:"phoneExt",maxlength:"5"}} --><!-- /ko -->
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="form-group tf-validate">
+				<label>Fax</label>
+				<!-- ko customInput:{type:"Phone",value:obFax,attributes:{class:"form-control",name:"fax",maxlength:"18"}} --><!-- /ko -->
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="form-group tf-validate">
+				<label>Email</label>
+				<input type="email" name="email" class="form-control" data-bind="value:obEmail" maxlength="100" />
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="form-group tf-validate">
+				<label>Notes</label>
+				<textarea name="note" class="form-control" data-bind="value:obNotes"></textarea>
+			</div>
+		</div>
+	</div>
+</div>

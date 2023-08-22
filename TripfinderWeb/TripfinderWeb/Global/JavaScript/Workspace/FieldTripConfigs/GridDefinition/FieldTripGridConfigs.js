@@ -12,7 +12,7 @@
 			hasDBID: false,
 			type: "FieldTripHolidays",
 			definition: tf.FieldTripHolidaysGridDefinition.gridDefinition,
-			editorContentTemplate: "Workspace/FieldTripConfigs/Modal/EditFieldTripHolidayRecord",
+			editorContentTemplate: "Workspace/Page/FieldTripConfigs/Modal/EditFieldTripHolidayRecord",
 			editorViewModelType: "EditFieldTripHolidayRecordViewModel"
 		},
 		{
@@ -24,7 +24,7 @@
 			hasDBID: false,
 			type: "FieldTripBlockOuts",
 			definition: tf.FieldTripBlockOutTimesGridDefinition.gridDefinition,
-			editorContentTemplate: "Workspace/FieldTripConfigs/Modal/EditFieldTripBlockOutTimeRecord",
+			editorContentTemplate: "Workspace/Page/FieldTripConfigs/Modal/EditFieldTripBlockOutTimeRecord",
 			editorViewModelType: "EditFieldTripBlockOutTimeRecordViewModel"
 		},
 		{
@@ -36,7 +36,7 @@
 			hasDBID: false,
 			type: "DistrictDepartments",
 			definition: tf.FieldTripDistrictDepartmentGridDefinition.gridDefinition,
-			editorContentTemplate: "Workspace/FieldTripConfigs/Modal/EditFieldTripDistrictDepartmentRecord",
+			editorContentTemplate: "Workspace/Page/FieldTripConfigs/Modal/EditFieldTripDistrictDepartmentRecord",
 			editorViewModelType: "EditFieldTripDistrictDepartmentRecordViewModel"
 		},
 		{
@@ -48,7 +48,7 @@
 			hasDBID: true,
 			type: "FieldTripActivities",
 			definition: tf.FieldTripActivityGridDefinition.gridDefinition,
-			editorContentTemplate: "Workspace/FieldTripConfigs/Modal/EditFieldTripActivityRecord",
+			editorContentTemplate: "Workspace/Page/FieldTripConfigs/Modal/EditFieldTripActivityRecord",
 			editorViewModelType: "EditFieldTripActivityRecordViewModel"
 		},
 		{
@@ -61,7 +61,7 @@
 			relationshipStr: "all",
 			type: "FieldTripAccounts",
 			definition: tf.FieldTripAccountGridDefinition.gridDefinition,
-			editorContentTemplate: "Workspace/FieldTripConfigs/Modal/EditFieldTripAcountRecord",
+			editorContentTemplate: "Workspace/Page/FieldTripConfigs/Modal/EditFieldTripAcountRecord",
 			editorViewModelType: "EditFieldTripAccountRecordViewModel"
 		},
 		{
@@ -73,8 +73,23 @@
 			hasDBID: true,
 			type: "FieldTripBillingClassifications",
 			definition: tf.FieldTripBillingClassificationGridDefinition.gridDefinition,
-			editorContentTemplate: "Workspace/FieldTripConfigs/Modal/EditFieldTripBillingClassificationRecord",
-			editorViewModelType: "EditFieldTripBillingClassificationRecordViewModel"
+			editorContentTemplate: "Workspace/Page/FieldTripConfigs/Modal/EditFieldTripBillingClassificationRecord",
+			editorViewModelType: "EditFieldTripBillingClassificationRecordViewModel",
+			handleResponse: function(items)
+			{
+				if (tf.measurementUnitConverter.isNeedConversion())
+				{
+					const unitColumns = tf.FieldTripBillingClassificationGridDefinition.gridDefinition.Columns.filter(({ UnitOfMeasureSupported }) => UnitOfMeasureSupported);
+					items.forEach(item =>
+					{
+						unitColumns.forEach(column =>
+						{
+							item[column.field] = tf.measurementUnitConverter.handleColumnUnitOfMeasure(item, column);
+						});
+					});
+				}
+				return items;
+			}
 		},
 		{
 			name: "Equipment",
@@ -85,7 +100,7 @@
 			hasDBID: true,
 			type: "FieldTripEquipments",
 			definition: tf.FieldTripEquipmentGridDefinition.gridDefinition,
-			editorContentTemplate: "Workspace/FieldTripConfigs/Modal/EditFieldTripEquipmentRecord",
+			editorContentTemplate: "Workspace/Page/FieldTripConfigs/Modal/EditFieldTripEquipmentRecord",
 			editorViewModelType: "EditFieldTripEquipmentRecordViewModel"
 		},
 		{
@@ -97,7 +112,7 @@
 			hasDBID: true,
 			type: "FieldTripClassifications",
 			definition: tf.FieldTripClassificationGridDefinition.gridDefinition,
-			editorContentTemplate: "Workspace/FieldTripConfigs/Modal/EditFieldTripClassificationRecord",
+			editorContentTemplate: "Workspace/Page/FieldTripConfigs/Modal/EditFieldTripClassificationRecord",
 			editorViewModelType: "EditFieldTripClassificationRecordViewModel"
 		},
 		{
@@ -110,19 +125,41 @@
 			relationshipStr: "all",
 			type: "FieldTripDestinations",
 			definition: tf.FieldTripDestinationGridDefinition.gridDefinition,
-			editorContentTemplate: "Workspace/FieldTripConfigs/Modal/EditFieldTripDestinationRecord",
-			editorViewModelType: "EditFieldTripDestinationRecordViewModel"
+			editorContentTemplate: "Workspace/Page/FieldTripConfigs/Modal/EditFieldTripDestinationRecord",
+			editorViewModelType: "EditFieldTripDestinationRecordViewModel",
+			disabled: true
+		},
+		{
+			name: "Template",
+			singular: "Template",
+			plural: "Templates",
+			value: "tem",
+			hasDBID: true,
+			type: "FieldTripTemplates",
+			definition: tf.fieldTripTemplatesGridDefinition.liteGridDefinition,
+			editorContentTemplate: "Workspace/Page/FieldTripConfigs/Modal/EditFieldTripTemplateRecord",
+			editorViewModelType: "EditFieldTripTemplateRecordViewModel",
+			sizeCss: "modal-dialog-md",
+			apiEndpoint: "FieldTripTemplates",
+			relationshipStr: "FieldTripSchool,FieldTripDepartment,FieldTripActivity,FieldTripDeparture",
+			disabled: true,
+			handleResponse: function(items)
+			{
+				items.sort(function(a, b)
+				{
+					return (a.Name || "").toLowerCase() > (b.Name || "").toLowerCase() ? 1 : -1;
+				});
+
+				return items.map(item => ({
+					...item,
+					FieldTripActivityName: item.FieldTripActivity && item.FieldTripActivity.Name,
+					FieldTripDepartureName: item.FieldTripDeparture && item.FieldTripDeparture.Name,
+					FieldTripDepartmentName: item.FieldTripDepartment && item.FieldTripDepartment.Name,
+					FieldTripSchoolName: item.FieldTripSchool && item.FieldTripSchool.Name,
+					TemplateStatusName: item.TemplateStatus ? "Inactive" : "Active"
+				}));
+			}
 		}
-		// ,
-		// {
-		// 	name: "Field Trip Templates",
-		// 	singular: "Field Trip Template",
-		// 	plural: "Field Trip Templates",
-		// 	value: "tem",
-		// 	noDBID: false,
-		// 	type: "FieldTripInvoiceTemplates",
-		// 	definition: tf.fieldTripTemplatesGridDefinition.gridDefinition()
-		// }
 	];
 
 	function FieldTripGridConfigs()
@@ -131,7 +168,10 @@
 
 	FieldTripGridConfigs.prototype.gridDefinitions = function()
 	{
-		return _FT_CONFIG_METADATAS;
+		return _FT_CONFIG_METADATAS.sort(function(a, b)
+		{
+			return (a.name).toLowerCase() > (b.name).toLowerCase() ? 1 : -1;
+		});;
 	};
 
 	FieldTripGridConfigs.prototype.getConfigMetadataBykey = function(key)

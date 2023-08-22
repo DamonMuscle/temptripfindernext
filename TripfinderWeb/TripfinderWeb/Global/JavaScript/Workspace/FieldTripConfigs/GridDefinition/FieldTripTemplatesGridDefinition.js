@@ -5,6 +5,55 @@
 	{
 	}
 
+	FieldTripTemplatesGridDefinition.prototype.liteGridDefinition = function()
+	{
+		return {
+			Columns: [
+				{
+					field: "Name",
+					title: "Template Name",
+					width: '150px',
+					type: "string",
+				},
+				{
+					field: "FieldTripSchoolName",
+					title: "School",
+					width: '150px',
+					type: "string",
+				},
+				{
+					field: "FieldTripDepartmentName",
+					title: "Department",
+					width: '150px',
+					type: "string",
+				},
+				{
+					field: "FieldTripActivityName",
+					title: "Activity",
+					width: '150px',
+					type: "string",
+				},
+				{
+					field: "FieldTripDepartureName",
+					title: "Departure",
+					width: '150px',
+					type: "string"
+				},
+				{
+					field: "Destination",
+					width: '150px',
+					type: "string",
+				},
+				{
+					field: "TemplateStatusName",
+					title: "Template Status",
+					width: '150px',
+					type: "string",
+				}
+			]
+		};
+	};
+
 	FieldTripTemplatesGridDefinition.prototype.gridDefinition = function()
 	{
 		return {
@@ -120,9 +169,9 @@
 				{
 					field: "EstimatedDistance",
 					title: "Estimated Distance",
-					"UnitOfMeasureSupported": true,
 					width: '150px',
-					type: "number"
+					type: "number",
+					UnitOfMeasureSupported: true,
 				},
 				{
 					field: "EstimatedHours",
@@ -220,11 +269,11 @@
 				{
 					field: "FuelConsumptionRate",
 					title: `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
-					"UnitOfMeasureSupported": true,
-					"UnitOfMeasureReverse": true,
 					width: '150px',
 					type: "number",
-					hidden: true
+					hidden: true,
+					UnitOfMeasureSupported: true,
+					UnitOfMeasureReverse: true,
 				},
 				{
 					field: "FixedCost",

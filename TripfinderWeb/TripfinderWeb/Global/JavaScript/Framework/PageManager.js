@@ -473,6 +473,10 @@
 				pageData = new TF.Page.RequiredFieldPage();
 				templateName = "workspace/page/requiredfield/panel";
 				break;
+			case "fieldtripconfigs":
+				pageData = new TF.Page.FieldTripConfigsPage();
+				templateName = "workspace/page/fieldtripconfigs/panel";
+				break;
 			// case "datalist":
 			// 	pageData = {};
 			// 	templateName = "workspace/page/datalist";

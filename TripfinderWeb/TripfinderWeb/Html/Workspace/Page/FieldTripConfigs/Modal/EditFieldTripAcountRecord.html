@@ -1,0 +1,99 @@
+<div class="form document-dataentry" data-bind="uiInit: init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="row">
+		<div class="col-xs-12">
+			<h4><strong>General Information</strong></h4>
+		</div>
+		<div class="col-xs-12">
+			<h4><strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('School')"></strong></h4>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="form-group tf-validate">
+				<label class="requirestar">Code</label>
+				<input type="text" name="Code" class="form-control" data-bind="value:obEntityDataModel().code" required
+						maxlength="50" />
+			</div>
+		</div>
+		<div class="col-xs-12">
+			<div class="form-group tf-validate">
+				<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('School')"></label>
+				<div class="input-group">
+					<div data-bind="typeahead:{source:obSchool,format:function(obj){return obj.School? obj.Name+ '('+obj.School+')':'None';},drowDownShow:true,selectedValue:obSelectedSchool,notSort:true}">
+						<!-- ko customInput:{type:"Select",value:obSelectedSchoolText,attributes:{class:"form-control",name:"school",placeholder:"None"}} -->
+						<!-- /ko -->
+					</div>
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-default btn-sharp">
+							<span class="caret"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="form-group tf-validate">
+				<label>Description</label>
+				<input type="text" name="Description" class="form-control"
+						data-bind="value:obEntityDataModel().description" />
+			</div>
+		</div>
+		<div class="col-xs-12">
+			<div class="form-group tf-validate">
+				<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Department')"></label>
+				<div class="input-group">
+					<div data-bind="typeahead:{source:obDepartment,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedDepartment,notSort:true}">
+						<!-- ko customInput:{type:"Select",value:obSelectedDepartmentText,attributes:{class:"form-control",name:"department",placeholder:"None"}} -->
+						<!-- /ko -->
+					</div>
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-default btn-sharp">
+							<span class="caret"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-6">
+			<div class="form-group tf-validate">
+				<label>Active From</label>
+				<div class="input-group">
+					<!-- ko customInput:{type:"Date",value:obEntityDataModel().activeFromDate,attributes:{class:"form-control",name:"activeFromDate"}} -->
+					<!-- /ko -->
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-6">
+			<div class="form-group tf-validate">
+				<label>Active To</label>
+				<div class="input-group">
+					<!-- ko customInput:{type:"Date",value:obEntityDataModel().activeToDate,attributes:{class:"form-control",name:"activeToDate"}} -->
+					<!-- /ko -->
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-12">
+			<div class="form-group tf-validate">
+				<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Activity')"></label>
+				<div class="input-group">
+					<div data-bind="typeahead:{source:obFieldTripActivity,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedActivity,notSort:true}">
+						<!-- ko customInput:{type:"Select",value:obSelectedActivityText,attributes:{class:"form-control",name:"fieldTripActivity",placeholder:"None"}} -->
+						<!-- /ko -->
+					</div>
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-default btn-sharp">
+							<span class="caret"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>

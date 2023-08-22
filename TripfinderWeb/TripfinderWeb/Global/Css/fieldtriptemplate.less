@@ -1,0 +1,153 @@
+.document-dataentry.field-trip-template {
+	height: calc(100vh - 200px);
+
+	.checkbox-container {
+		input {
+			top: 20px;
+			cursor: pointer;
+		}
+		label {
+			font-weight: normal;
+			cursor: pointer;
+			padding-top: 18px;
+			padding-left: 3px;
+			font-size: 13px;
+		}
+	}
+
+	.tab {
+		.tab-header {
+			display: flex;
+			> div {
+				display: inline-block;
+				background-color: #ebe9e9;
+				border: 1px solid #ccc;
+				border-right: none;
+				cursor: pointer;
+				text-align: center;
+				flex-basis: 10%;
+				padding: 5px 10px;
+				
+				&.destination {
+					flex-basis: 15%;
+				}
+
+				&.document {
+					flex-basis: 15%;
+				}
+
+				&.tab-placeholder {
+					background: none;
+					border-top: none;
+					border-bottom: 1px solid #ccc;
+					flex-basis: 50%;
+					cursor: pointer;
+					pointer-events: none;
+				}
+
+				&.active {
+					border-bottom: none;
+					background-color: #fff;
+				}
+			}
+		}
+
+		.tab-panel {
+			> div {
+				display: none;
+				padding: 10px;
+				border: 1px solid #ccc;
+				border-top: none;
+				margin-bottom: 20px;
+
+				&:first-child {
+					display: block;
+				}
+			}
+
+			.notes {
+				textarea {
+					height: 300px;
+				}
+			}
+
+			.document,
+			.billing {
+				.header {
+					margin-bottom: 6px;
+					.text {
+						font-weight: bold;
+
+						> span {
+							margin-left: 3px;
+						}
+					}
+
+					.button-bar {
+						display: inline-block;
+						vertical-align: middle;
+						padding-left: 12px;
+
+						div {
+							display: inline-block;
+							opacity: 0.4;
+							width: 16px;
+							height: 16px;
+							margin-right: 5px;
+						}
+
+						.edit {
+							background: url('../../global/img/grid/editor_pencil.png') no-repeat center center;
+							&.enable {
+								opacity: 0.7;
+								cursor: pointer;
+							}
+						}
+
+						.delete {
+							background: url('../../global/img/menu/Delete-Black.png') no-repeat center center;
+							&.enable {
+								opacity: 0.7;
+								cursor: pointer;
+							}
+						}
+
+						.add {
+							cursor: pointer;
+							opacity: 1;
+							background: url('../../global/img/add.png') no-repeat center center;
+						}
+					}
+				}
+			}
+
+			.billing .k-grid-content {
+				height: 266px;
+			}
+
+			.document .k-grid-content {
+				height: 366px;
+			}
+		}
+	}
+	
+	.radio-container {
+		input[type="radio"] {
+			position: relative;
+			cursor: pointer;
+		}
+
+		label {
+			font-weight: normal;
+			cursor: pointer;
+		}
+	}
+
+	.form-group.tf-validate.tf-textarea {
+		height: 79px;
+	}
+}
+
+.document-dataentry.field-trip-template-document {
+	height: 300px;
+}

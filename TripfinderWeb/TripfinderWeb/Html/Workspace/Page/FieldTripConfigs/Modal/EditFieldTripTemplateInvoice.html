@@ -1,0 +1,34 @@
+<div class="form document-dataentry field-trip-template-invoice" data-bind="uiInit:init, afterRender:afterRender">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="form-group tf-validate">
+				<label class="requirestar">Account Name</label>
+				<div class="input-group">
+					<div
+						data-bind="typeahead:{source:obFieldTripAccounts,format:function(obj){return obj.value;},drowDownShow:true,selectedValue:obSelectedAccount,notSort:true},
+						attr:{required:true}">
+						<!-- ko customInput:{type:"Select",value:obSelectedAccountText,attributes:{class:"form-control",name:"account"}} -->
+						<!-- /ko -->
+					</div>
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-default btn-sharp">
+							<span class="caret"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="form-group">
+				<label>Amount</label>
+				<!-- ko customInput:{type:"Number",value:obAmount,attributes:{class:"form-control",name:"amount"}} -->
+				<!-- /ko -->
+			</div>
+		</div>
+	</div>
+</div>

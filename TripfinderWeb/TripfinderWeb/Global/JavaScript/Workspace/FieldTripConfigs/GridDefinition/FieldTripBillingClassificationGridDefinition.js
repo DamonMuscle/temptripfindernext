@@ -1,9 +1,11 @@
 ﻿(function()
 {
 	createNamespace("TF.GridDefinition").FieldTripBillingClassificationGridDefinition = FieldTripBillingClassificationGridDefinition;
+
+	
 	function FieldTripBillingClassificationGridDefinition()
 	{
-
+		
 	}
 
 	FieldTripBillingClassificationGridDefinition.prototype.gridDefinition = {
@@ -18,14 +20,17 @@
 			},
 			{
 				field: "FuelConsumptionRate",
-				title: () => `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
-				"UnitOfMeasureSupported": true,
-				"UnitOfMeasureReverse": true,
+				get title()
+				{
+					return `Rate/(${tf.measurementUnitConverter.isImperial() ? "mi" : "km"})`;
+				},
 				defaultValue: null,
 				type: "number",
 				width: '120px',
 				Precision: 2,
-				format: "{0:0.00}"
+				format: "{0:0.00}",
+				UnitOfMeasureSupported: true,
+				UnitOfMeasureReverse: true,
 			},
 			{
 				field: "FixedCost",

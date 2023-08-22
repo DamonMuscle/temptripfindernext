@@ -1,0 +1,567 @@
+<div class="form document-dataentry field-trip-template" data-bind="uiInit: init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="row">
+		<div class="col-xs-20">
+			<div class="form-group tf-validate">
+				<label class="requirestar">Template Name</label>
+				<input type="text" name="Name" class="form-control" data-bind="value:obTemplateName" maxlength="200" />
+			</div>
+		</div>
+		<div class="col-xs-4">
+			<div class="form-group tf-validate checkbox-container">
+				<input type="checkbox" id="inactive" data-bind="checked:obInactive"/>
+				<label for="inactive">Inactive</label>
+			</div>
+		</div>
+	</div>
+
+	<div class="tab">
+		<div class="tab-header">
+			<div class="main active">Main</div>
+			<div class="destination">Destination</div>
+			<div class="billing">Billing</div>
+			<div class="note">Notes</div>
+			<div class="document">Documents</div>
+			<div class="tab-placeholder"></div>
+		</div>
+		<div class="tab-panel">
+			<div class="main">
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate">
+							<label>Field Trip Name</label>
+							<input type="text" name="fieldtripname" class="form-control" data-bind="value:obFieldTripName" maxlength="200" />
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate">
+							<label>School</label>
+							<div class="input-group">
+								<div data-bind="typeahead:{source:obSchoolList,format:function(obj){return obj.value;},drowDownShow:true,selectedValue:obSelectedSchool}">
+									<!-- ko customInput:{type:"Select",value:obSelectedSchoolText,attributes:{class:"form-control",name:"school",placeholder:"None"}} -->
+									<!-- /ko -->
+								</div>
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-default btn-sharp">
+										<span class="caret"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ko ifnot: isStrictAccountCodes -->
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate">
+							<label>Department</label>
+							<div class="input-group">
+								<div data-bind="typeahead:{source:obDepartmentList,format:function(obj){return obj.value;},drowDownShow:true,selectedValue:obSelectedDepartment}">
+									<!-- ko customInput:{type:"Select",value:obSelectedDepartmentText,attributes:{class:"form-control",name:"department",placeholder:"None"}} --><!-- /ko -->
+								</div>
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-default btn-sharp">
+										<span class="caret"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate">
+							<label>Activity</label>
+							<div class="input-group">
+								<div data-bind="typeahead:{source:obActivityList,format:function(obj){return obj.value;},drowDownShow:true,selectedValue:obSelectedActivity}">
+									<!-- ko customInput:{type:"Select",value:obSelectedActivityText,attributes:{class:"form-control",name:"activity",placeholder:"None"}} --><!-- /ko -->
+								</div>
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-default btn-sharp">
+										<span class="caret"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /ko -->
+
+				<!-- ko if: isStrictAccountCodes -->
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate">
+							<label>Department/Activity</label>
+							<div class="input-group">
+								<div data-bind="typeahead:{source:obFieldTripAccounts,format:function(obj){return obj.value;},drowDownShow:true,selectedValue:obSelectedAccount}">
+									<!-- ko customInput:{type:"Select",value:obSelectedAccountText,attributes:{class:"form-control",name:"account",placeholder:"None"}} --><!-- /ko -->
+								</div>
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-default btn-sharp">
+										<span class="caret"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /ko -->
+
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate">
+							<label>Contact</label>
+							<input type="text" name="fieldtripcontact" class="form-control" data-bind="value:obFieldTripContact" maxlength="200" />
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Phone</label>
+							<!-- ko customInput:{type:"Phone",value:obContactPhone,attributes:{class:"form-control",maxlength:"18"}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Phone Ext</label>
+							<!-- ko customInput:{type:"Integer",value:obContactPhoneExt,attributes:{class:"form-control",maxlength:"10",name:"contactphoneext"}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate">
+							<label>Email</label>
+							<input type="text" name="contactemail" class="form-control" data-tf-input-type="Email" data-bind="value:obContactEmail" maxlength="100" />
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate">
+							<label>Equipment</label>
+							<div class="input-group">
+								<div data-bind="typeahead:{source:obEquipmentList,format:function(obj){return obj.value;},drowDownShow:true,selectedValue:obSelectedEquipment}">
+									<!-- ko customInput:{type:"Select",value:obSelectedEquipmentText,attributes:{class:"form-control",name:"equipment",placeholder:"None"}} --><!-- /ko -->
+								</div>
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-default btn-sharp">
+										<span class="caret"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate">
+							<label>Classification</label>
+							<div class="input-group">
+								<div data-bind="typeahead:{source:obClassificationList,format:function(obj){return obj.value;},drowDownShow:true,selectedValue:obSelectedClassification}">
+									<!-- ko customInput:{type:"Select",value:obSelectedClassificationText,attributes:{class:"form-control",name:"classification",placeholder:"None"}} --><!-- /ko -->
+								</div>
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-default btn-sharp">
+										<span class="caret"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Number of Students</label>
+							<!-- ko customInput:{type:"Integer",value:obNumofStudents,attributes:{class:"form-control",name:"numofStudents",maxlength:"4"}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Number of Adults</label>
+							<!-- ko customInput:{type:"Integer",value:obNumofAdults,attributes:{class:"form-control",name:"numofAdults",maxlength:"4"}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Number of Wheel Chairs</label>
+							<!-- ko customInput:{type:"Integer",value:obNumofWheelChairs,attributes:{class:"form-control",name:"numofWheelChairs",maxlength:"4"}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Number of Vehicles</label>
+							<!-- ko customInput:{type:"Integer",value:obNumofVehicles,attributes:{class:"form-control",name:"numofVehicles",maxlength:"4"}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Estimated Distance</label>
+							<!-- ko customInput:{type:"Decimal",value:obEstimatedDistance,attributes:{class:"form-control",name:"estimatedDistance",maxlength:"9"}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Estimated Cost</label>
+							<!-- ko customInput:{type:"Decimal",value:obEstimatedCost,attributes:{class:"form-control",name:"estimatedCost",maxlength:"9"}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Estimated Hours</label>
+							<!-- ko customInput:{type:"Decimal",value:obEstimatedHours,attributes:{class:"form-control",name:"estimatedHours",maxlength:"9"}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="destination">
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate">
+							<label>Departure</label>
+							<div class="input-group">
+								<div data-bind="typeahead:{source:obDepartureList,format:function(obj){return obj.value;},drowDownShow:true,selectedValue:obSelectedDeparture}">
+									<!-- ko customInput:{type:"Select",value:obSelectedDepartureText,attributes:{class:"form-control",name:"school",placeholder:"None"}} -->
+									<!-- /ko -->
+								</div>
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-default btn-sharp">
+										<span class="caret"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate tf-textarea">
+							<label>Notes</label>
+							<textarea type="text" name="departurenote" class="form-control" data-bind="value:obDepartureNote"></textarea>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate">
+							<label>Destination</label>
+							<div class="input-group">
+								<div data-bind="typeahead:{source:obDestinationList,format:function(obj){return obj.value;},drowDownShow:true,selectedValue:obSelectedDestination}">
+									<!-- ko customInput:{type:"Select",value:obSelectedDestinationText,attributes:{class:"form-control",name:"school",placeholder:"None"}} -->
+									<!-- /ko -->
+								</div>
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-default btn-sharp">
+										<span class="caret"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate">
+							<label>Street</label>
+							<input type="text" name="destinationStreet" class="form-control" data-bind="value:obDestinationStreet,attr:{readonly:isStrictDestination}" />
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate">
+							<label>City</label>
+							<div class="input-group">
+								<div data-bind="typeahead:{source:obDestinationCityList,format:function(obj){return obj.value;},drowDownShow:true}">
+									<!-- ko customInput:{type:"String",value:obDestinationCity,attributes:{class:"form-control",name:"school",placeholder:"None",readonly:isStrictDestination}} -->
+									<!-- /ko -->
+								</div>
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-default btn-sharp" data-bind="attr:{disabled:isStrictDestination}">
+										<span class="caret"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>State</label>
+							<input type="text" name="destinationState" class="form-control" data-bind="value:obDestinationState,attr:{readonly:isStrictDestination}" />
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Zip</label>
+							<div class="input-group">
+								<div data-bind="typeahead:{source:obDestinationZipList,format:function(obj){return obj.value;},drowDownShow:true}">
+									<!-- ko customInput:{type:"String",value:obDestinationZip,attributes:{class:"form-control",name:"school",placeholder:"None",readonly:isStrictDestination}} -->
+									<!-- /ko -->
+								</div>
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-default btn-sharp" data-bind="attr:{disabled:isStrictDestination}">
+										<span class="caret"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate">
+							<label>Contact</label>
+							<input type="text" name="destinationContact" class="form-control" data-bind="value:obDestinationContact,attr:{readonly:isStrictDestination}"/>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate">
+							<label>Title</label>
+							<input type="text" name="destinationTitle" class="form-control" data-bind="value:obDestinationTitle,attr:{readonly:isStrictDestination}"/>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Phone</label>
+							<!-- ko customInput:{type:"Phone",value:obDestinationPhone,attributes:{class:"form-control",maxlength:"18",readonly:isStrictDestination}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Phone Ext</label>
+							<!-- ko customInput:{type:"Integer",value:obDestinationPhoneExt,attributes:{class:"form-control",maxlength:"10",readonly:isStrictDestination}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Fax</label>
+							<!-- ko customInput:{type:"Phone",value:obDestinationFax,attributes:{class:"form-control",maxlength:"18",name:"destinationFax", phonetype:"fax",readonly:isStrictDestination}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Email</label>
+							<input type="text" name="destinationEmail" class="form-control" data-tf-input-type="Email" data-bind="value:obDestinationEmail,attr:{readonly:isStrictDestination}" maxlength="100" />
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate tf-textarea">
+							<label>Notes</label>
+							<textarea class="form-control" data-bind="value:obDestinationNote,attr:{readonly:isStrictDestination}"></textarea>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate tf-textarea">
+							<label>Directions</label>
+							<textarea class="form-control" data-bind="value:obDirections"></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="billing">
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate">
+							<label>Billing Classification</label>
+							<div class="input-group">
+								<div data-bind="typeahead:{source:obBillingClassificationList,format:function(obj){return obj.value;},drowDownShow:true,selectedValue:obSelectedBillingClassification}">
+									<!-- ko customInput:{type:"Select",value:obSelectedBillingClassificationText,attributes:{class:"form-control",name:"billingClassification",placeholder:"None"}} -->
+									<!-- /ko -->
+								</div>
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-default btn-sharp">
+										<span class="caret"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label data-bind="text:`Rate/${tf.measurementUnitConverter.getShortUnits()}`">Rate/km</label>
+							<!-- ko customInput:{type:"Decimal",value:obFuelConsumptionRate,attributes:{class:"form-control",name:"fuelConsumptionRate",maxlength:"9",fixedPrecision:2}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Aide Fixed Cost</label>
+							<!-- ko customInput:{type:"Decimal",value:obAideFixedCost,attributes:{class:"form-control",name:"aideFixedCost",maxlength:"9",fixedPrecision:2}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Trip Fixed Cost</label>
+							<!-- ko customInput:{type:"Decimal",value:obTripFixedCost,attributes:{class:"form-control",name:"tripFixedCost",maxlength:"9",fixedPrecision:2}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Driver Fixed Cost</label>
+							<!-- ko customInput:{type:"Decimal",value:obDriverFixedCost,attributes:{class:"form-control",name:"driverFixedCost",maxlength:"9",fixedPrecision:2}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Minimum Cost</label>
+							<!-- ko customInput:{type:"Decimal",value:obMinimumCost,attributes:{class:"form-control",name:"minimumCost",maxlength:"9",fixedPrecision:2}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Vehicle Fixed Cost</label>
+							<!-- ko customInput:{type:"Decimal",value:obVehFixedCost,attributes:{class:"form-control",name:"vehFixedCost",maxlength:"9",fixedPrecision:2}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Driver Rate</label>
+							<!-- ko customInput:{type:"Decimal",value:obDriverRate,attributes:{class:"form-control",name:"driverRate",maxlength:"9",fixedPrecision:2}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Driver Overtime Rate</label>
+							<!-- ko customInput:{type:"Decimal",value:obDriverOTRate,attributes:{class:"form-control",name:"driverOTRate",maxlength:"9",fixedPrecision:2}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Aide Rate</label>
+							<!-- ko customInput:{type:"Decimal",value:obAideRate,attributes:{class:"form-control",name:"aideRate",maxlength:"9",fixedPrecision:2}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Aide Overtime Rate</label>
+							<!-- ko customInput:{type:"Decimal",value:obAideOTRate,attributes:{class:"form-control",name:"aideOTRate",maxlength:"9",fixedPrecision:2}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group tf-validate tf-textarea">
+							<label>Billing Notes</label>
+							<textarea class="form-control" data-bind="value:obBillingNotes"></textarea>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>Amount Basis</label>
+							<div class="radio-container">
+								<input type="radio" name="amountbasis" id="maxamount" value="0" />
+								<label for="maxamount">Max Amount</label>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="form-group tf-validate">
+							<label>&nbsp;</label>
+							<div class="radio-container">
+								<input type="radio" name="amountbasis" id="percentoftotal" value="1"/>
+								<label for="percentoftotal">Percent of Total</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="header">
+							<span class="text">Invoice Information<span>(<span data-bind="text:obInvoiceCount"></span>)</span></span>
+							<div class="button-bar">
+								<div class="edit" data-bind="css:{enable: obSelectedInvoices().length == 1}, click:onEditInvoice"></div>
+								<div class="delete" data-bind="css:{enable: obSelectedInvoices().length>0}, click:onDeleteInvoice"></div>
+								<div class="add" data-bind="click:onAddInvoice"></div>
+							</div>
+						</div>
+						<div class="kendo-grid grid-container"></div>
+					</div>
+				</div>
+			</div>
+			<div class="notes">
+				<div class="row">
+					<div class="col-xs-24">
+						<div class="form-group">
+							<label>Notes</label>
+							<textarea class="form-control" data-bind="value:obNotes"></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="document">
+				<div class="header">
+					<span class="text">Documents<span>(<span data-bind="text:obDocumentCount"></span>)</span></span>
+					<div class="button-bar">
+						<div class="edit" data-bind="css:{enable: obSelectedDocuments().length == 1}, click:onEditDocument"></div>
+						<div class="delete" data-bind="css:{enable: obSelectedDocuments().length>0}, click:onDeleteDocument"></div>
+						<div class="add" data-bind="click:onAddDocument"></div>
+					</div>
+				</div>
+				<div class="kendo-grid grid-container">
+				</div>
+			</div>
+		</div>
+	</div>
+<div>

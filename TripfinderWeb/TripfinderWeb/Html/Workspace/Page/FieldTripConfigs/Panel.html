@@ -1,0 +1,91 @@
+<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+<!-- /ko -->
+<div class="doc document-dataentry dataentry-container-panel document-grid page-container" data-bind="uiInit:init">
+	<div class="clearafter relative">
+		<div class="container row">
+			<div class="edit-title-group">
+				<div class="edit-title pull-left" style="margin-left:0;">
+					<span>Field Trip Configurations</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="controlpanel-container dataentry-container-init" style="overflow: hidden">
+		<div class="tabstrip-fieldtripconfigs ">
+			<div class="general-options-wrapper">
+				<div class="row">
+					<div class="sub-title">Options</div>
+				</div>
+				<div class="row">
+					<div class='col-xs-8'>
+						<label>Next Field Trip ID</label><div class="nextid textinput"><input data-bind="kendoNumericTextBox:{value:obNextID,format:'0',decimals:0,spinners:false,min:0,max:2147483647}" name="nextID" /></div>
+					</div>
+					<div class='col-xs-8'>
+						<input type="checkbox" id="strictAccount" data-bind="checked: obStrictAccount " /><label for="strictAccount">Strict Account Code Tracking</label>
+					</div>
+					<div class='col-xs-8'>
+						<input type="checkbox" id="respectDepartment" data-bind="checked: obRespectDepartments" /><label for="respectDepartment">Respect Departments</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-8 text-content">
+						Field Trip ID is maintained by Transfinder and is automatically incremented and assigned to each new field trip request.
+					</div>
+					<div class="col-xs-8 text-content">
+						If checked requires all department and activities be mapped to an account code. Account codes can not be typed in.
+					</div>
+					<div class="col-xs-8 text-content">
+						If checked, approvers will be restricted to those with access to the Department on the Field Trip, if one is selected.
+					</div>
+				</div>
+				<div class="row">
+					<div class='col-xs-8'>
+						<label>Request Deadline</label><div class="request textinput"><input data-bind="kendoNumericTextBox:{value:obRequest,format:'0',decimals:0,spinners:false,min:0}" name="request" /></div>
+					</div>
+					<div class='col-xs-8'>
+						<input type="checkbox" id="strictDestinations" data-bind="checked: obStrictDestinations" /><label for="strictDestinations">Strict Destinations</label>
+					</div>
+
+				</div>
+				<div class="row">
+					<div class="col-xs-8 text-content">
+						The deadline for submitting any Field Trip, This is the number of school day(s) prior to the depature date. "School days" consist of days other than holidays and weekends.
+					</div>
+					<div class="col-xs-8 text-content">
+						If checked requires all field trip destinations be selected from a list of known destinations while requesting a new field trip.
+					</div>
+				</div>
+			</div>
+			<div class="email-notification-wrapper">
+				<div class="row">
+					<div class="sub-title">Email Notification</div>
+				</div>
+				<div class="row">
+					<div class='col-xs-8'>
+						<input type="checkbox" id="enableNotifications" data-bind="checked: obEnableNotifications" /><label for="enableNotifications">Enable Notifications</label>
+					</div>
+					<div class='col-xs-8'>
+						<input type="checkbox" id="notifyAllOnDecline" data-bind="checked: obNotifyAllOnDecline" /><label for="notifyAllOnDecline">Notify All on Decline</label>
+					</div>
+				</div>
+			</div>
+			<div class="grid-wrapper">
+				<div class="grid-header">
+					<div class="header-title">
+						<span class="selected-label" data-bind="text:obSelected().label"></span>
+						<span class="icon bottom-caret"></span>
+					</div>
+					<div class="header-add-button" data-bind="click:onAddBtnClick">ADD</div>
+				</div>
+				<div class="kendo-grid grid-container detail-grid"></div>
+			</div>
+		</div>
+	</div>
+	<div class="edit-bottombar">
+		<div class="container">
+			<div class="row">
+				<button type="submit" class="btn tf-btn-black" data-bind="click:onSaveBtnClick">Save</button>
+			</div>
+		</div>
+	</div>
+</div>

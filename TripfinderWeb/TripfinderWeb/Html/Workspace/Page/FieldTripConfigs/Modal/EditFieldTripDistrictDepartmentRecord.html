@@ -1,0 +1,30 @@
+<div class="form document-dataentry" data-bind="uiInit: init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="row">
+		<div class="col-xs-12">
+			<h4><strong>District Department Information</strong></h4>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="form-group tf-validate">
+				<label class="requirestar">Code</label>
+				<input type="text" name="Name" class="form-control" data-bind="value:obCode" maxlength="50" />
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="form-group tf-validate">
+				<label>Description</label>
+				<textarea  name="Description" class="form-control" data-bind="value:obDescription" maxlength="500"></textarea>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+

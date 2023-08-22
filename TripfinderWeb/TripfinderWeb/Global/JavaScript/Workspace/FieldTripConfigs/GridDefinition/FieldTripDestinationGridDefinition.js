@@ -31,13 +31,15 @@
 			{
 				field: "State",
 				defaultValue: "",
-				type: "string"
+				type: "string",
+				width: '120px'
 			},
 			{
 				field: "Zip",
 				title: "Postal Code",
 				defaultValue: "",
-				type: "string"
+				type: "string",
+				width: '120px'
 			},
 			{
 				field: "Notes",
@@ -56,7 +58,8 @@
 				field: "ContactTitle",
 				title: "Title",
 				defaultValue: "",
-				type: "string"
+				type: "string",
+				width: '150px'
 			},
 			{
 				field: "Email",

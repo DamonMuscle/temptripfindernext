@@ -1,0 +1,23 @@
+<div class="form document-dataentry" data-bind="uiInit: init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="row">
+		<div class="col-xs-24">
+			<h4><strong>Classification Information</strong></h4>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="form-group" style="height:56px">
+				<label class="requirestar">Code</label>
+				<input type="text" name="Code" class="form-control" data-bind="value:obCode" required />
+			</div>
+		</div>
+		<div class="col-xs-24">
+			<div class="form-group" style="height:56px">
+				<label>Description</label>
+				<input type="text" name="description" class="form-control" data-bind="value:obDescription" />
+			</div>
+		</div>
+	</div>
+</div>

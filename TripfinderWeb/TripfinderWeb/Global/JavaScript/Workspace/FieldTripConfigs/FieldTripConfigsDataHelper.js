@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.Helper").FieldTripConfigsDataHelper = FieldTripConfigsDataHelper;
 
-	var _FT_NONDBID_SETTING_NAMES = ["EnableNotifications", "NotificationFromEmail", "NotificationFromName", "NotifyAllOnDecline", "ScheduleDaysInAdvance", "StrictAcctCodes", "StrictDest", "URL"];
+	var _FT_NONDBID_SETTING_NAMES = ["EnableNotifications", "NotificationFromEmail", "NotificationFromName", "NotifyAllOnDecline", "ScheduleDaysInAdvance", "StrictAcctCodes", "StrictDest", "URL", "RespectDepartments"];
 	var _FT_DBID_SETTING_NAMES = ["NextTripID"];
 	var _CACHED_HOLIDAY_MAP = null;
 	var _CACHED_BLOCK_TIME = null;
@@ -17,8 +17,6 @@
 
 		tf.datasourceManager.onDatabaseIdSet.subscribe(self.onDatabaseIdSet.bind(self));
 	}
-
-	FieldTripConfigsDataHelper.prototype.constructor = FieldTripConfigsDataHelper;
 
 	// FieldTripConfigsDataHelper.prototype.init = function()
 	// {
@@ -85,6 +83,7 @@
 			apiEndpoint = configType.apiEndpoint,
 			hasDBID = configType.hasDBID,
 			relationshipStr = configType.relationshipStr,
+			handleResponse = configType.handleResponse,
 			options = relationshipStr ? {
 				paramData: {
 					'@relationships': relationshipStr
@@ -96,7 +95,7 @@
 		{
 			if (resp && resp.Items && resp.Items.length)
 			{
-				return resp.Items;
+				return handleResponse ? handleResponse(resp.Items) : resp.Items;
 			}
 
 			return [];
@@ -111,7 +110,7 @@
 			hasDBID = configType.hasDBID,
 			apiUrl = pathCombine(hasDBID ? tf.api.apiPrefix() : tf.api.apiPrefixWithoutDatabase(), apiEndpoint),
 			paramData = configType.relationshipStr ? { "@relationships": configType.relationshipStr } : {};
-
+		recordEntity.Id = 0;
 		return tf.promiseAjax.post(apiUrl, { data: [recordEntity], paramData: paramData })
 			.then(function(resp)
 			{

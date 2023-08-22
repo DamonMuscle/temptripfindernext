@@ -1,0 +1,27 @@
+<div class="form" data-bind="uiInit: init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="row">
+		<div class="col-xs-12">
+			<h4><strong>Block Out Time Information</strong></h4>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-6">
+			<div class="form-group tf-validate">
+				<label>From Time</label>
+				<!-- ko customInput:{type:"Time",value:obFromTimeString,attributes:{class:"form-control",name:"fromTime"}} --><!-- /ko -->
+			</div>
+		</div>
+		<div class="col-xs-6">
+			<div class="form-group tf-validate">
+				<label>To Time</label>
+				<!-- ko customInput:{type:"Time",value:obToTimeString,attributes:{class:"form-control",name:"toTime"}} --><!-- /ko -->
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
