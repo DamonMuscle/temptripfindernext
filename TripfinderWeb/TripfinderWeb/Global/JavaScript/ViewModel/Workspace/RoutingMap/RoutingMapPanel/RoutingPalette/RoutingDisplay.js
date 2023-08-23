@@ -472,16 +472,19 @@
 					dragiconSpan.css('background-image', 'url(../../global/thirdparty/kendo/styles/Default/sprite.png)');
 					dragiconSpan.css('width', '16px');
 				}
-				var targetDataItem = e.sender.dataItem($(e.dropTarget));
+				var targetDataItem = e.sender.dataItem($(e.dropTarget)),
+					status = e.statusClass;
 				if (isNullObj(targetDataItem) || !targetDataItem.customData || targetDataItem.customData.openType === 'View'
-				|| targetDataItem.customData.isFirst || targetDataItem.customData.isLast)
+				|| ["i-insert-up", "i-insert-down"].includes(status))
 				{
+					// "i-insert-up", "i-insert-down" in latest kendo treeview these status rename to "i-insert-top", "i-insert-bottom"
+					// https://docs.telerik.com/kendo-ui/api/javascript/ui/treeview/events/drag
 					var insertIcon = $('#insertRoutingTripTreeIcon');
 					if (insertIcon.length > 0) insertIcon.remove();
 					e.setStatusClass("k-denied");
 					return;
 				}
-				var status = e.statusClass;
+
 				if (targetDataItem.customData.isTrip && status == "i-plus")
 				{
 					var insertIcon = $('#insertRoutingTripTreeIcon');
