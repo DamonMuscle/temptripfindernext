@@ -105,11 +105,31 @@
 
 		self._$element.find("input").on("keydown" + self._eventNamespace + "downOpen", (e) =>
 		{
-			if (!this._getWidget($editorIcon).is(":visible"))
+			var keyCode = e.keyCode || e.which;
+			// use key down to open picker
+			if (keyCode == $.ui.keyCode.DOWN && !this._getWidget($editorIcon).is(":visible"))
 			{
 				$editorIcon.trigger("click");
+				return;
+			}
+
+			if (self.type == "DateTime" && keyCode == $.ui.keyCode.ENTER && self.fromClose)
+			{
+				e.preventDefault();
+				e.stopPropagation();
+				self.fromClose = false;
+				self._$element.find("input").focus();
+				return;
 			}
 		});
+
+		if (self.type == "DateTime")
+		{
+			this.getPicker().bind("close", function(e)
+			{
+				self.fromClose = true;
+			})
+		}
 	};
 
 	DateTimeFieldEditor.prototype._unbindEvents = function()

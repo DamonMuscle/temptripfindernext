@@ -35,9 +35,10 @@
 		TF.DetailView.FieldEditor.DateTimeFieldEditor.prototype._bindEvents.call(this);
 		var dateTimePicker = this.getPicker();
 		const focusClass = "k-state-selected k-state-focused";
+		var input = self._$element.find("input");
 		dateTimePicker.bind("open", function(e)
 		{
-			self._$element.find("input").off("keydown").on("keydown" + self._eventNamespaceDateKey, function(e)
+			input.off("keydown.kendoDateTimePicker").on("keydown" + self._eventNamespaceDateKey, function(e)
 			{
 				var keyCode = e.keyCode || e.which;
 				if (![$.ui.keyCode.UP, $.ui.keyCode.DOWN, $.ui.keyCode.LEFT, $.ui.keyCode.RIGHT, $.ui.keyCode.ENTER].includes(keyCode))
@@ -48,6 +49,7 @@
 					return;
 				}
 
+
 				var widget = self._getWidget(self._$parent.find(".editor-icon")),
 					current = widget.find('.k-state-selected'),
 					tdIndex = current.parent().children().index(current),
@@ -57,15 +59,17 @@
 					weekDayCount = 7,
 					next = null;
 
-					e.preventDefault();
-					e.stopPropagation();
-	
-					if (keyCode == $.ui.keyCode.ENTER && current && current.length > 0)
-					{
-						current.trigger("click");
-						return;
-					}
-				
+				e.preventDefault();
+				e.stopPropagation();
+
+				if (keyCode == $.ui.keyCode.ENTER && current && current.length > 0)
+				{
+					dateTimePicker._change(new Date(current.find("a").attr("title")));
+					dateTimePicker.close();
+					input.focus();
+					return;
+				}
+
 				// find the next date by arrows keys
 				if (keyCode == $.ui.keyCode.UP || keyCode == $.ui.keyCode.DOWN)
 				{
