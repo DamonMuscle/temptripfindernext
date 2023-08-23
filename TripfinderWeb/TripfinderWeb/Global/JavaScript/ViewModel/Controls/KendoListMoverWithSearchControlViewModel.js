@@ -251,6 +251,8 @@
 				{
 					applyGridFilter(result.savedGridFilterDataModel);
 				}
+
+				return result.savedGridFilterDataModel;
 			});
 		}
 
