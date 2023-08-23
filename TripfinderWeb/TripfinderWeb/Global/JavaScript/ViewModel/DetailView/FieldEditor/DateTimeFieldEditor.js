@@ -102,6 +102,14 @@
 			// stop propagation to prevent kendo behavior.
 			e.stopPropagation();
 		});
+
+		self._$element.find("input").on("keydown" + self._eventNamespace + "downOpen", (e) =>
+		{
+			if (!this._getWidget($editorIcon).is(":visible"))
+			{
+				$editorIcon.trigger("click");
+			}
+		});
 	};
 
 	DateTimeFieldEditor.prototype._unbindEvents = function()
@@ -110,6 +118,7 @@
 			$editorIcon = self._$parent.find(".editor-icon");
 		$editorIcon.off(self._eventNamespace);
 		$(document).off(self._eventNamespace);
+		self._$element.find("input").off("keydown" + self._eventNamespace + "downOpen");
 	};
 
 	DateTimeFieldEditor.prototype._getWidget = function(element)
