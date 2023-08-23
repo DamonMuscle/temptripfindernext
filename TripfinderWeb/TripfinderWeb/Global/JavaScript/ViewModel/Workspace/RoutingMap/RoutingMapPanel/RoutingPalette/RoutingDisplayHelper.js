@@ -489,18 +489,23 @@
 		{
 			if (!target.items || target.items.length == 0)
 			{
+				// should not have this scenario in Tripfinder Next
 				return Promise.resolve(0);
 			}
 			else if (isSameTrip)
 			{
-				return Promise.resolve(target.items.length - 1);
+				// the terminal stop cannot be replaced.
+				// a field trip has 3 stops at least, otherwise no stop can be dragging
+				return Promise.resolve(target.items.length - 2);
 			}
 			else
 			{
-				return this.routingDisplay.dataModel.calculateTripStopSequence(destTrip, tripStop).then(function(sequence)
-				{
-					return sequence - 1;
-				});
+				return Promise.resolve(target.items.length - 1);
+				// refine this part when we support smart sequence
+				// return this.routingDisplay.dataModel.calculateTripStopSequence(destTrip, tripStop).then(function(sequence)
+				// {
+				// 	return sequence - 1;
+				// });
 			}
 		}
 		else if (target.customData.isStop)

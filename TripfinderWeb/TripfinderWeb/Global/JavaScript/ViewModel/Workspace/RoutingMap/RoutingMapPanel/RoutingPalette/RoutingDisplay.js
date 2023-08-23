@@ -98,53 +98,53 @@
 		if (insertIcon.length > 0) insertIcon.remove();
 
 		e.preventDefault();
-		var self = this;
+		const self = this,
+			source = e.sender.dataItem(e.sourceNode),
+			destination = e.sender.dataItem(e.destinationNode);
+
 		self.routingDisplayAutoScroll.onEnd();
 		self.viewModel.$element.find("#routingtreeview").removeClass("in-draging-status");
-		var source = e.sender.dataItem(e.sourceNode);
-		var destination = e.sender.dataItem(e.destinationNode);
-		if (!destination || (destination.customData && source.customData && destination.customData.tripId != source.customData.tripId && source.customData.schoolCode))
+
+		if (!destination) return;
+
+		var position = e.dropPosition,
+			currentIndex = source.customData.sequence - 1,
+			destinationFieldTripId = null,
+			sourceTripId = source.customData.tripId;
+
+		if (destination.customData.isTrip && position == "over")
 		{
-			return;
+			// add to a trip
+			destinationFieldTripId = destination.id;
+		}
+		else if (destination.customData.isStop)
+		{
+			destinationFieldTripId = destination.customData.tripId;
 		}
 
-		var position = e.dropPosition;
-		var currentIndex = source.customData.sequence - 1;
+		if (!destinationFieldTripId) return;
 
-		var destTripId = null,
-			sourceTripId = source.customData.tripId;
-		if (destination.customData.isTrip && position == "over") destTripId = destination.id; // add to a trip
-		else if (destination.customData.isStop) destTripId = destination.customData.tripId;
-		if (!destTripId) return;
-
-		var isSameTrip = sourceTripId == destTripId;
-		var tripStop = this.dataModel.getTripStopsByStopIds([source.id])[0];
+		var isSameTrip = sourceTripId == destinationFieldTripId;
+		var tripStop = self.dataModel.getTripStopsByStopIds([source.id])[0];
 		if (isNullObj(tripStop)) return;
 
-		var originalTripId = tripStop.FieldTripId;
-		var executeCoreInsertion = Promise.resolve(true);
+		var originalFieldTripId = tripStop.FieldTripId;
 
-		executeCoreInsertion.then(function(result)
+		var destTrip = self.dataModel.getTripById(destinationFieldTripId);
+		self.routingDisplayHelper.getInsertPosition(position, source, destination, isSameTrip, tripStop, destTrip).then(function(destinationIndex)
 		{
-			if (result)
+			if (destinationIndex == -1 || (isSameTrip && currentIndex == destinationIndex))
 			{
-				var destTrip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == destTripId; });
-				self.routingDisplayHelper.getInsertPosition(position, source, destination, isSameTrip, tripStop, destTrip).then(function(destinationIndex)
-				{
-					if (destinationIndex == -1 || (isSameTrip && currentIndex == destinationIndex))
-					{
-						return;
-					}
-
-					tf.loadingIndicator.show();
-
-					self.deleteNode(tripStop, isSameTrip);
-					self.dataModel.changeStopPosition(tripStop, destTripId, destinationIndex).then(function()
-					{
-						self.afterChangeStopPosition(tripStop, isSameTrip, originalTripId);
-					});
-				});
+				return;
 			}
+
+			tf.loadingIndicator.show();
+
+			self.deleteNode(tripStop, isSameTrip);
+			self.dataModel.changeStopPosition(tripStop, destinationFieldTripId, destinationIndex).then(function()
+			{
+				self.afterChangeStopPosition(tripStop, isSameTrip, originalFieldTripId);
+			});
 		});
 	};
 
@@ -177,87 +177,6 @@
 			tf.loadingIndicator.tryHide();
 		}));
 		return Promise.all(promises);
-	}
-
-	RoutingDisplay.prototype.addMultipleNodes = function(tripStops, trip)
-	{
-		function _arrayMove(arr, old_index, new_index)
-		{
-			if (new_index >= arr.length)
-			{
-				var k = new_index - arr.length + 1;
-				while (k--)
-				{
-					arr.push(undefined);
-				}
-			}
-			arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
-			return arr;
-		}
-
-		var self = this;
-		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(trip.id, 'trip', self.treeview.dataSource);
-		var tripStopNodes;
-		if (self.routingDisplayHelper.checkNodeWasExpanded(tripNode) && tripNode.children._data.length > 0)
-		{
-			tripStopNodes = tripNode.children._data;
-		}
-		else
-		{
-			tripStopNodes = tripNode.children.options.data.items;
-		}
-
-		if (trip.Session != TF.Helper.TripHelper.Sessions.ToSchool)
-		{
-			trip.FieldTripStops.sort(function(a, b) 
-			{
-				return a.Sequence < b.Sequence ? 1 : (a.Sequence > b.Sequence ? -1 : 0);
-			});
-		}
-		else
-		{
-			trip.FieldTripStops.sort(function(a, b) 
-			{
-				return a.Sequence > b.Sequence ? 1 : (a.Sequence < b.Sequence ? -1 : 0);
-			});
-		}
-
-		trip.FieldTripStops.map(function(tripStop)
-		{
-			var oldIndex;
-			var tripStopNode = Enumerable.From(tripStopNodes).FirstOrDefault(null, function(ts, index)
-			{
-				if (isNullObj(ts))
-				{
-					return false;
-				}
-				oldIndex = index;
-				return ts.id == tripStop.id;
-			});
-			if (tripStopNode)
-			{
-				if (tripStopNode.customData.sequence == tripStop.Sequence)
-				{
-					return;
-				}
-				if (self.routingDisplayHelper.checkNodeWasExpanded(tripNode))
-				{
-					self.routingDisplayHelper.resetUnexpandedTreeNodeValue(tripStopNode, tripStop);
-					self.routingDisplayHelper.removeTreeNode(tripStopNode, tripNode);
-					self._insertNode(tripStop, tripStopNode, tripNode, trip, tripStopNodes);
-				}
-				else
-				{
-					_arrayMove(tripStopNodes, oldIndex, tripStop.Sequence - 1);
-					self.routingDisplayHelper.resetUnexpandedTreeNodeValue(tripStopNode, tripStop);
-				}
-			}
-			else
-			{
-				var tripStopTreeView = self.newTripStop(tripStop, trip.Session, trip.Name);
-				self._insertNode(tripStop, tripStopTreeView, tripNode, trip, tripStopNodes);
-			}
-		});
 	}
 
 	RoutingDisplay.prototype._insertNode = function(tripStopData, tripStopNode, tripNode, tripData, tripStopNodes)
@@ -734,7 +653,7 @@
 			}
 		});
 
-		routingtreeview.data("kendoTreeView").templates.dragClue = kendo.template("No. #=data.item.customData.sequence?data.item.customData.sequence:''#, #=data.item.text#<div style='padding-left:20px'>Trip: #=item.customData.tripName?item.customData.tripName:''#, Total Students: #=data.item.customData.totalStudentCount != null ?data.item.customData.totalStudentCount:''#</div>");
+		routingtreeview.data("kendoTreeView").templates.dragClue = kendo.template("No. #=data.item.customData.sequence?data.item.customData.sequence:''#, #=data.item.text#<div style='padding-left:20px'>Trip: #=item.customData.tripName?item.customData.tripName:''#</div>");
 
 		self.isInitial = false;
 	};
