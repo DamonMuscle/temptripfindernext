@@ -12,7 +12,6 @@
 				field: "Code",
 				title: "Code",
 				defaultValue: "",
-				unique: true,
 				type: "string"
 			},
 			{
