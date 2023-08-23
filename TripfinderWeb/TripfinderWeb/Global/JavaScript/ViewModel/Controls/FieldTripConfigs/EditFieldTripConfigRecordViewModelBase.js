@@ -82,15 +82,24 @@
 							var originalValue = dataModel._entityBackup[fieldKey];
 							if (uniqueField.type === "date")
 							{
-								value = self.normalizeDateString(value);
-								if (value === null)
+								if (!value && $field.data("bv.result.notEmpty") === validator.STATUS_INVALID)
 								{
-									return { valid: false, message: " must be valid date" }
+									return { valid: true }; // already validated failed by the notEmpty validator
+								}
+								else
+								{
+									value = self.normalizeDateString(value);
+									if (value === null)
+									{
+										return { valid: false, message: " must be valid date" };
+									}
 								}
 								originalValue = self.normalizeDateString(originalValue);
 							}
+							
+							value = value || "";
 							//if unique value is not changed, no need to check existing record.
-							if ((originalValue && originalValue.trim()) === value.trim())
+							if ((originalValue && originalValue.trim().toLowerCase()) === value.trim().toLowerCase())
 							{
 								return { valid: true };
 							}
