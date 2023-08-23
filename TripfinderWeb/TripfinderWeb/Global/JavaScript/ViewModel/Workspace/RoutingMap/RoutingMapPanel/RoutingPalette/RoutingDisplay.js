@@ -138,12 +138,13 @@
 				return;
 			}
 
-			tf.loadingIndicator.show();
-
-			self.deleteNode(tripStop, isSameTrip);
-			self.dataModel.changeStopPosition(tripStop, destinationFieldTripId, destinationIndex).then(function()
+			tf.loadingIndicator.enhancedShow(() =>
 			{
-				self.afterChangeStopPosition(tripStop, isSameTrip, originalFieldTripId);
+				self.deleteNode(tripStop, isSameTrip);
+				return self.dataModel.changeStopPosition(tripStop, destinationFieldTripId, destinationIndex).then(function()
+				{
+					return self.afterChangeStopPosition(tripStop, isSameTrip, originalFieldTripId);
+				});
 			});
 		});
 	};
@@ -152,29 +153,28 @@
 	{
 		var self = this;
 		var promises = [];
-		var oldTrip = [Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == originalTripId; })];
-		promises.push(self.resetTripInfo(oldTrip, null, true).then(function()
+		var oldTrip = self.dataModel.getTripById(originalTripId);
+		promises.push(self.resetTripInfo([oldTrip], null, true).then(function()
 		{
 			if (!isSameTrip)
 			{
-				self.refreshAllStopNode(oldTrip[0]);
+				self.refreshAllStopNode(oldTrip);
 			}
 		}));
 		self.addNode(tripStop, isSameTrip);
 
 		if (self.dataModel.showImpactDifferenceChart() && !isSameTrip)
 		{
-			self.dataModel.refreshOptimizeSequenceRate(oldTrip[0].id, null, null, true);
+			self.dataModel.refreshOptimizeSequenceRate(oldTrip.id, null, null, true);
 		}
-		var currentTrip = [Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == tripStop.FieldTripId; })];
-		promises.push(self.resetTripInfo(currentTrip, null, true).then(function()
+		var currentTrip = self.dataModel.getTripById(tripStop.FieldTripId);
+		promises.push(self.resetTripInfo([currentTrip], null, true).then(function()
 		{
 			if (self.dataModel.showImpactDifferenceChart())
 			{
-				self.dataModel.refreshOptimizeSequenceRate(currentTrip[0].id, null, null, true);
+				self.dataModel.refreshOptimizeSequenceRate(currentTrip.id, null, null, true);
 			}
-			self.refreshAllStopNode(currentTrip[0]);
-			tf.loadingIndicator.tryHide();
+			self.refreshAllStopNode(currentTrip);
 		}));
 		return Promise.all(promises);
 	}
@@ -236,12 +236,10 @@
 
 	RoutingDisplay.prototype.deleteNode = function(tripStop, isSameTrip)
 	{
-		var total = 0,
-			studentData = [],
-			self = this, newLockStopId, tripStopNodes;
-		var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == tripStop.FieldTripId });
-		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.FieldTripId, 'trip', self.treeview.dataSource);
-		var tripWasExpanded = self.routingDisplayHelper.checkNodeWasExpanded(tripNode);
+		var self = this, tripStopNodes,
+			trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == tripStop.FieldTripId }),
+			tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.FieldTripId, 'trip', self.treeview.dataSource);
+		
 		if (self.routingDisplayHelper.checkNodeWasExpanded(tripNode) && tripNode.children._data.length > 0)
 		{
 			tripStopNodes = tripNode.children._data;
@@ -250,6 +248,7 @@
 		{
 			tripStopNodes = tripNode.children.options.data.items;
 		}
+
 		if (!isSameTrip && tripStop.LockStopTime && tripStopNodes.length > 0)
 		{
 			if (tripStopNodes[0].id != tripStop.id)
@@ -261,14 +260,8 @@
 				self.dataModel.setLockTime(tripStopNodes[1].id, trip.id);
 			}
 		}
-		var deleteElement, deleteNode;
-		tripStopNodes.map(function(oldTripStop)
-		{
-			if (oldTripStop.id == tripStop.id)
-			{
-				deleteNode = oldTripStop;
-			}
-		});
+
+		var deleteNode = tripStopNodes.find((oldTripStop) => oldTripStop.id == tripStop.id);
 		self.routingDisplayHelper.removeTreeNode(deleteNode, tripNode);
 	}
 

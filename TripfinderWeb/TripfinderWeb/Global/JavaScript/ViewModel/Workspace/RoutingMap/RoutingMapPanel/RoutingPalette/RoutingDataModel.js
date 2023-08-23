@@ -1141,8 +1141,7 @@
 		}
 
 		tf.loadingIndicator.showImmediately();
-		var tripIdDictionary = {};
-		var promise = new Promise(function(resolve)
+		return new Promise(function(resolve)
 		{
 			setTimeout(function()
 			{
@@ -1159,8 +1158,6 @@
 				});
 			});
 		});
-
-		return promise;
 	};
 
 	/**

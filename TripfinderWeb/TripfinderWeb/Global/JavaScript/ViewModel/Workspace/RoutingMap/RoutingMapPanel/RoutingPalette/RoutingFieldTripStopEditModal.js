@@ -8,6 +8,7 @@
 	{
 		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.call(this, fieldTripPaletteSectionVM, "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/EditRoutingFieldTripStop");
 
+		this.fieldTripPaletteSectionVM = fieldTripPaletteSectionVM;
 		this.viewModel = fieldTripPaletteSectionVM;
 		this.dataModel = fieldTripPaletteSectionVM.dataModel;
 		this.availableTrips = [];
@@ -377,7 +378,7 @@
 			self.resolve();
 		}).catch(e =>
 		{
-			self.viewModel.display.arcgisError(e.message);
+			self.fieldTripPaletteSectionVM.display.arcgisError(e.message);
 		});
 	};
 
@@ -486,8 +487,8 @@
 		{
 			if (self.obIsSmartAssignment())
 			{
-				// tripStopPromise = self.viewModel.drawTool.NAtool.getSmartAssignment(data, self.availableTrips);
-				// tripStopPromise = self.vrpTool.getSmartAssignment([data], self.availableTrips, self.obIsSmartSequence(), self.viewModel.drawTool);
+				// tripStopPromise = self.fieldTripPaletteSectionVM.drawTool.NAtool.getSmartAssignment(data, self.availableTrips);
+				// tripStopPromise = self.vrpTool.getSmartAssignment([data], self.availableTrips, self.obIsSmartSequence(), self.fieldTripPaletteSectionVM.drawTool);
 			}
 			else
 			{
@@ -517,7 +518,7 @@
 	RoutingFieldTripStopEditModal.prototype.stopCreate = function()
 	{
 		var self = this;
-		self.viewModel.drawTool._clearTempDrawing();
+		self.fieldTripPaletteSectionVM.drawTool._clearTempDrawing();
 		self.reject();
 	};
 
@@ -556,7 +557,7 @@
 			{
 				var tripId = data[0].FieldTripId, targetTripId = self.obSelectedTrip().id;
 				var tripStop = self.data[0];
-				self.viewModel.display.deleteNode(tripStop, !tripChanged);
+				self.fieldTripPaletteSectionVM.display.deleteNode(tripStop, !tripChanged);
 
 				//smart assignment,smart sequence
 				let position = self.obSelectedSequence() - 1;
@@ -564,7 +565,7 @@
 				if (self.obIsSmartAssignment())
 				{
 					const _tripStop = { ...tripStop };
-					const res = await self.viewModel.drawTool.NAtool.getSmartAssignment(_tripStop, self.availableTrips);
+					const res = await self.fieldTripPaletteSectionVM.drawTool.NAtool.getSmartAssignment(_tripStop, self.availableTrips);
 					if (res)
 					{
 						targetTripId = res.FieldTripId;
@@ -579,7 +580,7 @@
 					{
 						_tripStop.FieldTripId = targetTripId;
 					}
-					const res = await self.viewModel.drawTool.NAtool.calculateSmartSequence(_tripStop);
+					const res = await self.fieldTripPaletteSectionVM.drawTool.NAtool.calculateSmartSequence(_tripStop);
 					if (res.sequence != null)
 					{
 						position = res.sequence - 1;
@@ -588,7 +589,7 @@
 
 				return self.dataModel.changeStopPosition(tripStop, targetTripId, position, callZoomToLayers).then(function()
 				{
-					self.viewModel.display.afterChangeStopPosition(tripStop, !tripChanged, tripId);
+					self.fieldTripPaletteSectionVM.display.afterChangeStopPosition(tripStop, !tripChanged, tripId);
 					if (callZoomToLayers)
 					{
 						PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToLayers, self.dataModel.trips);
