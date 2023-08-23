@@ -9,7 +9,7 @@
 	{
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Copy Field Trip");
-		this.sizeCss = "modal-dialog";
+		this.sizeCss = "copy-trip-modal";
 		this.modalClass = "copy-trip-body";
 		this.contentTemplate('workspace/RoutingMap/RoutingMapPanel/RoutingPalette/CopyFieldTrip');
 		this.buttonTemplate('modal/PositiveNegative');
