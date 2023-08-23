@@ -45,9 +45,9 @@
 		self.allTypes = [
 			{ text: "All Data Types", value: "all" },
 			{ text: "Locations", value: "fieldtriplocation" },
+			{ text: "Map Address", value: "mapAddress" },
 			// { text: "Field Trip Stops", value: "" },
 			// { text: "Points of Interest", value: "poolStops" }, //coming soon
-			// { text: "Addresses", value: "mapAddress" }, //coming soon
 		];
 
 		self.obAllTypes = ko.observable(self.allTypes);
@@ -66,6 +66,7 @@
 		self.cardStyle = {
 			"fieldtriplocation": { title: "Locations", color: "#5B548F" },
 			"tripstop": { title: "Field Trip Stops", color: "#C39" },
+			"mapAddress": { title: "Map Address", color: "#ff0000" },
 		};
 		self.obSuggestedResult = ko.observable([]);
 		self.obAllResultsCount = ko.observable(0);
@@ -770,10 +771,10 @@
 		// 	return this.getSuggestedResultByAddressPoint(type, value, count);
 		// }
 
-		// if (type == "mapAddress")
-		// {
-		// 	return this.getSuggestedResultByMapAddress(type, value, count);
-		// }
+		if (type == "mapAddress")
+		{
+			return this.getSuggestedResultByMapAddress(type, value, count);
+		}
 
 		// if (type == "poolStops")
 		// {
@@ -1019,7 +1020,7 @@
 	/**
 	 * Format the UserSearch entities.
 	 * @param {type} entityList
-	 * @returns {void} 
+	 * @returns {void}
 	 */
 	RoutingMapSearch.prototype.userSearchEntitiesFormation = function(entityList)
 	{
@@ -1233,47 +1234,59 @@
 		});
 	};
 
-	RoutingMapSearch.prototype.getSuggestedResultByMapAddress = function(type, value, count)
+	RoutingMapSearch.prototype.getSuggestedResultByMapAddress = async function(type, value, count)
 	{
-		var self = this;
-		var map = self.map;
-		var geoSearch = new TF.RoutingMap.RoutingPalette.GeoSearch(tf.map.ArcGIS, map, false);
-		return geoSearch.suggest(value).then(function(data)
+		const self = this;
+		const style = self.cardStyle[type];
+		const geocodeService = TF.GIS.Analysis.getInstance().geocodeService;
+		const data = await geocodeService.suggestLocationsREST(value);
+		const { addresses, errorMessage } = data;
+		if (errorMessage !== null)
 		{
-			var style = self.cardStyle[type],
-				allData = (data || []),
-				entities = allData.slice(0, count),
-				cards = entities.map(function(item)
-				{
-					var geometry = new tf.map.ArcGIS.Point({
-						x: item.location.x,
-						y: item.location.y,
-						spatialReference: self.map.mapView.spatialReference
-					});
-					return {
-						Id: 0,
-						title: item.address,
-						subtitle: "",
-						type: type,
-						whereQuery: "",
-						imageSrc: undefined,
-						address: item.address,
-						x: item.location.x,
-						y: item.location.y,
-						geometry: geometry,
-						Addr_type: item.attributes.Addr_type
-					};
-				});
+			return Promise.reject(errorMessage);
+		}
+
+		const allData = (addresses || []),
+			entities = allData.slice(0, count),
+			candidates = await Promise.all(entities.map(item=>TF.GIS.Analysis.getInstance().geocodeService.findAddressCandidatesREST(item.text, item.magicKey)))
+			cards = self._generateMapAddressCards(type, candidates).filter(item => item !== null);
+
+		const result = {
+			type: type,
+			title: style.title,
+			color: style.color,
+			count: cards.length,
+			cards: cards,
+			whereQuery: ""
+		};
+		return Promise.resolve(result);
+	};
+
+	RoutingMapSearch.prototype._generateMapAddressCards = function(type, candidates)
+	{
+		return candidates.map(candidate => {
+			const { location, score, attributes, errorMessage } = candidate;
+			if (errorMessage !== null)
+			{
+				return null;
+			}
+
 			return {
+				Id: 0,
+				title: attributes.LongLabel,
+				subtitle: "",
 				type: type,
-				title: style.title,
-				color: style.color,
-				count: allData.length,
-				cards: cards,
-				whereQuery: ""
+				whereQuery: "",
+				imageSrc: undefined,
+				address: attributes.LongLabel,
+				Street: attributes.ShortLabel,
+				City: attributes.City,
+				XCoord: location.x,
+				YCoord: location.y,
+				Addr_type: attributes.Addr_type
 			};
 		});
-	};
+	}
 
 	RoutingMapSearch.prototype.getSuggestedResultByTripStop = function(type, value, count)
 	{
