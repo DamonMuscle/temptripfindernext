@@ -447,6 +447,7 @@
 		self.ArcGisDirections = self._viewModal._arcgis.Directions;
 		self.ArcGisLocator = self._viewModal._arcgis.Locator;
 
+		self.mapInstance = self._viewModal.mapInstance;
 		self.map = self._viewModal._map;
 		self.setPanelConfigs();
 		self.reloadDestinationPanel();

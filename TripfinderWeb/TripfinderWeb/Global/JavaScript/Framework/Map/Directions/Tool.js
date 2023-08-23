@@ -21,6 +21,10 @@
 		self.uTurnPolicy = self.UTurnPolicyEnum.ALLOWED;
 
 		self.stopTool = new TF.RoutingMap.RoutingPalette.StopTool(null, self._map, self._viewModel);
+
+		self.mapInstance = routingMapDocumentViewModel.mapInstance;
+		self.layerManager = new TF.GIS.LayerManager(self.mapInstance);
+
 		self._initialize();
 	}
 
@@ -72,8 +76,6 @@
 
 		self._bindMapEvents();
 		self._bindLayerEvents();
-
-		self._addLayers();
 	};
 
 	Tool.prototype._endDropMode = function()
@@ -167,15 +169,46 @@
 		self._onDropDestinationsChanged.notify(self._onDropMode);
 	};
 
-	Tool.prototype._initLayers = function()
+	Tool.prototype._initLayers = async function()
 	{
 		var self = this;
-		self._stopLayer = new self._arcgis.GraphicsLayer({ 'id': 'directions_stopLayer' });
-		self._stopSequenceLayer = new self._arcgis.GraphicsLayer({ 'id': 'directions_stopSequenceLayer' });
-		self._tripLayer = new self._arcgis.GraphicsLayer({ 'id': 'directions_tripLayer' });
-		self._tripVertexLayer = new self._arcgis.GraphicsLayer({ 'id': 'directions_tripVertexLayer' });
-		self._cursorLayer = new self._arcgis.GraphicsLayer({ 'id': 'directions_cursorLayer' });
-		self._arrowLayer = new self._arcgis.GraphicsLayer({ 'id': 'directions_arrowLayer' });
+		const layerOptions = [{
+			id: "directions_stopLayer",
+			index: 6
+		}, {
+			id: "directions_stopSequenceLayer",
+			index: 7
+		}, {
+			id: "directions_tripLayer",
+			index: 0
+		}, {
+			id: "directions_tripVertexLayer",
+			index: 1
+		}, {
+			id: "directions_cursorLayer",
+			index: 5
+		}, {
+			id: "directions_arrowLayer",
+			index: 2
+		}];
+		const layerInstances = await self.layerManager.createLayerInstances(layerOptions);
+		self.directionStopLayerInstance = layerInstances[0];
+		self._stopLayer = self.directionStopLayerInstance.layer;
+
+		self.directionStopSequenceLayerInstance = layerInstances[1];
+		self._stopSequenceLayer = self.directionStopSequenceLayerInstance.layer;
+
+		self.directionTripLayerInstance = layerInstances[2];
+		self._tripLayer = self.directionTripLayerInstance.layer;
+
+		self.directionTripVertexLayerInstance = layerInstances[3];
+		self._tripVertexLayer = self.directionTripVertexLayerInstance.layer;
+
+		self.directionCursorLayerInstance = layerInstances[4];
+		self._cursorLayer = self.directionCursorLayerInstance.layer;
+
+		self.directionArrowLayerInstance = layerInstances[5];
+		self._arrowLayer = self.directionArrowLayerInstance.layer;
 	};
 
 	Tool.prototype.getLayers = function()
@@ -189,20 +222,6 @@
 		self._map.findLayerById("directions_dragging_ghostLayer"),
 		self._stopLayer,
 		self._stopSequenceLayer].filter(function(c) { return !!c; });
-	};
-
-	Tool.prototype._addLayers = function()
-	{
-		var self = this;
-		if (self._map)
-		{
-			self._map.add(self._tripLayer, 0);
-			self._map.add(self._tripVertexLayer, 1);
-			self._map.add(self._arrowLayer, 2);
-			self._map.add(self._cursorLayer, 5);
-			self._map.add(self._stopLayer, 6);
-			self._map.add(self._stopSequenceLayer, 7);
-		}
 	};
 
 	Tool.prototype._clearLayers = function()
@@ -249,35 +268,15 @@
 	Tool.prototype._removeLayers = function()
 	{
 		var self = this;
-		if (self._tripLayer)
-		{
-			self._map.remove(self._tripLayer);
-			self._tripLayer = null;
-		}
-
-		if (self._stopLayer)
-		{
-			self._map.remove(self._stopLayer);
-			self._stopLayer = null;
-		}
-
-		if (self._tripVertexLayer)
-		{
-			self._map.remove(self._tripVertexLayer);
-			self._tripVertexLayer = null;
-		}
-
-		if (self._stopSequenceLayer)
-		{
-			self._map.remove(self._stopSequenceLayer);
-			self._stopSequenceLayer = null;
-		}
-
-		if (self._cursorLayer)
-		{
-			self._map.remove(self._cursorLayer);
-			self._cursorLayer = null;
-		}
+		const layerInstances = [
+			self.directionStopLayerInstance,
+			self.directionStopSequenceLayerInstance,
+			self.directionTripLayerInstance,
+			self.directionTripVertexLayerInstance,
+			self.directionCursorLayerInstance,
+			self.directionArrowLayerInstance
+		];
+		self.layerManager.removeLayerInstances(layerInstances);
 	};
 
 	Tool.prototype._openDropStopInformationBox = function()
@@ -784,7 +783,10 @@
 			if (!self._tripLayer ||
 				!self._tripLayer.graphics ||
 				!self._tripLayer.graphics.length)
+			{
+				TF.RoutingMap.EsriTool.centerMultipleItem(map, stops);
 				return;
+			}
 
 			TF.RoutingMap.EsriTool.centerSingleItem(map, self._tripLayer.graphics.toArray()[0]);
 		}
