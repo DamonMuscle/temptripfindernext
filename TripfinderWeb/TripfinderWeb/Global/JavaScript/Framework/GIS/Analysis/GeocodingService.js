@@ -305,13 +305,28 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 				success: (response) => {
 					const suggestions = response.suggestions;
 					addresses = suggestions.map(item => {
-						const [country, zip, state, city, street]= item.text.split(",").map(x=>x.trim()).reverse();
-						return { text: item.text, country, zip, state, city, street, magicKey: item.magicKey };
+						const values = item.text.split(",");
+						if (values.length === 5)
+						{
+							const [country, zip, state, city, street]= values.map(x=>x.trim()).reverse();
+							return { text: item.text, country, zip, state, city, street, magicKey: item.magicKey };
+						}
+						else
+						{
+							return { text: item.text, magicKey: item.magicKey };
+						}
 					}).filter((item) => {
-						const zipShouldBeDigits = /^[\d]+$/;
-						return zipShouldBeDigits.test(item.zip) && item.street != null;
+						if (item.zip)
+						{
+							const zipShouldBeDigits = /^[\d]+$/;
+							return item.zip && zipShouldBeDigits.test(item.zip) && item.street != null;
+						}
+						else
+						{
+							return item;
+						}
 					});
-	
+
 					resolve( { addresses, errorMessage });
 				}
 			});
