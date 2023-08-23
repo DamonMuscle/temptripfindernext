@@ -46,8 +46,8 @@
 			{ text: "All Data Types", value: "all" },
 			{ text: "Locations", value: "fieldtriplocation" },
 			{ text: "Map Address", value: "mapAddress" },
+			{ text: "Point of Interest", value: "poi" },
 			// { text: "Field Trip Stops", value: "" },
-			// { text: "Points of Interest", value: "poolStops" }, //coming soon
 		];
 
 		self.obAllTypes = ko.observable(self.allTypes);
@@ -67,6 +67,7 @@
 			"fieldtriplocation": { title: "Locations", color: "#5B548F" },
 			"tripstop": { title: "Field Trip Stops", color: "#C39" },
 			"mapAddress": { title: "Map Address", color: "#ff0000" },
+			"poi": { title: "Point of Interest", color: "#DA534F" },
 		};
 		self.obSuggestedResult = ko.observable([]);
 		self.obAllResultsCount = ko.observable(0);
@@ -771,9 +772,14 @@
 		// 	return this.getSuggestedResultByAddressPoint(type, value, count);
 		// }
 
-		if (type == "mapAddress")
+		if (type === "mapAddress")
 		{
 			return this.getSuggestedResultByMapAddress(type, value, count);
+		}
+
+		if (type === "poi")
+		{
+			return this.getSuggestedResultByPOIs(type, value, count);
 		}
 
 		// if (type == "poolStops")
@@ -1286,6 +1292,66 @@
 				Addr_type: attributes.Addr_type
 			};
 		});
+	}
+
+	RoutingMapSearch.prototype.getSuggestedResultByPOIs = async function(type, value, count)
+	{
+		const self = this,
+			style = self.cardStyle[type],
+			mapCenterPoint = self._getMapCenterPoint(),
+			fetchPOICount = self._getMaximumFetchPOICount(),
+			distanceOfMeters = self._getMaximumFetchPOIDistance(),
+			categoryIds = null,
+			searchExtent = null,
+			placeService = TF.GIS.Analysis.getInstance().placeService;
+
+		const { results, errorMessage } = await placeService.findPlaces(mapCenterPoint, value, categoryIds, distanceOfMeters, searchExtent, fetchPOICount);
+		if (errorMessage !== null)
+		{
+			return Promise.reject(errorMessage);
+		}
+
+		const cards = results.map(item => {
+			return {
+				Id: 0,
+				title: item.name,
+				subtitle: "",
+				type: type,
+				address: item.name,
+				Street: item.name,
+				City: null,
+				XCoord: item.location.longitude,
+				YCoord: item.location.latitude,
+				Addr_type: null
+			};
+		});
+
+		const result = {
+			type: type,
+			title: style.title,
+			color: style.color,
+			count: cards.length,
+			cards: cards,
+			whereQuery: ""
+		};
+		return Promise.resolve(result);
+	}
+
+	RoutingMapSearch.prototype._getMaximumFetchPOIDistance = function()
+	{
+		// TODO: read this value from configuration
+		return 5000;
+	}
+
+	RoutingMapSearch.prototype._getMaximumFetchPOICount = function()
+	{
+		// TODO: read this value from configuration
+		return 20;
+	}
+
+	RoutingMapSearch.prototype._getMapCenterPoint = function()
+	{
+		return this.map.mapView.center;
 	}
 
 	RoutingMapSearch.prototype.getSuggestedResultByTripStop = function(type, value, count)

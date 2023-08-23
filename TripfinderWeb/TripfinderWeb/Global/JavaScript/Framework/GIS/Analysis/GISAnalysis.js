@@ -51,6 +51,16 @@
 		configurable: false
 	});
 
+	Object.defineProperty(Analysis.prototype, 'placeService', {
+		get() { return this._placeService; },
+		set(value)
+		{
+			this._placeService = value;
+		},
+		enumerable: false,
+		configurable: false
+	});
+
 	Analysis.prototype.setMode = function(mode = "online")
 	{
 		if (!["online", "server"].includes(mode)) {
@@ -80,6 +90,7 @@
 			AnalysisInstance = new TF.GIS.Analysis(options);
 			AnalysisInstance.geocodeService = new TF.GIS.Analysis.GeocodingService(AnalysisInstance.settings);
 			AnalysisInstance.networkService = new TF.GIS.Analysis.NetworkService(AnalysisInstance.settings);
+			AnalysisInstance.placeService = new TF.GIS.Analysis.PlaceService(AnalysisInstance.settings);
 		}
 
 		return AnalysisInstance;
