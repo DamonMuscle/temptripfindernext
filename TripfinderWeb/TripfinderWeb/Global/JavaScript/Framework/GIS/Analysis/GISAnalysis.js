@@ -5,15 +5,13 @@
 	var AnalysisInstance = null;
 
 	const defaultOptions = {
-		mode: "online",
-		onlineVersion: "4.18",
+		mode: "online"
 	};
 
 	function Analysis(options)
 	{
 		this.settings = Object.assign({}, defaultOptions, options);
 		this._mode = this.settings.mode;
-		this._onlineVersion = this.settings.onlineVersion;
 		this.name = `Analysis - ${Date.now()}`;
 	}
 
@@ -21,12 +19,6 @@
 
 	Object.defineProperty(Analysis.prototype, 'mode', {
 		get() { return this._mode; },
-		enumerable: false,
-		configurable: false
-	});
-
-	Object.defineProperty(Analysis.prototype, 'onlineVersion', {
-		get() { return this._onlineVersion; },
 		enumerable: false,
 		configurable: false
 	});
@@ -72,14 +64,9 @@
 		this.geocodeService.setMode(mode);
 	}
 
-	Analysis.prototype.setOnlineVersion = function(version = "4.18")
-	{
-		this.onlineVersion = version;
-	}
-
 	Analysis.prototype.showDebugInfo = function()
 	{
-		console.log(`Analysis Information: ${this.mode}, ${this.onlineVersion}, ${this.name}`);
+		console.log(`Analysis Information: ${this.mode}, ${this.name}`);
 
 		this.geocodeService.showDebugInfo();
 	}
