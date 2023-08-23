@@ -286,6 +286,9 @@
 		verifyNextTripIDPromise = nextTripIDChanged ? self._verifyNextTripID(newNextTripID) : Promise.resolve(null);
 		verifyNextTripIDPromise.then(function(errMsg)
 		{
+			return errMsg || self._verifyRequestDeadline(self.obRequest());
+		}).then(function(errMsg)
+		{
 			self.pageLevelViewModel.clearError();
 
 			if (!!errMsg)
@@ -387,6 +390,15 @@
 
 		return count + " " + ((count === 0 || count > 1) ? def.plural : def.singular);
 	};
+
+	FieldTripConfigsPage.prototype._verifyRequestDeadline = function(value)
+	{
+		if (value === null || value === undefined || isNaN(value) || value < 0)
+		{
+			return "The Request Deadline must be a non-negative number.";
+		}
+		return "";
+	}
 
 	FieldTripConfigsPage.prototype._verifyNextTripID = function(nextTripID)
 	{
