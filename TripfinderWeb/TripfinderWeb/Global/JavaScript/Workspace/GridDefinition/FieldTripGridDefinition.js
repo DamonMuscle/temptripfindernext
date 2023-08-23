@@ -569,7 +569,7 @@
 			DisplayName: "Last Updated Date",
 			Width: '150px',
 			dbType: "datetime",
-			type: "datetime",
+			type: "date",
 			template: function(item)
 			{
 				let dt = utcToClientTimeZone(item["LastUpdated"]);

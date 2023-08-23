@@ -885,7 +885,14 @@
 							item[define.FieldName] = new Date(item[define.FieldName]);
 							break;
 						case "date":
-							item[define.FieldName] = moment(moment(new Date(item[define.FieldName])).format("L")).toDate();
+							if (define.dbType === "datetime")
+							{
+								item[define.FieldName] = new Date(item[define.FieldName]);
+							}
+							else
+							{
+								item[define.FieldName] = moment(moment(new Date(item[define.FieldName])).format("L")).toDate();
+							}
 							break;
 						case "time":
 							let time = item[define.FieldName];
