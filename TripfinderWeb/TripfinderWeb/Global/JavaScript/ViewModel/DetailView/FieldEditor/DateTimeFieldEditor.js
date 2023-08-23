@@ -102,6 +102,31 @@
 			// stop propagation to prevent kendo behavior.
 			e.stopPropagation();
 		});
+
+		self._$element.find("input").on("keydown" + self._eventNamespace + "downOpen", (e) =>
+		{
+			var keyCode = e.keyCode || e.which;
+			// use key down to open picker
+			if (keyCode == $.ui.keyCode.DOWN && !this._getWidget($editorIcon).is(":visible"))
+			{
+				$editorIcon.trigger("click");
+				return;
+			}
+
+			if (keyCode == $.ui.keyCode.ENTER && self.fromClose)
+			{
+				e.preventDefault();
+				e.stopPropagation();
+				self.fromClose = false;
+				self._$element.find("input").focus();
+				return;
+			}
+		});
+
+		this.getPicker().bind("close", function(e)
+		{
+			self.fromClose = true;
+		})
 	};
 
 	DateTimeFieldEditor.prototype._unbindEvents = function()
@@ -110,6 +135,7 @@
 			$editorIcon = self._$parent.find(".editor-icon");
 		$editorIcon.off(self._eventNamespace);
 		$(document).off(self._eventNamespace);
+		self._$element.find("input").off("keydown" + self._eventNamespace + "downOpen");
 	};
 
 	DateTimeFieldEditor.prototype._getWidget = function(element)

@@ -1667,11 +1667,11 @@
 			editor = self.getBlockEditElement($currentBlock).data("editor");
 
 		if (this._detailView.$element.has("." + TF.DetailView.DetailViewHelper.ExpandClassName).length > 0
-			|| $("div#loadingindicator").is(":visible"))
+			|| $("div#loadingindicator").is(":visible") || ($(".k-calendar-container").is(":visible") && isEnter))
 		{
 			return Promise.resolve();
 		}
-		if (!self.handleSpecificEventOnEditor(editor, isForward, isEnter))
+		if (!self.handleSpecificEventOnEditor(editor, isEnter))
 		{
 			return Promise.resolve();
 		}
@@ -1705,23 +1705,12 @@
 	/**
 	 * some editor has specific requirement on tab key event.
 	 */
-	FieldEditorHelper.prototype.handleSpecificEventOnEditor = function(editor, isForward, isEnter)
+	FieldEditorHelper.prototype.handleSpecificEventOnEditor = function(editor, isEnter)
 	{
 		if (editor && isEnter && editor instanceof TF.DetailView.FieldEditor.InputFieldEditor && !$.trim(editor._$element.find("input").val()))
 		{
 			// on string field, user click enter can not tab to next when they not type anything
 			return false;
-		}
-
-		if (editor && editor instanceof TF.DetailView.FieldEditor.DateFieldEditor && isForward && !isEnter)
-		{
-			// when on date filed editor, show calendar when tab key
-			var editIcon = editor._$parent.find(".editor-icon");
-			if (!editor._getWidget(editIcon).is(":visible"))
-			{
-				editIcon.trigger("click");
-				return false;
-			}
 		}
 
 		return true;

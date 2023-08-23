@@ -38,20 +38,21 @@
 				const initialValue = self.getFieldValue();
 				if (initialValue > 0)
 				{
-					const dataItems = self.comboBox.dataSource.data();
-					for (let i = 0; i < dataItems.length; i++)
+					var item = self.findItemFromSourceBy((item) => { return item.value === initialValue });
+					if (item)
 					{
-						if (dataItems[i].value === initialValue)
-						{
-							self.comboBox.select(i);
-							break;
-						}
+						self.comboBox.select(item[0]);
 					}
 				}
 				else 
 				{
 					const customValue = self.getCustomFieldText();
 					self.comboBox.input.val(customValue);
+					var item = self.findItemFromSourceBy((item) => { return item.text === customValue });
+					if (item)
+					{
+						self.comboBox.value(item[1].value);
+					}
 				}
 
 				self.comboBox.bind("change", (e) =>
@@ -68,6 +69,18 @@
 				self._$parent.find("div.editor-icon").css("display", 'none');
 				return Promise.resolve();
 			});
+	};
+
+	ComboBoxFieldEditor.prototype.findItemFromSourceBy = function(compare)
+	{
+		const dataItems = this.comboBox.dataSource.data();
+		for (let i = 0; i < dataItems.length; i++)
+		{
+			if (compare(dataItems[i]))
+			{
+				return [i, dataItems[i]];
+			}
+		}
 	};
 
 	ComboBoxFieldEditor.prototype.render = function(options)
