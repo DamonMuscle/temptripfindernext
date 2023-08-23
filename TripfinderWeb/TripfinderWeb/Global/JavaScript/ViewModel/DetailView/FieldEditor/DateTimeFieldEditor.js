@@ -113,7 +113,7 @@
 				return;
 			}
 
-			if (self.type == "DateTime" && keyCode == $.ui.keyCode.ENTER && self.fromClose)
+			if (keyCode == $.ui.keyCode.ENTER && self.fromClose)
 			{
 				e.preventDefault();
 				e.stopPropagation();
@@ -123,13 +123,10 @@
 			}
 		});
 
-		if (self.type == "DateTime")
+		this.getPicker().bind("close", function(e)
 		{
-			this.getPicker().bind("close", function(e)
-			{
-				self.fromClose = true;
-			})
-		}
+			self.fromClose = true;
+		})
 	};
 
 	DateTimeFieldEditor.prototype._unbindEvents = function()
