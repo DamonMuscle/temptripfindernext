@@ -7,7 +7,7 @@
 	{
 		this.showClearIcon = attributes && attributes.showClearIcon;
 		this.keypress = this.keypress.bind(this);
-
+		this.blurIntercept = attributes && attributes.hasOwnProperty("blurintercept") ? attributes.blurintercept : null;
 		if (attributes && attributes.adjustPopupPosition)
 		{
 			this.adjustPopupPosition = attributes.adjustPopupPosition;
@@ -32,6 +32,8 @@
 			this.maxDate = attributes.max;
 			this.disableWeekend = attributes.disableWeekend;
 			this.inputEnable = attributes.inputEnable;
+			this.ignoreReadonly = attributes.ignoreReadonly;
+			this.stepping = attributes.stepping;
 			this._exactFormat = attributes.exactFormat;
 		}
 		this.initialize.call(this);
@@ -74,9 +76,9 @@
 			{
 				if (strArr[0].length == 4)
 				{
-					return `${strArr[1]}/${strArr[2]}/${strArr[0]}`;
+					return strArr[1] + "/" + strArr[2] + "/" + strArr[0];
 				}
-				return `${strArr[1]}/${strArr[0]}/${strArr[2]}`;
+				return strArr[1] + "/" + strArr[0] + "/" + strArr[2];
 			}
 			return strValue;
 		}
@@ -86,6 +88,7 @@
 	TimeBox.prototype.initialize = function()
 	{
 		var self = this;
+
 		let $clearX = null;
 		if (self.showClearIcon)
 		{
@@ -112,10 +115,9 @@
 				}
 			}
 		}, this);
-		var $input = $(`<input ${this.type} type="text" class="form-control datepickerinput" data-tf-input-type="${this.type}"` +
-			` data-bind="disable:disable, css:{disabled:disable},event: {blur: updateValue,keypress:keypress}" />`);
+		var $input = $('<input ' + this.type + ' type="text" class="form-control datepickerinput" data-tf-input-type="' + this.type + '" data-bind="disable:disable, css:{disabled:disable},event: {blur: updateValue,keypress:keypress,keyup:keyup}" />');
 		this.applyAttribute($input, this.attributes);
-		var $button = $(`<div class="input-group-addon glyphicon datepickerbutton"><span unselectable="on" class="k-icon ${this.pickerIconClass}">select</span></div>`);
+		var $button = $('<div class="input-group-addon glyphicon datepickerbutton"><span unselectable="on" class="k-icon ' + this.pickerIconClass + '">select</span></div>');
 		if (this.attributes)
 		{
 			this.applyAttribute($button, this.attributes.picker);
@@ -128,16 +130,15 @@
 				$(":focus").blur();
 			});
 		}
-
 		var $element = null;
 		if (self.showClearIcon)
 		{
 			$element = $input.add($clearX).add($button);
-		}
-		else
+		} else
 		{
 			$element = $input.add($button);
 		}
+
 		var $container = "body";
 
 		if (this.$parent.closest(".document-dataentry").length > 0)
@@ -150,10 +151,10 @@
 			widgetParent: $container,
 			useCurrent: false,
 			keepInvalid: this.keepInvalid,
-			keepInvalid: true,
 			minDate: this.minDate,
 			maxDate: this.maxDate,
-			ignoreReadonly: true,
+			stepping: this.stepping,
+			ignoreReadonly: self.ignoreReadonly !== undefined && self.ignoreReadonly !== null ? self.ignoreReadonly : false,
 			daysOfWeekDisabled: this.disableWeekend ? [0, 6] : [],
 			widgetPositioning:
 			{
@@ -168,7 +169,7 @@
 		});
 
 		this._dateTimePicker = $element.data('DateTimePicker');
-		const dateTimePicker = this._dateTimePicker;
+		let dateTimePicker = this._dateTimePicker;
 		this.value.valueHasMutated();
 		ko.applyBindings(this, $element[0]);
 		if (self.showClearIcon)
@@ -209,9 +210,6 @@
 				{
 					this.value(this.getTimeString(newDate));
 				}
-				if(TF.isPhoneDevice) {
-					this._dateTimePicker.hide();
-				}
 			}.bind(this), this.delayChange ? 500 : 0);
 		}.bind(this));
 		$element.on('dp.show', function(e)
@@ -224,11 +222,12 @@
 			}
 
 			var widget = widgetParent.find(".bootstrap-datetimepicker-overlay>.bootstrap-datetimepicker-widget:last"),
+				offsetParent = widget.offsetParent(),
 				widgetWidth = widget.width(),
-				bodyWidth = widget.offsetParent().width();
-			if (TF.isPhoneDevice || tf.isFromWayfinder)
+				bodyWidth = offsetParent.width();
+			if (TF.isPhoneDevice)
 			{
-				var overlay = $(".bootstrap-datetimepicker-overlay");
+				var overlay = $("body>.bootstrap-datetimepicker-overlay");
 				overlay.on("click", function()
 				{
 					this._dateTimePicker.hide();
@@ -263,6 +262,7 @@
 						widget.css(
 							{
 								top: top,
+								bottom: 'auto',
 								left: left
 							});
 
@@ -287,7 +287,7 @@
 				{
 					this.adjustPopupPosition(this.$element, widget);
 				}
-				else
+				else 
 				{
 					var wightCss = {}, modal;
 					if (TF.isMobileDevice)
@@ -296,18 +296,17 @@
 						if (modal.length > 0)
 						{
 							bodyWidth = modal.width();
-
-							if (modal && wightOffsetLeft > modal.offset().left + bodyWidth - widgetWidth && bodyWidth > widgetWidth)
-							{
-								wightCss['left'] = modal.offset().left + bodyWidth - widgetWidth - 10;
-							}
-							else if (modal && wightOffsetLeft < modal.offset().left + 5)
-							{
-								wightCss['left'] = modal.offset().left;
-							} else
-							{
-								wightCss['left'] = wightOffsetLeft;
-							}
+						}
+						if (modal && wightOffsetLeft > modal.offset().left + bodyWidth - widgetWidth && bodyWidth > widgetWidth)
+						{
+							wightCss['left'] = modal.offset().left + bodyWidth - widgetWidth - 10;
+						}
+						else if (modal && wightOffsetLeft < modal.offset().left + 5)
+						{
+							wightCss['left'] = modal.offset().left;
+						} else
+						{
+							wightCss['left'] = wightOffsetLeft;
 						}
 					}
 					else
@@ -342,7 +341,6 @@
 
 					wightCss['top'] = top;
 					wightCss['bottom'] = "auto";
-
 					widget.css(wightCss);
 				}
 			}
@@ -375,17 +373,7 @@
 									bottom: windowHeight - this.$element.offset().top - widget.outerHeight() - this.$element.outerHeight()
 								});
 						}
-
-						const widgetToLeft = offset.left + this.$element.outerWidth() - widget.outerWidth();
-						if (widgetToLeft > 0)
-						{
-							widget.css({ left: widgetToLeft });
-						}
-						else
-						{
-							widget.css({ left: offset.left });
-						}
-					}.bind(this));
+					}.bind(this), 100);
 				}
 				$(window).on("resize.dateTime", function()
 				{
@@ -430,6 +418,24 @@
 		return /[^0-9A-Za-z|\/|\:| ]/g;
 	};
 
+	TimeBox.prototype.blurInterceptCheck = function(value)
+	{
+		if (this.blurIntercept)
+		{
+			if (value === "")
+			{
+				return;
+			}
+
+			const dt = new moment(value, 'h:mm A', true);
+			if (!dt.isValid())
+			{
+				this.$element[0].value = null;
+				this.value(null);
+			}
+		}
+	}
+
 	TimeBox.prototype.keypress = function(viewModel, e)
 	{
 		if (e.keyCode == 13)
@@ -446,6 +452,8 @@
 	TimeBox.prototype.updateValue = function(self, e)
 	{
 		var text = e ? e.currentTarget.value : '';
+		this.blurInterceptCheck(text);
+
 		if (this.inputEnable && text.indexOf('@') === 0)
 		{
 			return true;
@@ -465,7 +473,7 @@
 			this.value(this.getTimeString(dateTime));
 
 			if (isTimeColumn)
-				e ? (timePatten.test(text) ? null : (e.currentTarget.value = `${dateTime.format('h:mm')} ${(dateTime.hours() < 12 ? 'AM' : 'PM')}`)) : null;
+				e ? (timePatten.test(text) ? null : (e.currentTarget.value = dateTime.format('h:mm') + ' ' + (dateTime.hours() < 12 ? 'AM' : 'PM'))) : null;
 			else
 				null;
 
@@ -495,8 +503,7 @@
 		}
 		else
 		{
-			const formClass = this.disable() ? "input-group disabled" : "input-group";
-			return $("<div>").addClass(formClass).append(this.$element);
+			return $("<div>").addClass("input-group").append(this.$element);
 		}
 	};
 
@@ -571,4 +578,3 @@
 		e.preventDefault();
 	}
 })();
-
