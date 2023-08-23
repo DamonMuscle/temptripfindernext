@@ -49,7 +49,6 @@
 					return;
 				}
 
-
 				var widget = self._getWidget(self._$parent.find(".editor-icon")),
 					current = widget.find('.k-state-selected'),
 					tdIndex = current.parent().children().index(current),
@@ -64,7 +63,9 @@
 
 				if (keyCode == $.ui.keyCode.ENTER && current && current.length > 0)
 				{
-					dateTimePicker._change(new Date(current.find("a").attr("title")));
+					var value = current.find("a").attr(kendo.attr("value")).split('/'),
+						value = new Date(value[0], value[1], value[2]);
+					dateTimePicker._change(value);
 					dateTimePicker.close();
 					input.focus();
 					return;
