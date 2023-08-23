@@ -801,7 +801,7 @@
 
 									#if(!item.customData.schoolCode){#
 									<span class="arrival-time-span k-tripstop-state-hover"><div class="locked-time #: item.customData.lockStopTime ? "active" : ""#"></div>
-									<span title="Scheduled time" class="schedule-time">#:utcToClientTimeZone(item.customData.stopTime).format("MM/DD/YYYY hh:mm A")#</span> #:" | "#
+									<span title="Scheduled time" class="schedule-time">#:utcToClientTimeZone(item.customData.stopTime).format("MM/DD/YYYY hh:mm a")#</span> #:" | "#
 									<span title="Avg. Speed" class="#: item.customData.isLast ? "" : "avg-speed" #">#:item.customData.isLast ? "<none>" : item.customData.avgSpeed #</span>#:" | "#
 									<span title="Distance">#:item.customData.isLast ? "<none>" : item.customData.distance + " " + item.customData.measurementUnit #</span>#:" | "#
 									<span title="Duration">#:item.customData.isLast ? "<none>" : item.customData.duration#</span>
