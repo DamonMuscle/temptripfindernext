@@ -1254,14 +1254,14 @@
 
 		const allData = (addresses || []),
 			entities = allData.slice(0, count),
-			candidates = await Promise.all(entities.map(item=>TF.GIS.Analysis.getInstance().geocodeService.findAddressCandidatesREST(item.text, item.magicKey)))
+			candidates = await Promise.all(entities.map(item=>geocodeService.findAddressCandidatesREST(item.text, item.magicKey)))
 			cards = self._generateMapAddressCards(type, candidates).filter(item => item !== null);
 
 		const result = {
 			type: type,
 			title: style.title,
 			color: style.color,
-			count: cards.length,
+			count: allData.length,
 			cards: cards,
 			whereQuery: ""
 		};
