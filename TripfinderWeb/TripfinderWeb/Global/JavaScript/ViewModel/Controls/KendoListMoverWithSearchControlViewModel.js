@@ -694,6 +694,17 @@
 		{
 			requestOption.data.filterClause = this.leftSearchGrid.obSelectedGridFilterClause();
 		}
+
+		if (self.options.queryBySelectedColumns)
+		{
+			requestOption.data.fields = self.columns.map((c) => c.OriginalName || c.FieldName).concat('Id');
+		}
+
+		if (self.options.getRequiredColumns)
+		{
+			requestOption.data.fields = requestOption.data.fields.concat(self.options.getRequiredColumns());
+		}
+
 		var promise;
 		switch (self.options.GridType)
 		{
@@ -917,7 +928,10 @@
 		setTimeout(function()
 		{
 			var leftData = [];
+			var leftTempData = [];
 			var rightData = [];
+
+			self._updateUdfColumns(self.allRecords);
 
 			self.allRecords.filter(function(item)
 			{
@@ -927,9 +941,15 @@
 				}
 				else 
 				{
-					leftData.push(item);
+					leftTempData.push(item);
 				}
 			});
+
+			leftData = leftTempData;
+			if (self.options.filterSelectableRecords && rightData.length)
+			{
+				leftData = self.options.filterSelectableRecords(leftTempData, rightData);
+			}
 
 			if (gridType == "left" || !gridType)
 			{
@@ -971,6 +991,23 @@
 			self._changeLeftGridSelectable();
 		});
 	};
+
+	KendoListMoverWithSearchControlViewModel.prototype._updateUdfColumns = function(allRecords)
+	{
+		let udfs = _.uniqBy(this.columns.filter(c => !!c.OriginalName), "UDFId");
+		if (!udfs.length)
+		{
+			return;
+		}
+
+		allRecords.forEach(item =>
+		{
+			udfs.forEach(udf =>
+			{
+				item[udf.FieldName] = item[udf.OriginalName];
+			});
+		});
+	}
 
 	KendoListMoverWithSearchControlViewModel.prototype.initGridOption = function(options, gridType)
 	{
@@ -1133,6 +1170,7 @@
 		{
 			requestOptions.data.filterSet = requestOptions.data.filterSet || {};
 			requestOptions.data.filterSet.FilterItems = requestOptions.data.filterSet.FilterItems || [];
+			requestOptions.data.filterSet.FilterSets = requestOptions.data.filterSet.FilterSets || [];
 			requestOptions.data.filterSet.LogicalOperator = requestOptions.data.filterSet.LogicalOperator || "and";
 
 			switch(this.options.GridType)

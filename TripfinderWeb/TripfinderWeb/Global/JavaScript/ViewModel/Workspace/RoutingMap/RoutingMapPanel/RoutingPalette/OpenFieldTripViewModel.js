@@ -249,7 +249,7 @@
 
 	OpenFieldTripViewModel.prototype.getRequiredColumns = function()
 	{
-		return ['Session', 'BusAide', 'Disabled', 'FilterName', 'NonDisabled', 'Schools', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'StartDate', 'EndDate', 'FilterSpec', 'TravelScenarioId'];
+		return ['Id', 'FieldTripId', 'DBID', 'PublicId', 'Name', 'School', 'SchoolName', 'SchoolXCoord', 'SchoolYCoord', 'FieldTripDestinationId', 'FieldTripDestinationXCoord', 'FieldTripDestinationYCoord', 'Destination', 'DestinationStreet', 'DepartDateTime', 'EstimatedReturnDateTime'];
 	};
 
 	OpenFieldTripViewModel.prototype.onBeforeLeftGridDataBound = function()

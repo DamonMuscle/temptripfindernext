@@ -6,6 +6,7 @@
 	{
 		// options.getSelectableRecords = this._getSelectableRecords.bind(this);
 		this.unavailableData = unavailableData;
+		options.getRequiredColumns = this.getRequiredColumns;
 		TF.Control.KendoListMoverWithSearchControlViewModel.call(this, selectedData, options);
 		this.obDisableControl = disableControl;
 	}
@@ -179,6 +180,11 @@
 	ViewFieldTripViewModel.prototype.filterMenuClick = function(model, e)
 	{
 		this.createFilterMenu(model, e);
+	};
+
+	ViewFieldTripViewModel.prototype.getRequiredColumns = function()
+	{
+		return ['Id', 'FieldTripId', 'DBID', 'PublicId', 'Name', 'School', 'SchoolName', 'SchoolXCoord', 'SchoolYCoord', 'FieldTripDestinationId', 'FieldTripDestinationXCoord', 'FieldTripDestinationYCoord', 'Destination', 'DestinationStreet', 'DepartDateTime', 'EstimatedReturnDateTime'];
 	};
 
 	ViewFieldTripViewModel.prototype.onBeforeLeftGridDataBound = function()

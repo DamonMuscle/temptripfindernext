@@ -15,6 +15,7 @@
 				forceFitColumns: true,
 				enableColumnReorder: true
 			},
+			queryBySelectedColumns: true,
 			showRemoveColumnButton: true,
 			displayCheckbox: true,
 			type: "fieldtrip",
