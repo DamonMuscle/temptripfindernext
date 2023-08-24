@@ -271,7 +271,8 @@
 
 				columnDefinition["TrueDisplayName"] = item.TrueDisplayName;
 				columnDefinition["FalseDisplayName"] = item.FalseDisplayName;
-
+				let filterablePositiveLabel = isNotEmptyString(item.TrueDisplayName) ? item.TrueDisplayName : "True";
+				let filterableNegativeLabel = isNotEmptyString(item.FalseDisplayName) ? item.FalseDisplayName : "False";
 				columnDefinition["filterable"] = {
 					cell: {
 						template: function(args)
@@ -280,8 +281,8 @@
 								dataSource: new kendo.data.DataSource({
 									data: [
 										{ someField: "(not specified)", valueField: "null" },
-										{ someField: trueDisplay, valueField: "true" },
-										{ someField: falseDisplay, valueField: "false" }
+										{ someField: filterablePositiveLabel, valueField: "true" },
+										{ someField: filterableNegativeLabel, valueField: "false" }
 									]
 								}),
 								dataTextField: "someField",
@@ -389,6 +390,12 @@
 			type = TF.DetailView.UserDefinedFieldHelper.valueFormatToType(item.ValueFormat);
 		}
 		return type;
+	}
+
+
+	function isNotEmptyString(name)
+	{
+		return name != null && name.length !== 0;
 	}
 
 	function getGridDisplayType(type)
