@@ -20,7 +20,7 @@
 	{
 		if (!value)
 		{
-			return 0;
+			return value;
 		}
 		var floatValue = parseFloat(value),
 			decimalPrecision = 2,

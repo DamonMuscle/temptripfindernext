@@ -163,9 +163,10 @@
 
 	StringBox.prototype.valueChange = function(value)
 	{
+		value = this.convertValueType(value);
 		if (value !== this.obRawValue())
 		{
-			this.obRawValue(this.convertValueType(value));
+			this.obRawValue(value);
 		}
 	};
 
