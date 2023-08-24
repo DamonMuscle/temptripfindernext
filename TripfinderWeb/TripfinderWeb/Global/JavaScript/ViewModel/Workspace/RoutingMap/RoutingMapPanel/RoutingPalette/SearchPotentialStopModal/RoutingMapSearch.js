@@ -1311,7 +1311,7 @@
 			return Promise.reject(errorMessage);
 		}
 
-		const cards = results.map(item => {
+		const cards = results.slice(0, count).map(item => {
 			return {
 				Id: 0,
 				title: item.name,
@@ -1330,7 +1330,7 @@
 			type: type,
 			title: style.title,
 			color: style.color,
-			count: cards.length,
+			count: results.length,
 			cards: cards,
 			whereQuery: ""
 		};
