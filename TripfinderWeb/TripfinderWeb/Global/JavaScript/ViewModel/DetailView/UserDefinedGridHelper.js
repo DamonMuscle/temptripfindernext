@@ -1774,6 +1774,8 @@
 					fieldOptions.NumberPrecision = 2; // set default number Precision to 2 for normal Grid fields
 					fieldOptions.TrueDisplayName = "true";
 					fieldOptions.FalseDisplayName = "false";
+					let filterablePositiveLabel = "True";
+					let filterableNegativeLabel = "False";
 					const isUDFSystemField = fieldOptions.IsUDFSystemField;
 					if (isUDFSystemField)
 					{
@@ -1787,14 +1789,16 @@
 							fieldOptions.NumberPrecision = udf.NumberPrecision ? udf.NumberPrecision : 0;
 							fieldOptions.TrueDisplayName = udf.TrueDisplayName ? udf.TrueDisplayName : "true";
 							fieldOptions.FalseDisplayName = udf.FalseDisplayName ? udf.FalseDisplayName : "false";
+							filterablePositiveLabel = udf.TrueDisplayName && udf.TrueDisplayName.length !== 0 ? udf.TrueDisplayName : "True";
+							filterableNegativeLabel = udf.FalseDisplayName && udf.FalseDisplayName.length !== 0 ? udf.FalseDisplayName : "False";
 						}
 					}
 
 					result = {
 						"field": item.Name,
 						"title": item.Name,
-						"positiveLabel": fieldOptions.TrueDisplayName || "True",
-						"negativeLabel": fieldOptions.FalseDisplayName || "False",
+						"positiveLabel": filterablePositiveLabel,
+						"negativeLabel": filterableNegativeLabel,
 						"type": "SystemField",
 						"questionType": "SystemField",
 						"editType": {
