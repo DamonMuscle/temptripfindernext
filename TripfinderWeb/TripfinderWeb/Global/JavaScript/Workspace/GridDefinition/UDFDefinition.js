@@ -393,6 +393,12 @@
 		return name != null && name.length !== 0;
 	}
 
+
+	function isNotEmptyString(name)
+	{
+		return name != null && name.length !== 0;
+	}
+
 	function getGridDisplayType(type)
 	{
 		return type.replace(/date\/time/i, "datetime")
