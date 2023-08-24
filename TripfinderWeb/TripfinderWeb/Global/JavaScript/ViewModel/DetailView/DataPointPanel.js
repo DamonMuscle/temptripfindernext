@@ -1172,7 +1172,7 @@
 								</div>\
 							</div>");
 				helper.append((isGroup || isGroupItem) ? groupHtml :
-					$("<div class='in " + self.getDragStyle($target) + " hide " + (["grid", "treeList", "multipleGrid"].indexOf($target.attr("type")) >= 0 ? "grid" : "") + "' style='width:" + blockWidth + "px'>" + self.getDragInHtml($targetCopy) + "</div>"));
+					$("<div class='in " + self.getDragStyle($target) + " hide " + (["grid", "multipleGrid"].indexOf($target.attr("type")) >= 0 ? "grid" : "") + "' style='width:" + blockWidth + "px'>" + self.getDragInHtml($targetCopy) + "</div>"));
 				return helper[0];
 			},
 			drag: function(e, ui)
@@ -1355,7 +1355,6 @@
 			case "Boolean":
 				html = `<div class='item-content'>${$target.attr("displayValue")}</div>`;
 				break;
-			case "treeList":
 			case "multipleGrid":
 			case "UDGrid":
 			case "grid":
