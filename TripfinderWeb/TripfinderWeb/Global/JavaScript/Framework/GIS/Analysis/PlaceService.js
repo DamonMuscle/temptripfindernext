@@ -87,6 +87,33 @@
 		});
 	}
 
+	PlaceService.prototype.fetchPOIDetails = async function(placeId, fields = ["all"])
+	{
+		const self = this;
+		return new Promise((resolve, reject) =>
+		{
+			require({}, ["esri/rest/places", "esri/rest/support/FetchPlaceParameters"], (places, FetchPlaceParameters) =>
+			{
+				const params = new FetchPlaceParameters({
+					apiKey: self.settings.onlineToken,
+					placeId: placeId,
+					requestedFields: fields
+				});
+
+				let errorMessage = null;
+				places.fetchPlace(params).then((fetchResult) =>
+				{
+					const results = fetchResult.placeDetails;
+					resolve({ results, errorMessage });
+				}).catch((error) =>
+				{
+					errorMessage = `No places was found for this placeId: ${placeId}`;
+					reject({ errorMessage });
+				});
+			});
+		});
+	}
+
 	PlaceService.prototype.dispose = function()
 	{
 		this.settings = null;

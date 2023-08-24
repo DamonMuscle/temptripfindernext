@@ -1311,15 +1311,48 @@
 			return Promise.reject(errorMessage);
 		}
 
-		const cards = results.slice(0, count).map(item => {
+		const allData = results || [];
+		const entities = allData.slice(0, count);
+		const items = await Promise.all(entities.map(item=>placeService.fetchPOIDetails(item.placeId)));
+
+		const computeSubTitle = (address) =>
+		{
+			let items = [];
+			if (address.streetAddress)
+			{
+				items.push(address.streetAddress);
+			}
+
+			if (address.locality)
+			{
+				items.push(address.locality);
+			}
+
+			if (address.region)
+			{
+				items.push(address.region);
+			}
+
+			if (address.postcode)
+			{
+				items.push(address.postcode);
+			}
+
+			return items.join(", ");
+		};
+
+		const cards = entities.map(item =>
+		{
+			const details = items.find(o => o.results.placeId === item.placeId);
+			const address = details.results.address;
 			return {
 				Id: 0,
 				title: item.name,
-				subtitle: "",
+				subtitle: computeSubTitle(address),
 				type: type,
 				address: item.name,
 				Street: item.name,
-				City: null,
+				City: address.locality || null,
 				XCoord: item.location.longitude,
 				YCoord: item.location.latitude,
 				Addr_type: null
@@ -1330,7 +1363,7 @@
 			type: type,
 			title: style.title,
 			color: style.color,
-			count: results.length,
+			count: allData.length,
 			cards: cards,
 			whereQuery: ""
 		};
