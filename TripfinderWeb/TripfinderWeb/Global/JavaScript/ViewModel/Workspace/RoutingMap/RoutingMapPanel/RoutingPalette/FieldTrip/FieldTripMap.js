@@ -2221,3 +2221,54 @@
 		self.fieldTripSequenceLineArrowLayerInstance = null;
 	}
 })();
+
+
+(function()
+{
+	createNamespace("TF.RoutingPalette.FieldTripMap").StopGraphicWrapper = StopGraphicWrapper;
+
+	function StopGraphicWrapper() { }
+
+	StopGraphicWrapper.CreateStop = function(longitude, latitude, attributes = null, sequence = null)
+	{
+		const DEFAULT_STOP_COLOR = "#FFFFFF", DEFAULT_STOP_SEQUENCE = 0;
+		const color = attributes?.Color || DEFAULT_STOP_COLOR;
+		const stopSequence = sequence || attributes?.Sequence || DEFAULT_STOP_SEQUENCE;
+		const symbol = getStopSymbol(stopSequence, color);
+
+		return getPointGraphic(longitude, latitude, symbol, attributes);
+	}
+
+	StopGraphicWrapper.CreateHighlightStop = function(longitude, latitude, attributes)
+	{
+		const color = [253, 245, 53, 0.7];
+		const symbol = {
+			type: "simple-marker",
+			color: color,
+			size: 32,
+			outline: null
+		};
+
+		return getPointGraphic(longitude, latitude, symbol, attributes);
+	}
+
+	const getPointGraphic = (longitude, latitude, symbol, attributes) =>
+	{
+		const point = TF.GIS.GeometryHelper.CreatePointGeometry(longitude, latitude);
+		const geometry = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(point);
+
+		return new TF.GIS.SDK.Graphic({ geometry, symbol, attributes });
+	};
+
+	const getStopSymbol = (sequence, color) =>
+	{
+		let symbolHelper = new TF.Map.Symbol();
+		const stopSymbol = symbolHelper.tripStop(sequence, color);
+
+		symbolHelper.dispose();
+		symbolHelper = null;
+
+		return stopSymbol;
+	};
+
+})();
