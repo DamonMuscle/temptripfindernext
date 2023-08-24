@@ -457,9 +457,12 @@
 				{
 					tf.storageManager.delete(storageFilterDataKey);
 				}
-				tf.storageManager.save(storageFilterDataKey, {
+				
+				var storageTemporaryFilterDataKey = "grid.temporary.currentfilter." + pageType + ".id";
+				tf.storageManager.save(storageTemporaryFilterDataKey, {
 					"filteredIds": ids,
 					"filterName": filterName,
+					"isNotSaveIdToQuickFilter": true
 				}, true).then(function()
 				{
 					const location = "#/?pagetype=" + pageType;
@@ -504,18 +507,19 @@
 		var selectedIds = this.searchGrid.getSelectedIds();
 		//the filter will sticky once open a new grid, so save the sticky information in DB
 		var storageFilterDataKey = "grid.currentfilter." + gridType + ".id";
+		var storageTemporaryFilterDataKey = "grid.temporary.currentfilter." + gridType + ".id";
 		var filterName = $(e.currentTarget).find(".menu-label").text().trim() + ' (Selected Records)';
 		if (selectedIds.length > 0)
 		{
-			var storageFilterDataKey = "grid.currentfilter." + gridType + ".id";
-				tf.storageManager.save(storageFilterDataKey, {
-					"filteredIds": selectedIds,
-					"filterName": filterName,
-				}, true).then(function()
-				{
-					redirectWindow.location = "#/?pagetype=" + gridType, redirectWindow.name = "new-pageWindow_" + $.now();
+			tf.storageManager.save(storageTemporaryFilterDataKey, {
+				"filteredIds": selectedIds,
+				"filterName": filterName,
+				"isNotSaveIdToQuickFilter": true
+			}, true).then(function()
+			{
+				redirectWindow.location = "#/?pagetype=" + gridType, redirectWindow.name = "new-pageWindow_" + $.now();
 
-				}.bind(this));
+			}.bind(this));
 		}
 		else
 		{

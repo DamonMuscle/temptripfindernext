@@ -14,6 +14,7 @@
 	{
 		this.inited = false;
 		this._storageFilterDataKey = "grid.currentfilter." + this.getStorageKeyId() + ".id";
+		this._storageTemporaryFilterDataKey = "grid.temporary.currentfilter." + this.getStorageKeyId() + ".id";
 		this._storageGeoRegionTypeIdKey = "grid.currentGeoRegionType." + this.getStorageKeyId() + ".id";
 		this._storageDisplayQuickFilterBarKey = "grid.displayQuickFilterBar." + this._gridType;
 		this.obHeaderFilters = ko.observableArray([]);
@@ -235,7 +236,7 @@
 	{
 		var self = this;
 		//IF the request from search, do not sticky quick filter.
-		if (self.options.fromSearch || self.options.isTemporaryFilter)
+		if (self.options.fromSearch || self.options.isTemporaryFilter || this._gridState.isNotSaveIdToQuickFilter)
 		{
 			return Promise.resolve();
 		}
@@ -272,7 +273,8 @@
 		}
 		//IF the request from search or from a Dashboard Widget Grid, do not use the sticky quick filter.
 		if (self.options.fromSearch || self.options.isTemporaryFilter
-			|| (self.options.customGridType && self.options.customGridType.toLowerCase() === "dashboardwidget"))
+			|| (self.options.customGridType && self.options.customGridType.toLowerCase() === "dashboardwidget")
+			|| this._gridState.isNotSaveIdToQuickFilter)
 		{
 			return new TF.SearchParameters(null, null, null, null, null, null, null);
 		}
@@ -611,11 +613,10 @@
 				{
 					selectGridFilterEntityId = self.options.filterId;
 				}
-				else if (tf.storageManager.get(self._storageFilterDataKey, true))
+				else if (tf.storageManager.get(self._storageTemporaryFilterDataKey, true))
 				{
-					//open new grid in viewfinder is use local storage
-					selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey, true);
-					tf.storageManager.delete(self._storageFilterDataKey, true);
+					selectGridFilterEntityId = tf.storageManager.get(self._storageTemporaryFilterDataKey, true);
+					tf.storageManager.delete(self._storageTemporaryFilterDataKey, true);
 				}
 				else if (self.options.gridLayout)
 				{
@@ -699,6 +700,10 @@
 					if (self._gridState)
 					{
 						self._gridState.filteredIds = self.relatedFilterEntity.filteredIds;
+						if (self.relatedFilterEntity.isNotSaveIdToQuickFilter)
+						{
+							self._gridState.isNotSaveIdToQuickFilter = self.relatedFilterEntity.isNotSaveIdToQuickFilter;
+						}
 					}
 					self.options.fromMenu = self.relatedFilterEntity.filterName;
 
