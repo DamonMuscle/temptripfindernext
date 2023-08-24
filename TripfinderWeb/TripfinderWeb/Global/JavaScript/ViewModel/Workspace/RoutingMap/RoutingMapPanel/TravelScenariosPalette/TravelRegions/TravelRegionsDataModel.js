@@ -27,7 +27,6 @@
 
 		self.isSaving = false;
 
-		PubSub.subscribe(topicCombine(pb.DATA_CHANGE, "userprofile", pb.EDIT), function() { self._userProfileCache = null; });
 		PubSub.subscribe("selected-travel-scenario-change" + self.viewModel._viewModal.routeState, self.selectedTravelScenarioChanged.bind(self));
 		PubSub.subscribe("travel-scenario-delete" + self.viewModel._viewModal.routeState, this.deleteTravelScenario.bind(this));
 		PubSub.subscribe("MapCanvasPublishedHub", self._travelScenarioApprovePublished.bind(self));
@@ -823,7 +822,6 @@
 		this.travelRegionCollectionChangedEvent.unsubscribeAll();
 		this.highlightChangedEvent.unsubscribeAll();
 		this.travelRegions = null;
-		this._userProfileCache = null;
 		this.travelRegionFeatureData.dispose();
 		if (this.createMmpkMessageSubscription)
 		{

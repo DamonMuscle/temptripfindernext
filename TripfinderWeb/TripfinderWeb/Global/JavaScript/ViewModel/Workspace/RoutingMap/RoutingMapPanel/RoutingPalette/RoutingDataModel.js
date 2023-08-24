@@ -56,8 +56,6 @@
 		// self.streetDataModel = self.mapCanvasPage.mapEditingPaletteViewModel.myStreetsViewModel.dataModel;
 		// self.streetMeterBuffer = 40;
 
-		self.setUserProfileTripColor = self.setUserProfileTripColor.bind(this);
-		PubSub.subscribe(topicCombine(pb.DATA_CHANGE, "userprofile", pb.EDIT), this.setUserProfileTripColor);
 		self.stopPathChange = self.stopPathChange.bind(this);
 		PubSub.subscribe(topicCombine(pb.DATA_CHANGE, "stoppath"), this.stopPathChange);
 		this.onSchoolLocationDataSourceChange = this.onSchoolLocationDataSourceChange.bind(this);
@@ -2806,7 +2804,6 @@
 		self.onShowChartChangeEvent.unsubscribeAll();
 		self.mapCanvasPage.onUpdateRecordsEvent.unsubscribe(self.onSchoolLocationDataSourceChange);
 		self.onSchoolLocationChangeEvent.unsubscribeAll();
-		PubSub.unsubscribe(self.setUserProfileTripColor);
 		PubSub.unsubscribe(self.stopPathChange);
 		self.tripLockData.dispose();
 		self.fieldTripStopDataModel.dispose();
