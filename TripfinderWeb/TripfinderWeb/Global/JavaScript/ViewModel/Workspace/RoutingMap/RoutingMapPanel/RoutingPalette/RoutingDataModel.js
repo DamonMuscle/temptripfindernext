@@ -69,6 +69,16 @@
 			get() { return ALLFIELDTRIPS; },
 			enumerable: false,
 		});
+
+		Object.defineProperty(self, "trips",
+		{
+			get()
+			{
+				console.log("This property is obsoleted, please use fieldTrips instead. it should be removed in future.")
+				return ALLFIELDTRIPS;
+			},
+			enumerable: false,
+		});
 	}
 
 	RoutingDataModel.weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
