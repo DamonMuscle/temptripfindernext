@@ -1549,8 +1549,9 @@
 					}
 					else
 					{
-						const pauseDuration = moment.duration(moment(stop.StopTimeDepart).diff(moment(stop.StopTimeArrive))).asMinutes();
-			
+						const pauseDuration = stop.StopPauseMinutes;
+						
+						stop.StopPauseMinutes = null;
 						stop.StopTimeArrive = stop.StopTime;
 						stop.StopTimeDepart = moment(stop.StopTimeArrive)
 														.add(Math.ceil(pauseDuration), "minutes")
