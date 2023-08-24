@@ -311,6 +311,11 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 							const [country, zip, state, city, street]= values.map(x=>x.trim()).reverse();
 							return { text: item.text, country, zip, state, city, street, magicKey: item.magicKey };
 						}
+						else if (values.length === 6)
+						{
+							const [country, zip, state, city, street, name]= values.map(x=>x.trim()).reverse();
+							return { text: item.text, country, zip, state, city, street, magicKey: item.magicKey };
+						}
 						else
 						{
 							return { text: item.text, magicKey: item.magicKey };
@@ -336,7 +341,7 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 	GeocodingService.prototype.findAddressCandidatesREST = async function(searchAddress, magicKey)
 	{
 		const self = this;
-		const url = self.getValidLocatorUrl("suggestLocationsREST");
+		const url = self.getValidLocatorUrl("findAddressCandidatesREST");
 		if (url === null) {
 			return;
 		}
@@ -368,6 +373,66 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 						reject({ location, errorMessage });
 					}
 				}
+			});
+		});
+	}
+
+	GeocodingService.prototype.fetchPOICategoriesREST = async function()
+	{
+		const self = this;
+		const url = self.getValidLocatorUrl("fetchPOICategoriesREST");
+		if (url === null) {
+			return;
+		}
+
+		return new Promise((resolve, reject) =>
+		{
+			const geocodeDescriptionUrl = `${url}?f=pjson`;
+			$.ajax({
+				url: geocodeDescriptionUrl,
+				success: (response) => {
+					const POI = JSON.parse(response).categories.find(item => item.name === 'POI');
+					const categories = POI.categories.map(item => {
+						let data = { name: item.name, categories: item.categories.map(subItem => subItem.name) };
+						return data
+					});
+
+					resolve(categories);
+				}
+			});
+		});
+	}
+
+	GeocodingService.prototype.findLocatorPlaces = async function(location, categories, searchExtent = null, maxLocations = 10)
+	{
+		const self = this;
+		const url = self.getValidLocatorUrl("findLocatorPlaces");
+		if (url === null) {
+			return;
+		}
+
+		return new Promise((resolve, reject) =>
+		{
+			require({}, ["esri/config", "esri/rest/locator"], (esriConfig, locator) =>
+			{
+				self.setOnlineToken(esriConfig);
+				const params = {
+					categories,
+					location,
+					searchExtent,
+					maxLocations,
+				};
+
+				let errorMessage = null;
+				locator.addressToLocations(url, params).then((results) =>
+				{
+					resolve({ features: results, errorMessage });
+				}).catch(() => {
+					errorMessage = `No places was found for this location ${JSON.stringify(location)}, categories: ${JSON.stringify(categories)}`;
+					
+					self.clearOnlineToken(esriConfig);
+					reject({ errorMessage });
+				});
 			});
 		});
 	}
@@ -422,7 +487,7 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 		esriConfig.apiKey = null;
 	}
 
-	GeocodingService.prototype.unitTest = function()
+	GeocodingService.prototype.unitTest = async function()
 	{
 		let address = {
 			Street: "Disney World",
@@ -468,6 +533,12 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 		}).catch((error) => {
 			console.log(error.errorMessage);
 		});
+
+		// this.fetchPOICategoriesREST();
+
+		const Schenectady = { x: -73.888011, y: 42.817926 };
+		const findPoiResults = await this.findLocatorPlaces(Schenectady, ["School"]);
+		console.log(findPoiResults);
 	}
 
 	GeocodingService.prototype.dispose = function()
