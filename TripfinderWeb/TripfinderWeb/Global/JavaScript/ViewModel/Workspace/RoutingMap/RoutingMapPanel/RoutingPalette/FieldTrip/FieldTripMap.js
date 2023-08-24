@@ -1040,26 +1040,22 @@
 
 		// avoid add duplicate features.
 		await self.fieldTripHighlightLayerInstance.clearLayer();
-		
-		const { fromFieldTrip, toFieldTrip, previousStop, currentStop, nextStop, AssignSequence } = data;
-		const isAllFieldTripsInvisible = self.fieldTripsData.map(item => item.visible).every(item => item === false),
-		 	isFromFieldTripVisible = fromFieldTrip.visible,
-			isToFieldTripVisible = toFieldTrip.visible;
-		if (!isAllFieldTripsInvisible)
-		{
-			// show highlight stop
-			if (!!currentStop)
-			{
-				await self.fieldTripHighlightStopLayerInstance.clearLayer();
-			}
 
-			self.drawHighlightStop(data, currentStop, AssignSequence);
-		}
-
+		const isAllFieldTripsInvisible = self.fieldTripsData.map(item => item.visible).every(item => item === false);
 		if (isAllFieldTripsInvisible)
 		{
 			return;
 		}
+
+		const { toFieldTrip, previousStop, currentStop, nextStop, AssignSequence } = data;
+		const isToFieldTripVisible = toFieldTrip.visible;
+		// show highlight stop
+		if (!!currentStop)
+		{
+			await self.fieldTripHighlightStopLayerInstance.clearLayer();
+		}
+
+		self.drawHighlightStop(data, currentStop, AssignSequence);
 
 		// show highlight line
 		let fieldTripStops = null;
