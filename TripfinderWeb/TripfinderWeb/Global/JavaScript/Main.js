@@ -1521,6 +1521,11 @@ createNamespace("TF").generateUUID = function()
 	});
 };
 
+function kendoStringTypeParser(value)
+{
+	return value != null ? value + '' : value;
+}
+
 $(function()
 {
 	window.Sys = {};
