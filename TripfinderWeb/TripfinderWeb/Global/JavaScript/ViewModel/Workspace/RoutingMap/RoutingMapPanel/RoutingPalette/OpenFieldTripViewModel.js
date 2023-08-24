@@ -249,7 +249,7 @@
 
 	OpenFieldTripViewModel.prototype.getRequiredColumns = function()
 	{
-		return ['Id', 'FieldTripId', 'DBID', 'PublicId', 'Name', 'School', 'SchoolName', 'SchoolXCoord', 'SchoolYCoord', 'FieldTripDestinationId', 'FieldTripDestinationXCoord', 'FieldTripDestinationYCoord', 'Destination', 'DestinationStreet', 'DepartDateTime', 'EstimatedReturnDateTime'];
+		return ['Id', 'FieldTripId', 'DBID', 'PublicId', 'FieldTripStageId', 'Name', 'School', 'SchoolName', 'SchoolXCoord', 'SchoolYCoord', 'FieldTripDestinationId', 'FieldTripDestinationXCoord', 'FieldTripDestinationYCoord', 'Destination', 'DestinationStreet', 'DepartDateTime', 'EstimatedReturnDateTime'];
 	};
 
 	OpenFieldTripViewModel.prototype.onBeforeLeftGridDataBound = function()
