@@ -37,7 +37,7 @@
 	RoutingFeatureData.prototype.save = function(tripId)
 	{
 		var self = this;
-		var trip = self.dataModel.getTripById(tripId);
+		var trip = self.dataModel.getFieldTripById(tripId);
 		var tripPaths = [];
 		var tripBoundaries = [];
 		trip.FieldTripStops.forEach(function(stop)

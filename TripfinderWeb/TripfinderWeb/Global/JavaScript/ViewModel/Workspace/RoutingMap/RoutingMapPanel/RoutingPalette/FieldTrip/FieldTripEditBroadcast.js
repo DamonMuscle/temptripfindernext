@@ -88,7 +88,7 @@
 			y: tripStop.YCoord,
 			id: tripStop.id,
 			tripId: tripStop.FieldTripId,
-			Session: this.dataModel.getTripById(tripStop.FieldTripId).Session,
+			Session: this.dataModel.getFieldTripById(tripStop.FieldTripId).Session,
 			boundary: tripStop.boundary && tripStop.boundary.geometry ? tripStop.boundary.geometry.toJSON() : null,
 			path: tripStop.path && tripStop.path.geometry ? tripStop.path.geometry.toJSON() : null,
 			scenarioId: this.findScenarioId(tripStop.id)
@@ -113,7 +113,7 @@
 			ProhibitCrosser: tripStop.ProhibitCrosser,
 			//geometry: TF.cloneGeometry(tripStop.geometry),
 			boundary: tripStop.boundary && tripStop.boundary.geometry && tripStop.boundary.geometry.toJSON(),
-			Session: this.dataModel.getTripById(tripStop.FieldTripId).Session
+			Session: this.dataModel.getFieldTripById(tripStop.FieldTripId).Session
 		};
 	};
 
@@ -155,7 +155,7 @@
 	{
 		var self = this;
 		var data = { prevStop: {}, createStop: {}, nextStop: {}, tripId: tripStop.FieldTripId };
-		var trip = this.dataModel.getTripById(tripStop.FieldTripId);
+		var trip = this.dataModel.getFieldTripById(tripStop.FieldTripId);
 
 		data.createStop = self._copyTripStopGeo(tripStop);
 
@@ -179,7 +179,7 @@
 
 	FieldTripEditBroadcast.prototype.getTripStopPreAndNex = function(tripStop)
 	{
-		var self = this, trip = self.dataModel.getTripById(tripStop.tripId ? tripStop.tripId : tripStop.FieldTripId);
+		var self = this, trip = self.dataModel.getFieldTripById(tripStop.tripId ? tripStop.tripId : tripStop.FieldTripId);
 		trip.FieldTripStops.forEach(function(stop, index)
 		{
 			if (stop.id == tripStop.id)
@@ -211,7 +211,7 @@
 
 		var self = this;
 		var data = { prevStop: {}, deleteStop: {}, nextStop: {}, tripId: tripStop.FieldTripId };
-		var trip = this.dataModel.getTripById(tripStop.FieldTripId);
+		var trip = this.dataModel.getFieldTripById(tripStop.FieldTripId);
 
 		data.deleteStop = self._copyTripStopGeo(tripStop);
 
@@ -233,7 +233,7 @@
 
 	FieldTripEditBroadcast.prototype.findScenarioId = function(tripStopId)
 	{
-		var trips = this.dataModel.trips;
+		var trips = this.dataModel.fieldTrips;
 		for (var i = 0; i < trips.length; i++)
 		{
 			for (var j = 0; j < trips[i].FieldTripStops.length; j++)

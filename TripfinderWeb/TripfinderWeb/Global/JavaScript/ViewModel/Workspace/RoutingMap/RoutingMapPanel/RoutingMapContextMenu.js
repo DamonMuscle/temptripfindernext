@@ -233,7 +233,7 @@
 				}
 			} else if (type == 'tripstop')
 			{
-				let trip = routingPaletteViewModel.fieldTripPaletteSection.dataModel.getTripById(menuItemData.FieldTripId),
+				let trip = routingPaletteViewModel.fieldTripPaletteSection.dataModel.getFieldTripById(menuItemData.FieldTripId),
 					fieldTripStopId = menuItemData.type === "tripStop" ? menuItemData.id : menuItemData.FieldTripStopId,
 					fieldTripStop = menuItemData.Sequence ? routingPaletteViewModel.fieldTripPaletteSection.dataModel.getFieldTripStopBySequence(trip, menuItemData.Sequence) : 
 															routingPaletteViewModel.fieldTripPaletteSection.dataModel.getFieldTripStop(fieldTripStopId),

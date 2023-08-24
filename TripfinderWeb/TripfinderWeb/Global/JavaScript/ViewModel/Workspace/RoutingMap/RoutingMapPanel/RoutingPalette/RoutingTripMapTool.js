@@ -225,7 +225,7 @@
 						var lastType = self.editModal.getLastStopBoundaryType();
 						if (self.editModal.showWalkout() && self.editModal.isShowWalkoutGuideType(lastType))
 						{
-							var travelScenarioId = self.dataModel.trips ? self.dataModel.trips[0].TravelScenarioId : 1;
+							var travelScenarioId = self.dataModel.fieldTrips ? self.dataModel.fieldTrips[0].TravelScenarioId : 1;
 							var travelScenario = self._viewModal.travelScenariosPaletteViewModel.travelScenariosViewModel.dataModel.getTravelScenariosById(travelScenarioId);
 							const data = self.editModal.getWalkoutData();
 							self.stopPreviewTool.addPreview(graphic, data.walkoutDistance, data.distanceUnit, data.walkoutBuffer, data.bufferUnit,
@@ -245,7 +245,7 @@
 		var self = this;
 		var queryPromise = tf.startup.loadArcgisUrls().then(function()
 		{
-			var travelScenarioId = self.dataModel.trips ? self.dataModel.trips[0].TravelScenarioId : 1;
+			var travelScenarioId = self.dataModel.fieldTrips ? self.dataModel.fieldTrips[0].TravelScenarioId : 1;
 			return TF.queryTravelSCenarios(travelScenarioId);
 		});
 		return queryPromise.then(function(res)
@@ -354,7 +354,7 @@
 		{
 			if (graphic.attributes.type == "tripStop")
 			{
-				var trip = self.dataModel.getTripById(graphic.attributes.dataModel.FieldTripId);
+				var trip = self.dataModel.getFieldTripById(graphic.attributes.dataModel.FieldTripId);
 				if (!graphic.attributes.dataModel.SchoolCode
 					&& graphic.attributes.dataModel.OpenType === 'Edit' && ((trip && trip.visible) || (!trip)))
 				{
@@ -428,7 +428,7 @@
 		}
 		var self = this,
 			stopGraphic,
-			trip = self.dataModel.getTripById(tripId),
+			trip = self.dataModel.getFieldTripById(tripId),
 			geometry = tripStop.geometry,
 			stopColor = self.dataModel.getColorByTripId(tripId),
 			stopSymbol = self.symbol.tripStopSimpleMarker(stopColor, 23),
@@ -495,7 +495,7 @@
 
 	RoutingTripMapTool.prototype._updateTripStop = function(tripStop)
 	{
-		var self = this, stopSymbol, trip = self.dataModel.getTripById(tripStop.FieldTripId), visible = trip.visible;
+		var self = this, stopSymbol, trip = self.dataModel.getFieldTripById(tripStop.FieldTripId), visible = trip.visible;
 		var stopColor = self.dataModel.getColorByTripId(tripStop.FieldTripId);
 		var stopGraphic = self._pointLayer.graphics.items.filter(function(graphic)
 		{
@@ -700,7 +700,7 @@
 			arrowOnLine = true;
 			isInExtent = false;
 		}
-		if (self.dataModel.trips.length > 0 && self.dataModel.trips.filter(function(c) { return c.visible; }).length > 8)
+		if (self.dataModel.fieldTrips.length > 0 && self.dataModel.fieldTrips.filter(function(c) { return c.visible; }).length > 8)
 		{
 			minZoom = 16;
 		}
@@ -735,7 +735,7 @@
 			{
 				setTimeout(function()
 				{
-					var trip = self.dataModel.getTripById(graphic.attributes.dataModel.id);
+					var trip = self.dataModel.getFieldTripById(graphic.attributes.dataModel.id);
 					if (trip && trip.visible && (!tripId || trip.id == tripId))
 					{
 						var color = self._getColorArray(trip.id);
@@ -764,7 +764,7 @@
 	{
 		let self = this,
 			intersectGeometries = [];
-		let editTripIds = self.dataModel.trips.filter(r=> r.OpenType == "Edit" && r.Id > 0).map(r=> r.Id);
+		let editTripIds = self.dataModel.fieldTrips.filter(r=> r.OpenType == "Edit" && r.Id > 0).map(r=> r.Id);
 		let graphics = self._polygonLayer.graphics.items.filter(r=> r.attributes.dataModel.OBJECTID == 0 || !editTripIds.indexOf(r.attributes.dataModel.FieldTripId));
 
 		graphics.map(function(graphic)
@@ -807,7 +807,7 @@
 		stops.forEach(function(stop)
 		{
 			stop.address = stop.Street;
-			var trip = self.dataModel.getTripById(stop.FieldTripId);
+			var trip = self.dataModel.getFieldTripById(stop.FieldTripId);
 			trip.FieldTripStops.forEach(ts => currentStops.add(ts));
 			if (stop.boundary.BdyType == 0 || !self._isContainedByCurrentPolygons(stop, self._polygonLayer.graphics.items.filter(x => { return x.attributes.dataModel.FieldTripId == stop.FieldTripId; })))
 			{
@@ -842,7 +842,7 @@
 	RoutingTripMapTool.prototype.getNotContainTrips = function(graphic)
 	{
 		var self = this;
-		var trips = this.dataModel.trips;
+		var trips = this.dataModel.fieldTrips;
 		var notContainTrips = [];
 		for (var i = 0; i < trips.length; i++)
 		{
@@ -1077,7 +1077,7 @@
 			BdyType: tripStop.boundary.BdyType
 		};
 		tripStop = $.extend({}, tripStop, { geometry: tripStop.geometry.clone(), boundary: newStopBoundary });
-		var trips = self.dataModel.trips;
+		var trips = self.dataModel.fieldTrips;
 		// if overlap then cut overlap boundary 
 		if (!self._allowOverlap)
 		{

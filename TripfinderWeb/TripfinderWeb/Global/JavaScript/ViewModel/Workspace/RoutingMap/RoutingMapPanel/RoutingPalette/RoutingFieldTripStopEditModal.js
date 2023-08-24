@@ -282,7 +282,7 @@
 	{
 		if (this.mode() != "new" && this.data.length > 0)
 		{
-			return this.dataModel.getTripById(this.data[0].FieldTripId);
+			return this.dataModel.getFieldTripById(this.data[0].FieldTripId);
 		}
 		if (this.availableTrips.length == 0) return {};
 		if (tf.storageManager.get("routing-selectedTripId"))
@@ -476,7 +476,7 @@
 	RoutingFieldTripStopEditModal.prototype._createOneStop = function(tripStop)
 	{
 		var self = this;
-		// var travelScenarioId = self.dataModel.trips ? self.dataModel.trips[0].TravelScenarioId : 1;
+		// var travelScenarioId = self.dataModel.fieldTrips ? self.dataModel.fieldTrips[0].TravelScenarioId : 1;
 		// var travelScenario = self.dataModel._viewModal.travelScenariosPaletteViewModel.travelScenariosViewModel.dataModel.getTravelScenariosById(travelScenarioId);
 		
 		var data = self.trimStringSpace(tripStop);
@@ -592,7 +592,7 @@
 					self.fieldTripPaletteSectionVM.display.afterChangeStopPosition(tripStop, !tripChanged, tripId);
 					if (callZoomToLayers)
 					{
-						PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToLayers, self.dataModel.trips);
+						PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToLayers, self.dataModel.fieldTrips);
 					}
 					tf.loadingIndicator.tryHide()
 				});

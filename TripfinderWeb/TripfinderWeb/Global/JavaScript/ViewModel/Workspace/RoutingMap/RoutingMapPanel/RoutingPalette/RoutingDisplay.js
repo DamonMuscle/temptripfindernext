@@ -130,7 +130,7 @@
 
 		var originalFieldTripId = tripStop.FieldTripId;
 
-		var destTrip = self.dataModel.getTripById(destinationFieldTripId);
+		var destTrip = self.dataModel.getFieldTripById(destinationFieldTripId);
 		self.routingDisplayHelper.getInsertPosition(position, source, destination, isSameTrip, tripStop, destTrip).then(function(destinationIndex)
 		{
 			if (destinationIndex == -1 || (isSameTrip && currentIndex == destinationIndex))
@@ -153,7 +153,7 @@
 	{
 		var self = this;
 		var promises = [];
-		var oldTrip = self.dataModel.getTripById(originalTripId);
+		var oldTrip = self.dataModel.getFieldTripById(originalTripId);
 		promises.push(self.resetTripInfo([oldTrip], null, true).then(function()
 		{
 			if (!isSameTrip)
@@ -167,7 +167,7 @@
 		{
 			self.dataModel.refreshOptimizeSequenceRate(oldTrip.id, null, null, true);
 		}
-		var currentTrip = self.dataModel.getTripById(tripStop.FieldTripId);
+		var currentTrip = self.dataModel.getFieldTripById(tripStop.FieldTripId);
 		promises.push(self.resetTripInfo([currentTrip], null, true).then(function()
 		{
 			if (self.dataModel.showImpactDifferenceChart())
@@ -237,7 +237,7 @@
 	RoutingDisplay.prototype.deleteNode = function(tripStop, isSameTrip)
 	{
 		var self = this, tripStopNodes,
-			trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == tripStop.FieldTripId }),
+			trip = self.dataModel.getFieldTripById(tripStop.FieldTripId),
 			tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.FieldTripId, 'trip', self.treeview.dataSource);
 		
 		if (self.routingDisplayHelper.checkNodeWasExpanded(tripNode) && tripNode.children._data.length > 0)
@@ -268,7 +268,7 @@
 	RoutingDisplay.prototype.addNode = function(tripStop, isSameTrip)
 	{
 		var self = this;
-		var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == tripStop.FieldTripId });
+		var trip = self.dataModel.getFieldTripById(tripStop.FieldTripId);
 		var tripStopTreeView = self.newTripStop(tripStop, trip.Session, trip.Name);
 		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.FieldTripId, 'trip', self.treeview.dataSource);
 		var tripWasExpanded = self.routingDisplayHelper.checkNodeWasExpanded(tripNode);
@@ -699,8 +699,8 @@
 	RoutingDisplay.prototype.setFootInfo = function()
 	{
 		const self = this,
-			tripCount = self.dataModel.trips.length,
-			tripStopCount = self.dataModel.trips.reduce((result, trip) => result + trip.FieldTripStops.length, 0);
+			tripCount = self.dataModel.fieldTrips.length,
+			tripStopCount = self.dataModel.fieldTrips.reduce((result, trip) => result + trip.FieldTripStops.length, 0);
 
 		self.obFooterDisplay(`${tripCount} ${self.routingDisplayHelper.getSingleOrMultiple(tripCount, 'Field Trip')}, ${tripStopCount} ${self.routingDisplayHelper.getSingleOrMultiple(tripStopCount, 'Field Trip Stop')}`);
 	}
@@ -744,7 +744,7 @@
 	RoutingDisplay.prototype.onSchoolLocationChange = function()
 	{
 		var self = this;
-		self.dataModel._getSchoolLocations(self.dataModel.trips).then(function()
+		self.dataModel._getSchoolLocations(self.dataModel.fieldTrips).then(function()
 		{
 			self.bindSchoolLocation();
 		});
@@ -789,7 +789,7 @@
 		{
 			var el = $(this);
 			var data = self.treeview.dataItem(el);
-			var trip = self.dataModel.getTripById(data.customData.tripId);
+			var trip = self.dataModel.getFieldTripById(data.customData.tripId);
 			if (!trip)
 			{
 				return;
@@ -1022,7 +1022,7 @@
 		e.preventDefault();
 		e.stopPropagation();
 		var data = self.treeview.dataItem(e.target.closest('li'));
-		var trip = self.dataModel.getTripById(data.id);
+		var trip = self.dataModel.getFieldTripById(data.id);
 		this.eventsManager.copyTripClick(trip);
 	}
 
@@ -1044,7 +1044,7 @@
 		e.preventDefault();
 		e.stopPropagation();
 		var data = self.treeview.dataItem(e.target.closest('li'));
-		var trip = self.dataModel.getTripById(data.id);
+		var trip = self.dataModel.getFieldTripById(data.id);
 		this.eventsManager.closeTripClick(null, null, [trip]);
 	}
 
@@ -1054,7 +1054,7 @@
 		e.preventDefault();
 		e.stopPropagation();
 		var data = self.treeview.dataItem(e.target.closest('li'));
-		var trip = self.dataModel.getTripById(data.id);
+		var trip = self.dataModel.getFieldTripById(data.id);
 	}
 
 	function optimizeSequenceClick(e)
@@ -1102,7 +1102,7 @@
 			{
 				if (result)
 				{
-					var trips = [self.dataModel.getTripById(data.id)];
+					var trips = [self.dataModel.getFieldTripById(data.id)];
 
 					self.dataModel.setFieldTripActualStopTime(trips);
 					self.dataModel.copyFieldTripStopTimeWithActualTime(trips);
@@ -1188,7 +1188,7 @@
 		}
 
 		var tripStop = self.dataModel.getFieldTripStopByStopId(data.id),
-			trip = self.dataModel.getTripById(tripStop.FieldTripId),
+			trip = self.dataModel.getFieldTripById(tripStop.FieldTripId),
 			generatedPath = self.dataModel.getGeneratedPath(tripStop.id);
 		let result = await tf.modalManager.showModal(new TF.RoutingMap.RoutingPalette.DrivingPathModalViewModel(tripStop, trip, generatedPath));
 		if (result)
@@ -1254,7 +1254,7 @@
 		e.stopPropagation();
 		var data = self.treeview.dataItem(e.target.closest('li'));
 		var fieldTripStop = self.dataModel.getFieldTripStopByStopId(data.id);
-		var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, c => c.id === fieldTripStop.FieldTripId);
+		var trip = self.dataModel.getFieldTripById(fieldTripStop.FieldTripId);
 
 		if (!fieldTripStop)
 		{
@@ -1333,7 +1333,7 @@
 		var type = '';
 		if (data.level() == 0)
 		{
-			data = this.dataModel.getTripById(data.id);
+			data = this.dataModel.getFieldTripById(data.id);
 			type = 'fieldtrip';
 		}
 		else if (data.level() == 1)
@@ -1408,7 +1408,7 @@
 		});
 		for (var changeTripId in changeTripIds)
 		{
-			var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == changeTripId || c.FieldTripID == changeTripId });
+			var trip = self.dataModel.getFieldTripById(changeTripId);
 			self.resetTripInfo([trip], null, null, data.options ? data.options.resetScheduleTime : null);
 			self.refreshAllStopNode(trip);
 		}
@@ -1417,7 +1417,7 @@
 	RoutingDisplay.prototype._addTripStop = function(tripStop)
 	{
 		var self = this;
-		var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, c => c.id === tripStop.FieldTripId);
+		var trip = self.dataModel.getFieldTripById(tripStop.FieldTripId);
 
 		var tripStopTreeViewNode = self.newTripStop(tripStop, self.routingDisplayHelper.getTripType(), trip.Name);
 		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.FieldTripId, 'trip', self.treeview.dataSource);
@@ -1513,7 +1513,8 @@
 	RoutingDisplay.prototype._deleteTripStop = function(tripStop)
 	{
 		var self = this;
-		var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, c => c.id === tripStop.FieldTripId);
+		var trip = self.dataModel.getFieldTripById(tripStop.FieldTripId);
+
 		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.FieldTripId, 'trip', self.treeview.dataSource);
 		var tripWasExpanded = self.routingDisplayHelper.checkNodeWasExpanded(tripNode);
 		var newLockStopId;
@@ -1638,7 +1639,7 @@
 				return;
 			}
 
-			var trip = self.dataModel.getTripById(nodeData.customData.tripId),
+			var trip = self.dataModel.getFieldTripById(nodeData.customData.tripId),
 				isLast = tripStopData.PrimaryDestination;
 			if (tripStopData && tripStopData.TotalStudentCount != null)
 			{
@@ -1728,7 +1729,7 @@
 		var self = this;
 		if (nodeData.customData.isTrip)
 		{
-			var tripData = self.dataModel.getTripById(nodeData.id);
+			var tripData = self.dataModel.getFieldTripById(nodeData.id);
 			var totalDistance = 0;
 			tripData.FieldTripStops.map(function(tripStop)
 			{
@@ -1899,7 +1900,7 @@
 		var tripNodeElement = self.treeview.findByUid(tripNode.uid);
 		if (!data.tripId)
 		{
-			data = self.dataModel.getTripById(data.id);
+			data = self.dataModel.getFieldTripById(data.id);
 		}
 		if (tripNode.customData.openType == 'Edit' && tripNodeElement)
 		{
@@ -2070,7 +2071,7 @@
 						treeview.remove(treeview.findByUid(deleteTrip[0].uid));
 						self.cleanRemovedTreeViewItem(deletingDom, deleteTrip[0]);
 					}
-					if (self.dataModel.trips.some(i => i.Name === fieldTrip.Name))
+					if (self.dataModel.fieldTrips.some(i => i.Name === fieldTrip.Name))
 					{
 						let newTrip = self.newFieldTripData(fieldTrip);
 						editingList.push(newTrip);

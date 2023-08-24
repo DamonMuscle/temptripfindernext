@@ -112,7 +112,7 @@
 		});
 		if (!self._directionChangeShowMode)
 		{
-			self.dataModel.changeTripVisibility(self.dataModel.trips.map(function(t) { return t.id; }), isShowMode);
+			self.dataModel.changeTripVisibility(self.dataModel.fieldTrips.map(function(t) { return t.id; }), isShowMode);
 		}
 		self.routingPaletteVM.childViewShowChange();
 	};
@@ -120,10 +120,10 @@
 	FieldTripPaletteSectionViewModel.prototype.onChangeTripVisibilityEvent = function()
 	{
 		var self = this;
-		if (self.dataModel.trips.length > 0)
+		if (self.dataModel.fieldTrips.length > 0)
 		{
 			self._directionChangeShowMode = true;
-			var visibleCount = Enumerable.From(self.dataModel.trips).Count(function(c) { return c.visible; });
+			var visibleCount = Enumerable.From(self.dataModel.fieldTrips).Count(function(c) { return c.visible; });
 			self.changeVisibility(visibleCount > 0);
 			self._directionChangeShowMode = false;
 		}
@@ -168,7 +168,7 @@
 
 	FieldTripPaletteSectionViewModel.prototype.save = function()
 	{
-		return this.dataModel.saveRoutingFieldTrips(this.dataModel.trips);
+		return this.dataModel.saveRoutingFieldTrips(this.dataModel.fieldTrips);
 	};
 
 	FieldTripPaletteSectionViewModel.prototype.revert = function()

@@ -29,13 +29,13 @@
 
 	RoutingEventsManager.prototype.tripInfoClick = function(data)
 	{
-		var trip = this.dataModel.getTripById(data.id);
+		var trip = this.dataModel.getFieldTripById(data.id);
 		this.dataModel.editTrip(trip);
 	};
 
 	RoutingEventsManager.prototype.deleteTripClick = function(data)
 	{
-		var trip = this.dataModel.getTripById(data.id);
+		var trip = this.dataModel.getFieldTripById(data.id);
 		this.dataModel.deleteTrip(trip);
 	};
 
@@ -138,7 +138,7 @@
 
 	RoutingEventsManager.prototype.zoomClick = function(data, type)
 	{
-		if (this.dataModel.trips.length == 0 && !data)
+		if (this.dataModel.fieldTrips.length == 0 && !data)
 		{
 			return;
 		}
@@ -147,7 +147,7 @@
 		{
 			if (data === null)
 			{
-				data = this.dataModel.trips;
+				data = this.dataModel.fieldTrips;
 			}
 			else
 			{
@@ -196,7 +196,7 @@
 		var geometries = [];
 		if (trips.length == 0)
 		{
-			trips = this.dataModel.trips;
+			trips = this.dataModel.fieldTrips;
 		}
 		trips.map(function(trip)
 		{
@@ -297,7 +297,7 @@
 	RoutingEventsManager.prototype.closeTripClick = function(model, e, tripsData)
 	{
 		var self = this, promise = Promise.resolve(tripsData);
-		var trips = tripsData ? tripsData : this.dataModel.trips;
+		var trips = tripsData ? tripsData : this.dataModel.fieldTrips;
 		if (!tripsData)
 		{
 			promise = tf.modalManager.showModal(
@@ -407,7 +407,7 @@
 	RoutingEventsManager.prototype._onTripsChangeEvent = function()
 	{
 		var self = this;
-		self.obTripSelected(self.dataModel.trips.length > 0);
+		self.obTripSelected(self.dataModel.fieldTrips.length > 0);
 		
 		self.obEditFieldTripSelected(self.dataModel.getEditTrips().length > 0);
 
@@ -525,10 +525,7 @@
 	RoutingEventsManager.prototype.setScheduledTimeClick = function(tripStop)
 	{
 		var self = this;
-		var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c)
-		{
-			return c.id == tripStop.FieldTripId;
-		});
+		var trip = self.dataModel.getFieldTripById(tripStop.FieldTripId);
 		return tf.modalManager.showModal(new TF.RoutingMap.RoutingPalette.SetScheduledTimeModalViewModel(tripStop, trip))
 			.then(function(data)
 			{
@@ -550,8 +547,8 @@
 	RoutingEventsManager.prototype.tripAbsorptionClick = function(tripId)
 	{
 		var self = this;
-		var editTrips = self.dataModel.trips.filter(function(trip) { return trip.OpenType == "Edit" && trip.id != tripId });
-		var trip = self.dataModel.getTripById(tripId);
+		var editTrips = self.dataModel.fieldTrips.filter(function(trip) { return trip.OpenType == "Edit" && trip.id != tripId });
+		var trip = self.dataModel.getFieldTripById(tripId);
 		var tripStops = $.extend(true, [], trip.FieldTripStops.filter(function(stop) { return stop.SchoolCode == null || stop.SchoolCode.length == 0 }));
 		var promise = tf.modalManager.showModal(
 			new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(editTrips, { title: "Absorption" })
@@ -609,7 +606,7 @@
 	RoutingEventsManager.prototype.optimizeSequenceClick = function(tripId)
 	{
 		var self = this, tripStopRouteDictionary = {};
-		var oldTrip = self.dataModel.getTripById(tripId);
+		var oldTrip = self.dataModel.getFieldTripById(tripId);
 		if (oldTrip.FieldTripStops.length <= 1)
 		{
 			return tf.promiseBootbox.alert("No path need to optimize.");
@@ -842,7 +839,7 @@
 	{
 		var self = this;
 		this.clearMode();
-		var trip = self.dataModel.getTripById(data.id);
+		var trip = self.dataModel.getFieldTripById(data.id);
 		var tripStops = trip.FieldTripStops;
 		self._showRoutingDirectionModalViewModel(tripStops, trip, false);
 	};
@@ -1243,9 +1240,9 @@
 		// update and delete trips
 		newTrips.slice(0, oldTrips.length).forEach(function(trip, index)
 		{
-			for (var i = 0; i < self.dataModel.trips.length; i++)
+			for (var i = 0; i < self.dataModel.fieldTrips.length; i++)
 			{
-				if (self.dataModel.trips[i].id == trip.id)
+				if (self.dataModel.fieldTrips[i].id == trip.id)
 				{
 					trip.FieldTripStops.map(function(tripStop)
 					{
@@ -1254,7 +1251,7 @@
 							student.TripID = tripStop.FieldTripId;
 						});
 					});
-					self.dataModel.trips[i] = trip;
+					self.dataModel.fieldTrips[i] = trip;
 					self.dataModel.changeDataStack.push(trip);
 
 					// if (trip.FieldTripStops.length > 2)
@@ -1271,10 +1268,10 @@
 			}
 		});
 		// remove delete trips from dataModel trips array
-		self.dataModel.trips = self.dataModel.trips.filter(function(trip)
+		self.dataModel.setFieldTrips(self.dataModel.fieldTrips.filter(function(trip)
 		{
 			return deleteTripIds.indexOf(trip.id) < 0;
-		});
+		}));
 
 		// create new trips
 		newTrips.slice(oldTrips.length, newTrips.length).forEach(function(trip)
@@ -1510,12 +1507,12 @@
 		newTrip.durationDiff = 0;
 		newTrip.distanceDiff = 0;
 		var oldTrip;
-		for (var i = 0; i < dataModel.trips.length; i++)
+		for (var i = 0; i < dataModel.fieldTrips.length; i++)
 		{
-			if (dataModel.trips[i].id == newTrip.id)
+			if (dataModel.fieldTrips[i].id == newTrip.id)
 			{
-				oldTrip = dataModel.trips[i];
-				dataModel.trips[i] = newTrip;
+				oldTrip = dataModel.fieldTrips[i];
+				dataModel.fieldTrips[i] = newTrip;
 				break;
 			}
 		}

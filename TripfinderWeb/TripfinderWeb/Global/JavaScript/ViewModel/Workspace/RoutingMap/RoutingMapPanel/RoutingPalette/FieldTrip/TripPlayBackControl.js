@@ -6,7 +6,7 @@
 	{
 		this.viewModel = viewModel;
 		this.dataModel = viewModel.dataModel;
-		this.tripPlaybackControlTool = new TF.RoutingMap.TripPlaybackControlTool(() => { return this.viewModel._viewModal._map; }, () => { return this.dataModel.trips; });
+		this.tripPlaybackControlTool = new TF.RoutingMap.TripPlaybackControlTool(() => { return this.viewModel._viewModal._map; }, () => { return this.dataModel.fieldTrips; });
 		this.obPlayBackControlVisible = ko.observable(false);
 		this.onTripsChangeEvent = this.onTripsChangeEvent.bind(this);
 		this.subScribeEvents = [
@@ -58,7 +58,7 @@
 			this.lazyRun("initTripData", () =>
 			{
 				this.tripPlaybackControlTool.initTripData();
-				if (this.dataModel.trips.length == 0)
+				if (this.dataModel.fieldTrips.length == 0)
 				{
 					this.close();
 					return;

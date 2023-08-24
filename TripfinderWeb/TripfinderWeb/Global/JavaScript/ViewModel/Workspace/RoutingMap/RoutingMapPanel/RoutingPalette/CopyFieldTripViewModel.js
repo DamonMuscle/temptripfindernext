@@ -54,7 +54,7 @@
 		}
 
 		// this.setNewTripStops(newTrip);
-		this.dataModel.trips.push(newTrip);
+		this.dataModel.addFieldTrip(newTrip);
 		this.dataModel._setOpenType([newTrip], openType);
 		return Promise.resolve(newTrip);
 	};

@@ -98,7 +98,7 @@
 
 	ContiguousHelper.prototype._getBestSequence = function(odCostResults, tripStops, stops)
 	{
-		var self = this, trip = self.drawTool.dataModel.getTripById(stops[0].TripId);
+		var self = this, trip = self.drawTool.dataModel.getFieldTripById(stops[0].TripId);
 		var currentStops = stops.slice();
 		var groupedStops = self._getStopsGroupsByContiguous(tripStops);
 		groupedStops.forEach(function(stopsGroup)
@@ -150,7 +150,7 @@
 	ContiguousHelper.prototype._getInsertSequence = function(newStop, currentStops, odCostResults)
 	{
 		var self = this, minDelta = Number.MAX_VALUE, minIndex = 0;
-		var session = this.drawTool.dataModel.getTripById(currentStops[0].TripId).Session;
+		var session = this.drawTool.dataModel.getFieldTripById(currentStops[0].TripId).Session;
 		if (session == 0) { minDelta = self._findDistance(odCostResults, newStop.endId, currentStops[0].id, newStop); minIndex = -1; }
 		else { minDelta = self._findDistance(odCostResults, currentStops[currentStops.length - 1].id, newStop.startId, currentStops[currentStops.length - 1]); minIndex = currentStops.length - 1 }
 		for (var i = 0; i < currentStops.length - 1; i++)

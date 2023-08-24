@@ -88,7 +88,7 @@
 	TripLabelSetting.prototype.sourceModify = function(source)
 	{
 		var tripNames = {};
-		this.viewModel.dataModel.trips.forEach(function(trip)
+		this.viewModel.dataModel.fieldTrips.forEach(function(trip)
 		{
 			tripNames[trip.id] = trip.Name;
 		});

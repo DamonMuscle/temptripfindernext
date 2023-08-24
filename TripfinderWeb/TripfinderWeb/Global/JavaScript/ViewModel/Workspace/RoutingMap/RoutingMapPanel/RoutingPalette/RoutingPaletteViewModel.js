@@ -161,7 +161,7 @@
 			}
 		}
 
-		const fieldTrips = this.dataModel.trips,
+		const fieldTrips = this.dataModel.fieldTrips,
 			fieldTripCount = fieldTrips.length;
 		if (fieldTripCount > 0)
 		{
@@ -198,7 +198,7 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapZoomToStop = function(_, data)
 	{
 		const { tripId, sequence } = data;
-		const fieldTrip = this.dataModel.trips.find(item => item.id === tripId || item.oldId === tripId);
+		const fieldTrip = this.dataModel.getFieldTripById(tripId);
 		const stop = fieldTrip?.FieldTripStops.find(item => item.Sequence === sequence);
 		const coordinates = { longitude: stop?.XCoord, latitude: stop?.YCoord };
 
@@ -226,14 +226,13 @@
 		}
 
 		this.fieldTripMap?.setPathLineType(type);
-		this.fieldTripMap?.switchPathType(this.dataModel.trips);
+		this.fieldTripMap?.switchPathType(this.dataModel.fieldTrips);
 	}
 
 	RoutingPaletteViewModel.prototype.onMapCanvas_RecalculateTripMove = function(_, data)
 	{
 		const { fieldTripId, stopId } = data;
-		const fieldTrips = this.dataModel.trips;
-		const fieldTrip = fieldTrips.find(item => item.id === fieldTripId);
+		const fieldTrip = this.dataModel.getFieldTripById(fieldTripId);
 		if (!fieldTrip)
 		{
 			console.warn(`Cannot find field trip id=${fieldTripId}`);
@@ -257,7 +256,7 @@
 		if (tripStops && tripStops.length > 0)
 		{
 			const fieldTripId = tripStops[0].FieldTripId;
-			const fieldTrip = this.dataModel.trips.find(item => item.id === fieldTripId || item.oldId === fieldTripId);
+			const fieldTrip = this.dataModel.getFieldTripById(fieldTripId);
 			const effectSequences = tripStops.map(s => s.Sequence);
 			this.fieldTripMap?.refreshFieldTripPath(fieldTrip, effectSequences, callZoomToLayers);
 		}
@@ -271,7 +270,7 @@
 		}
 
 		const fieldTripId = items[0].FieldTripId;
-		const fieldTrip = this.dataModel.trips.find(item => item.id === fieldTripId || item.oldId === fieldTripId);
+		const fieldTrip = this.dataModel.getFieldTripById(fieldTripId);
 		this.fieldTripMap?.updateStopSymbol(fieldTrip, items);
 	};
 
@@ -283,8 +282,7 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapMoveStopLocation = function(_, data)
 	{
 		const { fieldTripId, stopId } = data;
-		const fieldTrips = this.dataModel.trips;
-		const fieldTrip = fieldTrips.find(item => item.id === fieldTripId);
+		const fieldTrip = this.dataModel.getFieldTripById(fieldTripId);
 		if (!fieldTrip)
 		{
 			console.warn(`Cannot find field trip id=${fieldTripId}`);
@@ -303,13 +301,13 @@
 
 	RoutingPaletteViewModel.prototype.onRefreshFieldTripPath = async function({fieldTripId})
 	{
-		const fieldTrip = this.dataModel.trips.find(item => item.id === fieldTripId || item.oldId === fieldTripId);
+		const fieldTrip = this.dataModel.getFieldTripById(fieldTripId);
 		await this.fieldTripMap?.refreshFieldTripPath(fieldTrip);
 	};
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapMoveStopLocationCompleted = function(data)
 	{
-		const trip = this.dataModel.getTripById(data.FieldTripId);
+		const trip = this.dataModel.getFieldTripById(data.FieldTripId);
 		const stop = this.dataModel.getFieldTripStopBySequence(trip, data.Sequence);
 
 		let updateStop = {...stop};
@@ -324,8 +322,7 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapDeleteStopLocation = function(_, data)
 	{
 		const { fieldTripId, fieldTripStopId } = data;
-		const fieldTrips = this.dataModel.trips;
-		const fieldTrip = fieldTrips.find(item => item.id === fieldTripId);
+		const fieldTrip = this.dataModel.getFieldTripById(fieldTripId);
 		if (!fieldTrip)
 		{
 			console.warn(`Cannot find field trip id=${fieldTripId}`);
@@ -352,7 +349,7 @@
 		tf.loadingIndicator.show();
 		
 		self.dataModel.fieldTripStopDataModel.delete(tripStop).finally(() => {
-			var fieldTrip = Enumerable.From(self.dataModel.trips).FirstOrDefault(function(c) { return c.id == tripStop.FieldTripId; })
+			const fieldTrip = this.dataModel.getFieldTripById(tripStop.FieldTripId);
 
 			PubSub.publish("on_FieldTripPalette_DeleteStopLocationCompleted", fieldTrip);
 
@@ -362,7 +359,7 @@
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapDirectionUpdated = function(data)
 	{
-		const trip = this.dataModel.getTripById(data.fieldTrip.id);
+		const trip = this.dataModel.getFieldTripById(data.fieldTrip.id);
 
 		this.dataModel.update(trip.FieldTripStops, true); // pass true to stop calling onTripStopsChangeEvent
 		this.fieldTripPaletteSection.display.resetTripInfo([trip]).then(()=>
@@ -384,14 +381,13 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapHighlightFieldTripStop = function(_, data)
 	{
 		const { FromTripId, ToTripId, StopId, AssignSequence } = data;
-		const fieldTrips = this.dataModel.trips;
-		const fromFieldTrip = fieldTrips.find(item => item.id === FromTripId);
+		const fromFieldTrip =  this.dataModel.getFieldTripById(FromTripId);
 		if (fromFieldTrip === undefined)
 		{
 			console.warn(`!!Cannot find from field trip id = ${FromTripId}`);
 		}
 
-		const toFieldTrip = fieldTrips.find(item => item.id === ToTripId);
+		const toFieldTrip = this.dataModel.getFieldTripById(ToTripId);
 		if (toFieldTrip === undefined)
 		{
 			console.warn(`!!Cannot find to field trip id = ${ToTripId}`);

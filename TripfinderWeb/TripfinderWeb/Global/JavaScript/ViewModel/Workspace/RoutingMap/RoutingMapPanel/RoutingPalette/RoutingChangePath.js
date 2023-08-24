@@ -65,7 +65,7 @@
 		self.reorderLayer();
 		self.tripStop = $.extend({}, tripStop, { path: $.extend({}, tripStop.path, { geometry: tripStop.path.geometry.clone() }) });
 		self.path = self.tripStop.path;
-		self.trip = self.viewModel.dataModel.getTripById(tripStop.TripId);
+		self.trip = self.viewModel.dataModel.getFieldTripById(tripStop.TripId);
 		self.travelScenarioId = self.trip.TravelScenarioId;
 		self.useFileService = true;
 		var nextTripStop = self.trip.TripStops[tripStop.Sequence];

@@ -632,7 +632,7 @@
 		var promise = new Promise(function(resolve, reject) { _resolve = resolve; _reject = reject; });
 
 		var currentStops = [], nonOverlapedStops = [];
-		self.dataModel.trips.forEach(function(trip)
+		self.dataModel.fieldTrips.forEach(function(trip)
 		{
 			currentStops = currentStops.concat(trip.TripStops);
 		});

@@ -960,7 +960,7 @@
 					unassignedStop = drawTool.dataModel.getFieldTripStopByStopId(stop.attributes.Name);
 				}
 				stopName = unassignedStop.Street;
-				tripName = drawTool.dataModel.getTripById(unassignedStop.TripId).Name;
+				tripName = drawTool.dataModel.getFieldTripById(unassignedStop.TripId).Name;
 				err = self.errDic[stop.attributes.ViolatedConstraints];
 				if (stop.attributes.ViolatedConstraints == 1024)
 				{

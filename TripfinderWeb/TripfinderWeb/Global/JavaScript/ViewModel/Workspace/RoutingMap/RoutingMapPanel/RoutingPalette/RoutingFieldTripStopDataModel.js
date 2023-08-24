@@ -57,7 +57,7 @@
 		self._viewModal.revertMode = "create-TripStop";
 		self._viewModal.revertData = [];
 
-		const targetFieldTrip = self.dataModel.getTripById(tripStops[0].FieldTripId);
+		const targetFieldTrip = self.dataModel.getFieldTripById(tripStops[0].FieldTripId);
 		const stops = tripStops.filter(Boolean).map(function(tripStop)
 		{
 			tripStop = self.createNewData(tripStop);
@@ -99,7 +99,7 @@
 			tripIds.add(x.FieldTripId);
 		});
 		var trips = [];
-		tripIds.forEach(x => trips.push(this.dataModel.getTripById(x)));
+		tripIds.forEach(x => trips.push(this.dataModel.getFieldTripById(x)));
 		this.dataModel.onTripsChangeEvent.notify({ add: [], edit: trips, delete: [] });
 	}
 
@@ -153,7 +153,7 @@
 		self._viewModal.revertMode = "";
 		self._viewModal.revertData = [];
 		insertToStops = sortTripStops(insertToStops);
-		var targetTrip = self.dataModel.getTripById(insertToStops[0].FieldTripId);
+		var targetTrip = self.dataModel.getFieldTripById(insertToStops[0].FieldTripId);
 		var sequenceOffset = insertToStops[0].Sequence;
 		self.bindTripDataToTripStop(newTripStops, targetTrip);
 		var solvePromise = Promise.resolve([]);
@@ -457,7 +457,7 @@
 		var deleteTripStops = [];
 		var editTripStops = [];
 		var changePathTripStops = [];
-		var trip = self.dataModel.getTripById(deleteArray[0].FieldTripId);
+		var trip = self.dataModel.getFieldTripById(deleteArray[0].FieldTripId);
 
 		deleteArray.forEach(function(tripStop)
 		{
@@ -545,9 +545,9 @@
 	RoutingFieldTripStopDataModel.prototype.moveTripStopsToOtherTrip = async function(tripStops, fieldTripId, newSequence, isSequenceOptimize, isSmartSequence, isPreserve)
 	{
 		var self = this;
-		var addTrip = self.dataModel.getTripById(fieldTripId);
+		var addTrip = self.dataModel.getFieldTripById(fieldTripId);
 		var removeStop = tripStops[0];
-		var removeStopTrip = self.dataModel.getTripById(removeStop.FieldTripId);
+		var removeStopTrip = self.dataModel.getFieldTripById(removeStop.FieldTripId);
 		if (isSmartSequence)
 		{
 			console.log("TODO: Move field trip stop to another trip with smart sequence checked.");
@@ -604,7 +604,7 @@
 		self._viewModal.revertData = [];
 		var oldSequence = tripStop.Sequence;
 		var editTripPathStops = [];
-		var trip = self.dataModel.getTripById(tripStop.FieldTripId);
+		var trip = self.dataModel.getFieldTripById(tripStop.FieldTripId);
 		var newPrevStop = newSequence > 1 ? self.dataModel.getFieldTripStopBySequence(trip, newSequence - 1) : null;
 		var oldPrevStop = oldSequence > 1 ? self.dataModel.getFieldTripStopBySequence(trip, oldSequence - 1) : null;
 		if (oldSequence < newSequence)
@@ -693,7 +693,7 @@
 			{
 				prevStop.routeStops = null;
 			}
-			var tripStops = self.dataModel.getTripById(tripStop.FieldTripId).FieldTripStops;
+			var tripStops = self.dataModel.getFieldTripById(tripStop.FieldTripId).FieldTripStops;
 			tripStops = sortTripStops(tripStops);
 			var startSequence = currentStop ? currentStop.Sequence : prevStop.Sequence;
 
@@ -752,7 +752,7 @@
 	RoutingFieldTripStopDataModel.prototype.insertTripStopToTrip = function(data, positionIndex)
 	{
 		var self = this;
-		var trip = this.dataModel.getTripById(data.FieldTripId);
+		var trip = this.dataModel.getFieldTripById(data.FieldTripId);
 		if (positionIndex == undefined)
 		{
 			if (data.doorToDoorSchoolId) { trip.FieldTripStops.splice(TF.Helper.TripHelper.getTripStopInsertSequenceBeforeSchool(trip.FieldTripStops.filter(s => s.id != data.id), trip.Session, data.doorToDoorSchoolId) - 1, 0, data); }
