@@ -27,16 +27,6 @@
 		TF.GIS.Layer.prototype.create.call(this, this.LAYER_TYPE.GRAPHIC);
 	}
 
-	StopLayer.prototype.createStop = function(longitude, latitude, attributes, stopSequence)
-	{
-		const DEFAULT_STOP_COLOR = "#FFFFFF", DEFAULT_STOP_SEQUENCE = 0;
-		const Color = attributes.Color || DEFAULT_STOP_COLOR;
-		const Sequence = stopSequence || attributes.Sequence || DEFAULT_STOP_SEQUENCE;
-		const symbol = this.getStopSymbol(Sequence, Color);
-		const graphic = this.createPointGraphic(longitude, latitude, symbol, attributes);
-		return graphic;
-	}
-
 	StopLayer.prototype.addStops = function(stopGraphics)
 	{
 		this.addMany(stopGraphics);

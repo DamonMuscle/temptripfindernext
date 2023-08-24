@@ -625,7 +625,7 @@
 				NAME: stop.Street,
 				Sequence: NEW_STOP_SEQUENCE
 			};
-			const graphic = highlightStopLayerInstance.createStop(longitude, latitude, attributes, NEW_STOP_SEQUENCE);
+			const graphic = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes, NEW_STOP_SEQUENCE);
 			graphics.push(graphic);
 		}
 
@@ -661,7 +661,7 @@
 				Name: stop.Street,
 				Sequence: NEW_STOP_SEQUENCE
 			};
-		const newStop = this.fieldTripHighlightStopLayerInstance.createStop(stop.XCoord, stop.YCoord, attributes);
+		const newStop = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(stop.XCoord, stop.YCoord, attributes);
 
 		return newStop;
 	}
@@ -679,7 +679,7 @@
 				Name,
 				Sequence: NEW_STOP_SEQUENCE
 			},
-			newStop = stopLayerInstance.createStop(longitude, latitude, attributes);
+			newStop = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes);
 
 		return { Name, City, RegionAbbr, CountryCode, newStop, XCoord: +longitude.toFixed(6), YCoord: +latitude.toFixed(6) };
 	}
@@ -722,7 +722,7 @@
 			const { id, DBID, FieldTripId, Name, Sequence, VehicleCurbApproach, XCoord, YCoord } = data[i];
 			const CurbApproach = VehicleCurbApproach;
 			const attributes = { DBID, FieldTripId, id, Name, CurbApproach, Sequence, Color };
-			const stop = stopLayerInstance.createStop(XCoord, YCoord, attributes);
+			const stop = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(XCoord, YCoord, attributes);
 			graphics.push(stop);
 		}
 
@@ -1158,7 +1158,7 @@
 			longitude = currentStop.XCoord,
 			latitude = currentStop.YCoord;
 
-			stopGraphic = self.fieldTripHighlightStopLayerInstance.createStop(longitude, latitude, attributes, sequence);
+			stopGraphic = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes, sequence);
 		}
 
 		const highlightStop = self.getHighlightStop();
@@ -1359,13 +1359,13 @@
 			id = TF.createId();
 			Name = fieldTrip.SchoolName;
 			attributes = {DBID, FieldTripId, id, Name, CurbApproach, Sequence, Color};
-			const school = self.fieldTripStopLayerInstance?.createStop(fieldTrip.SchoolXCoord, fieldTrip.SchoolYCoord, attributes);
+			const school = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(fieldTrip.SchoolXCoord, fieldTrip.SchoolYCoord, attributes);
 
 			Sequence = 2;
 			id = TF.createId();
 			Name = fieldTrip.Destination;
 			attributes = {DBID, FieldTripId, id, Name, CurbApproach, Sequence, Color};
-			const destination = self.fieldTripStopLayerInstance?.createStop(fieldTrip.FieldTripDestinationXCoord, fieldTrip.FieldTripDestinationYCoord, attributes);
+			const destination = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(fieldTrip.FieldTripDestinationXCoord, fieldTrip.FieldTripDestinationYCoord, attributes);
 
 			self.fieldTripStopLayerInstance?.addStops([destination, school]);
 		}
@@ -1382,7 +1382,7 @@
 				CurbApproach = stop.vehicleCurbApproach;
 				attributes = {DBID, FieldTripId, id, Name, CurbApproach, Sequence, Color};
 				// hide by default for UX.
-				const graphic = self.fieldTripStopLayerInstance?.createStop(stop.XCoord, stop.YCoord, attributes);
+				const graphic = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(stop.XCoord, stop.YCoord, attributes);
 				self.fieldTripStopLayerInstance?.setFeaturesVisibility([graphic], false);
 				graphics.push(graphic);
 			}

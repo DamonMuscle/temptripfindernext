@@ -24,15 +24,6 @@
 		return graphic;
 	}
 
-	HighlightStopLayer.prototype.createStop = function(longitude, latitude, attributes, stopSequence = null)
-	{
-		const DEFAULT_STOP_SEQUENCE = 0;
-		const Sequence = stopSequence || attributes.Sequence || DEFAULT_STOP_SEQUENCE;
-		const symbol = this.getStopSymbol(Sequence);
-		const graphic = this.createPointGraphic(longitude, latitude, symbol, attributes);
-		return graphic;
-	}
-
 	HighlightStopLayer.prototype.getStopSymbol = function(sequence)
 	{
 		const HIGHLIGHT_STOP_COLOR = "#FFFFFF";
