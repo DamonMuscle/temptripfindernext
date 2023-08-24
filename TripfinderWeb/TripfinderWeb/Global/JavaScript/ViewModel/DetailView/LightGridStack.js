@@ -898,8 +898,6 @@
 				});
 			case "multipleGrid":
 				return new TF.DetailView.DataBlockComponent.MultipleGridBlock(item, self.detailView);
-			case "treeList":
-				return new TF.DetailView.DataBlockComponent.TreeListBlock(item, self.detailView);
 			case "UDGrid":
 				return new TF.DetailView.DataBlockComponent.UDGridBlock(item, self.detailView);
 			default:
