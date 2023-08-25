@@ -42,6 +42,9 @@
 			self.thematicKendoGrid.destroy();
 		}
 
+		const hasEditRight = tf.authManager.isAuthorizedFor("gridViewLayouts", "edit");
+		const hasDeleteRight = tf.authManager.isAuthorizedFor("gridViewLayouts", "delete");
+
 		$gridContainer.kendoGrid(
 			{
 				dataSource:
@@ -87,10 +90,10 @@
 						field: "DataExportExists",
 						title: "Data Export Layout",
 						template: '<div class="#: tf.LayoutExtenstion.getDataExportImg(DataExportExists)#"></div>'
-					},
-					{
-						command: [
-							{
+					}].concat(hasEditRight||hasDeleteRight?
+					[{
+						command: (hasEditRight?
+							[{
 								name: "edit",
 								template: '<a class="k-button k-button-icontext k-grid-edit" title="Edit"><span class="k-icon k-edit"></span>Edit</a>',
 								click: function(e)
@@ -98,8 +101,8 @@
 									e.preventDefault();
 									self.editGridLayout(self.getGridLayoutDataModel(e));
 								}
-							},
-							{
+							}] : []).concat(hasDeleteRight ?
+							[{
 								name: "delete",
 								template: '<a class="k-button k-button-icontext k-grid-delete" title="Delete"><span class="k-icon k-delete"></span>Delete</a>',
 								click: function(e)
@@ -107,14 +110,14 @@
 									e.preventDefault();
 									self.deleteGridLayout(self.getGridLayoutDataModel(e));
 								}
-							}],
+							}] : []),
 						width: "60px",
 						title: "Action",
 						attributes:
 						{
 							"class": "text-center"
 						}
-					}]
+					}]:[])
 			});
 
 		self.thematicKendoGrid = $gridContainer.data("kendoGrid");
