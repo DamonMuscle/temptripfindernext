@@ -1299,13 +1299,13 @@
 		const self = this,
 			style = self.cardStyle[type],
 			mapCenterPoint = self._getMapCenterPoint(),
-			fetchPOICount = self._getMaximumFetchPOICount(),
-			distanceOfMeters = self._getMaximumFetchPOIDistance(),
+			fetchCount = TF.GIS.Analysis.PlaceServiceConfiguration.MaximumPlaceCount,
+			radiusOfMeters = TF.GIS.Analysis.PlaceServiceConfiguration.MaximumRadiusDistance,
 			categoryIds = null,
 			searchExtent = null,
 			placeService = TF.GIS.Analysis.getInstance().placeService;
 
-		const { results, errorMessage } = await placeService.findPlaces(mapCenterPoint, value, categoryIds, distanceOfMeters, searchExtent, fetchPOICount);
+		const { results, errorMessage } = await placeService.findPlaces(mapCenterPoint, value, categoryIds, radiusOfMeters, searchExtent, fetchCount);
 		if (errorMessage !== null)
 		{
 			return Promise.reject(errorMessage);
@@ -1368,18 +1368,6 @@
 			whereQuery: ""
 		};
 		return Promise.resolve(result);
-	}
-
-	RoutingMapSearch.prototype._getMaximumFetchPOIDistance = function()
-	{
-		// TODO: read this value from configuration
-		return 5000;
-	}
-
-	RoutingMapSearch.prototype._getMaximumFetchPOICount = function()
-	{
-		// TODO: read this value from configuration
-		return 20;
 	}
 
 	RoutingMapSearch.prototype._getMapCenterPoint = function()
