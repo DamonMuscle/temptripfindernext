@@ -645,6 +645,11 @@
 		return this.map.mapView.scale;
 	}
 
+	Map.prototype.getCenter = function()
+	{
+		return this.map.mapView.center;
+	}
+
 	Map.prototype.restrictPanOutside = function()
 	{
 		const self = this;

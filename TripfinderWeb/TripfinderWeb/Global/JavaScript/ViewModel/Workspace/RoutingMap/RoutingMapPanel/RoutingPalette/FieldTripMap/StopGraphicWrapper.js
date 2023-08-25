@@ -4,14 +4,14 @@
 
 	function StopGraphicWrapper() { }
 
-	StopGraphicWrapper.CreateStop = function(longitude, latitude, attributes = null, sequence = null)
+	StopGraphicWrapper.CreateStop = function(longitude, latitude, attributes = null, sequence = null, visible = true)
 	{
 		const DEFAULT_STOP_COLOR = "#FFFFFF", DEFAULT_STOP_SEQUENCE = 0;
 		const color = attributes?.Color || DEFAULT_STOP_COLOR;
 		const stopSequence = sequence || attributes?.Sequence || DEFAULT_STOP_SEQUENCE;
 		const symbol = getStopSymbol(stopSequence, color);
 
-		return getPointGraphic(longitude, latitude, symbol, attributes);
+		return getPointGraphic(longitude, latitude, symbol, attributes, visible);
 	}
 
 	StopGraphicWrapper.CreateHighlightBackgroundStop = function(longitude, latitude, attributes)
@@ -33,12 +33,12 @@
 		return getStopSymbol(sequence, HIGHLIGHT_STOP_COLOR);
 	}
 
-	const getPointGraphic = (longitude, latitude, symbol, attributes) =>
+	const getPointGraphic = (longitude, latitude, symbol, attributes, visible = true) =>
 	{
 		const point = TF.GIS.GeometryHelper.CreatePointGeometry(longitude, latitude);
 		const geometry = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(point);
 
-		return new TF.GIS.SDK.Graphic({ geometry, symbol, attributes });
+		return new TF.GIS.SDK.Graphic({ geometry, symbol, attributes, visible });
 	};
 
 	const getStopSymbol = (sequence, color) =>

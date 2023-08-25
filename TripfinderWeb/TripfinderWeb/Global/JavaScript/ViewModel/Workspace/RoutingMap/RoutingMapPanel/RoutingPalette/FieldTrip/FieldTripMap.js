@@ -1331,6 +1331,7 @@
 	FieldTripMap.prototype.drawStops = function(fieldTrip)
 	{
 		const self = this,
+			DEFAULT_STOP_VISIBILITY = false,
 		 	color = self._getColor(fieldTrip),
 			Color = color,
 			{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip);
@@ -1365,8 +1366,7 @@
 				CurbApproach = stop.vehicleCurbApproach;
 				attributes = {DBID, FieldTripId, id, Name, CurbApproach, Sequence, Color};
 				// hide by default for UX.
-				const graphic = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(stop.XCoord, stop.YCoord, attributes);
-				self.fieldTripStopLayerInstance?.setFeaturesVisibility([graphic], false);
+				const graphic = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(stop.XCoord, stop.YCoord, attributes, DEFAULT_STOP_VISIBILITY);
 				graphics.push(graphic);
 			}
 

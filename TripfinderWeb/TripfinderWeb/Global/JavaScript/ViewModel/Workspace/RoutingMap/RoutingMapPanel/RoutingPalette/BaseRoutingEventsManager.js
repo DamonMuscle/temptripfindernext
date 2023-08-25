@@ -30,11 +30,11 @@
 	BaseRoutingEventsManager.prototype.createFromSearchResult = function(option)
 	{
 		var self = this;
-		var map = this._viewModal._map;
+		var mapInstance = this._viewModal.mapInstance;
 		var options = {
 			onChoseFromFileEvent: self.createChangeEvent.bind(self)
 		};
-		self.routingSearchViewmodel = new TF.RoutingMap.RoutingPalette.RoutingSearchModalViewModel(map, options);
+		self.routingSearchViewmodel = new TF.RoutingMap.RoutingPalette.RoutingSearchModalViewModel(mapInstance, options);
 		return tf.modalManager.showModal(self.routingSearchViewmodel)
 			.then(function(data)
 			{

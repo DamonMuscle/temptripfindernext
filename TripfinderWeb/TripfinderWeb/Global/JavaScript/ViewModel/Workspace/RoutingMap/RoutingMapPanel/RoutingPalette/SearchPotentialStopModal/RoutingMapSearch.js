@@ -6,10 +6,11 @@
 	 * Constructor
 	 * @returns {void} 
 	 */
-	function RoutingMapSearch(map, options)
+	function RoutingMapSearch(mapInstance, options)
 	{
 		var self = this;
-		self.map = map;
+		self.map = mapInstance.map;
+		self.mapInstance = mapInstance;
 		self.$element = null;
 		self.$searchBtn = null;
 		self.$searchToolContainer = null;
@@ -1372,7 +1373,7 @@
 
 	RoutingMapSearch.prototype._getMapCenterPoint = function()
 	{
-		return this.map.mapView.center;
+		return this.mapInstance.getCenter();
 	}
 
 	RoutingMapSearch.prototype.getSuggestedResultByTripStop = function(type, value, count)
