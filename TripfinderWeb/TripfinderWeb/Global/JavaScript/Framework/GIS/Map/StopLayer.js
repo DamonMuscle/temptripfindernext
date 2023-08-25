@@ -6,8 +6,7 @@
 	{
 		const self = this;
 		TF.GIS.Layer.call(self, options);
-		
-		self.symbolHelper = new TF.Map.Symbol();
+
 		self._editing = {
 			movingStop: null
 		};
@@ -79,7 +78,7 @@
 		for (let i = 0; i < graphics.length; i++)
 		{
 			const graphic = graphics[i];
-			graphic.symbol = this.getStopSymbol(graphic.attributes.Sequence, color);
+			graphic.symbol = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.GetSymbol(graphic.attributes.Sequence, color);
 			graphic.attributes.Color = color;
 		}
 	}
@@ -87,11 +86,6 @@
 	StopLayer.prototype.getCloneFeatures = function()
 	{
 		return this.layer.graphics.clone().items || [];
-	}
-
-	StopLayer.prototype.getStopSymbol = function(sequence, color)
-	{
-		return this.symbolHelper.tripStop(sequence, color);
 	}
 
 	StopLayer.prototype._getMovedStopGraphic = function(graphics)
@@ -174,10 +168,5 @@
 
 	StopLayer.prototype.dispose = function()
 	{
-		if (this.symbolHelper)
-		{
-			this.symbolHelper.dispose();
-			this.symbolHelper = null;
-		}
 	}
 })();

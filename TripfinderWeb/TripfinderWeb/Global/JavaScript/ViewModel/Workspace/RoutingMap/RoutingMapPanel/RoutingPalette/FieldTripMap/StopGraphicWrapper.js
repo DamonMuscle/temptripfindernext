@@ -27,10 +27,15 @@
 		return getPointGraphic(longitude, latitude, symbol, attributes);
 	}
 
-	StopGraphicWrapper.GetHighlightStopSymbol = function(sequence)
+	StopGraphicWrapper.GetHighlightSymbol = function(sequence)
 	{
 		const HIGHLIGHT_STOP_COLOR = "#FFFFFF";
 		return getStopSymbol(sequence, HIGHLIGHT_STOP_COLOR);
+	}
+
+	StopGraphicWrapper.GetSymbol = function(sequence, color)
+	{
+		return getStopSymbol(sequence, color);
 	}
 
 	const getPointGraphic = (longitude, latitude, symbol, attributes, visible = true) =>
