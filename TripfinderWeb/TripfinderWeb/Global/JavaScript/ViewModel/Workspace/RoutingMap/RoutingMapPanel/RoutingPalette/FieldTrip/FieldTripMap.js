@@ -1896,7 +1896,7 @@
 	{
 		if (vertexes && vertexes[0] && vertexes[0].geometry)
 		{
-			var firstSegmentGeom = TF.GIS.SDK.geometryEngine.simplify(pathSegments[0].geometry);
+			var firstSegmentGeom = TF.GIS.GeometryHelper.SimplifyGeometry(pathSegments[0].geometry);
 			if (firstSegmentGeom && firstSegmentGeom.paths[0].length > 2 && pathSegments[0] && pathSegments[1])
 			{
 				firstSegmentGeom.removePoint(0, 0);
@@ -1913,7 +1913,7 @@
 		}
 		if (vertexes && vertexes[1] && vertexes[1].geometry)
 		{
-			var lastSegmentGeom = TF.GIS.SDK.geometryEngine.simplify(pathSegments[pathSegments.length - 1].geometry);
+			var lastSegmentGeom = TF.GIS.GeometryHelper.SimplifyGeometry(pathSegments[pathSegments.length - 1].geometry);
 			if (lastSegmentGeom && lastSegmentGeom.paths[0].length > 2 && pathSegments[pathSegments.length - 2] && pathSegments[pathSegments.length - 1])
 			{
 				lastSegmentGeom.removePoint(0, lastSegmentGeom.paths[0].length - 1);
@@ -1966,15 +1966,14 @@
 		var endIndex = polyline.paths[0].length - 1;
 		var endPoint = polyline.paths[0][endIndex];
 		var distance2 = Math.sqrt((endPoint[0] - point.x) * (endPoint[0] - point.x) + (endPoint[1] - point.y) * (endPoint[1] - point.y));
-		var vertexGeom = TF.GIS.StopHelper.GetPointOnPolylineByDistanceToPoint(polyline, 3, distance1 < distance2);
-		var location = TF.GIS.SDK.webMercatorUtils.webMercatorToGeographic(vertexGeom);
+		var locationPoint = TF.GIS.StopHelper.GetPointOnPolylineByDistanceToPoint(polyline, 3, distance1 < distance2);
 
 		const stopObject = {
 			curbApproach: stop.vehicleCurbApproach,
 			name: stop.Sequence,
 			sequence: stop.Sequence,
-			longitude: location.x,
-			latitude: location.y,
+			longitude: locationPoint.longitude,
+			latitude: locationPoint.latitude,
 		};
 		return networkService.createStopFeatureSet([stopObject]);
 	}
@@ -1982,7 +1981,7 @@
 	FieldTripMap.prototype._createPathSegments = function(result)
 	{
 		var self = this, pathSegments = [];
-		var stopToStopPathGeometry = new TF.GIS.SDK.Polyline({ spatialReference: { wkid: 102100 } });
+		var stopToStopPathGeometry = TF.GIS.GeometryHelper.CreateWebMercatorPolyline([]);
 		var stopToStopPathDirections = "";
 		stopToStopPathGeometry.paths = [
 			[]
@@ -2023,7 +2022,7 @@
 		else
 		{
 			pathSegments.push({
-				geometry: new TF.GIS.SDK.Polyline(self._map.mapView.spatialReference).addPath([])
+				geometry: TF.GIS.GeometryHelper.CreateWebMercatorPolyline([])
 			});
 		}
 		return pathSegments;

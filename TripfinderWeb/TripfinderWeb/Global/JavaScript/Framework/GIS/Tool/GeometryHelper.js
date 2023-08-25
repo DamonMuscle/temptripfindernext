@@ -16,12 +16,7 @@
 
 	GeometryHelper.CreateWebMercatorPoint = function(x, y)
 	{
-		return new TF.GIS.SDK.Point({
-			type: "point",
-			x,
-			y,
-			spatialReference: { wkid: 102100 }
-		});
+		return GeometryHelper.CreatePointGeometry(x, y, 102100);
 	}
 
 	GeometryHelper.ComputeWebMercatorPoint = function(longitude, latitude)
@@ -40,10 +35,20 @@
 		});
 	}
 
+	GeometryHelper.CreateWebMercatorPolyline = function(paths)
+	{
+		return GeometryHelper.CreatePolylineGeometry(paths, 102100);
+	}
+
 	GeometryHelper.ComputeWebMercatorPolyline = function(paths)
 	{
 		const polyline = GeometryHelper.CreatePolylineGeometry(paths);
 		return TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(polyline);
+	}
+
+	GeometryHelper.SimplifyGeometry = function(geometry)
+	{
+		return TF.GIS.SDK.geometryEngine.simplify(geometry);
 	}
 
 })();
