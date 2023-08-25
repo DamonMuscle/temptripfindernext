@@ -609,26 +609,15 @@
 
 	FieldTripMap.prototype.highlightQuickAddStops = function(stops)
 	{
-		const self = this,
-			NEW_STOP_ID = 0,
-			NEW_STOP_SEQUENCE = 0,
-			highlightStopLayerInstance =  self.fieldTripHighlightStopLayerInstance,
-			graphics = [];
+		const self = this, graphics = [];
 		for (let index = 0; index < stops.length; index++)
 		{
 			const stop = stops[index];
-			const longitude = stop.XCoord;
-			const latitude = stop.YCoord;
-			const attributes = {
-				id: NEW_STOP_ID,
-				NAME: stop.Street,
-				Sequence: NEW_STOP_SEQUENCE
-			};
-			const graphic = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes, NEW_STOP_SEQUENCE);
+			const graphic = self.createNewStop(stop);
 			graphics.push(graphic);
 		}
 
-		highlightStopLayerInstance.addStops(graphics);
+		self.fieldTripHighlightStopLayerInstance.addStops(graphics);
 	}
 
 	FieldTripMap.prototype.addHighlightStops = function(addGraphic)
@@ -653,32 +642,27 @@
 
 	FieldTripMap.prototype.createNewStop = function(stop)
 	{
-		const NEW_STOP_ID = 0,
-			NEW_STOP_SEQUENCE = 0,
-			attributes = {
-				id: NEW_STOP_ID,
-				Name: stop.Street,
-				Sequence: NEW_STOP_SEQUENCE
-			};
-		const newStop = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(stop.XCoord, stop.YCoord, attributes);
-
-		return newStop;
+		return this._createNewStop(stop.XCoord, stop.YCoord, stop.Street);
 	}
 
-
-	FieldTripMap.prototype._createGeocodingNewStop = async function(stopLayerInstance, longitude, latitude)
+	FieldTripMap.prototype._createNewStop = function(longitude, latitude, stopName)
 	{
 		const NEW_STOP_ID = 0,
 			NEW_STOP_SEQUENCE = 0,
-			UNNAMED_ADDRESS = "unnamed",
-			{ Address, City, RegionAbbr, CountryCode } = await stopLayerInstance.getGeocodeStop(longitude, latitude),
-			Name = Address || UNNAMED_ADDRESS,
 			attributes = {
 				id: NEW_STOP_ID,
-				Name,
+				Name: stopName,
 				Sequence: NEW_STOP_SEQUENCE
-			},
-			newStop = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes);
+			};
+		return TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes);
+	}
+
+	FieldTripMap.prototype._createGeocodingNewStop = async function(stopLayerInstance, longitude, latitude)
+	{
+		const UNNAMED_ADDRESS = "unnamed",
+			{ Address, City, RegionAbbr, CountryCode } = await stopLayerInstance.getGeocodeStop(longitude, latitude),
+			Name = Address || UNNAMED_ADDRESS,
+			newStop = this._createNewStop(longitude, latitude, Name);
 
 		return { Name, City, RegionAbbr, CountryCode, newStop, XCoord: +longitude.toFixed(6), YCoord: +latitude.toFixed(6) };
 	}
