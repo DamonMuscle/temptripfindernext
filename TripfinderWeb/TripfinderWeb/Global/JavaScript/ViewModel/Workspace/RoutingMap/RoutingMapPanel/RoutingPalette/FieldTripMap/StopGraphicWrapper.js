@@ -40,9 +40,7 @@
 
 	const getPointGraphic = (longitude, latitude, symbol, attributes, visible = true) =>
 	{
-		const point = TF.GIS.GeometryHelper.CreatePointGeometry(longitude, latitude);
-		const geometry = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(point);
-
+		const geometry = TF.GIS.GeometryHelper.ComputeWebMercatorPoint(longitude, latitude);
 		return new TF.GIS.SDK.Graphic({ geometry, symbol, attributes, visible });
 	};
 

@@ -1959,14 +1959,14 @@
 	FieldTripMap.prototype._findVertexToStopOnPath = function(path, stop, networkService)
 	{
 		if (!path || !path.paths || !path.paths[0] || !path.paths[0][0]) return;
-		path = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(TF.cloneGeometry(path));
+		var polyline = TF.GIS.GeometryHelper.ComputeWebMercatorPolyline(path.paths);
 		var point = TF.xyToGeometry(stop.XCoord, stop.YCoord);
-		var startPoint = path.paths[0][0];
+		var startPoint = polyline.paths[0][0];
 		var distance1 = Math.sqrt((startPoint[0] - point.x) * (startPoint[0] - point.x) + (startPoint[1] - point.y) * (startPoint[1] - point.y));
-		var endIndex = path.paths[0].length - 1;
-		var endPoint = path.paths[0][endIndex];
+		var endIndex = polyline.paths[0].length - 1;
+		var endPoint = polyline.paths[0][endIndex];
 		var distance2 = Math.sqrt((endPoint[0] - point.x) * (endPoint[0] - point.x) + (endPoint[1] - point.y) * (endPoint[1] - point.y));
-		var vertexGeom = TF.GIS.StopHelper.GetPointOnPolylineByDistanceToPoint(path, 3, distance1 < distance2);
+		var vertexGeom = TF.GIS.StopHelper.GetPointOnPolylineByDistanceToPoint(polyline, 3, distance1 < distance2);
 		var location = TF.GIS.SDK.webMercatorUtils.webMercatorToGeographic(vertexGeom);
 
 		const stopObject = {

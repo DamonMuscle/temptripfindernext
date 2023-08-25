@@ -590,8 +590,8 @@
 
 	Map.prototype.centerAt = function(longitude, latitude)
 	{
-		const point = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(new TF.GIS.SDK.Point({ x: longitude, y: latitude }));
-		this.centerAtPoint(point);
+		const geometry = TF.GIS.GeometryHelper.ComputeWebMercatorPoint(longitude, latitude);
+		this.centerAtPoint(geometry);
 	}
 
 	Map.prototype.centerAtPoint = function(point)
@@ -634,8 +634,8 @@
 
 	Map.prototype.centerAndZoom = function(longitude, latitude, scale = 5000)
 	{
-		const point = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(new TF.GIS.SDK.Point({ x: longitude, y: latitude }));
-		this.centerAtPoint(point);
+		const geometry = TF.GIS.GeometryHelper.ComputeWebMercatorPoint(longitude, latitude);
+		this.centerAtPoint(geometry);
 
 		this.map.mapView.scale = scale;
 	}

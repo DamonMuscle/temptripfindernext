@@ -12,12 +12,8 @@
 		if (!fromStartToEnd) { polyline.paths[0] = polyline.paths[0].reverse(); }
 		if (TF.GIS.SDK.geometryEngine.geodesicLength(polyline, "meters") <= distance)
 		{
-			return new TF.GIS.SDK.Point({
-				type: "point",
-				x: polyline.paths[0][0][0],
-				y: polyline.paths[0][0][1],
-				spatialReference: { wkid: 102100 }
-			});
+			const x = polyline.paths[0][0][0], y = polyline.paths[0][0][1];
+			return TF.GIS.GeometryHelper.CreateWebMercatorPoint(x, y);
 		}
 		for (var i = 0; i < polyline.paths[0].length - 1; i++)
 		{
@@ -38,16 +34,14 @@
 
 	StopHelper._findPointOnLineByDistance = function(line, distance)
 	{
-		var fromPoint = new TF.GIS.SDK.Point({ type: "point", x: line.paths[0][0][0], y: line.paths[0][0][1], spatialReference: { wkid: 102100 } });
-		var toPoint = new TF.GIS.SDK.Point({ type: "point", x: line.paths[0][1][0], y: line.paths[0][1][1], spatialReference: { wkid: 102100 } });
+		var fromPoint = TF.GIS.GeometryHelper.CreateWebMercatorPoint(line.paths[0][0][0], line.paths[0][0][1]);
+		var toPoint = TF.GIS.GeometryHelper.CreateWebMercatorPoint(line.paths[0][1][0], line.paths[0][1][1]);
 		var length = TF.GIS.SDK.geometryEngine.geodesicLength(line, "meters");
 		var ratio = distance == 0 || length == 0 ? 0 : (distance / length);
-		var point = new TF.GIS.SDK.Point({
-			type: "point",
-			x: (1 - ratio) * fromPoint.x + ratio * toPoint.x,
-			y: (1 - ratio) * fromPoint.y + ratio * toPoint.y,
-			spatialReference: { wkid: 102100 }
-		});
+		var point = TF.GIS.GeometryHelper.CreateWebMercatorPoint(
+			(1 - ratio) * fromPoint.x + ratio * toPoint.x,
+			(1 - ratio) * fromPoint.y + ratio * toPoint.y
+		);
 		return point;
 	};
 })();

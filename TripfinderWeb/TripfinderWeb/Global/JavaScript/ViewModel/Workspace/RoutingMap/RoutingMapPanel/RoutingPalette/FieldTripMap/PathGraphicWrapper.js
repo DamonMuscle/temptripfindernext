@@ -27,14 +27,7 @@
 
 	const getPolylineGraphic = (paths, symbol, attributes, visible = true) =>
 	{
-		const polyline = new TF.GIS.SDK.Polyline({
-			hasZ: false,
-			hasM: false,
-			paths: paths,
-			spatialReference: { wkid: 4326 }
-		});
-		const geometry = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(polyline);
-
+		const geometry = TF.GIS.GeometryHelper.ComputeWebMercatorPolyline(paths);
 		return new TF.GIS.SDK.Graphic({ geometry, symbol, attributes, visible });
 	};
 
