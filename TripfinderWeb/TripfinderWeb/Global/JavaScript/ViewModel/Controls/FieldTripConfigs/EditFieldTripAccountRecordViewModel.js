@@ -201,7 +201,7 @@
 		self.obEntityDataModel().activeFromDate
 			.subscribe(function(value)
 			{
-				if (!value)
+				if (!value || value == 'Invalid date')
 				{
 					self.obEntityDataModel().activeFromDate(null);
 				}
@@ -220,7 +220,7 @@
 		self.obEntityDataModel().activeToDate
 			.subscribe(function(value)
 			{
-				if (!value)
+				if (!value || value == 'Invalid date')
 				{
 					self.obEntityDataModel().activeToDate(null);
 				}
