@@ -658,10 +658,11 @@
 
 	FieldTripMap.prototype._createGeocodingNewStop = async function(longitude, latitude)
 	{
-		const UNNAMED_ADDRESS = "unnamed",
+		const self = this,
+		 	UNNAMED_ADDRESS = "unnamed",
 			{ Address, City, RegionAbbr, CountryCode } = await self.highlightStopLayerInstance.getGeocodeStop(longitude, latitude),
 			Name = Address || UNNAMED_ADDRESS,
-			newStop = this._createNewStop(longitude, latitude, Name);
+			newStop = self._createNewStop(longitude, latitude, Name);
 
 		return { Name, City, RegionAbbr, CountryCode, newStop, XCoord: +longitude.toFixed(6), YCoord: +latitude.toFixed(6) };
 	}
@@ -1105,10 +1106,10 @@
 			// add highlight sequence line
 			const { DBID, FieldTripId, Color } = data,
 				pathAttributes = { DBID, FieldTripId, Color },
-				basePathGraphic = self.pathLayerInstance.createHighlightPath(paths, pathAttributes);
+				basePathGraphic = TF.RoutingPalette.FieldTripMap.PathGraphicWrapper.CreateHighlightBackgroundPath(paths, pathAttributes);
 			highlightGraphics.push(basePathGraphic);
-	
-			const topPathGraphic = self.pathLayerInstance.createPath(paths, pathAttributes);
+
+			const topPathGraphic = TF.RoutingPalette.FieldTripMap.PathGraphicWrapper.CreatePath(paths, pathAttributes);
 			highlightGraphics.push(topPathGraphic);
 		}
 
@@ -1393,9 +1394,8 @@
 			// draw route path split by stop.
 			const stopPath = routePath[i];
 			const pathAttributes = fieldTrip.routePathAttributes;
-			const graphic = this.pathLayerInstance?.createPath([stopPath], pathAttributes);
 			// hide by default for UX.
-			this.pathLayerInstance?.setFeaturesVisibility([graphic], false);
+			const graphic = TF.RoutingPalette.FieldTripMap.PathGraphicWrapper.CreatePath([stopPath], pathAttributes, false);
 			this.pathLayerInstance?.addPath(graphic);
 		}
 	}
@@ -1409,10 +1409,8 @@
 			const Color = self._getColor(fieldTrip),
 				{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
 				attributes = { DBID, FieldTripId, Color };
-	
-			const graphic = self.sequenceLineLayerInstance?.createPath(sequenceLine, attributes);
 			// hide by default for UX.
-			self.sequenceLineLayerInstance?.setFeaturesVisibility([graphic], false);
+			const graphic = TF.RoutingPalette.FieldTripMap.PathGraphicWrapper.CreatePath(sequenceLine, attributes, false);
 			self.sequenceLineLayerInstance?.addPath(graphic, () =>
 			{
 				resolve();

@@ -248,7 +248,7 @@
 			paths: paths,
 			spatialReference: { wkid: 4326 }
 		}));
-		return new TF.GIS.SDK.Graphic({ geometry, symbol, attributes });		
+		return new TF.GIS.SDK.Graphic({ geometry, symbol, attributes });
 	}
 
 	Layer.prototype.queryFeatures = async function(geometry, condition = '1 = 1')
