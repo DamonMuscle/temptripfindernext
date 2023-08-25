@@ -73,15 +73,15 @@
 
 				const placesQueryParameters = new PlacesQueryParameters(params);
 				
-				let errorMessage = null;
+				let message = null;
 				places.queryPlacesNearPoint(placesQueryParameters).then((placesQueryResult) =>
 				{
 					const results = placesQueryResult.results;
-					resolve({ results, errorMessage });
+					resolve({ results, message });
 				}).catch((error) =>
 				{
-					errorMessage = `No places was found for this location ${JSON.stringify(location)}, searchText: ${searchText}, categoryIds: ${categoryIds}, searchRadius: ${searchRadius}`;
-					reject({ errorMessage });
+					message = `No places was found for this location ${JSON.stringify(location)}, searchText: ${searchText}, categoryIds: ${categoryIds}, searchRadius: ${searchRadius}`;
+					reject({ error, message });
 				});
 			});
 		});

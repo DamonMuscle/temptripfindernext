@@ -708,6 +708,11 @@
 				self.obAllResultsCount(allResultsCount);
 				self.obSingleResultCount(singleResultCount);
 				Deferred.resolve(createResponseObj(value, type, result ? [result] : []));
+			}).catch(() =>
+			{
+				self.obAllResultsCount(0);
+				self.obSingleResultCount(0);
+				Deferred.resolve(createResponseObj(value, type, []));
 			});
 		}
 		else
@@ -723,17 +728,17 @@
 				}
 			}
 
-			Promise.all(PromiseAll).then(function(result)
+			Promise.allSettled(PromiseAll).then(function(result)
 			{
 				var allResultsCount = 0,
 					searchResult = $.grep(result, function(item)
 					{
-						if (item && item.count)
+						if (item && item.status === "fulfilled" && item.value?.count)
 						{
-							allResultsCount += item.count;
-							return item;
+							allResultsCount += item.value.count;
+							return item.value;
 						}
-					});
+					}).map(item => item.value);
 
 				self.obAllResultsCount(allResultsCount);
 				self.obSingleResultCount(allResultsCount);
@@ -1306,11 +1311,14 @@
 			searchExtent = null,
 			placeService = TF.GIS.Analysis.getInstance().placeService;
 
-		const { results, errorMessage } = await placeService.findPlaces(mapCenterPoint, value, categoryIds, radiusOfMeters, searchExtent, fetchCount);
-		if (errorMessage !== null)
+		const { results } = await placeService.findPlaces(mapCenterPoint, value, categoryIds, radiusOfMeters, searchExtent, fetchCount).catch((result) =>
 		{
-			return Promise.reject(errorMessage);
-		}
+			const { error, message } = result;
+			if (message !== null)
+			{
+				return Promise.reject(error);
+			}
+		});
 
 		const allData = results || [];
 		const entities = allData.slice(0, count);
