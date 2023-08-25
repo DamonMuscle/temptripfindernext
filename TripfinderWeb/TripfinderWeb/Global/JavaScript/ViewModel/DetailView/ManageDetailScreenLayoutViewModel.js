@@ -89,6 +89,29 @@
 	ManageDetailScreenLayoutViewModel.prototype.initParameters = function()
 	{
 		var self = this;
+		const actionCommands = [{
+			name: "export",
+			template: '<a class="k-button k-button-icontext k-grid-export" title="Export"><span class=" "></span>export</a>',
+			click: self.exportBtnClick.bind(self)
+		}];
+
+		if (tf.authManager.isAuthorizedFor('detailViewLayouts', 'edit'))
+		{
+			actionCommands.push({
+				name: "edit",
+				template: '<a class="k-button k-button-icontext k-grid-edit" title="Edit"><span class="k-icon k-edit"></span>Edit</a>',
+				click: self.editBtnClick.bind(self)
+			});
+		}
+
+		if (tf.authManager.isAuthorizedFor('detailViewLayouts', 'delete'))
+		{
+			actionCommands.push({
+				name: "delete",
+				template: '<a class="k-button k-button-icontext k-grid-delete" title="Delete"><span class=" "></span>delete</a>',
+				click: self.deleteBtnClick.bind(self)
+			});
+		}
 		self.gridColumns = [
 			{
 				field: "Name",
@@ -108,22 +131,7 @@
 				}
 			},
 			{
-				command: [
-					{
-						name: "export",
-						template: '<a class="k-button k-button-icontext k-grid-export" title="Export"><span class=" "></span>export</a>',
-						click: self.exportBtnClick.bind(self)
-					},
-					{
-						name: "edit",
-						template: '<a class="k-button k-button-icontext k-grid-edit" title="Edit"><span class="k-icon k-edit"></span>Edit</a>',
-						click: self.editBtnClick.bind(self)
-					},
-					{
-						name: "delete",
-						template: '<a class="k-button k-button-icontext k-grid-delete" title="Delete"><span class=" "></span>delete</a>',
-						click: self.deleteBtnClick.bind(self)
-					}],
+				command: actionCommands,
 				title: "Action",
 				width: "80px",
 				attributes: {

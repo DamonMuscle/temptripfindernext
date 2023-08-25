@@ -14,10 +14,18 @@
 		self.sizeCss = "modal-dialog-lg";
 		self.title("Manage Layout");
 		self.contentTemplate("Modal/ManageDetailScreenLayout");
-		self.buttonTemplate("modal/positivenegativeother");
+		if (tf.authManager.isAuthorizedFor('detailViewLayouts', 'add'))
+		{
+			self.buttonTemplate("modal/positivenegativeother");
+			self.obOtherButtonLabel("Import Layout");
+		}
+		else
+		{
+			self.buttonTemplate("modal/positivenegative");
+		}
+		
 		self.obPositiveButtonLabel("Apply");
 		self.obNegativeButtonLabel("Close");
-		self.obOtherButtonLabel("Import Layout");
 
 		self.manageLayoutViewModel = new TF.DetailView.ManageDetailScreenLayoutViewModel(gridType, selectId, disableApply);
 		self.applyToPanel = self.applyToPanel.bind(self);
