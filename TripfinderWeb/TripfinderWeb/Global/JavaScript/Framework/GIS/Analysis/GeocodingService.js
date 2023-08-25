@@ -297,7 +297,7 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 			$.ajax({
 				url: suggestUrl,
 				data: {
-					countryCode: ['USA', 'CAN'],
+					countryCode: 'USA,CAN',
 					text: searchAddress,
 					token: self.mode === MODE.ONLINE ? self.settings.onlineToken : null,
 					f: "json"
