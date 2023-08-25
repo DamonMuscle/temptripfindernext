@@ -27,8 +27,7 @@
 	const INFO_STOP_COLOR = "#FFFFFF";
 	const FIELD_TRIP_LAYER_TYPE = {
 		PATH: "PathLayer",
-		STOP: "StopLayer",
-		HIGHLIGHT_STOP: "HighlightStopLayer"
+		STOP: "StopLayer"
 	};
 
 	//#endregion
@@ -132,7 +131,7 @@
 		}, {
 			id: RoutingPalette_FieldTripHighlightStopLayerId,
 			index: RoutingPalette_FieldTripHighlightStopLayer_Index,
-			layerType: FIELD_TRIP_LAYER_TYPE.HIGHLIGHT_STOP
+			layerType: FIELD_TRIP_LAYER_TYPE.STOP
 		}];
 		const layerInstances = await self.layerManager.createLayerInstances(layerOptions);
 
@@ -1089,7 +1088,7 @@
 		{
 			const { XCoord, YCoord, id } = stop,
 				attributes = { DBID, FieldTripId, id },
-				graphic = self.fieldTripHighlightStopLayerInstance.createBackgroundStop(XCoord, YCoord, attributes);
+				graphic = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateHighlightBackgroundStop(XCoord, YCoord, attributes);
 			stops.push(graphic);
 
 			vertex.push([XCoord, YCoord]);
@@ -1169,7 +1168,7 @@
 				highlightStop.geometry = stopGraphic.geometry;
 				highlightStop.attributes = stopGraphic.attributes;
 			}
-			highlightStop.symbol = self.fieldTripHighlightStopLayerInstance.getStopSymbol(sequence);
+			highlightStop.symbol = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.GetHighlightStopSymbol(sequence);
 		}
 		else
 		{
@@ -2220,55 +2219,4 @@
 		self.fieldTripPathArrowLayerInstance = null;
 		self.fieldTripSequenceLineArrowLayerInstance = null;
 	}
-})();
-
-
-(function()
-{
-	createNamespace("TF.RoutingPalette.FieldTripMap").StopGraphicWrapper = StopGraphicWrapper;
-
-	function StopGraphicWrapper() { }
-
-	StopGraphicWrapper.CreateStop = function(longitude, latitude, attributes = null, sequence = null)
-	{
-		const DEFAULT_STOP_COLOR = "#FFFFFF", DEFAULT_STOP_SEQUENCE = 0;
-		const color = attributes?.Color || DEFAULT_STOP_COLOR;
-		const stopSequence = sequence || attributes?.Sequence || DEFAULT_STOP_SEQUENCE;
-		const symbol = getStopSymbol(stopSequence, color);
-
-		return getPointGraphic(longitude, latitude, symbol, attributes);
-	}
-
-	StopGraphicWrapper.CreateHighlightStop = function(longitude, latitude, attributes)
-	{
-		const color = [253, 245, 53, 0.7];
-		const symbol = {
-			type: "simple-marker",
-			color: color,
-			size: 32,
-			outline: null
-		};
-
-		return getPointGraphic(longitude, latitude, symbol, attributes);
-	}
-
-	const getPointGraphic = (longitude, latitude, symbol, attributes) =>
-	{
-		const point = TF.GIS.GeometryHelper.CreatePointGeometry(longitude, latitude);
-		const geometry = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(point);
-
-		return new TF.GIS.SDK.Graphic({ geometry, symbol, attributes });
-	};
-
-	const getStopSymbol = (sequence, color) =>
-	{
-		let symbolHelper = new TF.Map.Symbol();
-		const stopSymbol = symbolHelper.tripStop(sequence, color);
-
-		symbolHelper.dispose();
-		symbolHelper = null;
-
-		return stopSymbol;
-	};
-
 })();
