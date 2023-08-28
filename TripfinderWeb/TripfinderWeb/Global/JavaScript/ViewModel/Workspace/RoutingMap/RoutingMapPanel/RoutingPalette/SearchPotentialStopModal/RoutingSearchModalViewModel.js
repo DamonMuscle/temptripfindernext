@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").RoutingSearchModalViewModel = RoutingSearchModalViewModel;
 
-	function RoutingSearchModalViewModel(map, option)
+	function RoutingSearchModalViewModel(mapInstance, option)
 	{
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Quick Add Stops");
@@ -11,7 +11,7 @@
 		this.buttonTemplate("modal/PositiveNegative");
 		this.obPositiveButtonLabel("Apply");
 		this.obNegativeButtonLabel("Cancel");
-		this.data(new TF.RoutingMap.RoutingPalette.RoutingSearchViewModel(map, option));
+		this.data(new TF.RoutingMap.RoutingPalette.RoutingSearchViewModel(mapInstance, option));
 
 		setTimeout(() =>
 		{

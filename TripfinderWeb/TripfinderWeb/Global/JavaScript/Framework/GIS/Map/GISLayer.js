@@ -236,19 +236,14 @@
 
 	Layer.prototype.createPointGraphic = function(longitude, latitude, symbol, attributes)
 	{
-		const geometry = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(new TF.GIS.SDK.Point({ x: longitude, y: latitude }));
+		const geometry = TF.GIS.GeometryHelper.ComputeWebMercatorPoint(longitude, latitude);
 		return new TF.GIS.SDK.Graphic({ geometry, symbol, attributes });
 	}
 
 	Layer.prototype.createPolylineGraphic = function(paths, symbol, attributes)
 	{
-		const geometry = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(new TF.GIS.SDK.Polyline({
-			hasZ: false,
-			hasM: false,
-			paths: paths,
-			spatialReference: { wkid: 4326 }
-		}));
-		return new TF.GIS.SDK.Graphic({ geometry, symbol, attributes });		
+		const geometry = TF.GIS.GeometryHelper.ComputeWebMercatorPolyline(paths);
+		return new TF.GIS.SDK.Graphic({ geometry, symbol, attributes });
 	}
 
 	Layer.prototype.queryFeatures = async function(geometry, condition = '1 = 1')

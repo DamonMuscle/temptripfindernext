@@ -2,10 +2,10 @@
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").RoutingSearchViewModel = RoutingSearchViewModel;
 
-	function RoutingSearchViewModel(map, options)
+	function RoutingSearchViewModel(mapInstance, options)
 	{
-		this.map = map;
-		this.routingMapSearch = new TF.RoutingMap.RoutingMapSearch(map, options);
+		this.mapInstance = mapInstance;
+		this.routingMapSearch = new TF.RoutingMap.RoutingMapSearch(mapInstance, options);
 	}
 
 	RoutingSearchViewModel.prototype.init = function()

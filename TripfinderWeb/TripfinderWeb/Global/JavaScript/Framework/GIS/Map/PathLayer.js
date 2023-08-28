@@ -4,10 +4,7 @@
 
 	function PathLayer(options)
 	{
-		const self = this;
-		TF.GIS.Layer.call(self, options);
-		
-		self.symbolHelper = new TF.Map.Symbol();
+		TF.GIS.Layer.call(this, options);
 	}
 
 	PathLayer.prototype = Object.create(TF.GIS.Layer.prototype);
@@ -16,24 +13,6 @@
 	PathLayer.prototype.create = function()
 	{
 		TF.GIS.Layer.prototype.create.call(this, this.LAYER_TYPE.GRAPHIC);
-	}
-
-	PathLayer.prototype.createPath = function(paths, attributes)
-	{
-		const DEFAULT_STOP_COLOR = "#FFFFFF"
-		const Color = attributes.Color || DEFAULT_STOP_COLOR;
-		const symbol = this.getSymbol(Color);
-		const graphic = this.createPolylineGraphic(paths, symbol, attributes);
-		return graphic;
-	}
-
-	PathLayer.prototype.createHighlightPath = function(paths, attributes)
-	{
-		const Color = [253, 245, 53, 0.7];
-		const symbol = this.getSymbol(Color);
-		symbol.width = symbol.width + 4;
-		const graphic = this.createPolylineGraphic(paths, symbol, attributes);
-		return graphic;
 	}
 
 	PathLayer.prototype.addPath = function(pathGraphic, afterAdd = null)
@@ -51,22 +30,12 @@
 		for (let i = 0; i < graphics.length; i++)
 		{
 			const graphic = graphics[i];
-			graphic.symbol =  this.getSymbol(color);
+			graphic.symbol =  TF.RoutingPalette.FieldTripMap.PathGraphicWrapper.GetSymbol(color);
 			graphic.attributes.Color = color;
 		}
 	}
 
-	PathLayer.prototype.getSymbol = function(color)
-	{
-		return this.symbolHelper.tripPath(color);
-	}
-
 	PathLayer.prototype.dispose = function()
 	{
-		if (this.symbolHelper)
-		{
-			this.symbolHelper.dispose();
-			this.symbolHelper = null;
-		}
 	}
 })();

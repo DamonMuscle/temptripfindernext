@@ -6,10 +6,11 @@
 	 * Constructor
 	 * @returns {void} 
 	 */
-	function RoutingMapSearch(map, options)
+	function RoutingMapSearch(mapInstance, options)
 	{
 		var self = this;
-		self.map = map;
+		self.map = mapInstance.map;
+		self.mapInstance = mapInstance;
 		self.$element = null;
 		self.$searchBtn = null;
 		self.$searchToolContainer = null;
@@ -707,6 +708,11 @@
 				self.obAllResultsCount(allResultsCount);
 				self.obSingleResultCount(singleResultCount);
 				Deferred.resolve(createResponseObj(value, type, result ? [result] : []));
+			}).catch(() =>
+			{
+				self.obAllResultsCount(0);
+				self.obSingleResultCount(0);
+				Deferred.resolve(createResponseObj(value, type, []));
 			});
 		}
 		else
@@ -722,17 +728,17 @@
 				}
 			}
 
-			Promise.all(PromiseAll).then(function(result)
+			Promise.allSettled(PromiseAll).then(function(result)
 			{
 				var allResultsCount = 0,
 					searchResult = $.grep(result, function(item)
 					{
-						if (item && item.count)
+						if (item && item.status === "fulfilled" && item.value?.count)
 						{
-							allResultsCount += item.count;
-							return item;
+							allResultsCount += item.value.count;
+							return item.value;
 						}
-					});
+					}).map(item => item.value);
 
 				self.obAllResultsCount(allResultsCount);
 				self.obSingleResultCount(allResultsCount);
@@ -1299,17 +1305,20 @@
 		const self = this,
 			style = self.cardStyle[type],
 			mapCenterPoint = self._getMapCenterPoint(),
-			fetchPOICount = self._getMaximumFetchPOICount(),
-			distanceOfMeters = self._getMaximumFetchPOIDistance(),
+			fetchCount = TF.GIS.Analysis.PlaceServiceConfiguration.MaximumPlaceCount,
+			radiusOfMeters = TF.GIS.Analysis.PlaceServiceConfiguration.MaximumRadiusDistance,
 			categoryIds = null,
 			searchExtent = null,
 			placeService = TF.GIS.Analysis.getInstance().placeService;
 
-		const { results, errorMessage } = await placeService.findPlaces(mapCenterPoint, value, categoryIds, distanceOfMeters, searchExtent, fetchPOICount);
-		if (errorMessage !== null)
+		const { results } = await placeService.findPlaces(mapCenterPoint, value, categoryIds, radiusOfMeters, searchExtent, fetchCount).catch((result) =>
 		{
-			return Promise.reject(errorMessage);
-		}
+			const { error, message } = result;
+			if (message !== null)
+			{
+				return Promise.reject(error);
+			}
+		});
 
 		const allData = results || [];
 		const entities = allData.slice(0, count);
@@ -1370,21 +1379,9 @@
 		return Promise.resolve(result);
 	}
 
-	RoutingMapSearch.prototype._getMaximumFetchPOIDistance = function()
-	{
-		// TODO: read this value from configuration
-		return 5000;
-	}
-
-	RoutingMapSearch.prototype._getMaximumFetchPOICount = function()
-	{
-		// TODO: read this value from configuration
-		return 20;
-	}
-
 	RoutingMapSearch.prototype._getMapCenterPoint = function()
 	{
-		return this.map.mapView.center;
+		return this.mapInstance.getCenter();
 	}
 
 	RoutingMapSearch.prototype.getSuggestedResultByTripStop = function(type, value, count)

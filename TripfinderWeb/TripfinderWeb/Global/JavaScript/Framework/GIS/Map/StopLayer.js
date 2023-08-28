@@ -6,8 +6,7 @@
 	{
 		const self = this;
 		TF.GIS.Layer.call(self, options);
-		
-		self.symbolHelper = new TF.Map.Symbol();
+
 		self._editing = {
 			movingStop: null
 		};
@@ -25,16 +24,6 @@
 	StopLayer.prototype.create = function()
 	{
 		TF.GIS.Layer.prototype.create.call(this, this.LAYER_TYPE.GRAPHIC);
-	}
-
-	StopLayer.prototype.createStop = function(longitude, latitude, attributes, stopSequence)
-	{
-		const DEFAULT_STOP_COLOR = "#FFFFFF", DEFAULT_STOP_SEQUENCE = 0;
-		const Color = attributes.Color || DEFAULT_STOP_COLOR;
-		const Sequence = stopSequence || attributes.Sequence || DEFAULT_STOP_SEQUENCE;
-		const symbol = this.getStopSymbol(Sequence, Color);
-		const graphic = this.createPointGraphic(longitude, latitude, symbol, attributes);
-		return graphic;
 	}
 
 	StopLayer.prototype.addStops = function(stopGraphics)
@@ -89,7 +78,7 @@
 		for (let i = 0; i < graphics.length; i++)
 		{
 			const graphic = graphics[i];
-			graphic.symbol = this.getStopSymbol(graphic.attributes.Sequence, color);
+			graphic.symbol = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.GetSymbol(graphic.attributes.Sequence, color);
 			graphic.attributes.Color = color;
 		}
 	}
@@ -97,11 +86,6 @@
 	StopLayer.prototype.getCloneFeatures = function()
 	{
 		return this.layer.graphics.clone().items || [];
-	}
-
-	StopLayer.prototype.getStopSymbol = function(sequence, color)
-	{
-		return this.symbolHelper.tripStop(sequence, color);
 	}
 
 	StopLayer.prototype._getMovedStopGraphic = function(graphics)
@@ -184,10 +168,5 @@
 
 	StopLayer.prototype.dispose = function()
 	{
-		if (this.symbolHelper)
-		{
-			this.symbolHelper.dispose();
-			this.symbolHelper = null;
-		}
 	}
 })();
