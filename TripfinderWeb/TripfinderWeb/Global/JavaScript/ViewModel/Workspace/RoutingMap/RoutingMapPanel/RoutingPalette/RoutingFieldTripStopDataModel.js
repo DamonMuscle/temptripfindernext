@@ -744,7 +744,10 @@
 
 	RoutingFieldTripStopDataModel.prototype._refreshTripPathByTripStops = function(tripStops, callZoomToLayers = true)
 	{
-		const data = { tripStops, callZoomToLayers };
+		const data = { tripStops, callZoomToLayers, onCompleted: ()=> tf.loadingIndicator.tryHide()};
+		
+		tf.loadingIndicator.showImmediately();
+		
 		PubSub.publish("on_MapCanvas_RefreshTripByStops", data);
 		return Promise.resolve(tripStops);
 	};

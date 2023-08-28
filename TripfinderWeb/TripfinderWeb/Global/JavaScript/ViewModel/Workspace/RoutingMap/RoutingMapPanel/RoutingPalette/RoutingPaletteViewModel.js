@@ -250,16 +250,18 @@
 		this.fieldTripMap?.refreshFieldTripPath(fieldTrip, effectSequences);
 	};
 
-	RoutingPaletteViewModel.prototype.onMapCanvas_RefreshPathByStops = function(_, data)
+	RoutingPaletteViewModel.prototype.onMapCanvas_RefreshPathByStops = async function(_, data)
 	{
-		const { tripStops, callZoomToLayers } = data;
+		const { tripStops, callZoomToLayers, onCompleted} = data;
 		if (tripStops && tripStops.length > 0)
 		{
 			const fieldTripId = tripStops[0].FieldTripId;
 			const fieldTrip = this.dataModel.getFieldTripById(fieldTripId);
 			const effectSequences = tripStops.map(s => s.Sequence);
-			this.fieldTripMap?.refreshFieldTripPath(fieldTrip, effectSequences, callZoomToLayers);
+			await this.fieldTripMap?.refreshFieldTripPath(fieldTrip, effectSequences, callZoomToLayers);
 		}
+
+		this.checkIfCompletedHandlerExists(data);
 	}
 
 	RoutingPaletteViewModel.prototype.onTripSequenceChange = function(evt, items)
