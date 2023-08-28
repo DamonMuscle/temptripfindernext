@@ -365,7 +365,10 @@
 			{
 				if (result && typeof result === "object")
 				{
-					this.obGridFilterDataModels.push(result);
+					if (!this.obGridFilterDataModels().some(filter => filter.name() == result.name()))
+					{
+						this.obGridFilterDataModels.push(result);
+					}
 					this.initFilterGrid();
 				}
 			}).finally(() =>
