@@ -811,7 +811,7 @@
 		{
 			elem.find('.form-base-container').append(`
 				<div class="form-question-container">
-							<div class="system-field-invalid warning hide">System field is not in the current data source</div>
+							<div class="system-field-invalid warning hide">System field is not in the current data source or has been deleted</div>
 				</div>`);
 			this.createQuestions(elem.find('.form-base-container'), this.options.UDGridFields);
 		}
@@ -953,6 +953,11 @@
 			{
 				getUDFOptionPromise().then(udfs =>
 				{
+					// if udfs is undefinded but system field question has value: thie udf field has been removed from the udf
+					if (udfs === undefined && q)
+					{
+						q.elem.hide();
+					}
 					let existsDbMatchedUDF = false;
 					// re assign targetField with udf display name
 					udfs && udfs.forEach(udf =>
@@ -1230,7 +1235,7 @@
 					</div>
 					<div class="section-block" style="padding: 20px 30px">
 		<div class="form-question-container">
-			<div class="system-field-invalid warning hide">System field is not in the current data source</div>
+			<div class="system-field-invalid warning hide">System field is not in the current data source or has been deleted</div>
 		</div>
 		</div>`);
 			self.createQuestions($(currentSectionBlock[2]), section.UDGridFields, section);
@@ -1260,7 +1265,7 @@
 
 			var currentSectionBlock = $(`<div class="section-block" id="${section.Id}" data-bind="visible: currentSectionId() === ${section.Id}">
 		<div class="form-question-container">
-			<div class="system-field-invalid warning hide">System field is not in the current data source</div>
+			<div class="system-field-invalid warning hide">System field is not in the current data source or has been deleted</div>
 		</div>
 </div>`);
 			ko.applyBindings(self, currentSectionBlock[0]);
