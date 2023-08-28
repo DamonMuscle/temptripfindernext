@@ -925,23 +925,6 @@
 		}
 	}
 
-	FieldTripMap.prototype.clearStops = function(fieldTrip, stops = null)
-	{
-		const self = this,
-			{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
-			stopFeatures = self._getStopFeatures(),
-			fieldTripStops = self._queryMapFeatures(stopFeatures, DBID, FieldTripId);
-
-		if (stops)
-		{
-			stops.forEach(stop =>
-			{
-				const sequence = stop.Sequence,
-					stopFeature = fieldTripStops.find(item => item.attributes.Sequence === sequence);
-				self.stopLayerInstance.deleteStop(stopFeature);
-			});
-		}
-	}
 	//#endregion
 
 	//#region Delete Stop
@@ -1612,13 +1595,6 @@
 
 	//#region - Computing Methods
 
-	FieldTripMap.prototype._computeRoutePath = function(routeResult)
-	{
-		const route = routeResult?.route,
-		 	paths = route?.geometry?.paths; 
-		return paths;
-	}
-
 	FieldTripMap.prototype._computeEffectSequences = function(fieldTrip, {addStop, moveStop, deleteStop} = {})
 	{
 		let effectSequences = [];
@@ -1684,14 +1660,6 @@
 		});
 	}
 
-	FieldTripMap.prototype._clearRoutePathForStop = function(changedStops)
-	{
-		for(var i = 0; i < changedStops.length - 1; i++)
-		{
-			changedStops[i]._geoPath = null;
-		}
-	}
-
 	FieldTripMap.prototype._computePathAttributes = function(fieldTrip, routeResult)
 	{
 		const Color = this._getColor(fieldTrip),
@@ -1721,13 +1689,6 @@
 		}
 
 		return paths;
-	}
-
-	FieldTripMap.prototype._computeDirections = function(routeResult)
-	{
-		const { features, routeName, strings, totalDriveTime, totalLength, totalTime } = routeResult.directions;
-		const routeDirections = { features, routeName, strings, totalDriveTime, totalLength, totalTime };
-		return routeDirections;
 	}
 
 	//#endregion
