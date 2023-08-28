@@ -727,6 +727,19 @@
 		return Promise.resolve(findFeatureResults);
 	}
 
+	Map.prototype.findFeaturesByHitTest = async function(event, layerId = null)
+	{
+		const response = await this.hitTest(event);
+		const graphics = response?.results?.map(item => item.graphic) || [];
+		if (graphics.length === 0 || layerId === null)
+		{
+			return graphics;
+		}
+		
+		const layerFeatures = graphics.filter(item => item.layer.id === layerId);
+		return layerFeatures;
+	}
+
 	Map.prototype.hitTest = async function(event)
 	{
 		return this.map.mapView && this.map.mapView.hitTest(event) || null;

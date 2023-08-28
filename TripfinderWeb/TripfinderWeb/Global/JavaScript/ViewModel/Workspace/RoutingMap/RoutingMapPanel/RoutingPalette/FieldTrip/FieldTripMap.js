@@ -1213,37 +1213,31 @@
 		{
 			// right click
 
-			response = await self.mapInstance?.map.mapView.hitTest(event);
-			if (response.results.length > 0)
+			const stopGraphics = await self.mapInstance?.findFeaturesByHitTest(event, RoutingPalette_FieldTripStopLayerId);
+			const pathGraphics = await self.mapInstance?.findFeaturesByHitTest(event, RoutingPalette_FieldTripPathLayerId);
+			if (stopGraphics.length > 0 || pathGraphics.length > 0)
 			{
-				const graphics = response.results.map(item => item.graphic);
-				const stopGraphics = graphics.filter(item => item.layer?.id === RoutingPalette_FieldTripStopLayerId);
-				const pathGraphics = graphics.filter(item => item.layer?.id === RoutingPalette_FieldTripPathLayerId);
+				await this.confirmToExitAddingStop(false);
+			}
 
-				if (stopGraphics.length > 0 || pathGraphics.length > 0)
-				{
-					await this.confirmToExitAddingStop(false);
-				}
+			if (stopGraphics.length > 0)
+			{
+				const data = stopGraphics.map(stop => {
+					const { DBID, FieldTripId, id, Sequence } = stop.attributes;
+					return { DBID, FieldTripId, id, Sequence };
+				});
+				const dataWrapper = { data, event };
+				this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.FieldTripStopClick, data: dataWrapper });
+			}
 
-				if (stopGraphics.length > 0)
-				{
-					const data = stopGraphics.map(stop => {
-						const { DBID, FieldTripId, id, Sequence } = stop.attributes;
-						return { DBID, FieldTripId, id, Sequence };
-					});
-					const dataWrapper = { data, event };
-					this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.FieldTripStopClick, data: dataWrapper });
-				}
-
-				if (pathGraphics.length > 0)
-				{
-					const data = pathGraphics.map(path => {
-						const { DBID, FieldTripId, Sequence } = path.attributes;
-						return { DBID, FieldTripId, Sequence };
-					});
-					const dataWrapper = { data, event };
-					this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.FieldTripPathClick, data: dataWrapper });
-				}
+			if (pathGraphics.length > 0)
+			{
+				const data = pathGraphics.map(path => {
+					const { DBID, FieldTripId, Sequence } = path.attributes;
+					return { DBID, FieldTripId, Sequence };
+				});
+				const dataWrapper = { data, event };
+				this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.FieldTripPathClick, data: dataWrapper });
 			}
 		}
 	}

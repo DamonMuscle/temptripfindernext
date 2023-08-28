@@ -108,8 +108,7 @@
 
 		self.mapClickEvent = mapInstance.map.mapView.on('click', async function(event) {
 
-			const locationGridLayerSearchFactor = 300; // The experience value, it depends on the point symbol size.
-			const locationGraphics = await self.getMapInstance().find(event.mapPoint, [self.manuallyPinLayerInstance], locationGridLayerSearchFactor);
+			const locationGraphics = await self.getMapInstance().findFeaturesByHitTest(event, ManuallyPinLayerId);
 	
 			self.gridMapPopup && self.gridMapPopup.close();
 			if(!locationGraphics || !locationGraphics.length)

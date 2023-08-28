@@ -447,8 +447,7 @@
 	{
 		const self = this;
 		const event = data.event;
-		const locationGridLayerSearchFactor = 300; // The experience value, it depends on the point symbol size.
-		const locationGraphics = await self.mapInstance.find(event.mapPoint, [self.locationGridLayerInstance], locationGridLayerSearchFactor);
+		const locationGraphics = await self.getMapInstance().findFeaturesByHitTest(event, LocationGridLayerId);
 
 		self.gridMapPopup && self.gridMapPopup.close();
 		if(!locationGraphics || !locationGraphics.length)
