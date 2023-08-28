@@ -58,7 +58,7 @@
 		return TF.GIS.SDK.geometryEngine.geodesicLength(polyline, "meters");
 	}
 
-	GeometryHelper.prototype.ComputeGeodesicBuffer = function(baseGeometry, distance)
+	GeometryHelper.ComputeGeodesicBuffer = function(baseGeometry, distance)
 	{
 		return TF.GIS.SDK.geometryEngine.geodesicBuffer(baseGeometry, distance, "meters");
 	}

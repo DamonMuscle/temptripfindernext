@@ -30,7 +30,6 @@
 		self.menuDataUpdateEvent = new TF.Events.Event();
 		self.onStopEditingEvent = new TF.Events.Event();
 
-		self.onMapViewClickEvent = new TF.Events.Event();
 		self.onMapViewPointerMoveEvent = new TF.Events.Event();
 		self.onMapViewMouseWheelEvent = new TF.Events.Event();
 		self.onMapViewCustomizedEvent = new TF.Events.Event();
@@ -137,11 +136,6 @@
 		{
 			console.error(e);
 		}
-	}
-
-	MapCanvasPage.prototype.onMapViewClick = function(event)
-	{
-		this.onMapViewClickEvent.notify({event});
 	}
 
 	MapCanvasPage.prototype.onMapViewPointerMove = function(event)
@@ -660,7 +654,6 @@
 					self.mapInstance.setExtent(TF.createDefaultMapExtent());
 				},
 				onMapViewUpdated: self.onMapViewUpdated.bind(self),
-				onMapViewClick: self.onMapViewClick.bind(self),
 				onMapViewPointerMove: self.onMapViewPointerMove.bind(self),
 				onMapViewMouseWheel: self.onMapViewMouseWheel.bind(self),
 				onMapViewCustomizedEventHandler: self.onMapViewCustomizedEventHandler.bind(self),
@@ -1039,7 +1032,6 @@
 		this.onUpdateRecordsEvent?.unsubscribeAll();
 		this.menuDataUpdateEvent?.unsubscribeAll();
 		this.onStopEditingEvent?.unsubscribeAll();
-		this.onMapViewClickEvent?.unsubscribeAll();
 		this.onMapViewPointerMoveEvent?.unsubscribeAll();
 		this.onMapViewMouseWheelEvent?.unsubscribeAll();
 		this.onMapViewCustomizedEvent?.unsubscribeAll();

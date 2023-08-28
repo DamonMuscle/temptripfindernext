@@ -159,11 +159,11 @@
 		{
 			const eventHandlers = {
 				onMapViewCreated: self.onMapViewCreated.bind(self),
-				onMapViewClick: self.onMapViewClick.bind(self),
 				onMapViewPointerMove: self.onMapViewPointerMove.bind(self)
 			};
 			await tf.pageManager.resizablePage.showMapView(eventHandlers);
 			self.mapInstance = tf.pageManager.resizablePage.getRightData();
+			self.mapInstance.onMapViewClickEvent.subscribe(self.onMapViewClickEventHandler.bind(self));
 			self.initMapTools();
 			self.initLocationMapGraphics();
 		}
@@ -443,9 +443,10 @@
 		// Map View Created.
 	}
 
-	LocationPage.prototype.onMapViewClick = async function(event)
+	LocationPage.prototype.onMapViewClickEventHandler = async function(_, data)
 	{
 		const self = this;
+		const event = data.event;
 		const locationGridLayerSearchFactor = 300; // The experience value, it depends on the point symbol size.
 		const locationGraphics = await self.mapInstance.find(event.mapPoint, [self.locationGridLayerInstance], locationGridLayerSearchFactor);
 

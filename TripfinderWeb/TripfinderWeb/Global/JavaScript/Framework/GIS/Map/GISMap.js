@@ -35,7 +35,6 @@
 		},
 		eventHandlers: {
 			onMapViewCreated: null,
-			onMapViewClick: null,
 			onMapViewDoubleClick: null,
 			onMapViewPointerMove: null,
 			onMapViewUpdated: null,
@@ -68,6 +67,7 @@
 		this.defineReadOnlyProperty('WKID_WEB_MERCATOR', WKID_WEB_MERCATOR);
 		this.create($mapContainer);
 
+		this.onMapViewClickEvent = new TF.Events.Event();
 		this.onMapViewExtentChangeEvent = new TF.Events.Event();
 		this.onMapViewScaleChangeEvent = new TF.Events.Event();
 		this.onMapViewKeyUpEvent = new TF.Events.Event();
@@ -294,10 +294,11 @@
 	Map.prototype.createMapEvents = function()
 	{
 		const self = this, mapView = self.map.mapView;
-		if (self.settings.eventHandlers.onMapViewClick)
+
+		self.eventHandler.onMapViewClick = mapView.on("click", (event) =>
 		{
-			self.eventHandler.onMapViewClick = mapView.on("click", self.settings.eventHandlers.onMapViewClick);
-		}
+			self.onMapViewClickEvent.notify({event});
+		});
 
 		if (self.settings.eventHandlers.onMapViewDoubleClick)
 		{
