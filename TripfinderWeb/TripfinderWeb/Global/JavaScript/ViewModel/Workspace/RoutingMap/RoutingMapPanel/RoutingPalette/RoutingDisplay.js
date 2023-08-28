@@ -649,7 +649,7 @@
 			}
 		});
 
-		routingtreeview.data("kendoTreeView").templates.dragClue = kendo.template("No. #=data.item.customData.sequence?data.item.customData.sequence:''#, #=data.item.text#<div style='padding-left:20px'>Trip: #=item.customData.tripName?item.customData.tripName:''#</div>");
+		routingtreeview.data("kendoTreeView").templates.dragClue = kendo.template("No. #=data.item.customData.sequence?data.item.customData.sequence:''#, #=data.item.text#<div style='padding-left:20px'>Field Trip: #=item.customData.tripName?item.customData.tripName:''#</div>");
 
 		self.isInitial = false;
 	};
