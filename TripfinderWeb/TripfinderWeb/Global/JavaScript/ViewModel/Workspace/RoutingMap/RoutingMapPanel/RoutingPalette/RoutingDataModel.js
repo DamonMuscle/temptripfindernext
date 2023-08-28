@@ -2795,6 +2795,7 @@
 	RoutingDataModel.prototype.dispose = function()
 	{
 		const self = this;
+		self.setFieldTrips([]);
 		self.tripLockData.unLockCurrentDocument();
 		self.onTripsChangeEvent.unsubscribeAll();
 		self.fieldTripEditBroadcast.dispose();
