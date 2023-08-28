@@ -694,6 +694,11 @@
 
 					columnExtension = $.extend(columnExtension, utcColumnExtension);
 				}
+
+				if (gridDefinition.UnitOfMeasureSupported == true)
+				{
+					columnExtension = $.extend(columnExtension, { UnitOfMeasureSupported: true });
+				}
 			}
 		}
 
@@ -2724,6 +2729,8 @@
 			$el = TF.Form.FormConfigHelper.getFormColumnContent(editType.targetField, dataTypeId, contentOption);
 		}
 
+		formatOption.systemQuestionTargetField = col.editType.targetField; 
+		formatOption.dataTypeId = dataTypeId;
 		const val = tf.systemFieldsFormat(type, value, $el, attributeFlag, numberPrecision, trueDisplayName, falseDisplayName, formatOption);
 
 		if (isCopy)
