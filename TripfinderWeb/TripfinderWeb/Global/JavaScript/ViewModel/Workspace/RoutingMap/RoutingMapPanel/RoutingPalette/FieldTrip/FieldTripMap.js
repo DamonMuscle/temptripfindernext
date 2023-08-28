@@ -248,7 +248,12 @@
 		const aIndex = paletteNameData.findIndex(item => item === a.Name);
 		const bIndex = paletteNameData.findIndex(item => item === b.Name);
 
-		return aIndex - bIndex;
+		if (aIndex !== bIndex)
+		{
+			return aIndex - bIndex;
+		}
+
+		return a.id - b.id;
 	}
 
 	FieldTripMap.prototype._sortFieldTripByName = function(fieldTrips)
