@@ -462,7 +462,7 @@
 				var dragiconSpan = $('span.k-icon.k-drag-status.k-denied');
 				if (dragiconSpan && dragiconSpan.css('background-image') == 'none')
 				{
-					dragiconSpan.css('background-image', 'url(../../global/thirdparty/kendo/styles/Default/sprite.png)');
+					// dragiconSpan.css('background-image', 'url(../../global/thirdparty/kendo/styles/Default/sprite.png)');
 					dragiconSpan.css('width', '16px');
 				}
 				var targetDataItem = e.sender.dataItem($(e.dropTarget)),
