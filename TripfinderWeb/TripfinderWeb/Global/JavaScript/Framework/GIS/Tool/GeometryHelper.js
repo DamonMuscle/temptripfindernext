@@ -51,4 +51,9 @@
 		return TF.GIS.SDK.geometryEngine.simplify(geometry);
 	}
 
+	GeometryHelper.CalculatePolylineGeodesicLength = function(polyline)
+	{
+		return TF.GIS.SDK.geometryEngine.geodesicLength(polyline, "meters");
+	}
+
 })();
