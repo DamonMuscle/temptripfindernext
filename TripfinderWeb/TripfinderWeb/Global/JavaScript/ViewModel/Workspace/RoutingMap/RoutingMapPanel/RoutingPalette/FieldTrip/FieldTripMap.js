@@ -254,11 +254,13 @@
 	FieldTripMap.prototype._sortFieldTripByName = function(fieldTrips)
 	{
 		const self = this;
-		const fieldTripIdMapping = fieldTrips.map(item => {
+		const fieldTripIdMapping = fieldTrips.map(item =>
+		{
+			const { DBID, FieldTripId } = self._extractFieldTripFeatureFields(item);
 			const data = {
-				DBID: item.DBID,
+				DBID: DBID,
 				Name: item.Name,
-				id: item.oldId || item.id
+				id: FieldTripId
 			};
 			return data;
 		});
@@ -1435,8 +1437,8 @@
 		{
 			const fieldTrip = fieldTripsClone[i],
 				value = self._getColor(fieldTrip),
-				fieldTripId = fieldTrip.oldId || fieldTrip.id,
-				description = self._extractArrowCondition(fieldTrip.DBID,  fieldTripId),
+				{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip),
+				description = self._extractArrowCondition(DBID,  FieldTripId),
 				symbol = self.arrowLayerHelper.getArrowSymbol(arrowOnPath, value);
 			uniqueValueInfos.push({ value, symbol, description });
 		}
@@ -1581,7 +1583,11 @@
 	{
 		const self = this,
 			visibleFieldTrips = self._getVisibleFieldTrips(),
-			conditions = visibleFieldTrips.map(item => this._extractArrowCondition(item.DBID, (item.oldId || item.id))),
+			conditions = visibleFieldTrips.map(item =>
+			{
+				const { DBID, FieldTripId } = self._extractFieldTripFeatureFields(item);
+				return this._extractArrowCondition(DBID, FieldTripId);
+			}),
 			expression = (conditions.length > 1) ? `(${conditions.join(") OR (")})` :
 				(conditions.length === 0) ? "1 = 0" : conditions;
 		return expression;
