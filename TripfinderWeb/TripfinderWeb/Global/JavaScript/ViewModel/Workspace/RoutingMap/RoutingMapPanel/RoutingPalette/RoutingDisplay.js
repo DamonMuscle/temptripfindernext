@@ -542,6 +542,13 @@
 			{
 				self.dropTreeNode(e);
 			},
+			kendoKeydown: function(e)
+			{
+				if (e.key === "Escape")
+				{
+					$('#insertRoutingTripTreeIcon').remove();
+				}
+			},
 			dataBound: function(e)
 			{
 				if (self.treeviewDataBoundTimer != null)
