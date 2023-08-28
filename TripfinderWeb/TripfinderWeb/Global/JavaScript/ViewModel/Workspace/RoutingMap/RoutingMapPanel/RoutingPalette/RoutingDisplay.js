@@ -105,7 +105,7 @@
 		self.routingDisplayAutoScroll.onEnd();
 		self.viewModel.$element.find("#routingtreeview").removeClass("in-draging-status");
 
-		if (!destination) return;
+		if (!destination || destination?.customData.openType === 'View') return;
 
 		var position = e.dropPosition,
 			currentIndex = source.customData.sequence - 1,
