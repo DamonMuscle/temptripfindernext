@@ -435,7 +435,7 @@
 	LocationPage.prototype.zoomToLocationGridLayerExtent = function()
 	{
 		const graphics = this.locationGridLayerInstance?.layer.graphics;
-		this.mapInstance?.setExtent(graphics);
+		this.mapInstance?.goTo(graphics);
 	}
 
 	LocationPage.prototype.onMapViewCreated = function()

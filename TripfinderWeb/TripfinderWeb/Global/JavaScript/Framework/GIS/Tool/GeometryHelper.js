@@ -46,14 +46,23 @@
 		return TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(polyline);
 	}
 
+	//#region geometryEngine
+
 	GeometryHelper.SimplifyGeometry = function(geometry)
 	{
 		return TF.GIS.SDK.geometryEngine.simplify(geometry);
 	}
 
-	GeometryHelper.CalculatePolylineGeodesicLength = function(polyline)
+	GeometryHelper.ComputePolylineGeodesicLength = function(polyline)
 	{
 		return TF.GIS.SDK.geometryEngine.geodesicLength(polyline, "meters");
 	}
+
+	GeometryHelper.prototype.ComputeGeodesicBuffer = function(baseGeometry, distance)
+	{
+		return TF.GIS.SDK.geometryEngine.geodesicBuffer(baseGeometry, distance, "meters");
+	}
+
+	//#endregion
 
 })();

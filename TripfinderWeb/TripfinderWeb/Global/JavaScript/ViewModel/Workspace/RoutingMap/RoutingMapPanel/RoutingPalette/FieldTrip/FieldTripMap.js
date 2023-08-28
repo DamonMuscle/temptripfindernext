@@ -445,7 +445,7 @@
 			graphics = graphics.concat(this._queryMapFeatures(sequenceLineFeatures, DBID, FieldTripId));
 		}
 
-		this.mapInstance.setExtent(graphics);
+		this.mapInstance.goTo(graphics);
 	}
 
 	FieldTripMap.prototype.zoomToFieldTripStop = function({longitude, latitude})

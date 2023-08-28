@@ -655,8 +655,9 @@
 	{
 		const self = this,
 			eventHandlers = {
-				onMapViewCreated: () => {
-					self._mapView.extent = TF.createDefaultMapExtent();
+				onMapViewCreated: () =>
+				{
+					self.mapInstance.setExtent(TF.createDefaultMapExtent());
 				},
 				onMapViewUpdated: self.onMapViewUpdated.bind(self),
 				onMapViewClick: self.onMapViewClick.bind(self),
@@ -666,7 +667,6 @@
 			};
 
 		self.mapInstance = await TF.Helper.MapHelper.createMapInstance(self.$mapDiv, eventHandlers);;
-		self._mapView = self.mapInstance.map.mapView;
 		self._map = self.mapInstance.map;
 	}
 

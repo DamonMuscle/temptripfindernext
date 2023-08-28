@@ -97,8 +97,9 @@
 	{
 		var self = this;
 		const eventHandlers = {
-			onMapViewCreated: () => {
-				self.getMapInstance().map.mapView.extent = TF.createDefaultMapExtent();
+			onMapViewCreated: () =>
+			{
+				self.getMapInstance().setExtent(TF.createDefaultMapExtent());
 			},
 			onMapViewUpdated: self.onMapViewUpdated.bind(self, mapToolOptions, hasManuallyPin),
 			onMapViewPointerMove: self.onMapViewPointerMove.bind(self)

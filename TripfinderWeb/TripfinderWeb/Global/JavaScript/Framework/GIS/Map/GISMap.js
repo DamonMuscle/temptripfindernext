@@ -610,10 +610,10 @@
 			return;
 		}
 
-		await this.setExtent(visibleFeatures);
+		await this.goTo(visibleFeatures);
 	}
 
-	Map.prototype.setExtent = async function(target)
+	Map.prototype.goTo = async function(target)
 	{
 		await this.map.mapView.goTo(target, { duration: 0, easing: "linear" });
 	}
@@ -650,6 +650,11 @@
 		return this.map.mapView.center;
 	}
 
+	Map.prototype.setExtent = function(extent)
+	{
+		this.map.mapView.extent = extent;
+	}
+
 	Map.prototype.restrictPanOutside = function()
 	{
 		const self = this;
@@ -665,7 +670,7 @@
 			recenterTimer = setTimeout(async () =>
 			{
 				recenterTimer = null;
-				await self.setExtent(extent);
+				await self.goTo(extent);
 			}, 50);
 		}
 
@@ -708,7 +713,7 @@
 		{
 			// use event extent to check the clicked graphic
 			const queryDistance = this.map.mapView.scale / searchScaleFactor;
-			spatialQueryGeometry = TF.GIS.SDK.geometryEngine.geodesicBuffer(queryGeometry, queryDistance, "meters");
+			spatialQueryGeometry = TF.GIS.GeometryHelper.ComputeGeodesicBuffer(queryGeometry, queryDistance);
 		}
 
 		for (let i = 0; i < layerInstances.length; i++)

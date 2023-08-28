@@ -12,7 +12,7 @@
 			clonePolyline.paths[0] = clonePolyline.paths[0].reverse();
 		}
 
-		if (TF.GIS.GeometryHelper.CalculatePolylineGeodesicLength(clonePolyline) <= distance)
+		if (TF.GIS.GeometryHelper.ComputePolylineGeodesicLength(clonePolyline) <= distance)
 		{
 			const x = clonePolyline.paths[0][0][0], y = clonePolyline.paths[0][0][1];
 			return TF.GIS.GeometryHelper.CreateWebMercatorPoint(x, y);
@@ -23,7 +23,7 @@
 		{
 			const paths = [[clonePolyline.paths[0][i], clonePolyline.paths[0][i + 1]]];
 			const segment = TF.GIS.GeometryHelper.CreateWebMercatorPolyline(paths);
-			const segmentLength = TF.GIS.GeometryHelper.CalculatePolylineGeodesicLength(segment);
+			const segmentLength = TF.GIS.GeometryHelper.ComputePolylineGeodesicLength(segment);
 			totalSegmentLength = totalSegmentLength + segmentLength;
 			if (totalSegmentLength > distance)
 			{
@@ -37,7 +37,7 @@
 	{
 		var fromPoint = TF.GIS.GeometryHelper.CreateWebMercatorPoint(line.paths[0][0][0], line.paths[0][0][1]);
 		var toPoint = TF.GIS.GeometryHelper.CreateWebMercatorPoint(line.paths[0][1][0], line.paths[0][1][1]);
-		var length = TF.GIS.GeometryHelper.CalculatePolylineGeodesicLength(line);
+		var length = TF.GIS.GeometryHelper.ComputePolylineGeodesicLength(line);
 		var ratio = distance == 0 || length == 0 ? 0 : (distance / length);
 		var point = TF.GIS.GeometryHelper.CreateWebMercatorPoint(
 			(1 - ratio) * fromPoint.x + ratio * toPoint.x,
