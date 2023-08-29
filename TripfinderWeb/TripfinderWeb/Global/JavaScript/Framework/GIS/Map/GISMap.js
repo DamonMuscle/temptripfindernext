@@ -35,7 +35,6 @@
 		},
 		eventHandlers: {
 			onMapViewCreated: null,
-			onMapViewDoubleClick: null,
 			onMapViewUpdated: null,
 			onMapViewUpdating: null,
 			onMapViewExtentChanges: null,
@@ -67,6 +66,7 @@
 		this.create($mapContainer);
 
 		this.onMapViewClickEvent = new TF.Events.Event();
+		this.onMapViewDoubleClick = new TF.Events.Event();
 		this.onMapViewPointerMove = new TF.Events.Event();
 		this.onMapViewExtentChangeEvent = new TF.Events.Event();
 		this.onMapViewScaleChangeEvent = new TF.Events.Event();
@@ -300,10 +300,10 @@
 			self.onMapViewClickEvent.notify({event});
 		});
 
-		if (self.settings.eventHandlers.onMapViewDoubleClick)
+		self.eventHandler.onMapViewDoubleClick = mapView.on("double-click", (event) =>
 		{
-			self.eventHandler.onMapViewDoubleClick = mapView.on("double-click", self.settings.eventHandlers.onMapViewDoubleClick);
-		}
+			self.onMapViewDoubleClick.notify({ event });
+		});
 
 		if (self.settings.eventHandlers.onMapViewUpdating)
 		{
@@ -387,6 +387,9 @@
 			self.settings.eventHandlers[name] = null;
 		}
 
+		this.onMapViewClickEvent?.unsubscribeAll();
+		this.onMapViewDoubleClick?.unsubscribeAll();
+		this.onMapViewPointerMove?.unsubscribeAll();
 		this.onMapViewExtentChangeEvent?.unsubscribeAll();
 		this.onMapViewScaleChangeEvent?.unsubscribeAll();
 		this.onMapViewKeyUpEvent?.unsubscribeAll();

@@ -1251,7 +1251,7 @@
 		const self = this;
 		const style = self.cardStyle[type];
 		const geocodeService = TF.GIS.Analysis.getInstance().geocodeService;
-		const center = self.mapInstance.getCenter();
+		const center = self._getMapCenterPoint();
 		const data = await geocodeService.suggestAddressLocations(value, center);
 		const { addresses, errorMessage } = data;
 		if (errorMessage !== null)
