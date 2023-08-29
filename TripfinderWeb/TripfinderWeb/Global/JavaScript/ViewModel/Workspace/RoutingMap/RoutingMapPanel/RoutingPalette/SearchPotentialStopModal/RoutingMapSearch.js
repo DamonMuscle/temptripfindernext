@@ -1291,7 +1291,7 @@
 				type: type,
 				whereQuery: "",
 				imageSrc: undefined,
-				address: attributes.LongLabel,
+				address: attributes.ShortLabel,
 				Street: attributes.ShortLabel,
 				City: attributes.City,
 				XCoord: location.x,
