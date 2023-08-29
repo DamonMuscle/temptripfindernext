@@ -1,7 +1,7 @@
 
 (function()
 {
-	createNamespace("TF.RoutingPalette").FieldTripMap = FieldTripMap;
+	createNamespace("TF.RoutingPalette").FieldTripMapOperation = FieldTripMapOperation;
 
 	//#region Constant
 
@@ -32,11 +32,11 @@
 
 	//#endregion
 
-	function FieldTripMap(mapInstance)
+	function FieldTripMapOperation(mapInstance)
 	{
 		if (!mapInstance)
 		{
-			console.error("FieldTripMap constructor failed! No valid mapInstance.");
+			console.error("FieldTripMapOperation constructor failed! No valid mapInstance.");
 			return;
 		}
 
@@ -59,7 +59,7 @@
 
 	//#region Property
 
-	FieldTripMap.prototype.defineReadOnlyProperty = function(propertyName, value)
+	FieldTripMapOperation.prototype.defineReadOnlyProperty = function(propertyName, value)
 	{
 		Object.defineProperty(this, propertyName, {
 			get() { return value; },
@@ -68,7 +68,7 @@
 		});
 	};
 
-	Object.defineProperty(FieldTripMap.prototype, 'pathLineType', {
+	Object.defineProperty(FieldTripMapOperation.prototype, 'pathLineType', {
 		get() { return this._pathLineType; },
 		set(value)
 		{
@@ -78,12 +78,12 @@
 		configurable: false
 	});
 
-	FieldTripMap.prototype.setPathLineType = function(type)
+	FieldTripMapOperation.prototype.setPathLineType = function(type)
 	{
 		this.pathLineType = type;
 	}
 
-	Object.defineProperty(FieldTripMap.prototype, 'fieldTripsData', {
+	Object.defineProperty(FieldTripMapOperation.prototype, 'fieldTripsData', {
 		get() { return this._fieldTripsData; },
 		set(value)
 		{
@@ -93,7 +93,7 @@
 		configurable: false
 	});
 
-	Object.defineProperty(FieldTripMap.prototype, 'editing', {
+	Object.defineProperty(FieldTripMapOperation.prototype, 'editing', {
 		get() { return this._editing; },
 		enumerable: false,
 		configurable: false
@@ -103,7 +103,7 @@
 
 	//#region Initialization
 
-	FieldTripMap.prototype.initLayers = async function()
+	FieldTripMapOperation.prototype.initLayers = async function()
 	{
 		const self = this;
 		if (self.stopLayerInstance &&
@@ -151,7 +151,7 @@
 		self.defineReadOnlyProperty("highlightStopLayerInstance", self.highlightStopLayerInstance);
 	}
 
-	FieldTripMap.prototype.initArrowLayers = function()
+	FieldTripMapOperation.prototype.initArrowLayers = function()
 	{
 		const self = this;
 		if (!self.mapInstance)
@@ -200,7 +200,7 @@
 
 	//#region - Edit / View Field Trips
 
-	FieldTripMap.prototype.addFieldTrip = async function(fieldTrip)
+	FieldTripMapOperation.prototype.addFieldTrip = async function(fieldTrip)
 	{
 		if (!this.mapInstance)
 		{
@@ -214,13 +214,13 @@
 		await this.addFieldTripPath(fieldTrip);
 	}
 
-	FieldTripMap.prototype.addFieldTripPath = async function(fieldTrip, effectSequences)
+	FieldTripMapOperation.prototype.addFieldTripPath = async function(fieldTrip, effectSequences)
 	{
 		await this.drawFieldTripPath(fieldTrip, effectSequences);
 		await this.drawSequenceLine(fieldTrip);
 	}
 
-	FieldTripMap.prototype.orderFeatures = async function()
+	FieldTripMapOperation.prototype.orderFeatures = async function()
 	{
 		const self = this,
 			fieldTrips = self.fieldTripsData,
@@ -239,7 +239,7 @@
 		await self.sequenceLineLayerInstance.addMany(sortedSequenceLineFeatures);
 	}
 
-	FieldTripMap.prototype._compareFieldTripNames = function(a, b)
+	FieldTripMapOperation.prototype._compareFieldTripNames = function(a, b)
 	{
 		// get the field trip data from palette.
 		// sort the result as same as palette.
@@ -256,7 +256,7 @@
 		return a.id - b.id;
 	}
 
-	FieldTripMap.prototype._sortFieldTripByName = function(fieldTrips)
+	FieldTripMapOperation.prototype._sortFieldTripByName = function(fieldTrips)
 	{
 		const self = this;
 		const fieldTripIdMapping = fieldTrips.map(item =>
@@ -278,7 +278,7 @@
 		return sortedFieldTrips;
 	}
 
-	FieldTripMap.prototype._sortStopFeaturesByFieldTrips = function(sortedFieldTrips)
+	FieldTripMapOperation.prototype._sortStopFeaturesByFieldTrips = function(sortedFieldTrips)
 	{
 		const self = this,
 			stopFeatures = self._getStopFeatures();
@@ -312,7 +312,7 @@
 		return [...sortedStopFeatures];
 	}
 
-	FieldTripMap.prototype._sortPathFeaturesByFieldTrips = function(sortedFieldTrips)
+	FieldTripMapOperation.prototype._sortPathFeaturesByFieldTrips = function(sortedFieldTrips)
 	{
 		const self = this,
 			pathFeatures = self._getPathFeatures();
@@ -320,7 +320,7 @@
 		return self._sortLineFeatures(sortedFieldTrips, pathFeatures);
 	}
 
-	FieldTripMap.prototype._sortSequenceLineFeaturesByFieldTrips = function(sortedFieldTrips)
+	FieldTripMapOperation.prototype._sortSequenceLineFeaturesByFieldTrips = function(sortedFieldTrips)
 	{
 		const self = this,
 			sequenceLineFeatures = self._getSequenceLineFeatures();
@@ -328,7 +328,7 @@
 		return self._sortLineFeatures(sortedFieldTrips, sequenceLineFeatures);
 	}
 
-	FieldTripMap.prototype._sortLineFeatures = function(sortedFieldTrips, lineFeatures)
+	FieldTripMapOperation.prototype._sortLineFeatures = function(sortedFieldTrips, lineFeatures)
 	{
 		const sortedLineFeatures = lineFeatures.sort((a, b) =>
 		{
@@ -363,7 +363,7 @@
 
 	//#region - Show / Hide Layers
 
-	FieldTripMap.prototype.setFieldTripVisibility = async function(fieldTrips)
+	FieldTripMapOperation.prototype.setFieldTripVisibility = async function(fieldTrips)
 	{
 		this.setFieldTripStopVisibility(fieldTrips);
 
@@ -377,27 +377,27 @@
 		this.setFieldTripHighlightLayerVisibility(fieldTrips);
 	}
 
-	FieldTripMap.prototype.setFieldTripStopVisibility = function(fieldTrips)
+	FieldTripMapOperation.prototype.setFieldTripStopVisibility = function(fieldTrips)
 	{
 		const stopFeatures = this._getStopFeatures();
 		this._setFieldTripLayerVisibility(fieldTrips, this.stopLayerInstance, stopFeatures);
 	}
 
-	FieldTripMap.prototype.setFieldTripPathVisibility = function(fieldTrips)
+	FieldTripMapOperation.prototype.setFieldTripPathVisibility = function(fieldTrips)
 	{
 		const pathFeatures = this._getPathFeatures();
 		const precondition = this.pathLineType === PATH_LINE_TYPE.Path;
 		this._setFieldTripLayerVisibility(fieldTrips, this.pathLayerInstance, pathFeatures, precondition);
 	}
 
-	FieldTripMap.prototype.setFieldTripSequenceLineVisibility = function(fieldTrips)
+	FieldTripMapOperation.prototype.setFieldTripSequenceLineVisibility = function(fieldTrips)
 	{
 		const sequenceLineFeatures = this._getSequenceLineFeatures();
 		const precondition = this.pathLineType === PATH_LINE_TYPE.Sequence;
 		this._setFieldTripLayerVisibility(fieldTrips, this.sequenceLineLayerInstance, sequenceLineFeatures, precondition);
 	}
 
-	FieldTripMap.prototype.setFieldTripHighlightLayerVisibility = function(fieldTrips)
+	FieldTripMapOperation.prototype.setFieldTripHighlightLayerVisibility = function(fieldTrips)
 	{
 		const fieldTripHighlightFeatures = this._getHighlightFeatures();
 		this._setFieldTripLayerVisibility(fieldTrips, this.highlightLayerInstance, fieldTripHighlightFeatures);
@@ -406,7 +406,7 @@
 		this._setFieldTripLayerVisibility(fieldTrips, this.highlightStopLayerInstance, fieldTripHighlightStopFeatures);
 	}
 
-	FieldTripMap.prototype._setFieldTripLayerVisibility = function(fieldTrips, layerInstance, layerFeatures, precondition = null)
+	FieldTripMapOperation.prototype._setFieldTripLayerVisibility = function(fieldTrips, layerInstance, layerFeatures, precondition = null)
 	{
 		for (let i = 0; i < fieldTrips.length; i++)
 		{
@@ -427,7 +427,7 @@
 
 	//#region - Zoom Map to Layers, Center Map
 
-	FieldTripMap.prototype.zoomToFieldTripLayers = function(fieldTrips)
+	FieldTripMapOperation.prototype.zoomToFieldTripLayers = function(fieldTrips)
 	{
 		const stopFeatures = this._getStopFeatures(),
 			pathFeatures = this._getPathFeatures(),
@@ -448,7 +448,7 @@
 		this.mapInstance.goTo(graphics);
 	}
 
-	FieldTripMap.prototype.zoomToFieldTripStop = function({longitude, latitude})
+	FieldTripMapOperation.prototype.zoomToFieldTripStop = function({longitude, latitude})
 	{
 		this.mapInstance.centerAndZoom(longitude, latitude);
 	}
@@ -457,7 +457,7 @@
 
 	//#region - Close Layer, Close Map
 
-	FieldTripMap.prototype.removeFieldTrip = async function(fieldTrip)
+	FieldTripMapOperation.prototype.removeFieldTrip = async function(fieldTrip)
 	{
 		const { DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip),
 			stopFeatures = this._getStopFeatures(),
@@ -483,7 +483,7 @@
 		}
 	}
 
-	FieldTripMap.prototype.removeMapLayerFeatures = function(layerInstance, removeFeatures)
+	FieldTripMapOperation.prototype.removeMapLayerFeatures = function(layerInstance, removeFeatures)
 	{
 		layerInstance.removeMany(removeFeatures);
 	}
@@ -492,7 +492,7 @@
 
 	//#region - Update Layer Color
 
-	FieldTripMap.prototype.updateSymbolColor = async function(fieldTrip)
+	FieldTripMapOperation.prototype.updateSymbolColor = async function(fieldTrip)
 	{
 		const color = this._getColor(fieldTrip),
 			{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip),
@@ -526,7 +526,7 @@
 		this.redrawSequenceArrowLayer(null, {}, [fieldTrip]);
 	}
 
-	FieldTripMap.prototype._updatePathArrowFeatureColor = function(arrowLayerInstance, condition, color)
+	FieldTripMapOperation.prototype._updatePathArrowFeatureColor = function(arrowLayerInstance, condition, color)
 	{
 		const arrowOnPath = this._isArrowOnPath();
 		const layerRenderer = arrowLayerInstance.getRenderer().clone();
@@ -541,7 +541,7 @@
 
 	//#region - Switch Field Trip Path Type (Sequence Lines / Path Lines)
 
-	FieldTripMap.prototype.switchPathType = async function(fieldTrips)
+	FieldTripMapOperation.prototype.switchPathType = async function(fieldTrips)
 	{
 		this.pathArrowLayerInstance.hide();
 		this.sequenceLineArrowLayerInstance.hide();
@@ -550,7 +550,7 @@
 		await this.updateFieldTripPathVisibility(fieldTrips);
 	}
 
-	FieldTripMap.prototype.updateFieldTripPathVisibility = async function(fieldTrips)
+	FieldTripMapOperation.prototype.updateFieldTripPathVisibility = async function(fieldTrips)
 	{
 		await this.redrawPathArrowLayer(null, {}, fieldTrips);
 		await this.redrawSequenceArrowLayer(null, {}, fieldTrips);
@@ -563,12 +563,12 @@
 
 	//#region New Copy
 
-	FieldTripMap.prototype.isNewCopy = function(fieldTrip)
+	FieldTripMapOperation.prototype.isNewCopy = function(fieldTrip)
 	{
 		return fieldTrip.Id === 0;
 	}
 
-	FieldTripMap.prototype.updateCopyFieldTripAttribute = function(fieldTrip)
+	FieldTripMapOperation.prototype.updateCopyFieldTripAttribute = function(fieldTrip)
 	{
 		if (fieldTrip.id !== fieldTrip.routePathAttributes.FieldTripId)
 		{
@@ -581,7 +581,7 @@
 	
 	//#region Add Field Trip Stop
 
-	FieldTripMap.prototype.startAddFieldTripStop = function()
+	FieldTripMapOperation.prototype.startAddFieldTripStop = function()
 	{
 		if (!this.editing.isAddingStop)
 		{
@@ -590,7 +590,7 @@
 		}
 	}
 
-	FieldTripMap.prototype.stopAddFieldTripStop = async function()
+	FieldTripMapOperation.prototype.stopAddFieldTripStop = async function()
 	{
 		if (this.editing.isAddingStop)
 		{
@@ -599,7 +599,7 @@
 		}
 	}
 
-	FieldTripMap.prototype.applyAddFieldTripStops = async function(stops, callback = ()=>{})
+	FieldTripMapOperation.prototype.applyAddFieldTripStops = async function(stops, callback = ()=>{})
 	{
 		if (!stops?.length >= 1)
 		{
@@ -617,7 +617,7 @@
 		callback();
 	}
 
-	FieldTripMap.prototype.highlightQuickAddStops = function(stops)
+	FieldTripMapOperation.prototype.highlightQuickAddStops = function(stops)
 	{
 		const self = this, graphics = [];
 		for (let index = 0; index < stops.length; index++)
@@ -630,7 +630,7 @@
 		self.highlightStopLayerInstance.addStops(graphics);
 	}
 
-	FieldTripMap.prototype.addHighlightStops = function(addGraphic)
+	FieldTripMapOperation.prototype.addHighlightStops = function(addGraphic)
 	{
 		const self = this,
 			highlightStop = self.getHighlightStop();
@@ -649,12 +649,12 @@
 		}
 	}
 
-	FieldTripMap.prototype.createNewStop = function(stop)
+	FieldTripMapOperation.prototype.createNewStop = function(stop)
 	{
 		return this._createNewStop(stop.XCoord, stop.YCoord, stop.Street);
 	}
 
-	FieldTripMap.prototype._createNewStop = function(longitude, latitude, stopName)
+	FieldTripMapOperation.prototype._createNewStop = function(longitude, latitude, stopName)
 	{
 		const NEW_STOP_ID = 0,
 			NEW_STOP_SEQUENCE = 0,
@@ -666,7 +666,7 @@
 		return TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes);
 	}
 
-	FieldTripMap.prototype._createGeocodingNewStop = async function(longitude, latitude)
+	FieldTripMapOperation.prototype._createGeocodingNewStop = async function(longitude, latitude)
 	{
 		const self = this,
 		 	UNNAMED_ADDRESS = "unnamed",
@@ -677,7 +677,7 @@
 		return { Name, City, RegionAbbr, CountryCode, newStop, XCoord: +longitude.toFixed(6), YCoord: +latitude.toFixed(6) };
 	}
 
-	FieldTripMap.prototype._refreshStopsSequenceLabel = function(data)
+	FieldTripMapOperation.prototype._refreshStopsSequenceLabel = function(data)
 	{
 		const self = this,
 			{ DBID, FieldTripId } = data[0],
@@ -702,7 +702,7 @@
 		}
 	}
 
-	FieldTripMap.prototype._drawNewStopsFromMap = function(data)
+	FieldTripMapOperation.prototype._drawNewStopsFromMap = function(data)
 	{
 		const self = this,
 			{ FieldTripId } = data[0],
@@ -721,13 +721,13 @@
 		self.stopLayerInstance.addStops(graphics);
 	}
 
-	FieldTripMap.prototype._updateStopGraphicSequenceLabel = function(stopGraphic)
+	FieldTripMapOperation.prototype._updateStopGraphicSequenceLabel = function(stopGraphic)
 	{
 		const attributes = stopGraphic.attributes;
 		stopGraphic.symbol = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.GetSymbol(attributes.Sequence, attributes.Color);
 	}
 
-	FieldTripMap.prototype._drawNewStopPathsFromMap = async function(data)
+	FieldTripMapOperation.prototype._drawNewStopPathsFromMap = async function(data)
 	{
 		const self = this,
 			{ DBID, FieldTripId } = data[0],
@@ -759,7 +759,7 @@
 
 	//#region Refresh Field Trip Path
 
-	FieldTripMap.prototype.refreshFieldTripPath = async function(fieldTrip, effectSequences, callZoomToLayers = true)
+	FieldTripMapOperation.prototype.refreshFieldTripPath = async function(fieldTrip, effectSequences, callZoomToLayers = true)
 	{
 		this.clearFieldTripPath(fieldTrip);
 		await this.clearFieldTripPathArrow(fieldTrip);
@@ -777,7 +777,7 @@
 		}
 	}
 
-	FieldTripMap.prototype.clearFieldTripPath = function(fieldTrip)
+	FieldTripMapOperation.prototype.clearFieldTripPath = function(fieldTrip)
 	{
 		const self = this,
 			{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
@@ -794,7 +794,7 @@
 		fieldTrip.directions = null;
 	}
 
-	FieldTripMap.prototype.clearSequenceLine = function(fieldTrip)
+	FieldTripMapOperation.prototype.clearSequenceLine = function(fieldTrip)
 	{
 		const self = this,
 			{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
@@ -807,7 +807,7 @@
 		}
 	}
 
-	FieldTripMap.prototype.clearFieldTripPathArrow = async function(fieldTrip)
+	FieldTripMapOperation.prototype.clearFieldTripPathArrow = async function(fieldTrip)
 	{
 		const self = this,
 			{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
@@ -823,7 +823,7 @@
 		await self.pathArrowLayerInstance.layer.applyEdits(edits);
 	}
 
-	FieldTripMap.prototype.clearSequenceLineArrow = async function(fieldTrip)
+	FieldTripMapOperation.prototype.clearSequenceLineArrow = async function(fieldTrip)
 	{
 		const self = this,
 			{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
@@ -847,7 +847,7 @@
 
 	//#region Move Stop Location
 
-	FieldTripMap.prototype.moveStopLocation = async function(fieldTrip, stop, sketchTool)
+	FieldTripMapOperation.prototype.moveStopLocation = async function(fieldTrip, stop, sketchTool)
 	{
 		const self = this;
 		if (!self.stopLayerInstance || !sketchTool)
@@ -882,7 +882,7 @@
 		stopGraphic.visible = false;
 	}
 
-	FieldTripMap.prototype.onStopLayerMoveStopCompleted = async function(data)
+	FieldTripMapOperation.prototype.onStopLayerMoveStopCompleted = async function(data)
 	{
 		const self = this,
 			{ fieldTrip, stop } = self.editing.features.movingStop,
@@ -905,7 +905,7 @@
 		self.hideLoadingIndicator();
 	}
 
-	FieldTripMap.prototype.onStopLayerMoveStopCompleted_UpdateDataModel = function(data)
+	FieldTripMapOperation.prototype.onStopLayerMoveStopCompleted_UpdateDataModel = function(data)
 	{
 		const stop = this.editing.features.movingStop.stop,
 			graphic = data.graphic,
@@ -932,7 +932,7 @@
 
 	//#region Delete Stop
 
-	FieldTripMap.prototype.deleteStopLocation = async function(fieldTrip, stop)
+	FieldTripMapOperation.prototype.deleteStopLocation = async function(fieldTrip, stop)
 	{
 		const self = this;
 		if (!self.stopLayerInstance)
@@ -979,7 +979,7 @@
 	//#endregion
 
 	//#region Update Stop
-	FieldTripMap.prototype.updateStopSymbol = function(fieldTrip, stops)
+	FieldTripMapOperation.prototype.updateStopSymbol = function(fieldTrip, stops)
 	{
 		const self = this;
 		const { DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
@@ -999,7 +999,7 @@
 
 	//#region Stop Info
 
-	FieldTripMap.prototype.addHighlightFeatures = async function(data)
+	FieldTripMapOperation.prototype.addHighlightFeatures = async function(data)
 	{
 		const self = this;
 		if (!self.stopLayerInstance ||
@@ -1072,7 +1072,7 @@
 		await self.drawHighlightFeatures(params, paths, stops, isToFieldTripVisible);
 	}
 
-	FieldTripMap.prototype.clearHighlightFeatures = async function()
+	FieldTripMapOperation.prototype.clearHighlightFeatures = async function()
 	{
 		const self = this;
 		if (!self.highlightLayerInstance)
@@ -1085,7 +1085,7 @@
 		await self.highlightStopLayerInstance.clearLayer();
 	}
 
-	FieldTripMap.prototype.drawHighlightFeatures = async function(data, paths, stops, isShowHighlightPath)
+	FieldTripMapOperation.prototype.drawHighlightFeatures = async function(data, paths, stops, isShowHighlightPath)
 	{
 		const self = this;
 		if (!self.pathLayerInstance)
@@ -1112,7 +1112,7 @@
 		await self.highlightLayerInstance.addMany(highlightGraphics);
 	}
 
-	FieldTripMap.prototype.drawHighlightStop = function(data, currentStop, sequence)
+	FieldTripMapOperation.prototype.drawHighlightStop = function(data, currentStop, sequence)
 	{
 		const self = this, isEditStop = !!currentStop;
 		let stopGraphic = null;
@@ -1149,7 +1149,7 @@
 		}
 	}
 
-	FieldTripMap.prototype.getHighlightStop = function()
+	FieldTripMapOperation.prototype.getHighlightStop = function()
 	{
 		const self = this;
 		const features = self._getHighlightStopFeatures();
@@ -1162,7 +1162,7 @@
 		return highlightStop;
 	}
 
-	FieldTripMap.prototype.updateStopInfo = function(data)
+	FieldTripMapOperation.prototype.updateStopInfo = function(data)
 	{
 		const self = this,
 			{ DBID, fieldTripStopId, fromFieldTripId, toFieldTripId, toStopSequence, color } = data,
@@ -1191,7 +1191,7 @@
 
 	//#region Map Events
 
-	FieldTripMap.prototype.onMapClickEvent = async function(data)
+	FieldTripMapOperation.prototype.onMapClickEvent = async function(data)
 	{
 		const self = this, event = data.event;
 
@@ -1244,7 +1244,7 @@
 		}
 	}
 
-	FieldTripMap.prototype.onMapKeyUpEvent = async function(_, data)
+	FieldTripMapOperation.prototype.onMapKeyUpEvent = async function(_, data)
 	{
 		const keyName = data.event.key;
 		switch (keyName)
@@ -1253,23 +1253,23 @@
 				await this.confirmToExitAddingStop();
 				break;
 			case "Enter":
-				console.log("TODO: Press Enter on FieldTripMap");
+				console.log("TODO: Press Enter on FieldTripMapOperation");
 				break;
 			case "Delete":
-				console.log("TODO: Press Delete on FieldTripMap");
+				console.log("TODO: Press Delete on FieldTripMapOperation");
 				break;
 			case "m":
 			case "M":
 				if (data.event.native.ctrlKey)
 				{
-					console.log("TODO: Press Ctrl + M on FieldTripMap, refresh trip stop path which is NULL");
+					console.log("TODO: Press Ctrl + M on FieldTripMapOperation, refresh trip stop path which is NULL");
 				}
 				break;
 			case "z":
 			case "Z":
 				if (data.event.native.ctrlKey)
 				{
-					console.log("TODO: Press Ctrl + Z on FieldTripMap, revertMapClick");//see _initRevertOperation in Plus
+					console.log("TODO: Press Ctrl + Z on FieldTripMapOperation, revertMapClick");//see _initRevertOperation in Plus
 				}
 				break;
 			default:
@@ -1277,7 +1277,7 @@
 		}
 	}
 
-	FieldTripMap.prototype.confirmToExitAddingStop = async function(needConfirmation = true, doFireEvent = true)
+	FieldTripMapOperation.prototype.confirmToExitAddingStop = async function(needConfirmation = true, doFireEvent = true)
 	{
 		if (!this.editing.isAddingStop)
 		{
@@ -1310,7 +1310,7 @@
 
 	//#region Map Visualization
 
-	FieldTripMap.prototype.drawStops = function(fieldTrip)
+	FieldTripMapOperation.prototype.drawStops = function(fieldTrip)
 	{
 		const self = this,
 			DEFAULT_STOP_VISIBILITY = false,
@@ -1356,7 +1356,7 @@
 		}
 	}
 
-	FieldTripMap.prototype.drawFieldTripPath = async function(fieldTrip, effectSequences)
+	FieldTripMapOperation.prototype.drawFieldTripPath = async function(fieldTrip, effectSequences)
 	{
 		const routePath = await this._updateRoutepathAndDirection(fieldTrip, effectSequences);
 		
@@ -1386,7 +1386,7 @@
 		}
 	}
 
-	FieldTripMap.prototype.drawSequenceLine = async function(fieldTrip)
+	FieldTripMapOperation.prototype.drawSequenceLine = async function(fieldTrip)
 	{
 		const self = this;
 		return new Promise((resolve, reject) =>
@@ -1406,7 +1406,7 @@
 
 	//#region - Path Arrows
 
-	FieldTripMap.prototype._getArrowRenderer = function()
+	FieldTripMapOperation.prototype._getArrowRenderer = function()
 	{
 		const self = this,
 		 	uniqueValueInfos = [],
@@ -1430,21 +1430,21 @@
 		return self.arrowLayerHelper.createUniqueValueRenderer(uniqueValueInfos);
 	}
 
-	FieldTripMap.prototype.updateArrowRenderer = function()
+	FieldTripMapOperation.prototype.updateArrowRenderer = function()
 	{
 		const arrowRenderer = this._getArrowRenderer();
 		this.pathArrowLayerInstance.setRenderer(arrowRenderer);
 		this.sequenceLineArrowLayerInstance.setRenderer(arrowRenderer);
 	}
 
-	FieldTripMap.prototype.hideArrowLayer = function()
+	FieldTripMapOperation.prototype.hideArrowLayer = function()
 	{
 		const self = this;
 		self.pathArrowLayerInstance.hide();
 		self.sequenceLineArrowLayerInstance.hide();
 	}
 
-	FieldTripMap.prototype.redrawPathArrowLayer = async function(_, data = {}, fieldTrips = null)
+	FieldTripMapOperation.prototype.redrawPathArrowLayer = async function(_, data = {}, fieldTrips = null)
 	{
 		const self = this;
 		if (self.pathLineType === PATH_LINE_TYPE.Sequence)
@@ -1463,7 +1463,7 @@
 		arrowLayerInstance.show();
 	}
 
-	FieldTripMap.prototype.redrawSequenceArrowLayer = async function(_, data, fieldTrips = null)
+	FieldTripMapOperation.prototype.redrawSequenceArrowLayer = async function(_, data, fieldTrips = null)
 	{
 		const self = this;
 		if (self.pathLineType === PATH_LINE_TYPE.Path)
@@ -1482,7 +1482,7 @@
 		arrowLayerInstance.show();
 	}
 
-	FieldTripMap.prototype._redrawArrowLayer = async function(fieldTrips, arrowLayerInstance, pathFeatures, data)
+	FieldTripMapOperation.prototype._redrawArrowLayer = async function(fieldTrips, arrowLayerInstance, pathFeatures, data)
 	{
 		const self = this;
 
@@ -1521,7 +1521,7 @@
 		}
 	}
 
-	FieldTripMap.prototype._computeArrowFeatures = function(polylineFeature)
+	FieldTripMapOperation.prototype._computeArrowFeatures = function(polylineFeature)
 	{
 		let arrows = [];
 		if (!polylineFeature)
@@ -1548,22 +1548,22 @@
 		return arrows;
 	}
 
-	FieldTripMap.prototype.setFieldTripPathArrowVisibility = function(expression)
+	FieldTripMapOperation.prototype.setFieldTripPathArrowVisibility = function(expression)
 	{
 		this.pathArrowLayerInstance.setLayerDefinitionExpression(expression);
 	}
 
-	FieldTripMap.prototype._getVisibleFieldTrips = function()
+	FieldTripMapOperation.prototype._getVisibleFieldTrips = function()
 	{
 		return this.fieldTripsData.filter(item => item.visible);
 	}
 
-	FieldTripMap.prototype.setFieldTripSequenceLineArrowVisibility = function(expression)
+	FieldTripMapOperation.prototype.setFieldTripSequenceLineArrowVisibility = function(expression)
 	{
 		this.sequenceLineArrowLayerInstance.setLayerDefinitionExpression(expression);
 	}
 
-	FieldTripMap.prototype._calculateArrowLayerExpression = function()
+	FieldTripMapOperation.prototype._calculateArrowLayerExpression = function()
 	{
 		const self = this,
 			visibleFieldTrips = self._getVisibleFieldTrips(),
@@ -1577,12 +1577,12 @@
 		return expression;
 	}
 
-	FieldTripMap.prototype._isArrowOnPath = function()
+	FieldTripMapOperation.prototype._isArrowOnPath = function()
 	{
 		return this.pathLineType === PATH_LINE_TYPE.Sequence;
 	}
 
-	FieldTripMap.prototype._extractArrowCondition = function(DBID, fieldTripId)
+	FieldTripMapOperation.prototype._extractArrowCondition = function(DBID, fieldTripId)
 	{
 		return `DBID = ${DBID} and id = ${fieldTripId}`;
 	}
@@ -1591,7 +1591,7 @@
 
 	//#region - Computing Methods
 
-	FieldTripMap.prototype._computeEffectSequences = function(fieldTrip, {addStop, moveStop, deleteStop} = {})
+	FieldTripMapOperation.prototype._computeEffectSequences = function(fieldTrip, {addStop, moveStop, deleteStop} = {})
 	{
 		let effectSequences = [];
 
@@ -1611,7 +1611,7 @@
 		return effectSequences.map(stop => stop.Sequence);
 	}
 
-	FieldTripMap.prototype._updateRoutepathAndDirection = async function(fieldTrip, effectSequences)
+	FieldTripMapOperation.prototype._updateRoutepathAndDirection = async function(fieldTrip, effectSequences)
 	{
 		if (!fieldTrip.routePath)
 		{
@@ -1628,7 +1628,7 @@
 		return routePath;
 	}
 	
-	FieldTripMap.prototype._getEffectStops = function(fieldTrip, effectSequences)
+	FieldTripMapOperation.prototype._getEffectStops = function(fieldTrip, effectSequences)
 	{
 		let effectedStops = [];
 		if (!effectSequences)
@@ -1643,7 +1643,7 @@
 		return effectedStops;
 	}
 
-	FieldTripMap.prototype._swapAttributeForStop = function(fieldTripStops, routeResult)
+	FieldTripMapOperation.prototype._swapAttributeForStop = function(fieldTripStops, routeResult)
 	{
 		const stops = routeResult?.stops;
 
@@ -1656,7 +1656,7 @@
 		});
 	}
 
-	FieldTripMap.prototype._computePathAttributes = function(fieldTrip, routeResult)
+	FieldTripMapOperation.prototype._computePathAttributes = function(fieldTrip, routeResult)
 	{
 		const Color = this._getColor(fieldTrip),
 			{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip),
@@ -1665,7 +1665,7 @@
 		return attributes;
 	}
 
-	FieldTripMap.prototype._computeSequenceLine = function(fieldTrip)
+	FieldTripMapOperation.prototype._computeSequenceLine = function(fieldTrip)
 	{
 		const paths = [];
 
@@ -1693,7 +1693,7 @@
 
 	//#region Routing
 
-	FieldTripMap.prototype.calculateRouteByStops = async function(fieldTrip, fieldTripStops)
+	FieldTripMapOperation.prototype.calculateRouteByStops = async function(fieldTrip, fieldTripStops)
 	{
 		const MIN_ROUTING_STOPS = 2;
 		if (fieldTripStops.length < MIN_ROUTING_STOPS)
@@ -1757,7 +1757,7 @@
 		return fieldTripStops;
 	}
 
-	FieldTripMap.prototype.createStopObjects = function(fieldTripStops)
+	FieldTripMapOperation.prototype.createStopObjects = function(fieldTripStops)
 	{
 		const stops = [];
 
@@ -1777,7 +1777,7 @@
 		return stops;
 	}
 
-	FieldTripMap.prototype.createRouteParams = function(stopFeatureSet)
+	FieldTripMapOperation.prototype.createRouteParams = function(stopFeatureSet)
 	{
 		return {
 			impedanceAttribute: null,
@@ -1787,7 +1787,7 @@
 		};
 	};
 
-	FieldTripMap.prototype._isLastStop = function(trip, stop, allStops)
+	FieldTripMapOperation.prototype._isLastStop = function(trip, stop, allStops)
 	{
 		if (!trip)
 		{
@@ -1797,7 +1797,7 @@
 	};
 
 	//if refresh path fail, will solve path one by one for each stop
-	FieldTripMap.prototype.refreshTripByStopsSeperately = function(trip, tripStops, networkService)
+	FieldTripMapOperation.prototype.refreshTripByStopsSeperately = function(trip, tripStops, networkService)
 	{
 		var self = this,
 			index = 0,
@@ -1861,7 +1861,7 @@
 		return solveRequest();
 	}
 
-	FieldTripMap.prototype._updatePathSegments = function(pathSegments, vertexes)
+	FieldTripMapOperation.prototype._updatePathSegments = function(pathSegments, vertexes)
 	{
 		if (vertexes && vertexes[0] && vertexes[0].geometry)
 		{
@@ -1898,13 +1898,13 @@
 		return pathSegments;
 	}
 
-	FieldTripMap.prototype._getBeforeStop = function(trip, tripStop)
+	FieldTripMapOperation.prototype._getBeforeStop = function(trip, tripStop)
 	{
 		var beforeStops = trip.FieldTripStops.filter(s => s.Sequence < tripStop.Sequence);
 		return beforeStops[beforeStops.length - 1];
 	}
 
-	FieldTripMap.prototype._getVertexesCloseToStopOnPathSeperately = function(beforeStop, afterStop, networkService)
+	FieldTripMapOperation.prototype._getVertexesCloseToStopOnPathSeperately = function(beforeStop, afterStop, networkService)
 	{
 		var self = this, vertex = null;
 		vertex = getPrevVertex();
@@ -1925,7 +1925,7 @@
 		}
 	}
 
-	FieldTripMap.prototype._findVertexToStopOnPath = function(path, stop, networkService)
+	FieldTripMapOperation.prototype._findVertexToStopOnPath = function(path, stop, networkService)
 	{
 		if (!path || !path.paths || !path.paths[0] || !path.paths[0][0]) return;
 		var polyline = TF.GIS.GeometryHelper.ComputeWebMercatorPolyline(path.paths);
@@ -1947,7 +1947,7 @@
 		return networkService.createStopFeatureSet([stopObject]);
 	}
 
-	FieldTripMap.prototype._createPathSegments = function(result)
+	FieldTripMapOperation.prototype._createPathSegments = function(result)
 	{
 		var self = this, pathSegments = [];
 		var stopToStopPathGeometry = TF.GIS.GeometryHelper.CreateWebMercatorPolyline([]);
@@ -1997,7 +1997,7 @@
 		return pathSegments;
 	}
 
-	FieldTripMap.prototype._createTripStops = function(fieldTrip, tripStops, pathSegments)
+	FieldTripMapOperation.prototype._createTripStops = function(fieldTrip, tripStops, pathSegments)
 	{
 		var self = this;
 		tripStops.forEach(function(stop, index)
@@ -2027,58 +2027,58 @@
 
 	//#region Private Methods
 
-	FieldTripMap.prototype._getStopFeatures = function()
+	FieldTripMapOperation.prototype._getStopFeatures = function()
 	{
 		return this.stopLayerInstance?.getFeatures();
 	}
 
-	FieldTripMap.prototype._getPathFeatures = function()
+	FieldTripMapOperation.prototype._getPathFeatures = function()
 	{
 		return this.pathLayerInstance?.getFeatures();
 	}
 
-	FieldTripMap.prototype._getHighlightFeatures = function()
+	FieldTripMapOperation.prototype._getHighlightFeatures = function()
 	{
 		return this.highlightLayerInstance?.getFeatures();
 	}
 
-	FieldTripMap.prototype._getHighlightStopFeatures = function()
+	FieldTripMapOperation.prototype._getHighlightStopFeatures = function()
 	{
 		return this.highlightStopLayerInstance?.getFeatures();
 	}
 
-	FieldTripMap.prototype._getPathArrowFeatures = async function(condition = '1 = 1')
+	FieldTripMapOperation.prototype._getPathArrowFeatures = async function(condition = '1 = 1')
 	{
 		return await this._getArrowFeatures(this.pathArrowLayerInstance, condition);
 	}
 
-	FieldTripMap.prototype._getSequenceLineFeatures = function()
+	FieldTripMapOperation.prototype._getSequenceLineFeatures = function()
 	{
 		return this.sequenceLineLayerInstance?.getFeatures();
 	}
 
-	FieldTripMap.prototype._getSequenceLineArrowFeatures = async function(condition = '1 = 1')
+	FieldTripMapOperation.prototype._getSequenceLineArrowFeatures = async function(condition = '1 = 1')
 	{
 		return await this._getArrowFeatures(this.sequenceLineArrowLayerInstance, condition);
 	}
 
-	FieldTripMap.prototype._getArrowFeatures = async function(arrowLayerInstance, condition = '1 = 1')
+	FieldTripMapOperation.prototype._getArrowFeatures = async function(arrowLayerInstance, condition = '1 = 1')
 	{
 		const queryResult = await arrowLayerInstance?.queryFeatures(null, condition);
 		return queryResult.features || [];
 	}
 
-	FieldTripMap.prototype._getColor = function(fieldTrip)
+	FieldTripMapOperation.prototype._getColor = function(fieldTrip)
 	{
 		return fieldTrip.color;
 	}
 
-	FieldTripMap.prototype._sortBySequence = function(stops)
+	FieldTripMapOperation.prototype._sortBySequence = function(stops)
 	{
 		return stops.sort((a, b) => a.Sequence - b.Sequence);
 	}
 
-	FieldTripMap.prototype._queryMapFeatures = function(features, DBID, FieldTripId)
+	FieldTripMapOperation.prototype._queryMapFeatures = function(features, DBID, FieldTripId)
 	{
 		const results = [];
 		for (let i = 0; i < features.length; i++)
@@ -2094,7 +2094,7 @@
 		return results;
 	}
 
-	FieldTripMap.prototype._queryArrowFeatures = function(features, DBID, Id)
+	FieldTripMapOperation.prototype._queryArrowFeatures = function(features, DBID, Id)
 	{
 		const results = [];
 		for (let i = 0; i < features.length; i++)
@@ -2110,7 +2110,7 @@
 		return results;
 	}
 
-	FieldTripMap.prototype._extractFieldTripFeatureFields = function(fieldTrip)
+	FieldTripMapOperation.prototype._extractFieldTripFeatureFields = function(fieldTrip)
 	{
 		const DBID = fieldTrip.DBID,
 			FieldTripId = fieldTrip.oldId || fieldTrip.id;
@@ -2118,7 +2118,7 @@
 		return { DBID, FieldTripId };
 	}
 
-	FieldTripMap.prototype.showLoadingIndicator = function()
+	FieldTripMapOperation.prototype.showLoadingIndicator = function()
 	{
 		if (tf.loadingIndicator)
 		{
@@ -2126,7 +2126,7 @@
 		}
 	}
 
-	FieldTripMap.prototype.hideLoadingIndicator = function()
+	FieldTripMapOperation.prototype.hideLoadingIndicator = function()
 	{
 		if (tf.loadingIndicator)
 		{
@@ -2136,7 +2136,7 @@
 
 	//#endregion
 
-	FieldTripMap.prototype.dispose = function()
+	FieldTripMapOperation.prototype.dispose = function()
 	{
 		const self = this;
 

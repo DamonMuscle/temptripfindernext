@@ -142,7 +142,7 @@
 	{
 		if (!this.fieldTripMap)
 		{
-			this.fieldTripMap = new TF.RoutingPalette.FieldTripMap(this.mapInstance);
+			this.fieldTripMap = new TF.RoutingPalette.FieldTripMapOperation(this.mapInstance);
 			await this.fieldTripMap.initLayers();
 		}
 
