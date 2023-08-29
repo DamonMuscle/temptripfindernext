@@ -73,12 +73,17 @@
 		this.remove(stopGraphic);
 	}
 
-	StopLayer.prototype.updateColor = function(graphics, color)
+	StopLayer.prototype.updateColor = function(graphics, color, createStopSymbol)
 	{
+		if (!createStopSymbol instanceof Function)
+		{
+			throw new Error("invalid parameter: createStopSymbol");
+		}
+
 		for (let i = 0; i < graphics.length; i++)
 		{
 			const graphic = graphics[i];
-			graphic.symbol = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.GetSymbol(graphic.attributes.Sequence, color);
+			graphic.symbol = createStopSymbol(graphic.attributes.Sequence, color);
 			graphic.attributes.Color = color;
 		}
 	}

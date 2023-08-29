@@ -25,12 +25,17 @@
 		this.remove(pathGraphic);
 	}
 
-	PathLayer.prototype.updateColor = function(graphics, color)
+	PathLayer.prototype.updateColor = function(graphics, color, createPathSymbol)
 	{
+		if (!createPathSymbol instanceof Function)
+		{
+			throw new Error("invalid parameter: createPathSymbol");
+		}
+
 		for (let i = 0; i < graphics.length; i++)
 		{
 			const graphic = graphics[i];
-			graphic.symbol =  TF.RoutingPalette.FieldTripMap.PathGraphicWrapper.GetSymbol(color);
+			graphic.symbol =  createPathSymbol(color);
 			graphic.attributes.Color = color;
 		}
 	}

@@ -501,19 +501,22 @@
 			sequenceLineFeatures = this._getSequenceLineFeatures(),
 			fieldTripHighlightFeatures = this._getHighlightFeatures();
 
+		const createStopSymbol = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.GetSymbol;
+		const createPathSymbol = TF.RoutingPalette.FieldTripMap.PathGraphicWrapper.GetSymbol;
+
 		const fieldTripStops = this._queryMapFeatures(stopFeatures, DBID, FieldTripId);
-		this.stopLayerInstance.updateColor(fieldTripStops, color);
+		this.stopLayerInstance.updateColor(fieldTripStops, color, createStopSymbol);
 
 		const fieldTripPaths = this._queryMapFeatures(pathFeatures, DBID, FieldTripId);
-		this.pathLayerInstance.updateColor(fieldTripPaths, color);
+		this.pathLayerInstance.updateColor(fieldTripPaths, color, createPathSymbol);
 
 		const fieldTripSequenceLines = this._queryMapFeatures(sequenceLineFeatures, DBID, FieldTripId);
-		this.sequenceLineLayerInstance.updateColor(fieldTripSequenceLines, color);
+		this.sequenceLineLayerInstance.updateColor(fieldTripSequenceLines, color, createPathSymbol);
 
 		const fieldTripHighlights = this._queryMapFeatures(fieldTripHighlightFeatures, DBID, FieldTripId);
 		// prevent update highlight path symbol.
 		const highlightLines = fieldTripHighlights.filter(item => item.geometry.type === "polyline" && item.symbol.color.a === 1);
-		this.sequenceLineLayerInstance.updateColor(highlightLines, color);
+		this.sequenceLineLayerInstance.updateColor(highlightLines, color, createPathSymbol);
 
 		// update path arrow color
 		const condition = this._extractArrowCondition(DBID, FieldTripId);
