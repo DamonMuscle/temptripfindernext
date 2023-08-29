@@ -13,10 +13,10 @@
 	{
 		var item = {};
 		item[fieldName] = value;
-		var column = tf.helpers.kendoGridHelper.getGridColumnsFromDefinitionByType(dataType).filter(x => x.FieldName.toLowerCase() === fieldName.toLowerCase());
-		if (column && column.length === 1 && column[0].UnitOfMeasureSupported)
+		const lowerCasedFieldName = fieldName.toLowerCase();
+		var column = tf.helpers.kendoGridHelper.getGridColumnsFromDefinitionByType(dataType).find(x => x.FieldName.toLowerCase() === lowerCasedFieldName);
+		if (column && column.UnitOfMeasureSupported)
 		{
-			column = column[0];
 			return tf.measurementUnitConverter.handleColumnUnitOfMeasure(item, column);
 		}
 		return value;
