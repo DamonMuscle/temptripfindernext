@@ -178,6 +178,12 @@
 				// this._addDocument(TF.Document.DocumentData.GridInfo.create(type), e);
 				tf.pageManager.openNewPage(type);
 
+				const parentMenu = $(e.target).closest('li.menu-container.has-submenu');
+				if(parentMenu.length)
+				{
+					self.closeOpenedNavigationItemMenu(false);
+				}
+
 				// close the navigation menu in mobile device after click
 				if (TF.isPhoneDevice)
 				{
