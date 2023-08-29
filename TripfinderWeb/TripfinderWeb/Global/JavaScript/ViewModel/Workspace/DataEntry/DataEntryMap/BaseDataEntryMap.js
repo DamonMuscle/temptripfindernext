@@ -161,7 +161,7 @@
 		this.initLayers();
 	}
 
-	BaseDataEntryMap.prototype.onMapViewPointerMove = function(event)
+	BaseDataEntryMap.prototype.onMapViewPointerMove = async function(event)
 	{
 		const self = this, mapInstance = self.getMapInstance();
 		if (!mapInstance || mapInstance.map.mapView.pining)
@@ -177,20 +177,9 @@
 			return;
 		}
 
-		mapInstance.hitTest(event).then((response) =>
-		{
-			let graphics = null, cursor = "default";
-			if (response && response.results.length > 0)
-			{
-				graphics = response.results;
-				const locationGraphics =  graphics.filter(item => item.graphic?.layer?.id === ManuallyPinLayerId);
-				if (locationGraphics.length > 0)
-				{
-					cursor = "pointer";
-				}
-			}
-			mapInstance.setMapCursor(cursor);
-		});
+		const graphics = await mapInstance.findFeaturesByHitTest(event, ManuallyPinLayerId);
+		const cursor = graphics.length > 0 ? "pointer" : "default";
+		mapInstance.setMapCursor(cursor);
 	}
 
 	BaseDataEntryMap.prototype._initMapTool = function(mapToolOptions, hasManuallyPin)

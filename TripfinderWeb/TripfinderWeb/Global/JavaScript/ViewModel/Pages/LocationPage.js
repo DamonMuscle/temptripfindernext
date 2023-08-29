@@ -488,7 +488,7 @@
 		self.getMapPopup().focusRecord(record.Id, allGraphics);
 	}
 
-	LocationPage.prototype.onMapViewPointerMove = function(event)
+	LocationPage.prototype.onMapViewPointerMove = async function(event)
 	{
 		const self = this;
 		if (!self.mapInstance)
@@ -504,21 +504,9 @@
 			return;
 		}
 
-		self.mapInstance.hitTest(event).then((response) =>
-		{
-			let graphics = null, cursor = "default";
-			if (response && response.results.length > 0)
-			{
-				graphics = response.results;
-				const locationGraphics =  graphics.filter(item => item.graphic.layer.id === LocationGridLayerId);
-				if (locationGraphics.length > 0)
-				{
-					cursor = "pointer";
-				}
-			}
-			
-			self.mapInstance.setMapCursor(cursor);
-		});
+		const graphics = await self.mapInstance.findFeaturesByHitTest(event, LocationGridLayerId);
+		const cursor = graphics.length > 0 ? "pointer" : "default";
+		self.mapInstance.setMapCursor(cursor);
 	}
 
 	LocationPage.prototype.refreshClick = function()
