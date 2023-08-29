@@ -154,7 +154,7 @@
 		var self = this;
 		var promises = [];
 		var oldTrip = self.dataModel.getFieldTripById(originalTripId);
-		promises.push(self.resetTripInfo([oldTrip], null, true).then(function()
+		promises.push(self.resetTripInfo([oldTrip], null, true, false, true).then(function()
 		{
 			if (!isSameTrip)
 			{
@@ -168,7 +168,7 @@
 			self.dataModel.refreshOptimizeSequenceRate(oldTrip.id, null, null, true);
 		}
 		var currentTrip = self.dataModel.getFieldTripById(tripStop.FieldTripId);
-		promises.push(self.resetTripInfo([currentTrip], null, true).then(function()
+		promises.push(self.resetTripInfo([currentTrip], null, true, false, true).then(function()
 		{
 			if (self.dataModel.showImpactDifferenceChart())
 			{
@@ -335,7 +335,7 @@
 		}
 	}
 
-	RoutingDisplay.prototype.resetTripInfo = function(fieldTrips, notReset, clearOptimizeImpact, resetScheduleTime)
+	RoutingDisplay.prototype.resetTripInfo = function(fieldTrips, notReset, clearOptimizeImpact, resetScheduleTime, disableRecalculate)
 	{
 		const self = this;
 		if (fieldTrips === null || fieldTrips === undefined)
@@ -343,7 +343,14 @@
 			return Promise.resolve(true);
 		}
 
-		return self.dataModel.recalculate(fieldTrips).then(function(response)
+		let promise = Promise.resolve(fieldTrips);
+		
+		if (!disableRecalculate)
+		{
+			promise = self.dataModel.recalculate(fieldTrips);
+		}
+
+		return promise.then(function(response)
 		{
 			var fieldTripData = response;
 			for (var i = 0; i < fieldTripData.length; i++)
