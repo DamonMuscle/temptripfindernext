@@ -101,10 +101,10 @@
 			{
 				self.getMapInstance().setExtent(TF.createDefaultMapExtent());
 			},
-			onMapViewUpdated: self.onMapViewUpdated.bind(self, mapToolOptions, hasManuallyPin),
-			onMapViewPointerMove: self.onMapViewPointerMove.bind(self)
+			onMapViewUpdated: self.onMapViewUpdated.bind(self, mapToolOptions, hasManuallyPin)
 		};
 		const mapInstance = await TF.Helper.MapHelper.createMapInstance(self.element, eventHandlers);
+		mapInstance.onMapViewPointerMove.subscribe(self.onMapViewPointerMove.bind(self));
 
 		self.mapClickEvent = mapInstance.map.mapView.on('click', async function(event) {
 
@@ -161,9 +161,9 @@
 		this.initLayers();
 	}
 
-	BaseDataEntryMap.prototype.onMapViewPointerMove = async function(event)
+	BaseDataEntryMap.prototype.onMapViewPointerMove = async function(_, data)
 	{
-		const self = this, mapInstance = self.getMapInstance();
+		const self = this, mapInstance = self.getMapInstance(), event = data.event;
 		if (!mapInstance || mapInstance.map.mapView.pining)
 		{
 			return;

@@ -158,12 +158,12 @@
 		else
 		{
 			const eventHandlers = {
-				onMapViewCreated: self.onMapViewCreated.bind(self),
-				onMapViewPointerMove: self.onMapViewPointerMove.bind(self)
+				onMapViewCreated: self.onMapViewCreated.bind(self)
 			};
 			await tf.pageManager.resizablePage.showMapView(eventHandlers);
 			self.mapInstance = tf.pageManager.resizablePage.getRightData();
 			self.mapInstance.onMapViewClickEvent.subscribe(self.onMapViewClickEventHandler.bind(self));
+			self.mapInstance.onMapViewPointerMove.subscribe(self.onMapViewPointerMove.bind(self));
 			self.initMapTools();
 			self.initLocationMapGraphics();
 		}
@@ -488,9 +488,9 @@
 		self.getMapPopup().focusRecord(record.Id, allGraphics);
 	}
 
-	LocationPage.prototype.onMapViewPointerMove = async function(event)
+	LocationPage.prototype.onMapViewPointerMove = async function(_, data)
 	{
-		const self = this;
+		const self = this, event = data.event;
 		if (!self.mapInstance)
 		{
 			return;

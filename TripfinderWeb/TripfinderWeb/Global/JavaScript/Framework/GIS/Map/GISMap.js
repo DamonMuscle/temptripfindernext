@@ -36,7 +36,6 @@
 		eventHandlers: {
 			onMapViewCreated: null,
 			onMapViewDoubleClick: null,
-			onMapViewPointerMove: null,
 			onMapViewUpdated: null,
 			onMapViewUpdating: null,
 			onMapViewExtentChanges: null,
@@ -68,6 +67,7 @@
 		this.create($mapContainer);
 
 		this.onMapViewClickEvent = new TF.Events.Event();
+		this.onMapViewPointerMove = new TF.Events.Event();
 		this.onMapViewExtentChangeEvent = new TF.Events.Event();
 		this.onMapViewScaleChangeEvent = new TF.Events.Event();
 		this.onMapViewKeyUpEvent = new TF.Events.Event();
@@ -319,10 +319,10 @@
 			executeOnce();
 		}
 
-		if (self.settings.eventHandlers.onMapViewPointerMove)
+		self.eventHandler.onMapViewPointerMove = mapView.on('pointer-move', (event) =>
 		{
-			self.eventHandler.onMapViewPointerMove = mapView.on('pointer-move', self.settings.eventHandlers.onMapViewPointerMove);
-		}
+			self.onMapViewPointerMove.notify({event});
+		});
 
 		if (self.settings.eventHandlers.onMapViewCreated)
 		{

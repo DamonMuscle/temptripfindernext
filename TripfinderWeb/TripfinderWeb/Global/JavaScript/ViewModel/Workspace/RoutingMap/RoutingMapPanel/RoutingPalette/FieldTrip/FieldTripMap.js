@@ -1191,7 +1191,6 @@
 	FieldTripMap.prototype.onMapClickEvent = async function(data)
 	{
 		const self = this, event = data.event;
-		let response = null;
 
 		if (event.button === 0)
 		{
@@ -1828,7 +1827,8 @@
 						if (!result.routeResults)
 						{
 							tripStops[index]._geoPath = null;
-						} else
+						}
+						else
 						{
 							var pathSegments = self._createPathSegments(result);
 							pathSegments = self._updatePathSegments(pathSegments, [vertex, null]);
@@ -1926,7 +1926,7 @@
 	{
 		if (!path || !path.paths || !path.paths[0] || !path.paths[0][0]) return;
 		var polyline = TF.GIS.GeometryHelper.ComputeWebMercatorPolyline(path.paths);
-		var point = TF.xyToGeometry(stop.XCoord, stop.YCoord);
+		var point = TF.GIS.GeometryHelper.ComputeWebMercatorPoint(stop.XCoord, stop.YCoord);
 		var startPoint = polyline.paths[0][0];
 		var distance1 = Math.sqrt((startPoint[0] - point.x) * (startPoint[0] - point.x) + (startPoint[1] - point.y) * (startPoint[1] - point.y));
 		var endIndex = polyline.paths[0].length - 1;
@@ -2008,7 +2008,8 @@
 				stop.StreetSpeed = stop.Speed;
 				stop.Distance = pathSegments[index].length ? pathSegments[index].length * 1 : -1;
 				stop._geoPath = pathSegments[index].geometry;
-			} else if (stop.failedStop || self._isLastStop(fieldTrip, stop, tripStops))
+			}
+			else if (stop.failedStop || self._isLastStop(fieldTrip, stop, tripStops))
 			{
 				stop.path = {};
 				stop.Distance = 0;
