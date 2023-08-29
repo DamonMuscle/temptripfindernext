@@ -243,6 +243,41 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 		});
 	}
 
+	GeocodingService.prototype.suggestAddressLocations = async function(text, center)
+	{
+		const self = this;
+		const url = self.getValidLocatorUrl("suggestStreetLocations");
+		if (url === null) {
+			return;
+		}
+
+		return new Promise((resolve, reject) =>
+		{
+			require({}, ["esri/config", "esri/rest/locator", "esri/geometry/SpatialReference"], (esriConfig, locator) =>
+			{
+				self.setOnlineToken(esriConfig);
+
+				let addresses = null, errorMessage = null;
+				const params = {
+					categories: "Address",
+					location: center,
+					text,
+				};
+
+				locator.suggestLocations(url, params).then((response) =>
+				{
+					addresses = response;
+					resolve({ addresses, errorMessage });
+				}).catch(() => {
+					errorMessage = `No address was found for this street ${JSON.stringify(text)}`;
+					
+					self.clearOnlineToken(esriConfig);
+					reject({ addresses, errorMessage });
+				});
+			});
+		});
+	}
+
 	GeocodingService.prototype.suggestLocations = function(searchAddress)
 	{
 		const self = this;
