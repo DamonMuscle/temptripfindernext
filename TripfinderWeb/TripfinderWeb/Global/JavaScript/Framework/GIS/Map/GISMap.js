@@ -639,10 +639,8 @@
 
 	Map.prototype.centerAndZoom = function(longitude, latitude, scale = 5000)
 	{
-		const geometry = TF.GIS.GeometryHelper.ComputeWebMercatorPoint(longitude, latitude);
-		this.centerAtPoint(geometry);
-
-		this.map.mapView.scale = scale;
+		this.centerAt(longitude, latitude);
+		this.setScale(scale);
 	}
 
 	Map.prototype.getScale = function()
@@ -650,9 +648,19 @@
 		return this.map.mapView.scale;
 	}
 
+	Map.prototype.setScale = function(scale)
+	{
+		this.map.mapView.scale = scale;
+	}
+
 	Map.prototype.getCenter = function()
 	{
 		return this.map.mapView.center;
+	}
+
+	Map.prototype.getExtent = function()
+	{
+		return this.map.mapView.extent;
 	}
 
 	Map.prototype.setExtent = function(extent)
@@ -679,9 +687,9 @@
 			}, 50);
 		}
 
-		const resetMapExtent = async () =>
+		this.onMapViewExtentChangeEvent.subscribe(() =>
 		{
-			const MERCATOR_MAX_Y = 19972000, MERCATOR_MIN_Y = -19972000, mapExtent = this.map.mapView.extent;
+			const MERCATOR_MAX_Y = 19972000, MERCATOR_MIN_Y = -19972000, mapExtent = this.getExtent();
 
 			if (mapExtent)
 			{
@@ -699,11 +707,6 @@
 					recenterMap(mapExtent);
 				}
 			}
-		}
-
-		this.map.mapView.watch("extent", async function(value)
-		{
-			resetMapExtent();
 		});
 	}
 
@@ -717,7 +720,7 @@
 		if (queryGeometry && queryGeometry.type === GEOMETRY_TYPE.POINT)
 		{
 			// use event extent to check the clicked graphic
-			const queryDistance = this.map.mapView.scale / searchScaleFactor;
+			const queryDistance = this.getScale() / searchScaleFactor;
 			spatialQueryGeometry = TF.GIS.GeometryHelper.ComputeGeodesicBuffer(queryGeometry, queryDistance);
 		}
 
