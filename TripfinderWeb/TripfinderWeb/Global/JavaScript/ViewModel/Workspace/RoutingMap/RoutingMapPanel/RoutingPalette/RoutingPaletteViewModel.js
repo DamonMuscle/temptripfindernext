@@ -135,15 +135,15 @@
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapAddStopFromMap = function(_)
 	{
-		this.fieldTripMap?.startAddFieldTripStop();
+		this.fieldTripMapOperation?.startAddFieldTripStop();
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapChange = async function(_, data)
 	{
-		if (!this.fieldTripMap)
+		if (!this.fieldTripMapOperation)
 		{
-			this.fieldTripMap = new TF.RoutingPalette.FieldTripMapOperation(this.mapInstance);
-			await this.fieldTripMap.initLayers();
+			this.fieldTripMapOperation = new TF.RoutingPalette.FieldTripMapOperation(this.mapInstance);
+			await this.fieldTripMapOperation.initLayers();
 		}
 
 		await this.displayFieldTripPath(data);
@@ -159,7 +159,7 @@
 			for (let i = 0; i < deleteFieldTrips.length; i++)
 			{
 				const fieldTrip = deleteFieldTrips[i];
-				this.fieldTripMap.removeFieldTrip(fieldTrip);
+				this.fieldTripMapOperation.removeFieldTrip(fieldTrip);
 			}
 		}
 
@@ -167,8 +167,8 @@
 			fieldTripCount = fieldTrips.length;
 		if (fieldTripCount > 0)
 		{
-			this.fieldTripMap.fieldTripsData = fieldTrips;
-			this.fieldTripMap.initArrowLayers();
+			this.fieldTripMapOperation.fieldTripsData = fieldTrips;
+			this.fieldTripMapOperation.initArrowLayers();
 		}
 
 		if (data && (data.add.length > 0))
@@ -178,23 +178,23 @@
 			for (let i = addFieldTrips.length - 1; i >= 0; i--)
 			{
 				const fieldTrip = addFieldTrips[i];
-				await this.fieldTripMap.addFieldTrip(fieldTrip);
+				await this.fieldTripMapOperation.addFieldTrip(fieldTrip);
 			}
 		}
 		
 		if (fieldTripCount > 0)
 		{
-			this.fieldTripMap.updateArrowRenderer();
-			await this.fieldTripMap.setFieldTripStopVisibility(fieldTrips);
-			await this.fieldTripMap.updateFieldTripPathVisibility(fieldTrips);
-			await this.fieldTripMap.orderFeatures();
-			this.fieldTripMap.zoomToFieldTripLayers(fieldTrips);
+			this.fieldTripMapOperation.updateArrowRenderer();
+			await this.fieldTripMapOperation.setFieldTripStopVisibility(fieldTrips);
+			await this.fieldTripMapOperation.updateFieldTripPathVisibility(fieldTrips);
+			await this.fieldTripMapOperation.orderFeatures();
+			this.fieldTripMapOperation.zoomToFieldTripLayers(fieldTrips);
 		}
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapZoomToLayers = function(_, data)
 	{
-		this.fieldTripMap?.zoomToFieldTripLayers(data);
+		this.fieldTripMapOperation?.zoomToFieldTripLayers(data);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapZoomToStop = function(_, data)
@@ -204,31 +204,31 @@
 		const stop = fieldTrip?.FieldTripStops.find(item => item.Sequence === sequence);
 		const coordinates = { longitude: stop?.XCoord, latitude: stop?.YCoord };
 
-		this.fieldTripMap?.zoomToFieldTripStop(coordinates);
+		this.fieldTripMapOperation?.zoomToFieldTripStop(coordinates);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapShowHide = function(_, data)
 	{
 		// make sure the arrows is correct after map extent changes when layer is hide.
-		this.fieldTripMap?.updateArrowRenderer();
-		this.fieldTripMap?.setFieldTripVisibility(data);
+		this.fieldTripMapOperation?.updateArrowRenderer();
+		this.fieldTripMapOperation?.setFieldTripVisibility(data);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapUpdateColor = function(_, data)
 	{
-		this.fieldTripMap?.updateSymbolColor(data);
+		this.fieldTripMapOperation?.updateSymbolColor(data);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapTripPathTypeChange = function(_, isSequenceLine)
 	{
-		const type = isSequenceLine ? this.fieldTripMap?.PATH_LINE_TYPE.Sequence : this.fieldTripMap?.PATH_LINE_TYPE.Path;
-		if (type === this.fieldTripMap?.pathLineType)
+		const type = isSequenceLine ? this.fieldTripMapOperation?.PATH_LINE_TYPE.Sequence : this.fieldTripMapOperation?.PATH_LINE_TYPE.Path;
+		if (type === this.fieldTripMapOperation?.pathLineType)
 		{
 			return;
 		}
 
-		this.fieldTripMap?.setPathLineType(type);
-		this.fieldTripMap?.switchPathType(this.dataModel.fieldTrips);
+		this.fieldTripMapOperation?.setPathLineType(type);
+		this.fieldTripMapOperation?.switchPathType(this.dataModel.fieldTrips);
 	}
 
 	RoutingPaletteViewModel.prototype.onMapCanvas_RecalculateTripMove = function(_, data)
@@ -248,8 +248,8 @@
 			return;
 		}
 
-		const effectSequences = this.fieldTripMap?._computeEffectSequences(fieldTrip, {moveStop: fieldTripStop});
-		this.fieldTripMap?.refreshFieldTripPath(fieldTrip, effectSequences);
+		const effectSequences = this.fieldTripMapOperation?._computeEffectSequences(fieldTrip, {moveStop: fieldTripStop});
+		this.fieldTripMapOperation?.refreshFieldTripPath(fieldTrip, effectSequences);
 	};
 
 	RoutingPaletteViewModel.prototype.onMapCanvas_RefreshPathByStops = async function(_, data)
@@ -260,7 +260,7 @@
 			const fieldTripId = tripStops[0].FieldTripId;
 			const fieldTrip = this.dataModel.getFieldTripById(fieldTripId);
 			const effectSequences = tripStops.map(s => s.Sequence);
-			await this.fieldTripMap?.refreshFieldTripPath(fieldTrip, effectSequences, callZoomToLayers);
+			await this.fieldTripMapOperation?.refreshFieldTripPath(fieldTrip, effectSequences, callZoomToLayers);
 		}
 
 		this.checkIfCompletedHandlerExists(data);
@@ -275,12 +275,12 @@
 
 		const fieldTripId = items[0].FieldTripId;
 		const fieldTrip = this.dataModel.getFieldTripById(fieldTripId);
-		this.fieldTripMap?.updateStopSymbol(fieldTrip, items);
+		this.fieldTripMapOperation?.updateStopSymbol(fieldTrip, items);
 	};
 
 	RoutingPaletteViewModel.prototype.onFieldTripStopUpdatedEvent = function(_, data)
 	{
-		this.fieldTripMap?.updateStopInfo(data);
+		this.fieldTripMapOperation?.updateStopInfo(data);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapMoveStopLocation = function(_, data)
@@ -300,13 +300,13 @@
 			return;
 		}
 
-		this.fieldTripMap?.moveStopLocation(fieldTrip, fieldTripStop, this.mapCanvasPage.sketchTool);
+		this.fieldTripMapOperation?.moveStopLocation(fieldTrip, fieldTripStop, this.mapCanvasPage.sketchTool);
 	};
 
 	RoutingPaletteViewModel.prototype.onRefreshFieldTripPath = async function({fieldTripId})
 	{
 		const fieldTrip = this.dataModel.getFieldTripById(fieldTripId);
-		await this.fieldTripMap?.refreshFieldTripPath(fieldTrip);
+		await this.fieldTripMapOperation?.refreshFieldTripPath(fieldTrip);
 	};
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapMoveStopLocationCompleted = function(data)
@@ -340,7 +340,7 @@
 			return;
 		}
 
-		this.fieldTripMap?.deleteStopLocation(fieldTrip, fieldTripStop);
+		this.fieldTripMapOperation?.deleteStopLocation(fieldTrip, fieldTripStop);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapDeleteStopLocationCompleted = function(data)
@@ -452,12 +452,12 @@
 		const nextStop = nextIndex === INVALID_STOP_INDEX ? null : toFieldTripStops[nextIndex];
 		params = { fromFieldTrip, toFieldTrip, previousStop, currentStop, nextStop, AssignSequence };
 
-		this.fieldTripMap?.addHighlightFeatures(params);
+		this.fieldTripMapOperation?.addHighlightFeatures(params);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapClearHighlightFieldTripStop = function(_, data)
 	{
-		this.fieldTripMap?.clearHighlightFeatures();
+		this.fieldTripMapOperation?.clearHighlightFeatures();
 	}
 
 	RoutingPaletteViewModel.prototype.onMapViewClickEventHandler = function(_, data)
@@ -468,7 +468,7 @@
 			return;
 		}
 
-		this.fieldTripMap?.onMapClickEvent(data);
+		this.fieldTripMapOperation?.onMapClickEvent(data);
 	}
 
 	RoutingPaletteViewModel.prototype.onMapViewMouseWheelHandler = function(_, data)
@@ -526,12 +526,12 @@
 	{
 		if (stops.length === 1)
 		{
-			const newStop = this.fieldTripMap?.createNewStop(stops[0]);
-			this.fieldTripMap?.addHighlightStops(newStop);
+			const newStop = this.fieldTripMapOperation?.createNewStop(stops[0]);
+			this.fieldTripMapOperation?.addHighlightStops(newStop);
 		}
 		else
 		{
-			this.fieldTripMap?.highlightQuickAddStops(stops);
+			this.fieldTripMapOperation?.highlightQuickAddStops(stops);
 		}
 	}
 
@@ -574,10 +574,10 @@
 			childViewModel.dispose();
 		});
 
-		if (this.fieldTripMap)
+		if (this.fieldTripMapOperation)
 		{
-			this.fieldTripMap.dispose();
-			this.fieldTripMap = null;
+			this.fieldTripMapOperation.dispose();
+			this.fieldTripMapOperation = null;
 		}
 
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMap);
