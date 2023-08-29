@@ -8,6 +8,8 @@
 		options.filterSelectableRecords = this._filterSelectableRecords.bind(this);
 		options.getRequiredColumns = this.getRequiredColumns;
 		options.withRelationShip = true;
+		options.needAdjustUtcColumnsForClientFilter = true;
+		options.needUpdateSchemaOnRebuildGrid = true;
 		TF.Control.KendoListMoverWithSearchControlViewModel.call(this, selectedData, options);
 		this.obDisableControl = disableControl;
 	}

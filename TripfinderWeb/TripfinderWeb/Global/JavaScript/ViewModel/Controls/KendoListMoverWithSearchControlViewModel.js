@@ -41,7 +41,9 @@
 		overlay: true,
 		serverPaging: false,
 		getSelectableRecords: null,
-		additionalFilterItems: [] // this property is taken advantage to control the datasource in the list mover. for example, we show fieldtrips who have been geocoded only.
+		additionalFilterItems: [], // this property is taken advantage to control the datasource in the list mover. for example, we show fieldtrips who have been geocoded only.
+		needAdjustUtcColumnsForClientFilter: false, //FT-3472, whether adjust utc by updating the record value instead of converting utc to client timezone in column template
+		needUpdateSchemaOnRebuildGrid: false //FT-3472, whether update data source schema model fields, if it's not built with full grid definition columns on initializing
 	};
 
 	function KendoListMoverWithSearchControlViewModel(selectedData, options)
@@ -883,22 +885,24 @@
 	KendoListMoverWithSearchControlViewModel.prototype.changeSourceDataToGridAcceptData = function(data)
 	{
 		var self = this;
+		const needAdjustUtc = !self.options.serverPaging && self.options.needAdjustUtcColumnsForClientFilter;
 		data.forEach(function(item)
 		{
 			self.columns.forEach(function(define)
 			{
 				if (item[define.FieldName] !== null &&
-					item[define.FieldName] !== undefined)
+					item[define.FieldName] !== undefined &&
+					item[define.FieldName] !== "")
 				{
 					switch (define.type)
 					{
 						case "datetime":
-							item[define.FieldName] = new Date(item[define.FieldName]);
+							item[define.FieldName] = define.isUTC && needAdjustUtc ? utcToClientTimeZone(item[define.FieldName]).toDate() : new Date(item[define.FieldName]);
 							break;
 						case "date":
-							if (define.dbType === "datetime")
+							if (define.dbType === "datetime" && define.isUTC && needAdjustUtc)
 							{
-								item[define.FieldName] = new Date(item[define.FieldName]);
+								item[define.FieldName] = moment(utcToClientTimeZone(item[define.FieldName]).format("L")).toDate();
 							}
 							else
 							{
@@ -1042,6 +1046,9 @@
 
 			// options.dataSource = this.allRecords;
 			// options.kendoGridOption.dataSource.data = this.allRecords;
+
+			options.needAdjustUtcColumnsForClientFilter = self.options.needAdjustUtcColumnsForClientFilter;
+			options.needUpdateSchemaOnRebuildGrid = self.options.needUpdateSchemaOnRebuildGrid;
 		}
 		options.routeState = "ListMover" + gridType + "KendoGrid";
 	};
@@ -1441,6 +1448,7 @@
 
 			return column;
 		});
+		self.adjustUtcColumnsForClientFilter(columns);
 		return columns;
 	};
 
@@ -1468,6 +1476,7 @@
 
 			return column;
 		});
+		self.adjustUtcColumnsForClientFilter(columns);
 		return columns;
 	};
 

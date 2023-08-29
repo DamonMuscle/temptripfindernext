@@ -570,9 +570,9 @@
 			Width: '150px',
 			dbType: "datetime",
 			type: "date",
-			template: function(item)
+			template: function(item, notAdjustUtc)
 			{
-				let dt = utcToClientTimeZone(item["LastUpdated"]);
+				let dt = notAdjustUtc ? moment(item["LastUpdated"]) : utcToClientTimeZone(item["LastUpdated"]);
 				return dt.isValid() ? dt.format("MM/DD/YYYY") : "";
 			},
 			isUTC: true,

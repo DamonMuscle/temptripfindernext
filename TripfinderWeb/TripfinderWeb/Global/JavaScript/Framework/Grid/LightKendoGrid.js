@@ -505,6 +505,18 @@
 				kendoOptions.sortable.mode = this.sortModel;
 				this._removeInvisibleListFilterItems(this.getKendoColumn());
 				kendoOptions.autoBind = true;
+				if (this.options.needUpdateSchemaOnRebuildGrid)
+				{
+					if (!kendoOptions.dataSource.schema)
+					{
+						kendoOptions.dataSource.schema = {};
+					}
+					if (!kendoOptions.dataSource.schema.model)
+					{
+						kendoOptions.dataSource.schema.model = {};
+					}
+					kendoOptions.dataSource.schema.model.fields = this.getKendoField();
+				}
 				this.kendoGrid.setOptions(kendoOptions);
 				this._initFilterDropDownListTimer();
 				TF.CustomFilterHelper.initCustomFilterBtn(this.$container);
@@ -3374,6 +3386,29 @@
 		return columns;
 	};
 
+	LightKendoGrid.prototype.adjustUtcColumnsForClientFilter = function(columns)
+	{
+		const self = this;
+		if (!self.options.kendoGridOption || self.options.kendoGridOption.serverPaging || !self.options.needAdjustUtcColumnsForClientFilter)
+		{
+			return;
+		}
+
+		columns.forEach(column =>
+		{
+			if (column.isUTC)
+			{
+				if (column.template)
+				{
+					const originalTemplate = column.template;
+					column.template = function(item)
+					{
+						return originalTemplate.call(this, item, true);
+					}
+				}
+			}
+		});
+	};
 
 	LightKendoGrid.prototype.setColumnFilterableCell = function (column, definition, source)
 	{
