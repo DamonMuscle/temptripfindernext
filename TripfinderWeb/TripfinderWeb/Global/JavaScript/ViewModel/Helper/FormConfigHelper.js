@@ -9,6 +9,19 @@
 		//constructor
 	}
 
+	FormConfigHelper.convertValueByMeasurementUnit = function(value, fieldName, dataType)
+	{
+		var item = {};
+		item[fieldName] = value;
+		const lowerCasedFieldName = fieldName.toLowerCase();
+		var column = tf.helpers.kendoGridHelper.getGridColumnsFromDefinitionByType(dataType).find(x => x.FieldName.toLowerCase() === lowerCasedFieldName);
+		if (column && column.UnitOfMeasureSupported)
+		{
+			return tf.measurementUnitConverter.handleColumnUnitOfMeasure(item, column);
+		}
+		return value;
+	}
+
 	FormConfigHelper.getFormColumnContent = function(columnName, dataTypeId, options = { isGrid: false })
 	{
 
@@ -144,7 +157,7 @@
 			"Geo": { type: "Geo" },
 			"IntGratDate1": { type: "Date" },
 			"LastUpdated": { type: "Date" },
-			"WalkToSchoolPolicy": { type: "numner" },
+			"WalkToSchoolPolicy": { type: "number" },
 			"WalkToStopPolicy": { type: "number" },
 			"Xcoord": { type: "Coord" },
 			"Ycoord": { type: "Coord" },
@@ -279,7 +292,7 @@
 	tf.systemFieldsFormat = function(type, value, el, attributeFlag, numberPrecision,
 		trueDisplayName, falseDisplayName, options = { isGrid: false, isUTC: false })
 	{
-		const { isGrid, isUTC } = options;
+		const { isGrid, isUTC, systemQuestionTargetField, dataTypeId } = options;
 
 		function clearEmptyImagePlacehold(_el)
 		{
@@ -405,7 +418,13 @@
 			case "currency":
 			case "Number":
 			case "number":
+			case "float":
 				if (IsEmptyString(value)) { return ""; }
+				if (systemQuestionTargetField && dataTypeId)
+				{
+					const dataTypeKey = tf.dataTypeHelper.getKeyById(dataTypeId);
+					value = FormConfigHelper.convertValueByMeasurementUnit(value, systemQuestionTargetField, dataTypeKey);
+				}
 				return tf.dataFormatHelper.numberFormatter(value, numberPrecision);
 			case TYPE_PHONE_NUMBER:
 				if (IsEmptyString(value)) { return ""; }

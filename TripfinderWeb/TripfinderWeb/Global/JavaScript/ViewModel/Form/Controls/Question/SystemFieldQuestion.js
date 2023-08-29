@@ -65,6 +65,8 @@
 
 		if (fieldFormatConfig)
 		{
+			options.dataTypeId = dataTypeId;
+			options.systemQuestionTargetField = this.field.editType.targetField;
 			displayValue = tf.systemFieldsFormat(fieldFormatConfig.type, value, this.$el, attributeFlag, numberPrecision, trueDisplayName, falseDisplayName, options);
 		}
 		else if (systemFieldType)
