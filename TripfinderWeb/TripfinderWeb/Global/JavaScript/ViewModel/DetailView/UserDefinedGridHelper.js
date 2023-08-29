@@ -697,7 +697,7 @@
 
 				if (gridDefinition.UnitOfMeasureSupported == true)
 				{
-					columnExtension = $.extend(columnExtension, { UnitOfMeasureSupported: true });
+					columnExtension.UnitOfMeasureSupported = true;
 				}
 			}
 		}
