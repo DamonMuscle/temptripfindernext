@@ -1073,6 +1073,11 @@
 						title: "Error",
 						message: ex.responseJSON.Message
 					});
+
+					if ([400, 412].includes(ex.status))
+					{
+						self.resetFilterForCurrentInvalidFilter();
+					}
 				});
 		});
 	}
@@ -4358,6 +4363,38 @@
 				});
 			});
 		}
+	};
+
+	LightKendoGrid.prototype.resetFilterForCurrentInvalidFilter = function (response)
+	{
+		var self = this,
+			filterId = self.obSelectedGridFilterId(),
+			message = filterId ? String.format("The applied filter \"{0}\" is invalid.", self.obSelectedGridFilterName()) : "The applied quick filter is invalid.";
+		return tf.promiseBootbox.alert(message).then(function ()
+		{
+			self.clearGridFilterClick().then(function ()
+			{
+				if (filterId && response.Message != "Invisible UDF")
+				{
+					// use response.Message to distinguish deleted udf and invisible udf.
+					tf.promiseAjax.patch(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters", filterId), {
+						data: [{ "op": "replace", "path": "/IsValid", "value": false }]
+					}).then(function ()
+					{
+						var filters = self.obGridFilterDataModels().filter(function (filter)
+						{
+							return filter.id() == filterId;
+						});
+
+						if (filters && filters.length == 1)
+						{
+							filters[0].isValid(false);
+						}
+					})
+				}
+				self.$container.find(".grid-filter-clear-all").trigger('mousedown');
+			});
+		});
 	};
 
 	LightKendoGrid.prototype.setBooleanNotSpecifiedFilterItem = function (filterItems)
