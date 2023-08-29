@@ -656,6 +656,17 @@
 						}
 						item["FormattedValue" + i] = formattedValue;
 					}
+					else if (fieldType === "boolean")
+					{
+						var itemValue = dataColumns.find(x => x.FieldName === fieldData || x.OriginalName === fieldData || x.DisplayName === fieldData);
+						if (itemValue !== null && currentValue !== null)
+						{
+							item["FormattedValue" + i] =
+								(currentValue === true || currentValue.toString().toLowerCase() === 'true') ?
+									(itemValue.questionFieldOptions ? itemValue.questionFieldOptions.TrueDisplayName : itemValue.TrueDisplayName || currentValue) :
+									(itemValue.questionFieldOptions ? itemValue.questionFieldOptions.FalseDisplayName : itemValue.FalseDisplayName || currentValue);
+						}
+					}
 					else
 					{
 						item["FormattedValue" + i] = currentValue;

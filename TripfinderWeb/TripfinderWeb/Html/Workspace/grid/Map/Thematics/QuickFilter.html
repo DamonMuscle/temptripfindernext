@@ -36,7 +36,13 @@
 					<!--/ko -->
 					<!--/ko -->
 					<!--ko ifnot: filterStyle() === "isempty" || filterStyle() === "isnotempty" -->
+					<!--ko ifnot: typeCode() === "Boolean"-->
 					<!--ko customInput:{ type:typeCode, disable:filterDisabled, value:filterValue, attributes:{class: "form-control quick-filter-input k-input-needed", adjustPopupPosition: $parent.adjustCalendarPosition.bind($parent)}, events: { input: $parent.filterTextInput.bind({parent: $parent, data: $data}) } } -->
+					<!--/ko -->
+					<!--/ko -->
+					<!--ko if: typeCode() === "Boolean"-->
+					<!--ko customInput:{ type:typeCode, disable:filterDisabled, value:filterValue, attributes:{class: "form-control quick-filter-input", trueDisplayName: trueDisplay, falseDisplayName:falseDisplay, adjustPopupPosition: $parent.adjustCalendarPosition.bind($parent)}, events: { input: $parent.filterTextInput.bind({parent: $parent, data: $data}) } } -->
+					<!--/ko -->
 					<!--/ko -->
 					<!--/ko -->
 					<!--/ko-->

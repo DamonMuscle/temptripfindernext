@@ -313,28 +313,38 @@
 		{
 			case "Boolean":
 				let dataField = field.selectField();
-				// convert the diaplay value to boolean for filtering
-				if (dataField.questionType === 'Boolean')
+				const _getFilterValue = function(trueDisplayName, falseDisplayName) 
 				{
-					let trueDisplayName = dataField.filterable.positiveLabel;
-					let falseDisplayName = dataField.filterable.negativeLabel;
 					if (trueDisplayName && value === trueDisplayName)
 					{
-						filterValue = true;
+						return true;
 					}
 					else if (falseDisplayName && value === falseDisplayName)
 					{
-						filterValue = false;
+						return false;
 					}
 					else
 					{
-						filterValue = value.toLowerCase() === "true" ? true : false;
+						return value.toLowerCase() === "true";
 					}
 				}
-				else
+
+				filterValue = value.toLowerCase() === "true";
+
+				// convert the diaplay value to boolean for filtering
+				if (dataField.questionType === 'Boolean')
 				{
-					filterValue = value.toLowerCase() === "true" ? true : false;
+					filterValue = _getFilterValue(dataField.filterable.positiveLabel, dataField.filterable.negativeLabel);
 				}
+				else if (dataField.questionType === 'SystemField')
+				{
+					filterValue = _getFilterValue(dataField.questionFieldOptions.TrueDisplayName, dataField.questionFieldOptions.FalseDisplayName);
+				}
+				else if (dataField.Type === 'Boolean')
+				{
+					filterValue = _getFilterValue(dataField.TrueDisplayName, dataField.FalseDisplayName);
+				}
+
 				break;
 			case "Time":
 				if (moment(value).isValid())
@@ -1253,6 +1263,22 @@
 			field.filterMenuData.changeType(selectField.FieldName, self.typeCodeMenuEmun[self.fieldType(selectField.type)], isQuickDateFilter);
 			field.type = selectField.type;
 			field.filterDisabled(false);
+			if (selectField.type === 'boolean')
+			{
+				const _firstLetterCap = (word) => !word || word.length === 0 ? "" : `${word.charAt(0).toUpperCase()}${word.slice(1)}`;
+
+				if (selectField.questionType === 'SystemField')
+				{
+					field.trueDisplay(_firstLetterCap(selectField.questionFieldOptions.TrueDisplayName));
+					field.falseDisplay(_firstLetterCap(selectField.questionFieldOptions.FalseDisplayName));
+				}
+				else 
+				{
+					field.trueDisplay(_firstLetterCap(selectField.TrueDisplayName));
+					field.falseDisplay(_firstLetterCap(selectField.FalseDisplayName));
+				}
+			}
+
 			field.typeCode(self.typeCodeEmun[self.fieldType(self.fieldType(selectField.type))]);
 
 			if (self.obFields()[field.index + 1])
@@ -1462,6 +1488,8 @@
 			"type": "string",
 			"typeCode": ko.observable("String"),
 			"filterValue": ko.observable(""),
+			"trueDisplay": ko.observable(""),
+			"falseDisplay": ko.observable(""),
 			"autocompletion": ko.observableArray([]),
 			"customActive": ko.observable(false),
 			"filterSet": null
