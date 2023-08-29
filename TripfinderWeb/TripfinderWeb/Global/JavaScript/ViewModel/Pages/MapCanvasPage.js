@@ -1048,7 +1048,7 @@
 
 		if (this.mapInstance)
 		{
-			TF.GIS.MapFactory.destroyMapInstanceById(this.mapInstance.settings.mapId);
+			TF.GIS.MapFactory.destroyMapInstance(this.mapInstance);
 			this.mapInstance = null;
 		}
 

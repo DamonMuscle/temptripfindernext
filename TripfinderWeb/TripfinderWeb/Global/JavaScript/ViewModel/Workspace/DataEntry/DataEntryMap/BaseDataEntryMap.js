@@ -792,8 +792,8 @@
 			this._map.expandMapTool = null;
 			this._map.SketchViewModel = null;
 
-			const mapId = this.getMapId();
-			TF.GIS.MapFactory.destroyMapInstanceById(mapId);
+			const mapInstance = this.getMapInstance();
+			TF.GIS.MapFactory.destroyMapInstance(mapInstance);
 		}
 
 		if (this.mapViewerViewModel)

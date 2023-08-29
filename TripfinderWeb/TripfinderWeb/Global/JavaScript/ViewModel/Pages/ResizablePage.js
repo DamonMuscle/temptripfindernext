@@ -532,7 +532,7 @@
 			{
 				self.obGridData().exitCurrentMode();
 			}
-			TF.GIS.MapFactory.destroyMapInstanceById(self.mapviewInstace.settings.mapId);
+			TF.GIS.MapFactory.destroyMapInstance(self.mapviewInstace);
 			self.mapviewInstace = null;
 		}
 	};

@@ -23,8 +23,9 @@
 		{
 			return instances.find(x=>x.id === id).instance;
 		},
-		destroyMapInstanceById: function(id)
+		destroyMapInstance: function(mapInstance)
 		{
+			const id = mapInstance.settings.mapId;
 			const index = instances.findIndex(x=>x.id === id);
 			if (index === -1)
 			{
