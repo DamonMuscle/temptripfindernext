@@ -35,7 +35,6 @@
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.HighlightFieldTripStop, self.onFieldTripMapHighlightFieldTripStop.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.ClearHighlightFieldTripStop, self.onFieldTripMapClearHighlightFieldTripStop.bind(self));
 
-		mapCanvasPage.onMapViewMouseWheelEvent.subscribe(self.onMapCanvasMapViewMouseWheelHandler.bind(self));
 		mapCanvasPage.onMapViewCustomizedEvent.subscribe(self.onMapCanvasMapViewCustomizedEventHandler.bind(self));
 		PubSub.subscribe("on_MapCanvas_RecalculateTripMove", self.onMapCanvas_RecalculateTripMove.bind(self));
 		PubSub.subscribe("on_MapCanvas_RefreshTripByStops", self.onMapCanvas_RefreshPathByStops.bind(self));
@@ -66,6 +65,7 @@
 		});
 
 		self.mapInstance.onMapViewClickEvent.subscribe(self.onMapViewClickEventHandler.bind(self));
+		self.mapInstance.onMapViewMouseWheelEvent.subscribe(self.onMapViewMouseWheelHandler.bind(self));
 	};
 
 	RoutingPaletteViewModel.prototype.initLabelSetting = function()
@@ -471,7 +471,7 @@
 		this.fieldTripMap?.onMapClickEvent(data);
 	}
 
-	RoutingPaletteViewModel.prototype.onMapCanvasMapViewMouseWheelHandler = function(_, data)
+	RoutingPaletteViewModel.prototype.onMapViewMouseWheelHandler = function(_, data)
 	{
 		TF.RoutingMap.ContextMenuBase.prototype.removeContextMenu();
 	}

@@ -38,7 +38,6 @@
 			onMapViewUpdated: null,
 			onMapViewUpdating: null,
 			onMapViewExtentChanges: null,
-			onMapViewMouseWheel: null,
 			onMapViewCustomizedEventHandler: null,
 		}
 	};
@@ -66,11 +65,12 @@
 		this.create($mapContainer);
 
 		this.onMapViewClickEvent = new TF.Events.Event();
-		this.onMapViewDoubleClick = new TF.Events.Event();
-		this.onMapViewPointerMove = new TF.Events.Event();
+		this.onMapViewDoubleClickEvent = new TF.Events.Event();
+		this.onMapViewPointerMoveEvent = new TF.Events.Event();
 		this.onMapViewExtentChangeEvent = new TF.Events.Event();
 		this.onMapViewScaleChangeEvent = new TF.Events.Event();
 		this.onMapViewKeyUpEvent = new TF.Events.Event();
+		this.onMapViewMouseWheelEvent = new TF.Events.Event();
 	}
 
 	/**
@@ -302,7 +302,7 @@
 
 		self.eventHandler.onMapViewDoubleClick = mapView.on("double-click", (event) =>
 		{
-			self.onMapViewDoubleClick.notify({ event });
+			self.onMapViewDoubleClickEvent.notify({ event });
 		});
 
 		if (self.settings.eventHandlers.onMapViewUpdating)
@@ -321,7 +321,7 @@
 
 		self.eventHandler.onMapViewPointerMove = mapView.on('pointer-move', (event) =>
 		{
-			self.onMapViewPointerMove.notify({event});
+			self.onMapViewPointerMoveEvent.notify({event});
 		});
 
 		if (self.settings.eventHandlers.onMapViewCreated)
@@ -344,10 +344,10 @@
 			self.onMapViewKeyUpEvent.notify({ event });
 		});
 
-		if (self.settings.eventHandlers.onMapViewMouseWheel)
+		self.eventHandler.onMapViewMouseWheel = mapView.on('mouse-wheel', (event) =>
 		{
-			self.eventHandler.onMapViewMouseWheel = mapView.on('mouse-wheel', self.settings.eventHandlers.onMapViewMouseWheel);
-		}
+			self.onMapViewMouseWheelEvent.notify({ event });
+		});
 
 		this.defineReadOnlyProperty("fireCustomizedEvent", function ({ eventType, data = {} })
 		{
@@ -388,11 +388,12 @@
 		}
 
 		this.onMapViewClickEvent?.unsubscribeAll();
-		this.onMapViewDoubleClick?.unsubscribeAll();
-		this.onMapViewPointerMove?.unsubscribeAll();
+		this.onMapViewDoubleClickEvent?.unsubscribeAll();
+		this.onMapViewPointerMoveEvent?.unsubscribeAll();
 		this.onMapViewExtentChangeEvent?.unsubscribeAll();
 		this.onMapViewScaleChangeEvent?.unsubscribeAll();
 		this.onMapViewKeyUpEvent?.unsubscribeAll();
+		this.onMapViewMouseWheelEvent?.unsubscribeAll();
 	}
 
 	Map.prototype.setMapCursor = function(cursorType)

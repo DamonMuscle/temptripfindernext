@@ -104,7 +104,7 @@
 			onMapViewUpdated: self.onMapViewUpdated.bind(self, mapToolOptions, hasManuallyPin)
 		};
 		const mapInstance = await TF.Helper.MapHelper.createMapInstance(self.element, eventHandlers);
-		mapInstance.onMapViewPointerMove.subscribe(self.onMapViewPointerMove.bind(self));
+		mapInstance.onMapViewPointerMoveEvent.subscribe(self.onMapViewPointerMoveEventHandler.bind(self));
 
 		self.mapClickEvent = mapInstance.map.mapView.on('click', async function(event) {
 
@@ -161,7 +161,7 @@
 		this.initLayers();
 	}
 
-	BaseDataEntryMap.prototype.onMapViewPointerMove = async function(_, data)
+	BaseDataEntryMap.prototype.onMapViewPointerMoveEventHandler = async function(_, data)
 	{
 		const self = this, mapInstance = self.getMapInstance(), event = data.event;
 		if (!mapInstance || mapInstance.map.mapView.pining)

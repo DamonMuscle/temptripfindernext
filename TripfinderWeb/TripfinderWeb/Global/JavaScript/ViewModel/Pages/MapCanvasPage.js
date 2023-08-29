@@ -30,7 +30,6 @@
 		self.menuDataUpdateEvent = new TF.Events.Event();
 		self.onStopEditingEvent = new TF.Events.Event();
 
-		self.onMapViewMouseWheelEvent = new TF.Events.Event();
 		self.onMapViewCustomizedEvent = new TF.Events.Event();
 
 		// arrange the panels and palettes.
@@ -135,11 +134,6 @@
 		{
 			console.error(e);
 		}
-	}
-
-	MapCanvasPage.prototype.onMapViewMouseWheel = function(event)
-	{
-		this.onMapViewMouseWheelEvent.notify({event});
 	}
 
 	MapCanvasPage.prototype.onMapViewCustomizedEventHandler = function(event)
@@ -648,7 +642,6 @@
 					self.mapInstance.setExtent(TF.createDefaultMapExtent());
 				},
 				onMapViewUpdated: self.onMapViewUpdated.bind(self),
-				onMapViewMouseWheel: self.onMapViewMouseWheel.bind(self),
 				onMapViewCustomizedEventHandler: self.onMapViewCustomizedEventHandler.bind(self),
 			};
 
@@ -1025,7 +1018,6 @@
 		this.onUpdateRecordsEvent?.unsubscribeAll();
 		this.menuDataUpdateEvent?.unsubscribeAll();
 		this.onStopEditingEvent?.unsubscribeAll();
-		this.onMapViewMouseWheelEvent?.unsubscribeAll();
 		this.onMapViewCustomizedEvent?.unsubscribeAll();
 
 		// this.routingSnapManager.dispose();
