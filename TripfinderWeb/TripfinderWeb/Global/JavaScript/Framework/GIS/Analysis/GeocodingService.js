@@ -260,6 +260,7 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 				let addresses = null, errorMessage = null;
 				const params = {
 					categories: "Address",
+					countryCode: 'USA,CAN',
 					location: center,
 					text,
 				};
