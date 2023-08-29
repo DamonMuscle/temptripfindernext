@@ -19,9 +19,10 @@
 			instances.push({instance: map, id: mapId, container: $mapContainer});
 			return map;
 		},
-		getMapInstanceById: function(id)
+		getMapInstance: function($mapContainer)
 		{
-			return instances.find(x=>x.id === id).instance;
+			const id = $($mapContainer)?.attr(attrKey);
+			return instances.find(x=>x.id === id)?.instance;
 		},
 		destroyMapInstance: function(mapInstance)
 		{

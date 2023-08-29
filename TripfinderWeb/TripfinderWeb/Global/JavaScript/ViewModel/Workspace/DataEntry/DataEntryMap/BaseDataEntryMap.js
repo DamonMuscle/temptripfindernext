@@ -143,15 +143,9 @@
 		return self.gridMapPopup;
 	}
 
-	BaseDataEntryMap.prototype.getMapId = function()
-	{
-		return $(this.element).attr("data-mapid");
-	}
-
 	BaseDataEntryMap.prototype.getMapInstance = function()
 	{
-		const mapId = this.getMapId();
-		return TF.GIS.MapFactory.getMapInstanceById(mapId);
+		return TF.GIS.MapFactory.getMapInstance(this.element);
 	}
 
 	BaseDataEntryMap.prototype.onMapViewUpdated = function(mapToolOptions, hasManuallyPin)
