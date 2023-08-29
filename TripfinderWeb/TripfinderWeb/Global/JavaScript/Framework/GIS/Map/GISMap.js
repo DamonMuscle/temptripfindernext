@@ -36,8 +36,6 @@
 		eventHandlers: {
 			onMapViewCreated: null,
 			onMapViewUpdated: null,
-			onMapViewUpdating: null,
-			onMapViewExtentChanges: null,
 			onMapViewCustomizedEventHandler: null,
 		}
 	};
@@ -71,6 +69,7 @@
 		this.onMapViewScaleChangeEvent = new TF.Events.Event();
 		this.onMapViewKeyUpEvent = new TF.Events.Event();
 		this.onMapViewMouseWheelEvent = new TF.Events.Event();
+		this.onMapViewUpdatingEvent = new TF.Events.Event();
 	}
 
 	/**
@@ -305,10 +304,10 @@
 			self.onMapViewDoubleClickEvent.notify({ event });
 		});
 
-		if (self.settings.eventHandlers.onMapViewUpdating)
+		self.eventHandler.onMapViewUpdating = mapView.watch('updating', (event) =>
 		{
-			self.eventHandler.onMapViewUpdating = mapView.watch('updating', self.settings.eventHandlers.onMapViewUpdating);
-		}
+			self.onMapViewUpdatingEvent.notify({ event });
+		});
 
 		if (self.settings.eventHandlers.onMapViewUpdated)
 		{
@@ -387,13 +386,14 @@
 			self.settings.eventHandlers[name] = null;
 		}
 
-		this.onMapViewClickEvent?.unsubscribeAll();
-		this.onMapViewDoubleClickEvent?.unsubscribeAll();
-		this.onMapViewPointerMoveEvent?.unsubscribeAll();
-		this.onMapViewExtentChangeEvent?.unsubscribeAll();
-		this.onMapViewScaleChangeEvent?.unsubscribeAll();
-		this.onMapViewKeyUpEvent?.unsubscribeAll();
-		this.onMapViewMouseWheelEvent?.unsubscribeAll();
+		self.onMapViewClickEvent?.unsubscribeAll();
+		self.onMapViewDoubleClickEvent?.unsubscribeAll();
+		self.onMapViewPointerMoveEvent?.unsubscribeAll();
+		self.onMapViewExtentChangeEvent?.unsubscribeAll();
+		self.onMapViewScaleChangeEvent?.unsubscribeAll();
+		self.onMapViewKeyUpEvent?.unsubscribeAll();
+		self.onMapViewMouseWheelEvent?.unsubscribeAll();
+		self.onMapViewUpdatingEvent?.unsubscribeAll();
 	}
 
 	Map.prototype.setMapCursor = function(cursorType)

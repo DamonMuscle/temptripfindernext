@@ -2,9 +2,12 @@
 {
 	createNamespace("TF.GIS").GeometryHelper = GeometryHelper;
 
+	const WKID_WGS_1984 = 4326;
+	const WKID_WEB_MERCATOR = 102100;
+
 	function GeometryHelper() { }
 
-	GeometryHelper.CreatePointGeometry = function(longitude, latitude, wkid = 4326)
+	GeometryHelper.CreatePointGeometry = function(longitude, latitude, wkid = WKID_WGS_1984)
 	{
 		return new TF.GIS.SDK.Point({
 			type: "point",
@@ -16,7 +19,7 @@
 
 	GeometryHelper.CreateWebMercatorPoint = function(x, y)
 	{
-		return GeometryHelper.CreatePointGeometry(x, y, 102100);
+		return GeometryHelper.CreatePointGeometry(x, y, WKID_WEB_MERCATOR);
 	}
 
 	GeometryHelper.ComputeWebMercatorPoint = function(longitude, latitude)
@@ -25,7 +28,7 @@
 		return TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(point);
 	}
 
-	GeometryHelper.CreatePolylineGeometry = function(paths, wkid = 4326)
+	GeometryHelper.CreatePolylineGeometry = function(paths, wkid = WKID_WGS_1984)
 	{
 		return new TF.GIS.SDK.Polyline({
 			hasZ: false,
@@ -37,7 +40,7 @@
 
 	GeometryHelper.CreateWebMercatorPolyline = function(paths)
 	{
-		return GeometryHelper.CreatePolylineGeometry(paths, 102100);
+		return GeometryHelper.CreatePolylineGeometry(paths, WKID_WEB_MERCATOR);
 	}
 
 	GeometryHelper.ComputeWebMercatorPolyline = function(paths)
