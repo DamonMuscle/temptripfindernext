@@ -118,11 +118,6 @@
 
 		return leftData.filter(l =>
 		{
-			if (l.isLocked)
-			{
-				return false;
-			}
-
 			var isSelectableTrip = false;
 			rightData.forEach(r =>
 			{
