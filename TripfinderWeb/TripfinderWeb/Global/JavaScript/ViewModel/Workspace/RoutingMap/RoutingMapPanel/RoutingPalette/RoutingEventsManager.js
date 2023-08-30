@@ -104,7 +104,8 @@
 							{
 								if (result)
 								{
-									self.dataModel.setOpenFieldTrips(data);
+									// FT-3761, does not auto zoom on set open field trips. will auto zoom on RoutingPaletteViewModel.prototype.onFieldTripMapChange
+									self.dataModel.setOpenFieldTrips(data, true);
 								}
 							});
 						}

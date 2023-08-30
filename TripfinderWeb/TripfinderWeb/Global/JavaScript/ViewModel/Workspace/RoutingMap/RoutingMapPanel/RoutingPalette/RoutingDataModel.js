@@ -1014,7 +1014,7 @@
 		var self = this;
 		if (fieldTripIds.length == 0)
 		{
-			return { Trips: [] };
+			return { FieldTrips: [] };
 		}
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "routingfieldtrips"), {
 			paramData: { fieldTripIds: fieldTripIds.toString() }
