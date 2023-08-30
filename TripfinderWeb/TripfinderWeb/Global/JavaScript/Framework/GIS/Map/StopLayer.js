@@ -128,7 +128,7 @@
 		if (!geocodeService.isAvailableCountry(CountryCode))
 		{
 			tf.promiseBootbox.alert({
-				message: "Please pin a location in USA or Canada.",
+				message: "Please add a location in USA or Canada.",
 				title: "Alert"
 			});
 			return null;
