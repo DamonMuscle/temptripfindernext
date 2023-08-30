@@ -528,14 +528,14 @@
 	{
 		var self = this;
 		var trip = self.dataModel.getFieldTripById(tripStop.FieldTripId);
-		return tf.modalManager.showModal(new TF.RoutingMap.RoutingPalette.SetScheduledTimeModalViewModel(tripStop, trip))
+		return tf.modalManager.showModal(new TF.RoutingMap.RoutingPalette.SetScheduledTimeModalViewModel(tripStop, trip, self.dataModel))
 			.then(function(data)
 			{
 				if (data)
 				{
 					return data;
 				}
-				return Promise.resolve(false);
+				return false;
 			});
 	};
 

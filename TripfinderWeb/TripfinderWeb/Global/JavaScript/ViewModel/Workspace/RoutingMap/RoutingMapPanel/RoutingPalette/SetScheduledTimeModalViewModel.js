@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").SetScheduledTimeModalViewModel = SetScheduledTimeModalViewModel;
 
-	function SetScheduledTimeModalViewModel(tripStop, trip)
+	function SetScheduledTimeModalViewModel(tripStop, trip, dataModel)
 	{
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Update Stop Time");
@@ -12,7 +12,7 @@
 		this.buttonTemplate("modal/PositiveNegative");
 		this.obPositiveButtonLabel("OK");
 		this.obNegativeButtonLabel("Cancel");
-		this.viewModel = new TF.RoutingMap.RoutingPalette.SetScheduledTimeViewModel(tripStop, trip);
+		this.viewModel = new TF.RoutingMap.RoutingPalette.SetScheduledTimeViewModel(tripStop, trip, dataModel);
 		this.data(this.viewModel);
 	}
 

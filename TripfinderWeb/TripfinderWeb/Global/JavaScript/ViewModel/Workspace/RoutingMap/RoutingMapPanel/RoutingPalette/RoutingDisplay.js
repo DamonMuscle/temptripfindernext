@@ -1109,7 +1109,7 @@
 		return tf.promiseBootbox.confirm(
 			{
 				message: "You are about to Copy Calculated Duration for all field trip stops. The Duration and the locked field trip stop time (" +
-						utcToClientTimeZone(lockedTripStop.StopTimeArrive || lockedTripStop.StopTimeDepart).format('MM-DD-YYYY h:mm a') + ") will be used to determine the Times. Any manual adjustments to Time will be overwritten. Are you sure you want to continue?",
+						utcToClientTimeZone(self.dataModel.getFieldTripStopTime(lockedTripStop)).format('MM-DD-YYYY h:mm a') + ") will be used to determine the Times. Any manual adjustments to Time will be overwritten. Are you sure you want to continue?",
 				title: "Confirmation"
 			})
 			.then(function(result)
@@ -1698,9 +1698,9 @@
 			{
 				nodeData.set('customData.distance', parseFloat(self.convertToCurrentMeasurementUnit(tripStopData.Distance)).toFixed(2));
 			}
-			if (tripStopData && (tripStopData.StopTimeArrive || tripStopData.StopTimeDepart))
+			if (tripStopData && self.dataModel.getFieldTripStopTime(tripStopData))
 			{
-				nodeData.set('customData.stopTime', tripStopData.StopTimeArrive || tripStopData.StopTimeDepart);
+				nodeData.set('customData.stopTime', self.dataModel.getFieldTripStopTime(tripStopData));
 			}
 			if (tripStopData && tripStopData.Duration)
 			{
@@ -1861,7 +1861,7 @@
 				isFirst,
 				duration: TF.RoutingMap.RoutingPalette.RoutingDisplayHelper.durationToString(tripStop.Duration),
 				avgSpeed: self.speedToString(tripStop.Speed),
-				stopTime: tripStop.StopTimeArrive || tripStop.StopTimeDepart,
+				stopTime: self.dataModel.getFieldTripStopTime(tripStop),
 				sequence: tripStop.Sequence,
 				geometry: tripStop.geometry,
 				schoolCode: tripStop.SchoolCode,

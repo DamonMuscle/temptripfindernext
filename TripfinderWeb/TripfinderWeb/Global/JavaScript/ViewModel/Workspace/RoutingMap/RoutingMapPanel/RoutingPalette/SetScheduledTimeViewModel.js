@@ -2,26 +2,27 @@
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").SetScheduledTimeViewModel = SetScheduledTimeViewModel;
 
-	function SetScheduledTimeViewModel(tripStop, trip)
+	function SetScheduledTimeViewModel(tripStop, trip, dataModel)
 	{
 		var self = this;
 		
-		this.momentHelper = new TF.Document.MomentHelper();
+		self.momentHelper = new TF.Document.MomentHelper();
 
-		this.tripStop = tripStop;
-		this.trip = trip;
-		this.arrivalDate = ko.observable();
-		this.arrivalTime = ko.observable();
-		this.numOfMinutes = ko.observable(0);
-		this.changeType = ko.observable(0);
+		self.tripStop = tripStop;
+		self.trip = trip;
+		self.dataModel = dataModel;
+		self.arrivalDate = ko.observable();
+		self.arrivalTime = ko.observable();
+		self.numOfMinutes = ko.observable(0);
+		self.changeType = ko.observable(0);
 
 		self.convertStopTimeArrive(tripStop);
 
 
-		this.arrivalDateTime = ko.computed(function()
+		self.arrivalDateTime = ko.computed(function()
 		{
 			const arrivalDateTime = self.momentHelper.getDateTime(self.arrivalDate(), self.arrivalTime(), true);
-			const stopTime = self.tripStop.StopTimeArrive || self.tripStop.StopTimeDepart;
+			const stopTime = self.dataModel.getFieldTripStopTime(self.tripStop);
 
 			var minutesDiff = 0;
 
@@ -42,18 +43,18 @@
 			return arrivalDateTime;
 		});
 
-		this.stopAffect = ko.observable(0);
-		this.updateDisabled = ko.observable(false);
-		this.updateDisabledNumberBox = ko.computed(function()
+		self.stopAffect = ko.observable(0);
+		self.updateDisabled = ko.observable(false);
+		self.updateDisabledNumberBox = ko.computed(function()
 		{
 			return !self.updateDisabled();
 		});
-		this.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
+		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 	}
 
 	SetScheduledTimeViewModel.prototype.convertStopTimeArrive = function(tripStop)
 	{
-		const stopTime = tripStop.StopTimeArrive || tripStop.StopTimeDepart;
+		const stopTime = this.dataModel.getFieldTripStopTime(tripStop);
 		this.arrivalDate(this.momentHelper.getDatePart(stopTime, true));
 		this.arrivalTime(this.momentHelper.getTimePart(stopTime, true));
 	}

@@ -574,11 +574,11 @@
 	RoutingTripViewModel.prototype.setTripStopScheduleTime = function(data)
 	{
 		var self = this;
-		if (this.isDisabled)
+		if (self.isDisabled)
 		{
 			return;
 		}
-		tf.modalManager.showModal(new TF.RoutingMap.RoutingPalette.SetScheduledTimeModalViewModel(data, this.trip))
+		tf.modalManager.showModal(new TF.RoutingMap.RoutingPalette.SetScheduledTimeModalViewModel(data, self.trip, self.dataModel))
 			.then(function(result)
 			{
 				if (result)

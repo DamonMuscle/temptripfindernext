@@ -1460,7 +1460,7 @@
 				{
 					if (trips[i].FieldTripStops[j].LockStopTime)
 					{
-						trips[i].FieldTripStops[j].ActualStopTime = trips[i].FieldTripStops[j].StopTimeArrive || trips[i].FieldTripStops[j].StopTimeDepart;
+						trips[i].FieldTripStops[j].ActualStopTime = this.getFieldTripStopTime(trips[i].FieldTripStops[j]);
 						lockStop = trips[i].FieldTripStops[j];
 						lockStopIndex = j;
 						break;
@@ -1630,6 +1630,21 @@
 		}
 
 		this.onTripStopTimeChangeEvent.notify({});
+	};
+
+	RoutingDataModel.prototype.getFieldTripStopTime = function(fieldTripStop)
+	{
+		// if (typeof fieldTripStop.PrimaryDeparture !== "boolean")
+		// {
+		// 	throw new Error("getFieldTripStopTime");
+		// }
+		const value = fieldTripStop.PrimaryDeparture ? fieldTripStop.StopTimeDepart : fieldTripStop.StopTimeArrive;
+
+		// if(new Date(value).toString() === "Invalid Date")
+		// {
+		// 	throw new Error("getFieldTripStopTime Invalid Date");
+		// }
+		return value;
 	};
 
 	RoutingDataModel.prototype.getLockTimeStop = function(tripId)

@@ -325,7 +325,7 @@
 			}
 			else if (property.toLowerCase() == 'stopTime'.toLowerCase())
 			{
-				node.customData[property] = data.StopTimeArrive || data.StopTimeDepart;
+				node.customData[property] = self.routingDisplay.dataModel.getFieldTripStopTime(data);
 			}
 			else if (property.toLowerCase() == 'duration')
 			{
