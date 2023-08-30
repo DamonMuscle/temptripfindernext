@@ -25,7 +25,7 @@
 	GeometryHelper.ComputeWebMercatorPoint = function(longitude, latitude)
 	{
 		const point = GeometryHelper.CreatePointGeometry(longitude, latitude);
-		return TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(point);
+		return GeometryHelper.ConvertToWebMercator(point);
 	}
 
 	GeometryHelper.CreatePolylineGeometry = function(paths, wkid = WKID_WGS_1984)
@@ -46,7 +46,17 @@
 	GeometryHelper.ComputeWebMercatorPolyline = function(paths)
 	{
 		const polyline = GeometryHelper.CreatePolylineGeometry(paths);
-		return TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(polyline);
+		return GeometryHelper.ConvertToWebMercator(polyline);
+	}
+
+	GeometryHelper.ConvertToWebMercator = function(geometry)
+	{
+		return TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(geometry);
+	}
+
+	GeometryHelper.ConvertToWGS1984 = function(geometry)
+	{
+		return TF.GIS.SDK.webMercatorUtils.webMercatorToGeographic(geometry);
 	}
 
 	//#region geometryEngine

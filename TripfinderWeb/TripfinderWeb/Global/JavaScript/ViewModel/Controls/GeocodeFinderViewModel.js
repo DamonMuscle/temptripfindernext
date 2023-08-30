@@ -160,6 +160,32 @@
 		self.obGeoCity(city);
 		self.obGeoZip(zip);
 
+		const computeAddress = (item) =>
+		{
+			let items = [];
+			if (item.street || item.GeoStreet)
+			{
+				items.push(item.street || item.GeoStreet);
+			}
+
+			if (item.city || item.GeoCity)
+			{
+				items.push(item.city || item.GeoCity);
+			}
+
+			if (item.GeoCounty)
+			{
+				items.push(item.GeoCounty);
+			}
+
+			if (item.zip || item.GeoZip)
+			{
+				items.push(item.zip || item.GeoZip);
+			}
+
+			return items.join(", ");
+		};
+
 		return tf.loadingIndicator.enhancedShow(TF.GIS.Analysis.getInstance().geocodeService.suggestLocationsREST(searchAddress).then(function(response)
 		{
 			let selectIndex = 0, exactMatchRecord = null;
@@ -172,7 +198,7 @@
 					item.GeoCity = matched?.attributes?.City || item.city;
 					item.GeoCounty = matched?.attributes?.Subregion || null;
 					item.GeoZip = matched?.attributes?.Postal || item.zip;
-					item.address = `${item.street}, ${item.city}, ${item.state}, ${item.zip}`;
+					item.address = computeAddress(item);
 					item.XCoord = item.Xcoord = matched?.location.x;
 					item.YCoord = item.Ycoord = matched?.location.y;
 					item.Score = matched?.score;

@@ -342,7 +342,12 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 					const suggestions = response.suggestions;
 					addresses = suggestions.map(item => {
 						const values = item.text.split(",");
-						if (values.length === 5)
+						if (values.length === 3)
+						{
+							const [country, state, city]= values.map(x=>x.trim()).reverse();
+							return { text: item.text, country, state, city, magicKey: item.magicKey };
+						}
+						else if (values.length === 5)
 						{
 							const [country, zip, state, city, street]= values.map(x=>x.trim()).reverse();
 							return { text: item.text, country, zip, state, city, street, magicKey: item.magicKey };
