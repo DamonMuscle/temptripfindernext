@@ -109,7 +109,15 @@
 
 							return tf.fieldTripConfigsDataHelper.isRecordExistingByType(self.configType, recordEntity).then(function(existed)
 							{
-								return { valid: !existed, message: "already exists" };
+								if($($field).data('bv.messages') == undefined)
+								{
+									return {valid: true};
+								}
+								else
+								{
+									return { valid: !existed, message: "already exists" };
+								}
+
 							});
 						}
 					}
