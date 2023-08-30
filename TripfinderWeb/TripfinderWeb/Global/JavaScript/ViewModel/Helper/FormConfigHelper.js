@@ -424,7 +424,7 @@
 				if (systemQuestionTargetField && dataTypeId)
 				{
 					const dataTypeKey = tf.dataTypeHelper.getKeyById(dataTypeId);
-					value = FormConfigHelper.convertValueByMeasurementUnit(value, systemQuestionTargetField, dataTypeKey);
+					return FormConfigHelper.convertValueByMeasurementUnit(value, systemQuestionTargetField, dataTypeKey);
 				}
 				return tf.dataFormatHelper.numberFormatter(value, numberPrecision);
 			case TYPE_PHONE_NUMBER:
