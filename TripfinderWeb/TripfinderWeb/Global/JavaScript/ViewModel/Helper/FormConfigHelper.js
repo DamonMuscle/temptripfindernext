@@ -205,6 +205,7 @@
 			"EstLife": { type: "number" },
 			"FuelCapacity": { type: "number" },
 			"Height": { type: "number" },
+			"Width": { type: "number" },
 			"InActive": { type: "Checkbox" },
 			"InsuranceExp": { type: "Date" },
 			"LastUpdated": { type: "Date" },
