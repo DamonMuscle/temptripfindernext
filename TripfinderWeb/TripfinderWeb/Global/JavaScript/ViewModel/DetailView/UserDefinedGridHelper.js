@@ -697,7 +697,12 @@
 
 				if (gridDefinition.UnitOfMeasureSupported == true)
 				{
-					columnExtension.UnitOfMeasureSupported = true;
+					columnExtension = $.extend(columnExtension, { UnitOfMeasureSupported: true });
+				}
+
+				if (gridDefinition.UnitTypeOfMeasureSupported)
+				{
+					columnExtension = $.extend(columnExtension, { UnitTypeOfMeasureSupported: gridDefinition.UnitTypeOfMeasureSupported });
 				}
 			}
 		}
