@@ -8,7 +8,7 @@
 		this.unavailableData = unavailableData;
 		options.getRequiredColumns = this.getRequiredColumns;
 		options.needAdjustUtcColumnsForClientFilter = true;
-		options.needneedUpdateSchemaOnRebuildGrid = true;
+		options.needUpdateSchemaOnRebuildGrid = true;
 		TF.Control.KendoListMoverWithSearchControlViewModel.call(this, selectedData, options);
 		this.obDisableControl = disableControl;
 	}
