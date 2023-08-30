@@ -669,8 +669,14 @@
 	FieldTripMapOperation.prototype._createGeocodingNewStop = async function(longitude, latitude)
 	{
 		const self = this,
-		 	UNNAMED_ADDRESS = "unnamed",
-			{ Address, City, RegionAbbr, CountryCode } = await self.highlightStopLayerInstance.getGeocodeStop(longitude, latitude),
+			data = await self.highlightStopLayerInstance.getGeocodeStop(longitude, latitude);
+		if (!data)
+		{
+			return null;
+		}
+
+		const UNNAMED_ADDRESS = "unnamed",
+			{ Address, City, RegionAbbr, CountryCode } = data,
 			Name = Address || UNNAMED_ADDRESS,
 			newStop = self._createNewStop(longitude, latitude, Name);
 
@@ -1204,6 +1210,12 @@
 				const { longitude, latitude } = mapPoint;
 				self.showLoadingIndicator();
 				const newStopData = await self._createGeocodingNewStop(longitude, latitude);
+				if (newStopData === null)
+				{
+					self.hideLoadingIndicator();
+					return;
+				}
+
 				self.addHighlightStops(newStopData.newStop);
 				self.hideLoadingIndicator();
 
@@ -1412,7 +1424,7 @@
 		 	uniqueValueInfos = [],
 			arrowOnPath = self._isArrowOnPath(),
 			fieldTrips = this.fieldTripsData;
-		
+
 		// sort by Name to make sure the arrow z-index is correct.
 		const fieldTripsClone = [...fieldTrips];
 		fieldTripsClone.sort(self._compareFieldTripNames);
@@ -1495,7 +1507,7 @@
 			{
 				continue;
 			}
-			
+
 			const edits = {};
 			const condition = self._extractArrowCondition(DBID, FieldTripId);
 			const arrowFeatures = await arrowLayerInstance.queryArrowFeatures(condition);
@@ -2156,6 +2168,7 @@
 			self.sequenceLineArrowLayerInstance,
 		];
 		self.layerManager.removeLayerInstances(layerInstances);
+		self.layerManager = null;
 
 		self.stopLayerInstance = null;
 		self.pathLayerInstance = null;

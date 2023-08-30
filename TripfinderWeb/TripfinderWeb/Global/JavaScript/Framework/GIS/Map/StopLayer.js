@@ -125,6 +125,15 @@
 		}
 
 		const { Address, City, RegionAbbr, CountryCode } = geocodeResult?.attributes;
+		if (!geocodeService.isAvailableCountry(CountryCode))
+		{
+			tf.promiseBootbox.alert({
+				message: "Please pin a location in USA or Canada.",
+				title: "Alert"
+			});
+			return null;
+		}
+
 		const data = { Address, City, RegionAbbr, CountryCode };
 
 		return data;

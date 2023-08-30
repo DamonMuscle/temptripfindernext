@@ -396,6 +396,11 @@
 		self.onMapViewUpdatingEvent?.unsubscribeAll();
 	}
 
+	Map.prototype.getMapCursor = function()
+	{
+		return this.map.mapView.container.style.cursor;
+	}
+
 	Map.prototype.setMapCursor = function(cursorType)
 	{
 		const availableCursorTypes = ["default", "locate", "locate-white", "pin", "pointer", "crosshair"];
