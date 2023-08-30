@@ -2297,7 +2297,6 @@
 								if (item.type === 'boolean')
 								{
 									_resetBooleanFieldData(item, self);
-									self.changeFilter(item);
 								}
 							})
 							self.bindDragAndDropEvent();
