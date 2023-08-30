@@ -5,10 +5,27 @@
 	function FieldTripPaletteSectionViewModel(routingPaletteVM, routeState, trips)
 	{
 		var self = this;
-		self.viewModel = routingPaletteVM; //delete in future
-		self._viewModal = routingPaletteVM.mapCanvasPage;//delete in future
-		self.routingPaletteVM = routingPaletteVM;//recommended
-		self.mapCanvasPage = routingPaletteVM.mapCanvasPage;//recommended
+		self.routingPaletteVM = routingPaletteVM;
+		self.mapCanvasPage = routingPaletteVM.mapCanvasPage;
+		Object.defineProperty(self, "_viewModal",
+		{
+			get()
+			{
+				console.log("This property is obsoleted, please use mapCanvasPage instead. it should be removed in future.(FieldTripPaletteSectionViewModel)")
+				return self.mapCanvasPage;
+			},
+			enumerable: false,
+		});
+
+		Object.defineProperty(self, "viewModel",
+		{
+			get()
+			{
+				console.log("This property is obsoleted, please use routingPaletteVM instead. it should be removed in future.(FieldTripPaletteSectionViewModel)")
+				return self.routingPaletteVM;
+			},
+			enumerable: false,
+		});
 		self.isEyeVisible = ko.observable(true);
 		self.isShowMode = ko.observable(true);
 		self.isShowMode.subscribe(self._changeShow.bind(self));
@@ -36,7 +53,7 @@
 	FieldTripPaletteSectionViewModel.prototype.uiInit = function(model, element)
 	{
 		var self = this;
-		this.$element = $(element);
+		self.$element = $(element);
 		// this.documentChange = tf.documentManagerViewModel.obCurrentDocument.subscribe(function(document)
 		// {
 		// 	if (document == self.mapCanvasPage)
@@ -84,7 +101,7 @@
 		this.isShowMode(isShowMode);
 		if (!isShowMode)
 		{
-			this._viewModal.setMode("", "Normal");
+			this.mapCanvasPage.setMode("", "Normal");
 		}
 	};
 
@@ -100,9 +117,9 @@
 		if (!isShowMode)
 		{
 			// hide all field trips and exit AddFieldTripStop.
-			if (self._viewModal.routingPaletteViewModel?.fieldTripMapOperation?.editing.isAddingStop)
+			if (self.mapCanvasPage.routingPaletteViewModel?.fieldTripMapOperation?.editing.isAddingStop)
 			{
-				self._viewModal.routingPaletteViewModel.fieldTripMapOperation.stopAddFieldTripStop();
+				self.mapCanvasPage.routingPaletteViewModel.fieldTripMapOperation.stopAddFieldTripStop();
 			}
 		}
 		var layers = self.getLayers();
@@ -145,7 +162,7 @@
 	{
 		var self = this;
 		var layers = this.getLayers();
-		this.routingPaletteVM._viewModal.setMode("Routing", "Normal");
+		this.routingPaletteVM.mapCanvasPage.setMode("Routing", "Normal");
 		this.editFieldTripStopModal.closeEditModal();
 		return this.dataModel.close().then(function()
 		{

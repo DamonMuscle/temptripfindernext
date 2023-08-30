@@ -9,8 +9,16 @@
 		var self = this;
 		self.mapCanvasPage = fieldTripPaletteSectionVM.routingPaletteVM.mapCanvasPage;
 		TF.RoutingMap.BaseMapDataModel.call(this, self.mapCanvasPage);
-		self.viewModel = fieldTripPaletteSectionVM; //delete in future
 		self.fieldTripPaletteSectionVM = fieldTripPaletteSectionVM;
+		Object.defineProperty(self, "viewModel",
+		{
+			get()
+			{
+				console.log("This property is obsoleted, please use fieldTripPaletteSectionVM instead. it should be removed in future.(RoutingDataModel)")
+				return self.fieldTripPaletteSectionVM;
+			},
+			enumerable: false,
+		});
 		self.routeState = self.mapCanvasPage.routeState;
 		self.tripStopDictionary = {};
 		self.tripStopOriginalData = [];
@@ -72,7 +80,7 @@
 		{
 			get()
 			{
-				console.log("This property is obsoleted, please use fieldTrips instead. it should be removed in future.")
+				console.log("This property is obsoleted, please use fieldTrips instead. it should be removed in future.(RoutingDataModel)")
 				return ALLFIELDTRIPS;
 			},
 			enumerable: false,
@@ -310,7 +318,7 @@
 			newTrips = self._getNewTrip(data);
 			newTripIds = newTrips.map(function(c) { return c.id; });
 			self.setFieldTrips(self.fieldTrips.concat(newTrips));
-			self.viewModel.routingChangePath && self.viewModel.routingChangePath.stop();
+			self.fieldTripPaletteSectionVM.routingChangePath && self.fieldTripPaletteSectionVM.routingChangePath.stop();
 			self._removeNotOpenEditTrips(data);
 			self.bindColor();
 
@@ -319,7 +327,7 @@
 			{
 				if (!disableAutoZoom)
 				{
-					self.viewModel.eventsManager.zoomClick({});
+					self.fieldTripPaletteSectionVM.eventsManager.zoomClick({});
 				}
 			});
 
@@ -607,7 +615,7 @@
 			}
 			return false;
 		}
-		var treeView = self.viewModel.$element.find("#routingtreeview").data('kendoTreeView');
+		var treeView = self.fieldTripPaletteSectionVM.$element.find("#routingtreeview").data('kendoTreeView');
 		var tripNode = treeView.dataSource.getFirst(tripId, function(item)
 		{
 			return item.customData && item.customData.isTrip;
@@ -651,12 +659,12 @@
 		{
 			if (i != 0 && newTrip.FieldTripStops[i].SchoolCode)
 			{
-				promiseList.push(self.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.FieldTripStops.slice(startIndex, i + 1), true));
+				promiseList.push(self.fieldTripPaletteSectionVM.drawTool.NAtool.refreshTripByMultiStops(newTrip.FieldTripStops.slice(startIndex, i + 1), true));
 				startIndex = i;
 			}
 			else if (i == newTrip.FieldTripStops.length - 1 && (newTrip.FieldTripStops[i].SchoolCode === "" || newTrip.FieldTripStops[i].SchoolCode === null))
 			{
-				promiseList.push(self.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.FieldTripStops.slice(startIndex, i + 1), true));
+				promiseList.push(self.fieldTripPaletteSectionVM.drawTool.NAtool.refreshTripByMultiStops(newTrip.FieldTripStops.slice(startIndex, i + 1), true));
 			}
 		}
 		return Promise.all(promiseList).then(function(newList)
@@ -1227,7 +1235,7 @@
 	RoutingDataModel.prototype._filterNotLockTripIds = function(trips)
 	{
 		var self = this;
-		return self.viewModel.eventsManager._getLockedByOtherTrips().then(function(lockedByOther)
+		return self.fieldTripPaletteSectionVM.eventsManager._getLockedByOtherTrips().then(function(lockedByOther)
 		{
 			return trips.filter(function(trip)
 			{
@@ -1764,9 +1772,9 @@
 			}
 		}
 
-		self.viewModel.routingChangePath && self.viewModel.routingChangePath.clearAll();
+		self.fieldTripPaletteSectionVM.routingChangePath && self.fieldTripPaletteSectionVM.routingChangePath.clearAll();
 		self.clearContextMenuOperation();
-		self.viewModel.editFieldTripStopModal.closeEditModal();
+		self.fieldTripPaletteSectionVM.editFieldTripStopModal.closeEditModal();
 		self.fieldTripPaletteSectionVM.routingPaletteVM?.fieldTripMapOperation?.confirmToExitAddingStop(false);
 		// self.clearTripOriginalData(tripsToClose);
 		return promise.then(function()
@@ -1822,7 +1830,7 @@
 				}
 
 				self.clearContextMenuOperation();
-				self.viewModel.editFieldTripStopModal.closeEditModal();
+				self.fieldTripPaletteSectionVM.editFieldTripStopModal.closeEditModal();
 				self.mapCanvasPage.setMode("Routing", "Normal");
 				tf.loadingIndicator.tryHide();
 				// self._updateTravelScenarioLock();
@@ -1878,7 +1886,7 @@
 			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: viewTripsToClose });
 		}
 		self.clearContextMenuOperation();
-		self.viewModel.editFieldTripStopModal.closeEditModal();
+		self.fieldTripPaletteSectionVM.editFieldTripStopModal.closeEditModal();
 		self.fieldTripPaletteSectionVM.routingPaletteVM?.fieldTripMapOperation?.confirmToExitAddingStop(false);
 		return promise;
 	};
@@ -1970,7 +1978,7 @@
 	RoutingDataModel.prototype.unSaveCheck = function(tripsToClose)
 	{
 		var self = this;
-		return self.viewModel.editFieldTripStopModal.beforeChangeData().then(function(ans)
+		return self.fieldTripPaletteSectionVM.editFieldTripStopModal.beforeChangeData().then(function(ans)
 		{
 			if (ans)
 			{
@@ -2086,7 +2094,7 @@
 				});
 			return Promise.resolve();
 		}
-		self.viewModel.routingChangePath.stop();
+		self.fieldTripPaletteSectionVM.routingChangePath.stop();
 		return self.saveRoutingFieldTrips(trips).then(function(success)
 		{
 			if (success)
@@ -2119,7 +2127,7 @@
 				});
 			return Promise.resolve();
 		}
-		self.viewModel.routingChangePath.stop();
+		self.fieldTripPaletteSectionVM.routingChangePath.stop();
 		return self.saveRoutingFieldTrips(fieldTrips).then(function(success)
 		{
 			if (success)
@@ -2349,7 +2357,7 @@
 		trips = trips || self.fieldTrips;
 		self.featureData.clear();
 		self.clearRevertInfo();
-		self.viewModel.routingChangePath && self.viewModel.routingChangePath.clearAll();
+		self.fieldTripPaletteSectionVM.routingChangePath && self.fieldTripPaletteSectionVM.routingChangePath.clearAll();
 		var unsavedNewTrips = [], viewTrips = [], editTrips = [];
 		trips.map(function(trip)
 		{
@@ -2406,7 +2414,7 @@
 			var trips = refreshTrips.slice();
 			self.featureData.clear();
 			self.clearRevertInfo();
-			self.viewModel.routingChangePath.clearAll();
+			self.fieldTripPaletteSectionVM.routingChangePath.clearAll();
 			self.setFieldTrips(self.getViewTrips());
 			self.changeDataStack([]);
 			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: trips });
@@ -2587,7 +2595,7 @@
 		// exclude the ungeocode and exception student.
 		let needCalcuAcrossStreetStudents = allNewAssignStudents.filter(stu => stu.XCoord != 0 && stu.YCoord != 0 && stu.RequirementID);
 
-		return self.viewModel.drawTool.NAtool._getAcrossStreetStudents(stop, needCalcuAcrossStreetStudents, null, trip, isAssignStudent).then(function(results)
+		return self.fieldTripPaletteSectionVM.drawTool.NAtool._getAcrossStreetStudents(stop, needCalcuAcrossStreetStudents, null, trip, isAssignStudent).then(function(results)
 		{
 			var crossStudentIds = results[0];
 			var stopCrossStudentIds = results[3] || [];

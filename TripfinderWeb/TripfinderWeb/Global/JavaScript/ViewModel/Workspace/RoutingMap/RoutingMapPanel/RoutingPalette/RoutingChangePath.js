@@ -8,10 +8,10 @@
 	{
 		var self = this;
 		self.viewModel = fieldTripPaletteSectionVM;
-		self.routeState = fieldTripPaletteSectionVM._viewModal.routeState;
-		self._map = fieldTripPaletteSectionVM._viewModal._map;
-		self._arcgis = fieldTripPaletteSectionVM._viewModal._arcgis;
-		TF.RoutingMap.Directions.Tool.call(this, self._map, self._arcgis, fieldTripPaletteSectionVM._viewModal);
+		self.routeState = fieldTripPaletteSectionVM.mapCanvasPage.routeState;
+		self._map = fieldTripPaletteSectionVM.mapCanvasPage._map;
+		self._arcgis = fieldTripPaletteSectionVM.mapCanvasPage._arcgis;
+		TF.RoutingMap.Directions.Tool.call(this, self._map, self._arcgis, fieldTripPaletteSectionVM.mapCanvasPage);
 		self.isChangeRouteChecked = true;
 		self.isMapDetailsChecked = true;
 		self.isDirectionDetailsRequired = true;

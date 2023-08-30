@@ -2,13 +2,33 @@
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").BaseRoutingEventsManager = BaseRoutingEventsManager;
 
-	function BaseRoutingEventsManager(fieldTripPaletteSectionVM, viewModal)
+	function BaseRoutingEventsManager(fieldTripPaletteSectionVM, mapCanvasPage)
 	{
-		this.viewModel = fieldTripPaletteSectionVM;
-		this.fieldTripPaletteSectionVM = fieldTripPaletteSectionVM;
-		this._viewModal = viewModal;
-		this.copyFromObject = ko.computed(this.getCopyFrom.bind(this));
-		this.fileOpenCompleteEvent = new TF.Events.Event();
+		const self = this;
+		self.fieldTripPaletteSectionVM = fieldTripPaletteSectionVM;
+		self.mapCanvasPage = mapCanvasPage;
+		self.copyFromObject = ko.computed(self.getCopyFrom.bind(self));
+		self.fileOpenCompleteEvent = new TF.Events.Event();
+
+		Object.defineProperty(self, "viewModel",
+		{
+			get()
+			{
+				console.log("This property is obsoleted, please use fieldTripPaletteSectionVM instead. it should be removed in future.(BaseRoutingEventsManager)")
+				return self.fieldTripPaletteSectionVM;
+			},
+			enumerable: false,
+		});
+
+		Object.defineProperty(self, "_viewModal",
+		{
+			get()
+			{
+				console.log("This property is obsoleted, please use mapCanvasPage instead. it should be removed in future.(BaseRoutingEventsManager)")
+				return self.mapCanvasPage;
+			},
+			enumerable: false,
+		});
 	}
 
 	BaseRoutingEventsManager.prototype = Object.create(TF.RoutingMap.EventBase.prototype);
@@ -16,9 +36,9 @@
 
 	BaseRoutingEventsManager.prototype.getCopyFrom = function()
 	{
-		if (this._viewModal.obCopyPointObject())
+		if (this.mapCanvasPage.obCopyPointObject())
 		{
-			var copyFrom = this._viewModal.obCopyPointObject().getData();
+			var copyFrom = this.mapCanvasPage.obCopyPointObject().getData();
 			if (copyFrom && copyFrom.boundary && copyFrom.boundary.geometry)
 			{
 				return copyFrom;
@@ -30,7 +50,7 @@
 	BaseRoutingEventsManager.prototype.createFromSearchResult = function(option)
 	{
 		var self = this;
-		var mapInstance = this._viewModal.mapInstance;
+		var mapInstance = this.mapCanvasPage.mapInstance;
 		var options = {
 			onChoseFromFileEvent: self.createChangeEvent.bind(self)
 		};
@@ -65,7 +85,7 @@
 			};
 
 
-		await self.fieldTripPaletteSectionVM.viewModel.onQuickAddStops(data);
+		await self.fieldTripPaletteSectionVM.routingPaletteVM.onQuickAddStops(data);
 		if (data.length == 1)
 		{
 			self.fieldTripPaletteSectionVM.editFieldTripStopModal.create(data[0], options);

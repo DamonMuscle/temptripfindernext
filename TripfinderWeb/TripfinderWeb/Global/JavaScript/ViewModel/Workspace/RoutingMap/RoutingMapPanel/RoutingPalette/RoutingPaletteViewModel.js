@@ -15,8 +15,16 @@
 		self.isOpen = !!isOpen;
 		self.templateName = "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/RoutingPalette";
 		self.$element = null;
-		self._viewModal = mapCanvasPage;
 		self.mapCanvasPage = mapCanvasPage;
+		Object.defineProperty(self, "_viewModal",
+		{
+			get()
+			{
+				console.log("This property is obsoleted, please use mapCanvasPage instead. it should be removed in future.(RoutingPaletteViewModel)")
+				return self.mapCanvasPage;
+			},
+			enumerable: false,
+		});
 		self.fieldTripPaletteSection = new TF.RoutingMap.RoutingPalette.FieldTripPaletteSectionViewModel(self, routeState, trips);
 		self.dataModel = self.fieldTripPaletteSection.dataModel;
 		self.childViewModels =[self.fieldTripPaletteSection];

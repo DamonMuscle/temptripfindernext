@@ -5,7 +5,7 @@
 	function RoutingEventsManager(fieldTripPaletteSectionVM, routeState)
 	{
 		var self = this;
-		TF.RoutingMap.RoutingPalette.BaseRoutingEventsManager.call(this, fieldTripPaletteSectionVM, fieldTripPaletteSectionVM.viewModel._viewModal);
+		TF.RoutingMap.RoutingPalette.BaseRoutingEventsManager.call(this, fieldTripPaletteSectionVM, fieldTripPaletteSectionVM.routingPaletteVM.mapCanvasPage);
 		self.routeState = routeState;
 		self.vrpTool = new TF.RoutingMap.RoutingPalette.VRPTool();
 		self.contiguousHelper = new TF.RoutingMap.RoutingPalette.ContiguousHelper();
@@ -127,11 +127,11 @@
 	{
 		var self = this;
 		var $target = $(e.currentTarget);
-		if (self._viewModal.mode === "Routing-Create")
+		if (self.mapCanvasPage.mode === "Routing-Create")
 		{
-			self._viewModal.setMode("", "Normal");
+			self.mapCanvasPage.setMode("", "Normal");
 			$target.addClass("active");
-			self.viewModel.routingPaletteVM.fieldTripMapOperation?.confirmToExitAddingStop(false, false);
+			self.fieldTripPaletteSectionVM.routingPaletteVM.fieldTripMapOperation?.confirmToExitAddingStop(false, false);
 		}
 		$target.addClass("checked");
 	}
@@ -173,7 +173,7 @@
 			return;
 		}
 
-		var map = this._viewModal._map;
+		var map = this.mapCanvasPage._map;
 		var trips = [];
 		if (type != "trip" && data.customData && data.customData.geometry)
 		{
@@ -224,17 +224,17 @@
 	RoutingEventsManager.prototype.expandAllClick = function()
 	{
 		var self = this;
-		var treeView = self.viewModel.$element.find("#routingtreeview").data('kendoTreeView');
+		var treeView = self.fieldTripPaletteSectionVM.$element.find("#routingtreeview").data('kendoTreeView');
 		treeView.expand("> .k-group > .k-item");
 	};
 
 	RoutingEventsManager.prototype.collapseAllClick = function()
 	{
 		var self = this;
-		var treeView = self.viewModel.$element.find("#routingtreeview").data('kendoTreeView');
+		var treeView = self.fieldTripPaletteSectionVM.$element.find("#routingtreeview").data('kendoTreeView');
 
 		// set suspend attribute to false if its true to ensure the collapse method works
-		self.viewModel.$element.find("#routingtreeview .k-item").each((index,element) => {
+		self.fieldTripPaletteSectionVM.$element.find("#routingtreeview .k-item").each((index,element) => {
 			var isSuspend = $(element).attr('suspend');
 
 			if(isSuspend == 'true')
@@ -257,7 +257,7 @@
 	RoutingEventsManager.prototype._getLockedByOtherTrips = function()
 	{
 		var self = this;
-		var routeState = this.viewModel.viewModel.routeState;
+		var routeState = self.fieldTripPaletteSectionVM.viewModel.routeState;
 		return self.dataModel.tripLockData.getLockInfo().then(function(lockInfo)
 		{
 			return lockInfo.selfLockedList.filter(function(item)
@@ -367,18 +367,19 @@
 
 	RoutingEventsManager.prototype.copyTripClick = function(tripData)
 	{
-		this.viewModel.routingChangePath.stop();
-		this.dataModel.copyAsNewFieldTrip(tripData);
+		const self = this;
+		self.fieldTripPaletteSectionVM.routingChangePath.stop();
+		self.dataModel.copyAsNewFieldTrip(tripData);
 	};
 
 	RoutingEventsManager.prototype.copyTripStopClick = function(tripStopId)
 	{
 		var self = this;
-		if (self._viewModal.mode === 'Routing-Create')
+		if (self.mapCanvasPage.mode === 'Routing-Create')
 		{
-			self._viewModal.setMode("Routing", "Normal");
+			self.mapCanvasPage.setMode("Routing", "Normal");
 		}
-		this.viewModel.routingChangePath.stop();
+		self.fieldTripPaletteSectionVM.routingChangePath.stop();
 		var tripStop = self.dataModel.getFieldTripStopByStopId(tripStopId);
 		tf.modalManager.showModal(new TF.RoutingMap.RoutingPalette.CopyTripStopModalViewModel(tripStop, self.dataModel))
 			.then(function(tripName)
@@ -428,23 +429,23 @@
 	RoutingEventsManager.prototype.addStopFromMapClick = function()
 	{
 		var self = this;
-		self._viewModal.RoutingMapTool.deactivateMeasurementTool();
-		self._viewModal.RoutingMapTool.deactivateGoogleStreetTool();
+		self.mapCanvasPage.RoutingMapTool.deactivateMeasurementTool();
+		self.mapCanvasPage.RoutingMapTool.deactivateGoogleStreetTool();
 		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMap);
-		self._viewModal.setMode("Routing", "Create");
+		self.mapCanvasPage.setMode("Routing", "Create");
 	};
 
 	RoutingEventsManager.prototype.addStopFromSelectionClick = function()
 	{
 		var self = this;
 		var copyObject = this.copyFromObject();
-		self.viewModel.drawTool.copyToTripStop(copyObject);
+		self.fieldTripPaletteSectionVM.drawTool.copyToTripStop(copyObject);
 	};
 
 	RoutingEventsManager.prototype.addStopFromSearchResultClick = function(model, e, option, insertBehindSpecialStop)
 	{
 		var self = this;
-		self._viewModal.setMode("Routing", "AddFromSearchResult");
+		self.mapCanvasPage.setMode("Routing", "AddFromSearchResult");
 		self.insertBehindSpecialStop = insertBehindSpecialStop;
 		if (e)
 		{
@@ -453,7 +454,7 @@
 		}
 		return self.createFromSearchResult(option).then(function(data)
 		{
-			self._viewModal.setMode("Routing", "Normal");
+			self.mapCanvasPage.setMode("Routing", "Normal");
 			return data;
 		});
 	};
@@ -462,29 +463,30 @@
 	{
 		PubSub.publish("clear_ContextMenu_Operation");
 		var self = this;
-		if (self._viewModal.mode === 'Routing-Create')
+		if (self.mapCanvasPage.mode === 'Routing-Create')
 		{
-			self.viewModel.routingPaletteVM.fieldTripMapOperation?.confirmToExitAddingStop(false);
+			self.fieldTripPaletteSectionVM.routingPaletteVM.fieldTripMapOperation?.confirmToExitAddingStop(false);
 		}
 		// this item is boundary ,so change it to trip stop
 		var fieldTripStop = self.dataModel.getFieldTripStop(item.FieldTripStopId ? item.FieldTripStopId : item.id, item.FieldTripId);
 
-		self.viewModel.editFieldTripStopModal.showEditModal([fieldTripStop]).then(function()
+		self.fieldTripPaletteSectionVM.editFieldTripStopModal.showEditModal([fieldTripStop]).then(function()
 		{
-			self.viewModel.drawTool.changeSymbolToEditing(item.id);
+			self.fieldTripPaletteSectionVM.drawTool.changeSymbolToEditing(item.id);
 			function closeEvent()
 			{
-				self.viewModel.drawTool.changeSymbolToNotEditing();
-				self.viewModel.editFieldTripStopModal.onCloseEditModalEvent.unsubscribe(closeEvent);
+				self.fieldTripPaletteSectionVM.drawTool.changeSymbolToNotEditing();
+				self.fieldTripPaletteSectionVM.editFieldTripStopModal.onCloseEditModalEvent.unsubscribe(closeEvent);
 			}
-			self.viewModel.editFieldTripStopModal.onCloseEditModalEvent.subscribe(closeEvent);
+			self.fieldTripPaletteSectionVM.editFieldTripStopModal.onCloseEditModalEvent.subscribe(closeEvent);
 		}).catch(function() { });
 	};
 
 	RoutingEventsManager.prototype.changeStopSelectAreaClick = function(type, data, e)
 	{
-		this.viewModel.drawTool.select(type);
-		//this._viewModal.setMode("Routing", "SelectMapArea-" + type);
+		const self = this;
+		self.fieldTripPaletteSectionVM.drawTool.select(type);
+		//self.mapCanvasPage.setMode("Routing", "SelectMapArea-" + type);
 		PubSub.publish("clear_ContextMenu_Operation");
 	};
 
@@ -498,8 +500,8 @@
 				routingDataModel: self.dataModel,
 				tripStops: selectedItems,
 				trips: self.dataModel.getEditTrips(),
-				stopPoolName: self.viewModel.stopPoolPaletteSection.display.obStopPoolName(),
-				stopPoolColor: self.viewModel.stopPoolPaletteSection.display.obStopPoolColor()
+				stopPoolName: self.fieldTripPaletteSectionVM.stopPoolPaletteSection.display.obStopPoolName(),
+				stopPoolColor: self.fieldTripPaletteSectionVM.stopPoolPaletteSection.display.obStopPoolColor()
 			};
 
 			tf.modalManager.showModal(new TF.RoutingMap.RoutingPalette.AssignStopsModalViewModel(options))
@@ -516,7 +518,7 @@
 					}
 					else
 					{
-						self.viewModel.stopPoolPaletteSection.drawTool.copyToStopPools(data.selectedTripStops);
+						self.fieldTripPaletteSectionVM.stopPoolPaletteSection.drawTool.copyToStopPools(data.selectedTripStops);
 					}
 				});
 		}
@@ -541,7 +543,7 @@
 	{
 		var self = this;
 		var tripStop = self.dataModel.getFieldTripStopByStopId(tripStopId);
-		return self.viewModel.viewModel.stopPoolPaletteSection.drawTool.copyToStopPool(tripStop);
+		return self.fieldTripPaletteSectionVM.viewModel.stopPoolPaletteSection.drawTool.copyToStopPool(tripStop);
 	};
 
 	RoutingEventsManager.prototype.tripAbsorptionClick = function(tripId)
@@ -553,15 +555,15 @@
 		var promise = tf.modalManager.showModal(
 			new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(editTrips, { title: "Absorption" })
 		);
-		self.viewModel.routingChangePath.stop();
+		self.fieldTripPaletteSectionVM.routingChangePath.stop();
 		promise.then(function(data)
 		{
 			if (!data) return;
 			var targetTrips = data.length == 0 ? editTrips : data;
 			if (targetTrips.length == 0) return;
 
-			self.vrpTool.getTripAbsorption(tripStops, targetTrips, self.viewModel.drawTool).then(function(result)
-			//self.vrpTool.getSmartAssignment_multi(tripStops, targetTrips, true, self.viewModel.drawTool, true).then(function(result)
+			self.vrpTool.getTripAbsorption(tripStops, targetTrips, self.fieldTripPaletteSectionVM.drawTool).then(function(result)
+			//self.vrpTool.getSmartAssignment_multi(tripStops, targetTrips, true, self.fieldTripPaletteSectionVM.drawTool, true).then(function(result)
 			{
 				if (result && $.isArray(result) && result.length > 0)
 				{
@@ -611,7 +613,7 @@
 		{
 			return tf.promiseBootbox.alert("No path need to optimize.");
 		}
-		self.viewModel.routingChangePath.stop();
+		self.fieldTripPaletteSectionVM.routingChangePath.stop();
 		tf.loadingIndicator.show();
 		// remove route stop path, cause route stop property contain _map property, json copy would catch circular sturcture error
 		oldTrip.FieldTripStops.map(function(tripStop)
@@ -668,12 +670,12 @@
 		{
 			if (i != 0 && trip.FieldTripStops[i].SchoolCode)
 			{
-				promiseList.push(self.viewModel.drawTool.NAtool.refreshTripByMultiStops(trip.FieldTripStops.slice(startIndex, i + 1), true));
+				promiseList.push(self.fieldTripPaletteSectionVM.drawTool.NAtool.refreshTripByMultiStops(trip.FieldTripStops.slice(startIndex, i + 1), true));
 				startIndex = i;
 			}
 			else if (i == trip.FieldTripStops.length - 1 && (trip.FieldTripStops[i].SchoolCode === "" || trip.FieldTripStops[i].SchoolCode === null))
 			{
-				promiseList.push(self.viewModel.drawTool.NAtool.refreshTripByMultiStops(trip.FieldTripStops.slice(startIndex, i + 1), true));
+				promiseList.push(self.fieldTripPaletteSectionVM.drawTool.NAtool.refreshTripByMultiStops(trip.FieldTripStops.slice(startIndex, i + 1), true));
 			}
 		}
 		return Promise.all(promiseList).then(function(newList)
@@ -727,30 +729,35 @@
 
 	RoutingEventsManager.prototype.addRegionClick = function(type, data)
 	{
-		this.viewModel.routingChangePath.stop();
-		this.viewModel.drawTool.addRegion(type, data.id);
+		const self = this;
+		self.fieldTripPaletteSectionVM.routingChangePath.stop();
+		self.fieldTripPaletteSectionVM.drawTool.addRegion(type, data.id);
 	};
 
 	RoutingEventsManager.prototype.removeRegionClick = function(type, data)
 	{
-		this.viewModel.routingChangePath.stop();
-		this.viewModel.drawTool.removeRegion(type, data.id);
+		const self = this;
+		self.fieldTripPaletteSectionVM.routingChangePath.stop();
+		self.fieldTripPaletteSectionVM.drawTool.removeRegion(type, data.id);
 	};
 
 	RoutingEventsManager.prototype.redrawClick = function(type, data)
 	{
-		this.viewModel.routingChangePath.stop();
-		this.viewModel.drawTool.redrawRegion(type, data.id);
+		const self = this;
+		self.fieldTripPaletteSectionVM.routingChangePath.stop();
+		self.fieldTripPaletteSectionVM.drawTool.redrawRegion(type, data.id);
 	};
 
 	RoutingEventsManager.prototype.reshapeClick = function(type, data)
 	{
-		this.viewModel.routingChangePath.stop();
-		this.viewModel.drawTool.reshape(data.id);
+		const self = this;
+		self.fieldTripPaletteSectionVM.routingChangePath.stop();
+		self.fieldTripPaletteSectionVM.drawTool.reshape(data.id);
 	};
 
 	RoutingEventsManager.prototype.deleteOneClick = function(fieldTripStopId, fieldTripId, e)
 	{
+		const self = this;
 		e.stopPropagation();
 		let  msg = "Are you sure you want to delete this field trip stop?";
 
@@ -766,8 +773,8 @@
 				const data = { fieldTripId, fieldTripStopId };
 				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocation, data);
 
-				this.viewModel.routingChangePath && this.viewModel.routingChangePath.clearAll();
-				this._viewModal.setMode("Routing", "Normal");
+				self.fieldTripPaletteSectionVM.routingChangePath && self.fieldTripPaletteSectionVM.routingChangePath.clearAll();
+				self.mapCanvasPage.setMode("Routing", "Normal");
 			}
 
 			PubSub.publish("clear_ContextMenu_Operation");
@@ -855,11 +862,12 @@
 
 	RoutingEventsManager.prototype.refreshPathClick = function(data)
 	{
+		const self = this;
 		this.clearMode();
-		this.viewModel.routingChangePath && this.viewModel.routingChangePath.clearAll();
-		this.viewModel.routingPaletteVM.fieldTripMapOperation?.confirmToExitAddingStop(false);
+		self.fieldTripPaletteSectionVM.routingChangePath && self.fieldTripPaletteSectionVM.routingChangePath.clearAll();
+		self.fieldTripPaletteSectionVM.routingPaletteVM.fieldTripMapOperation?.confirmToExitAddingStop(false);
 
-		tf.loadingIndicator.enhancedShow(this.viewModel.viewModel.onRefreshFieldTripPath({fieldTripId: data.id}));
+		tf.loadingIndicator.enhancedShow(self.fieldTripPaletteSectionVM.viewModel.onRefreshFieldTripPath({fieldTripId: data.id}));
 	};
 
 	RoutingEventsManager.prototype.tripPathRefreshClick = function(data)
@@ -869,9 +877,10 @@
 
 	RoutingEventsManager.prototype.clearMode = function()
 	{
-		this._viewModal.setMode("Routing", "Normal");
+		const self = this;
+		this.mapCanvasPage.setMode("Routing", "Normal");
 		PubSub.publish("clear_ContextMenu_Operation");
-		this.viewModel.routingChangePath && this.viewModel.routingChangePath.stop();
+		self.fieldTripPaletteSectionVM.routingChangePath && self.fieldTripPaletteSectionVM.routingChangePath.stop();
 	};
 
 	RoutingEventsManager.prototype._showRoutingDirectionModalViewModel = function(tripStops, trip, isShowStopTitle)
@@ -890,11 +899,11 @@
 	RoutingEventsManager.prototype.tripPathEditClick = function(data)
 	{
 		var self = this;
-		this.clearMode();
+		self.clearMode();
 		var tripStops = data.tripStops;
 		if (tripStops)
 		{
-			self.viewModel.routingChangePath.route(tripStops[0]);
+			self.fieldTripPaletteSectionVM.routingChangePath.route(tripStops[0]);
 		}
 	};
 
@@ -921,7 +930,7 @@
 		{
 			return;
 		}
-		self.viewModel.routingChangePath.stop();
+		self.fieldTripPaletteSectionVM.routingChangePath.stop();
 		var promise = Promise.resolve(trips);
 		promise = tf.modalManager.showModal(
 			new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(trips, { title: "Select Field Trips", otherButtonName: "Optimize All Field Trips", isVrpClick: true })
@@ -946,7 +955,7 @@
 			Promise.all([self.dataModel.loadDistrictPolicy(), self.dataModel.loadTrip(data)])
 				.then(function(result)
 				{
-					return self.vrpTool.getVRP(data, self.viewModel.drawTool);
+					return self.vrpTool.getVRP(data, self.fieldTripPaletteSectionVM.drawTool);
 				}).then(function(newTripStops)
 				{
 					// if (self._isSameSchoolLocationForAllTripsVRP(trips))
@@ -980,7 +989,7 @@
 
 		newTripStops.forEach(function(newTrip)
 		{
-			promises.push(self.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip));
+			promises.push(self.fieldTripPaletteSectionVM.drawTool.NAtool.refreshTripByMultiStops(newTrip));
 
 		});
 		return Promise.all(promises).then(function(results)
@@ -1160,8 +1169,8 @@
 		var self = this, oldTripDataList = [],
 			newTripDataList = [];
 		Promise.all([
-			this.viewModel.display.resetTripInfo(oldTrips, true),
-			this.viewModel.display.resetTripInfo(newTrips, true)]).then(function()
+			self.fieldTripPaletteSectionVM.display.resetTripInfo(oldTrips, true),
+			self.fieldTripPaletteSectionVM.display.resetTripInfo(newTrips, true)]).then(function()
 			{
 				newSummaryTripObject(oldTrips, oldTripDataList);
 				newSummaryTripObject(newTrips, newTripDataList);
@@ -1207,7 +1216,7 @@
 								});
 								tf.documentManagerViewModel.add(new TF.Document.DocumentData(TF.Document.DocumentData.RoutingMap, { type: 'RoutingMap', tabName: 'Routing Map', trips: newTrips, autoOpen: false })).then((routeState) =>
 								{
-									self.viewModel.dataModel._viewModal.RoutingMapTool.compareMapCanvasTool.openCompareMapCanvasByRouteState(routeState);
+									self.fieldTripPaletteSectionVM.dataModel.mapCanvasPage.RoutingMapTool.compareMapCanvasTool.openCompareMapCanvasByRouteState(routeState);
 								});
 							}
 							else
@@ -1376,12 +1385,12 @@
 		// {
 		// 	if (i != 0 && unassignedStops[i].SchoolCode)
 		// 	{
-		var promise = self.viewModel.drawTool.NAtool.refreshTripByMultiStops(unassignedStops, true, null, null, null, unassignedStopsTrip);
+		var promise = self.fieldTripPaletteSectionVM.drawTool.NAtool.refreshTripByMultiStops(unassignedStops, true, null, null, null, unassignedStopsTrip);
 		// 		startIndex = i;
 		// 	}
 		// 	else if (i == unassignedStops.length - 1 && (unassignedStops[i].SchoolCode === "" || unassignedStops[i].SchoolCode === null))
 		// 	{
-		// 		promiseList.push(self.viewModel.drawTool.NAtool.refreshTripByMultiStops(unassignedStops.slice(startIndex, i + 1), true, null, null, null, unassignedStopsTrip));
+		// 		promiseList.push(self.fieldTripPaletteSectionVM.drawTool.NAtool.refreshTripByMultiStops(unassignedStops.slice(startIndex, i + 1), true, null, null, null, unassignedStopsTrip));
 		// 	}
 		// }
 		var newTripStops = [];
@@ -1480,7 +1489,7 @@
 	RoutingEventsManager.prototype.optimizeSequenceMenuClick = function()
 	{
 		var self = this;
-		self.viewModel.routingChangePath.stop();
+		self.fieldTripPaletteSectionVM.routingChangePath.stop();
 		tf.modalManager.showModal(
 			new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(this.dataModel.getEditTrips(), { otherButtonName: "Optimize Sequence All Field Trips", title: "Select Field Trip" }, self.dataModel)
 		).then(function(data)

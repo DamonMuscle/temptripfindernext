@@ -6,31 +6,49 @@
 	{
 		var self = this;
 		self.dataModel = dataModel;
-		self.viewModel = dataModel.viewModel;
+		self.fieldTripPaletteSectionVM = dataModel.fieldTripPaletteSectionVM;
 		self.featureData = dataModel.featureData.tripStopFeatureData;
 		self.tripBoundaryFeatureData = dataModel.featureData.tripBoundaryFeatureData;
 		self.tripPathFeatureData = dataModel.featureData.tripPathFeatureData;
-		self._viewModal = dataModel.viewModel._viewModal;
+		self.mapCanvasPage = dataModel.fieldTripPaletteSectionVM.mapCanvasPage;
 		self.currentTripStudentsCount = 0;
-
 		self.onFieldTripStopUpdatedEvent = new TF.Events.Event();
+
+		Object.defineProperty(self, "viewModel",
+		{
+			get()
+			{
+				console.log("This property is obsoleted, please use fieldTripPaletteSectionVM instead. it should be removed in future.(RoutingFieldTripStopDataModel)")
+				return self.fieldTripPaletteSectionVM;
+			},
+			enumerable: false,
+		});
+		Object.defineProperty(self, "_viewModal",
+		{
+			get()
+			{
+				console.log("This property is obsoleted, please use mapCanvasPage instead. it should be removed in future.(RoutingFieldTripStopDataModel)")
+				return self.mapCanvasPage;
+			},
+			enumerable: false,
+		});
 	}
 
 	RoutingFieldTripStopDataModel.prototype.create = function(newData, isFromRevert, insertToSpecialSequenceIndex, isSearchCreate)
 	{
 		var self = this;
-		self._viewModal.revertMode = "create-TripStop";
-		self._viewModal.revertData = [];
+		self.mapCanvasPage.revertMode = "create-TripStop";
+		self.mapCanvasPage.revertData = [];
 		var data = self.createNewData(newData);
 		data.OpenType = "Edit";
 		data.type = "tripStop";
 		self.insertTripStopToTrip(data, insertToSpecialSequenceIndex);
 
-		self.viewModel.viewModel.fieldTripMapOperation?.applyAddFieldTripStops([{...data, Sequence: insertToSpecialSequenceIndex + 1, VehicleCurbApproach: data.vehicleCurbApproach}], function()
+		self.fieldTripPaletteSectionVM.routingPaletteVM.fieldTripMapOperation?.applyAddFieldTripStops([{...data, Sequence: insertToSpecialSequenceIndex + 1, VehicleCurbApproach: data.vehicleCurbApproach}], function()
 		{
 			if (!isSearchCreate)
 			{
-				self.viewModel.viewModel.fieldTripMapOperation?.startAddFieldTripStop();
+				self.fieldTripPaletteSectionVM.routingPaletteVM.fieldTripMapOperation?.startAddFieldTripStop();
 			}
 
 			self.insertToRevertData(data);
@@ -54,8 +72,8 @@
 			return Promise.resolve();
 		}
 
-		self._viewModal.revertMode = "create-TripStop";
-		self._viewModal.revertData = [];
+		self.mapCanvasPage.revertMode = "create-TripStop";
+		self.mapCanvasPage.revertData = [];
 
 		const targetFieldTrip = self.dataModel.getFieldTripById(tripStops[0].FieldTripId);
 		const stops = tripStops.filter(Boolean).map(function(tripStop)
@@ -69,7 +87,7 @@
 			return tripStop;
 		});
 
-		return self.viewModel.viewModel.fieldTripMapOperation?.applyAddFieldTripStops(stops, function()
+		return self.fieldTripPaletteSectionVM.routingPaletteVM.fieldTripMapOperation?.applyAddFieldTripStops(stops, function()
 		{
 			// set stop time to new trip stop by calculate
 			const fieldTripId = stops[0].FieldTripId;
@@ -150,8 +168,8 @@
 		isSequenceOptimize, isSmartSequence, isPreserve, resetScheduleTime, notNotifyTreeAndMap)
 	{
 		var self = this, stops;
-		self._viewModal.revertMode = "";
-		self._viewModal.revertData = [];
+		self.mapCanvasPage.revertMode = "";
+		self.mapCanvasPage.revertData = [];
 		insertToStops = sortTripStops(insertToStops);
 		var targetTrip = self.dataModel.getFieldTripById(insertToStops[0].FieldTripId);
 		var sequenceOffset = insertToStops[0].Sequence;
@@ -354,8 +372,8 @@
 	RoutingFieldTripStopDataModel.prototype.update = function(modifyDataArray, isFromBroadCastSync, isNoStopChange)
 	{
 		var self = this;
-		self._viewModal.revertMode = "update-TripStop";
-		self._viewModal.revertData = [];
+		self.mapCanvasPage.revertMode = "update-TripStop";
+		self.mapCanvasPage.revertData = [];
 		var changeData = [];
 		var moveTripStops = [];
 		modifyDataArray.forEach(function(modifyData)
@@ -451,8 +469,8 @@
 	RoutingFieldTripStopDataModel.prototype._deleteTripStopInOneTrip = function(deleteArray, isFromRevert, isMoveToOtherTrip)
 	{
 		var self = this;
-		self._viewModal.revertMode = "delete-TripStop";
-		self._viewModal.revertData = [];
+		self.mapCanvasPage.revertMode = "delete-TripStop";
+		self.mapCanvasPage.revertData = [];
 		deleteArray = self.dataModel.singleToArray(deleteArray);
 		var deleteTripStops = [];
 		var editTripStops = [];
@@ -552,10 +570,10 @@
 		{
 			console.log("TODO: Move field trip stop to another trip with smart sequence checked.");
 
-			self.viewModel.drawTool.redrawPath(removeStopTrip);
+			self.fieldTripPaletteSectionVM.drawTool.redrawPath(removeStopTrip);
 			var getSequencePromise = Promise.resolve(tripStops);
-			if (isPreserve) getSequencePromise = self.viewModel.eventsManager.contiguousHelper.getSmartAssignment(tripStops, addTrip, self.viewModel.drawTool);
-			else { getSequencePromise = self.viewModel.eventsManager.vrpTool.getSmartAssignment_multi(tripStops, [addTrip], true, self.viewModel.drawTool); }
+			if (isPreserve) getSequencePromise = self.fieldTripPaletteSectionVM.eventsManager.contiguousHelper.getSmartAssignment(tripStops, addTrip, self.fieldTripPaletteSectionVM.drawTool);
+			else { getSequencePromise = self.fieldTripPaletteSectionVM.eventsManager.vrpTool.getSmartAssignment_multi(tripStops, [addTrip], true, self.fieldTripPaletteSectionVM.drawTool); }
 			return getSequencePromise.then(function(stops)
 			{
 				if (!stops || !$.isArray(stops) || stops.length == 0) return stops;
@@ -572,8 +590,8 @@
 					{
 						changedStudents = changedStudents.concat(stop.Students);
 					});
-					self.viewModel.drawTool.onTripStopsChangeEvent(null, { add: [], edit: edits, delete: [] });
-					self.viewModel.drawTool.redrawPath(addTrip);
+					self.fieldTripPaletteSectionVM.drawTool.onTripStopsChangeEvent(null, { add: [], edit: edits, delete: [] });
+					self.fieldTripPaletteSectionVM.drawTool.redrawPath(addTrip);
 					return edits;
 				})
 			});
@@ -600,8 +618,8 @@
 	RoutingFieldTripStopDataModel.prototype._reorderTripStopSequenceInOneTrip = function(tripStop, newSequence, callZoomToLayers = true)
 	{
 		var self = this;
-		self._viewModal.revertMode = "";
-		self._viewModal.revertData = [];
+		self.mapCanvasPage.revertMode = "";
+		self.mapCanvasPage.revertData = [];
 		var oldSequence = tripStop.Sequence;
 		var editTripPathStops = [];
 		var trip = self.dataModel.getFieldTripById(tripStop.FieldTripId);
@@ -675,7 +693,7 @@
 		var self = this;
 		var sequenceChanges = [];
 		tripStop.routeStops = null;
-		return self.viewModel.drawTool.NAtool.refreshTrip(tripStop, "new", false, true).then(function(data)
+		return self.fieldTripPaletteSectionVM.drawTool.NAtool.refreshTrip(tripStop, "new", false, true).then(function(data)
 		{
 			var prevStop = data[0];
 			var currentStop = data.length > 1 ? data[1] : null;
@@ -719,22 +737,22 @@
 	RoutingFieldTripStopDataModel.prototype._refreshTripByAddMultiStopsSmart = function(newTripStops, currentTripStops, newTrip)
 	{
 		var self = this;
-		return self.viewModel.drawTool.NAtool.refreshTripByAddMultiStopsSmart(newTripStops, currentTripStops, newTrip);
+		return self.fieldTripPaletteSectionVM.drawTool.NAtool.refreshTripByAddMultiStopsSmart(newTripStops, currentTripStops, newTrip);
 	};
 
 	RoutingFieldTripStopDataModel.prototype._refreshTripSequenceOptimizeAndPreserve = function(newTripStops, currentTripStops)
 	{
 		var self = this;
-		return self.viewModel.drawTool.NAtool.refreshTripByMultiStops(currentTripStops, true).then(function(currentStops)
+		return self.fieldTripPaletteSectionVM.drawTool.NAtool.refreshTripByMultiStops(currentTripStops, true).then(function(currentStops)
 		{
 			currentStops.forEach(function(stop, index) { stop.Sequence = index + 1; })
-			return self.viewModel.eventsManager.contiguousHelper.getSmartAssignment(newTripStops, { FieldTripStops: currentStops }, self.viewModel.drawTool).then(function(newStops)
+			return self.fieldTripPaletteSectionVM.eventsManager.contiguousHelper.getSmartAssignment(newTripStops, { FieldTripStops: currentStops }, self.fieldTripPaletteSectionVM.drawTool).then(function(newStops)
 			{
 				newStops.forEach(function(stop)
 				{
 					currentStops = currentStops.slice(0, stop.Sequence - 1).concat([stop]).concat(currentStops.slice(stop.Sequence - 1));
 				});
-				return self.viewModel.drawTool.NAtool.refreshTripByMultiStops(currentStops, false).then(function(currentStops)
+				return self.fieldTripPaletteSectionVM.drawTool.NAtool.refreshTripByMultiStops(currentStops, false).then(function(currentStops)
 				{
 					return { stops: currentStops };
 				})
@@ -783,7 +801,7 @@
 	{
 		var self = this;
 		var tripStopToCalc = $.extend({}, tripStop, { FieldTripId: trip.id });
-		return self.viewModel.drawTool.NAtool.refreshTrip(tripStopToCalc, "new").then(function(data)
+		return self.fieldTripPaletteSectionVM.drawTool.NAtool.refreshTrip(tripStopToCalc, "new").then(function(data)
 		{
 			return Enumerable.From(data).FirstOrDefault({}, function(c) { return c.id == tripStopToCalc.id; }).Sequence;
 		});
@@ -815,7 +833,7 @@
 
 	RoutingFieldTripStopDataModel.prototype.insertToRevertData = function(data)
 	{
-		this._viewModal.revertData.push($.extend({}, data, { geometry: data && data.geometry ? TF.cloneGeometry(data.geometry) : null }));
+		this.mapCanvasPage.revertData.push($.extend({}, data, { geometry: data && data.geometry ? TF.cloneGeometry(data.geometry) : null }));
 	};
 
 	RoutingFieldTripStopDataModel.prototype.getDataModel = function()
