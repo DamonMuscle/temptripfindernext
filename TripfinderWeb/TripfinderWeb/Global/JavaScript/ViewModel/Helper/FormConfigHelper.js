@@ -424,6 +424,7 @@
 				if (systemQuestionTargetField && dataTypeId)
 				{
 					const dataTypeKey = tf.dataTypeHelper.getKeyById(dataTypeId);
+					//For convertValueByMeasurementUnit has added commas, just return the value 
 					return FormConfigHelper.convertValueByMeasurementUnit(value, systemQuestionTargetField, dataTypeKey);
 				}
 				return tf.dataFormatHelper.numberFormatter(value, numberPrecision);
