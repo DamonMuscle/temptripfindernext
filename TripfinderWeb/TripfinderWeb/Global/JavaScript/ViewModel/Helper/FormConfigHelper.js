@@ -424,7 +424,8 @@
 				if (systemQuestionTargetField && dataTypeId)
 				{
 					const dataTypeKey = tf.dataTypeHelper.getKeyById(dataTypeId);
-					value = FormConfigHelper.convertValueByMeasurementUnit(value, systemQuestionTargetField, dataTypeKey);
+					//For convertValueByMeasurementUnit has added commas, just return the value 
+					return FormConfigHelper.convertValueByMeasurementUnit(value, systemQuestionTargetField, dataTypeKey);
 				}
 				return tf.dataFormatHelper.numberFormatter(value, numberPrecision);
 			case TYPE_PHONE_NUMBER:
