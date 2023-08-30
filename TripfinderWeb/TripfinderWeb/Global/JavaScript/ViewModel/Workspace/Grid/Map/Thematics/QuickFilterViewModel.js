@@ -1814,6 +1814,14 @@
 		}
 	};
 
+	function _resetBooleanFieldData(fieldData, self)
+	{
+		let originalFieldName = fieldData.selectField().FieldName;
+		fieldData.selectField().FieldName = null;
+		self.changeFilter(fieldData);
+		fieldData.selectField().FieldName = originalFieldName;
+	}
+
 	/**
 	 * Triggered when field selected option is changed.
 	 * @param {object} model ViewModel.
@@ -1875,6 +1883,11 @@
 		{
 			selectedColumn = self.getFieldObjectByName(selectedValue);
 			self.selectedFields[idx] = selectedColumn.FieldName;
+		}
+
+		if (fieldData.type === 'boolean' && fieldData.selectField()?.FieldName !== null)
+		{
+			_resetBooleanFieldData(fieldData, self);
 		}
 
 		hideQuickDateFilterOnInit(self, fieldData.role);
@@ -2280,6 +2293,13 @@
 								self.selectedFields[itemIndex - length] = selectedFieldText;
 							}
 							self.obFields(fieldList);
+							fieldList.forEach(item => {
+								if (item.type === 'boolean')
+								{
+									_resetBooleanFieldData(item, self);
+									self.changeFilter(item);
+								}
+							})
 							self.bindDragAndDropEvent();
 							self.shouldDoFilter = true;
 							self.onFieldReordered.notify({ "startIndex": Number(dragItemIndex), "endIndex": Number(lastMovedItemIndex) });
