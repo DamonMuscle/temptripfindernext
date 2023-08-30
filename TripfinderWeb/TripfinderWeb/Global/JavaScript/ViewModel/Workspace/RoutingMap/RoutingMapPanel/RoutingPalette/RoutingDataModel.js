@@ -1767,7 +1767,7 @@
 		self.viewModel.routingChangePath && self.viewModel.routingChangePath.clearAll();
 		self.clearContextMenuOperation();
 		self.viewModel.editFieldTripStopModal.closeEditModal();
-		self.fieldTripPaletteSectionVM.routingPaletteVM?.fieldTripMap?.confirmToExitAddingStop(false);
+		self.fieldTripPaletteSectionVM.routingPaletteVM?.fieldTripMapOperation?.confirmToExitAddingStop(false);
 		// self.clearTripOriginalData(tripsToClose);
 		return promise.then(function()
 		{
@@ -1879,7 +1879,7 @@
 		}
 		self.clearContextMenuOperation();
 		self.viewModel.editFieldTripStopModal.closeEditModal();
-		self.fieldTripPaletteSectionVM.routingPaletteVM?.fieldTripMap?.confirmToExitAddingStop(false);
+		self.fieldTripPaletteSectionVM.routingPaletteVM?.fieldTripMapOperation?.confirmToExitAddingStop(false);
 		return promise;
 	};
 

@@ -26,11 +26,11 @@
 		data.type = "tripStop";
 		self.insertTripStopToTrip(data, insertToSpecialSequenceIndex);
 
-		self.viewModel.viewModel.fieldTripMap?.applyAddFieldTripStops([{...data, Sequence: insertToSpecialSequenceIndex + 1, VehicleCurbApproach: data.vehicleCurbApproach}], function()
+		self.viewModel.viewModel.fieldTripMapOperation?.applyAddFieldTripStops([{...data, Sequence: insertToSpecialSequenceIndex + 1, VehicleCurbApproach: data.vehicleCurbApproach}], function()
 		{
 			if (!isSearchCreate)
 			{
-				self.viewModel.viewModel.fieldTripMap?.startAddFieldTripStop();
+				self.viewModel.viewModel.fieldTripMapOperation?.startAddFieldTripStop();
 			}
 
 			self.insertToRevertData(data);
@@ -69,7 +69,7 @@
 			return tripStop;
 		});
 
-		return self.viewModel.viewModel.fieldTripMap?.applyAddFieldTripStops(stops, function()
+		return self.viewModel.viewModel.fieldTripMapOperation?.applyAddFieldTripStops(stops, function()
 		{
 			// set stop time to new trip stop by calculate
 			const fieldTripId = stops[0].FieldTripId;

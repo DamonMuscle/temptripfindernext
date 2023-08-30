@@ -100,9 +100,9 @@
 		if (!isShowMode)
 		{
 			// hide all field trips and exit AddFieldTripStop.
-			if (self._viewModal.routingPaletteViewModel?.fieldTripMap?.editing.isAddingStop)
+			if (self._viewModal.routingPaletteViewModel?.fieldTripMapOperation?.editing.isAddingStop)
 			{
-				self._viewModal.routingPaletteViewModel.fieldTripMap.stopAddFieldTripStop();
+				self._viewModal.routingPaletteViewModel.fieldTripMapOperation.stopAddFieldTripStop();
 			}
 		}
 		var layers = self.getLayers();

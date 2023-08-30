@@ -131,7 +131,7 @@
 		{
 			self._viewModal.setMode("", "Normal");
 			$target.addClass("active");
-			self.viewModel.routingPaletteVM.fieldTripMap?.confirmToExitAddingStop(false, false);
+			self.viewModel.routingPaletteVM.fieldTripMapOperation?.confirmToExitAddingStop(false, false);
 		}
 		$target.addClass("checked");
 	}
@@ -464,7 +464,7 @@
 		var self = this;
 		if (self._viewModal.mode === 'Routing-Create')
 		{
-			self.viewModel.routingPaletteVM.fieldTripMap?.confirmToExitAddingStop(false);
+			self.viewModel.routingPaletteVM.fieldTripMapOperation?.confirmToExitAddingStop(false);
 		}
 		// this item is boundary ,so change it to trip stop
 		var fieldTripStop = self.dataModel.getFieldTripStop(item.FieldTripStopId ? item.FieldTripStopId : item.id, item.FieldTripId);
@@ -857,7 +857,7 @@
 	{
 		this.clearMode();
 		this.viewModel.routingChangePath && this.viewModel.routingChangePath.clearAll();
-		this.viewModel.routingPaletteVM.fieldTripMap?.confirmToExitAddingStop(false);
+		this.viewModel.routingPaletteVM.fieldTripMapOperation?.confirmToExitAddingStop(false);
 
 		tf.loadingIndicator.enhancedShow(this.viewModel.viewModel.onRefreshFieldTripPath({fieldTripId: data.id}));
 	};

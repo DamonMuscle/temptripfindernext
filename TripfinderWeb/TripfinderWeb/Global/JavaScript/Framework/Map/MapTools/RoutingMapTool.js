@@ -1224,12 +1224,12 @@
 
 	RoutingMapTool.prototype.isAddingFieldTripStop = function()
 	{
-		return this.routingMapDocumentViewModel.routingPaletteViewModel?.fieldTripMap?.editing.isAddingStop;
+		return this.routingMapDocumentViewModel.routingPaletteViewModel?.fieldTripMapOperation?.editing.isAddingStop;
 	}
 
 	RoutingMapTool.prototype.exitAddingFieldTripStop = function()
 	{
-		return this.routingMapDocumentViewModel.routingPaletteViewModel?.fieldTripMap?.confirmToExitAddingStop(false);
+		return this.routingMapDocumentViewModel.routingPaletteViewModel?.fieldTripMapOperation?.confirmToExitAddingStop(false);
 	}
 
 	RoutingMapTool.prototype.dispose = function ()

@@ -1024,7 +1024,7 @@
 	DirectionPaletteViewModel.prototype.openDestinationDropModeClick = function(viewModel, e)
 	{
 		this._viewModal.sketchTool.stop();
-		if (this._viewModal.routingPaletteViewModel.fieldTripMap?.editing.isAddingStop)
+		if (this._viewModal.routingPaletteViewModel.fieldTripMapOperation?.editing.isAddingStop)
 		{
 			// skip add routing destination when adding a field trip stop.
 			return;

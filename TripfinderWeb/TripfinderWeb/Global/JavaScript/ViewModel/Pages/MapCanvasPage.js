@@ -672,7 +672,7 @@
 		{
 			if (e.key == "Escape")
 			{
-				self.routingPaletteViewModel?.fieldTripMap?.confirmToExitAddingStop();
+				self.routingPaletteViewModel?.fieldTripMapOperation?.confirmToExitAddingStop();
 			}
 		});
 	};
