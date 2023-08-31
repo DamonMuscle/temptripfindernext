@@ -13,7 +13,6 @@
 		self.obFooterDisplay = ko.observable("0 Field Trips, 0 Field Trip Stops");
 		self.expandStatusDictionary = {};
 		self.treeview;
-		self.stopLocationDisctionary = {};
 		self.triggerEventType = '';
 		self.updateMissionDictionary = {};
 

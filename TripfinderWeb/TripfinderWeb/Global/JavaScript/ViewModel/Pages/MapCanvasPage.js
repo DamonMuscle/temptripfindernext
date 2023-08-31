@@ -12,8 +12,6 @@
 		self.DocumentData.data = mapObjects;
 		self._arcgis = null;
 		self._map = null;
-		self._search = null;
-		self._dragOrigin = null;
 		self.obAreaUnit = ko.observable();
 		self.obDistanceUnit = ko.observable();
 		self._currentMeasureOption = null;
@@ -41,9 +39,7 @@
 		this.autoPan = null;
 		this.revertMode = "";
 		this.revertData = null;
-		this.rightClickTimer = null;
 		this.prevent = false;
-		self._borderTool = null;
 		self.togglePalettePanel = self.togglePalettePanel.bind(self);
 
 		self.routingMapContextMenu = new TF.RoutingMap.RoutingMapPanel.RoutingMapContextMenu(self);
@@ -502,7 +498,7 @@
 					setTimeout(function()
 					{
 						data.show();
-					}, 100);			
+					}, 100);
 				} else
 				{
 					if (icon)
