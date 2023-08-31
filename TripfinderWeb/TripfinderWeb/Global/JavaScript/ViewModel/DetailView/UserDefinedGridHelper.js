@@ -686,23 +686,27 @@
 			{
 				// Get the isUTC from the systemField's targetField
 				let gridDefinition = TF.Form.FormConfigHelper.getSystemFieldRelatedColumnDefinition(col.editType.targetField, dataTypeId);
-				if (gridDefinition && gridDefinition.isUTC == true)
+				if (gridDefinition)
 				{
-					utcColumnExtension = {
-						isUTC: true
+					if (gridDefinition.isUTC)
+					{
+						columnExtension = $.extend(columnExtension, { isUTC: true });
 					}
 
-					columnExtension = $.extend(columnExtension, utcColumnExtension);
-				}
+					if (gridDefinition.UnitOfMeasureSupported)
+					{
+						columnExtension = $.extend(columnExtension, { UnitOfMeasureSupported: true });
+					}
 
-				if (gridDefinition.UnitOfMeasureSupported == true)
-				{
-					columnExtension = $.extend(columnExtension, { UnitOfMeasureSupported: true });
-				}
+					if (gridDefinition.UnitTypeOfMeasureSupported)
+					{
+						columnExtension = $.extend(columnExtension, { UnitTypeOfMeasureSupported: gridDefinition.UnitTypeOfMeasureSupported });
+					}
 
-				if (gridDefinition.UnitTypeOfMeasureSupported)
-				{
-					columnExtension = $.extend(columnExtension, { UnitTypeOfMeasureSupported: gridDefinition.UnitTypeOfMeasureSupported });
+					if (gridDefinition.UnitOfMeasureReverse)
+					{
+						columnExtension = $.extend(columnExtension, { UnitOfMeasureReverse: true });
+					}
 				}
 			}
 		}
