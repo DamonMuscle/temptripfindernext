@@ -24,7 +24,7 @@
 			}
 		});
 		self.viewModel = viewModal;
-		self._viewModal = viewModal._viewModal;
+		self._viewModal = viewModal.mapCanvasPage;
 		self.dataModel = new TF.RoutingMap.TravelScenariosPalette.TravelRegionsDataModel(self);
 		self.eyeTitle = ko.observable("Travel Regions");
 		self.eventsManager = new TF.RoutingMap.TravelScenariosPalette.TravelRegions.EventsManager(self);

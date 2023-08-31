@@ -12,7 +12,7 @@
 			self.drawTool = drawTool;
 			self.dataModel = drawTool.dataModel;
 			self.viewModel = drawTool.viewModel;
-			self._viewModel = drawTool.viewModel._viewModal;
+			self._viewModel = drawTool.viewModel.mapCanvasPage;
 			self._viewModal = drawTool._viewModal;
 			self.editModal = drawTool.editModal;
 			self._map = drawTool._map;
@@ -79,7 +79,7 @@
 								var stop = { geometry: mapPoint, boundary: { geometry: result.walkoutZone.geometry }, ProhibitCrosser: self.drawTool._prohibitCrosser };
 								if (isTrial)
 								{
-									self.viewModel.viewModel.fieldTripPaletteSection.dataModel.getUnAssignStudentInBoundaryProhibitCross(stop).then(function(students)
+									self.viewModel.viewModel.fieldTripPaletteSectionVM.dataModel.getUnAssignStudentInBoundaryProhibitCross(stop).then(function(students)
 									{
 										self._tempWalkoutLayer.removeAll();
 										self._tempWalkoutLayer.add(previewGraphic);
@@ -197,7 +197,7 @@
 				if (isTrial)
 				{
 					var stop = { geometry: pointCllicked, boundary: { geometry: result.walkoutZone.geometry }, ProhibitCrosser: self.drawTool._prohibitCrosser };
-					self.viewModel.viewModel.fieldTripPaletteSection.dataModel.getUnAssignStudentInBoundaryProhibitCross(stop).then(function(students)
+					self.viewModel.viewModel.fieldTripPaletteSectionVM.dataModel.getUnAssignStudentInBoundaryProhibitCross(stop).then(function(students)
 					{
 						self._previewLayer.add(previewGraphic);
 						stop.studentCount = students.length;
@@ -218,70 +218,6 @@
 		{
 			self.viewModel.display.arcgisError(e.message);
 		});
-	}
-
-	StopPreviewTool.prototype._getWalkoutPreviews = function(evtArray, barriers)
-	{
-		var self = this, promises = [];
-		self.resolve = null;
-		self.reject = null;
-		self.promise = new Promise(function(resolve, reject) { self.resolve = resolve; self.reject = reject; });
-		var ps = [], previewGraphics = [];
-		evtArray.forEach(function(evt)
-		{
-			if (evt.walkoutZone)
-			{
-				promises.push(new Promise(function(resolve) { resolve({ walkoutZone: new self._arcgis.Graphic(evt.walkoutZone) }) }))
-			} else
-			{
-				promises.push(self.stopTool.generateWalkoutZone(new self._arcgis.Graphic(evt.geometry), self.drawTool._walkoutDistance, self.drawTool._walkoutDistanceUnit, self.drawTool._walkoutBuffer,
-					self.drawTool._walkoutBufferUnit, self.drawTool._walkoutType, null, null, null, null, barriers));
-			}
-		})
-
-		Promise.all(promises).then(function(results)
-		{
-			results.forEach(function(result, index)
-			{
-				var pointCllicked = TF.cloneGeometry(evtArray[index].geometry);
-				var previewGraphic = null;
-				if (self.drawTool._walkoutType == 0 || !result.walkoutGuide)
-				{
-					if (result.walkoutGuide)
-					{
-						previewGraphic = new self._arcgis.Graphic(result.walkoutGuide, self._walkoutPreviewLineSymbol, { previewId: evtArray[index].previewId })
-					} else
-					{
-						previewGraphic = new self._arcgis.Graphic(result.walkoutZone.geometry, self._walkoutPreviewCircleSymbol, { previewId: evtArray[index].previewId })
-					}
-
-				}
-				else if (self.drawTool._walkoutType == 1)
-				{
-					previewGraphic = new self._arcgis.Graphic(result.walkoutZone.geometry, self._walkoutPreviewCircleSymbol, { previewId: evtArray[index].previewId })
-				}
-				var stop = { geometry: pointCllicked, boundary: { geometry: result.walkoutZone.geometry }, ProhibitCrosser: self.drawTool._prohibitCrosser };
-				previewGraphics.push(previewGraphic);
-				ps.push(self.viewModel.viewModel.fieldTripPaletteSection.dataModel.getUnAssignStudentInBoundaryProhibitCross(stop));
-			})
-			Promise.all(ps).then(function(results)
-			{
-				results.forEach(function(students, index)
-				{
-					previewGraphics[index].attributes.students = students;
-					self._tempWalkoutLayer.add(previewGraphics[index]);
-					previewGraphics[index].visible = false
-					evtArray[index].students = students;
-					evtArray[index].studentCount = students.length;
-					var studentLabelGraphic = new self._arcgis.Graphic(TF.cloneGeometry(evtArray[index].geometry), self.Symbol.createStudentLabelSymbol(evtArray[index]), { type: "studentLabel", previewId: evtArray[index].previewId });
-					self._tempWalkoutLayer.add(studentLabelGraphic);
-					studentLabelGraphic.visible = false
-				});
-				self.resolve(true);
-
-			})
-		});
-		return self.promise;
 	}
 
 	StopPreviewTool.prototype.onTrialStopWalkoutPreviewChange = function(event, items)

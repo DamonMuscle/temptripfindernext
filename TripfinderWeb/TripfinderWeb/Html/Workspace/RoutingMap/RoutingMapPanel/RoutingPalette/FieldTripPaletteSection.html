@@ -18,7 +18,7 @@
 		<div class="parcelpalette mapeditingpalette">
 			<div class="directions-tool locate-tool parcelpoint-tool" data-bind="with:eventsManager">
 				<div class="print-setting-group" data-bind="dropDownMenu">
-					<div class="icon file fixed-menu-btn" title="File" data-bind="css:{disable:!viewModel.isFileShow()}"></div>
+					<div class="icon file fixed-menu-btn" title="File" data-bind="css:{disable:!fieldTripPaletteSectionVM.isFileShow()}"></div>
 					<div class="menu fileMenu withsub-menu with-sub-menu">
 						<ul>
 							<li data-bind="clickButton:{click:openTripClick,disable:!tf.authManager.isAuthorizedFor('routingMap', 'edit')}">
@@ -82,7 +82,7 @@
 				</div>
 				<div class="vertical-line"></div>
 				<div class="print-setting-group create-dropdown-list" data-bind="dropDownMenu">
-					<div class="icon fixed-menu-btn destination add-tripstop" title="Add Stop" data-bind="css:{disable:!obEditFieldTripSelected()||!viewModel.isShowMode()},click:addStopClick.bind($data)"></div>
+					<div class="icon fixed-menu-btn destination add-tripstop" title="Add Stop" data-bind="css:{disable:!obEditFieldTripSelected()||!fieldTripPaletteSectionVM.isShowMode()},click:addStopClick.bind($data)"></div>
 					<div class="menu map-pinpoint-white withsub-menu">
 						<ul>
 							<li data-bind="click:addStopFromMapClick,mapModeStyleButton">

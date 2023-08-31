@@ -160,7 +160,7 @@
 		}).subscribe(self.onShowArrowsCheckboxClicked.bind(self));
 
 		self.travelScenario = null;
-		PubSub.subscribe("selected-travel-scenario-change" + self._viewModal.routeState, self.selectedTravelScenarioChanged.bind(self));
+		PubSub.subscribe("selected-travel-scenario-change" + self.mapCanvasPage.routeState, self.selectedTravelScenarioChanged.bind(self));
 		setTimeout(function()
 		{
 			self.notifyDataChange(true);
@@ -174,7 +174,7 @@
 	{
 		var self = this;
 		var isShow = self.isShowMode();
-		self._viewModal._directionsTool.getLayers().forEach(function(item)
+		self.mapCanvasPage._directionsTool.getLayers().forEach(function(item)
 		{
 			item.visible = isShow;
 		});
@@ -199,7 +199,7 @@
 	DirectionPaletteViewModel.prototype.onRoundTripCheckBoxClicked = function(checked)
 	{
 		var self = this,
-			directionTool = self._viewModal._directionsTool;
+			directionTool = self.mapCanvasPage._directionsTool;
 
 		self.notifyDataChange(true);
 		if (directionTool._stops === undefined)
@@ -222,11 +222,11 @@
 
 		if (checked)
 		{
-			prevRouteResult = self._viewModal._directionsTool._prevRouteResult;
+			prevRouteResult = self.mapCanvasPage._directionsTool._prevRouteResult;
 			if (prevRouteResult)
 			{
 				routeResult = prevRouteResult.routeResults[0];
-				self._viewModal._directionsTool.notifyDirectionChanged(routeResult);
+				self.mapCanvasPage._directionsTool.notifyDirectionChanged(routeResult);
 			}
 		} else
 		{
@@ -266,7 +266,7 @@
 	{
 		var self = this;
 		self.notifyDataChange(true);
-		self._viewModal._directionsTool.addArrow();
+		self.mapCanvasPage._directionsTool.addArrow();
 	};
 
 	DirectionPaletteViewModel.prototype.buildDestinationSearches = function()
@@ -441,14 +441,14 @@
 	{
 		var self = this;
 		self.element = $(el);
-		self.ArcGisSearch = self._viewModal._arcgis.Search;
-		// self.ArcGisRegistry = self._viewModal._arcgis.registry;
-		self.ArcGisExtent = self._viewModal._arcgis.Extent;
-		self.ArcGisDirections = self._viewModal._arcgis.Directions;
-		self.ArcGisLocator = self._viewModal._arcgis.Locator;
+		self.ArcGisSearch = self.mapCanvasPage._arcgis.Search;
+		// self.ArcGisRegistry = self.mapCanvasPage._arcgis.registry;
+		self.ArcGisExtent = self.mapCanvasPage._arcgis.Extent;
+		self.ArcGisDirections = self.mapCanvasPage._arcgis.Directions;
+		self.ArcGisLocator = self.mapCanvasPage._arcgis.Locator;
 
-		self.mapInstance = self._viewModal.mapInstance;
-		self.map = self._viewModal._map;
+		self.mapInstance = self.mapCanvasPage.mapInstance;
+		self.map = self.mapCanvasPage._map;
 		self.setPanelConfigs();
 		self.reloadDestinationPanel();
 		// https://developers.arcgis.com/javascript/latest/api-reference/esri-widgets-Directions.html
@@ -1023,8 +1023,8 @@
 
 	DirectionPaletteViewModel.prototype.openDestinationDropModeClick = function(viewModel, e)
 	{
-		this._viewModal.sketchTool.stop();
-		if (this._viewModal.routingPaletteViewModel.fieldTripMapOperation?.editing.isAddingStop)
+		this.mapCanvasPage.sketchTool.stop();
+		if (this.mapCanvasPage.routingPaletteViewModel.fieldTripMapOperation?.editing.isAddingStop)
 		{
 			// skip add routing destination when adding a field trip stop.
 			return;
@@ -1125,7 +1125,7 @@
 	DirectionPaletteViewModel.prototype.printClick = function(viewModel, e)
 	{
 		var self = this,
-			directionTool = self._viewModal._directionsTool,
+			directionTool = self.mapCanvasPage._directionsTool,
 			data = this.obDirectionDetails().map(function(item) { return item.toData(); }),
 			points = this.obDestinationsArray().map(function(item)
 			{
@@ -1165,9 +1165,9 @@
 				totalTime: totalTime,
 				totalDistance: totalDistance
 			}, {
-				MapDefaultBasemap: self._viewModal._mapView.map.basemap,
+				MapDefaultBasemap: self.mapCanvasPage._mapView.map.basemap,
 				arcgis: tf.map.ArcGIS,
-				map: self._viewModal._map,
+				map: self.mapCanvasPage._map,
 				showBaseMap: setting ? setting["Overview"] : false,
 				showStopMap: setting ? setting["Destination Vicinity"] : false,
 				showTurnByTurnMap: setting ? setting["Turn-By-Turn"] : false,
@@ -1645,7 +1645,7 @@
 					self.loadTravelScenarios();
 				}
 			};
-			self._viewModal.menuDataUpdateEvent.subscribe(this._travelScenariosChange);
+			self.mapCanvasPage.menuDataUpdateEvent.subscribe(this._travelScenariosChange);
 			// subscribe travel scenario change event
 			PubSub.subscribe("ScenarioApproveStatusChange", this._travelScenariosChange);
 			PubSub.subscribe("StreetApproveStatusChange", this._travelScenariosChange);
@@ -1727,10 +1727,10 @@
 
 	DirectionPaletteViewModel.prototype.close = function()
 	{
-		this._viewModal._directionsTool._clearTooltipHide();
-		this._viewModal._directionsTool._onEscMode();
+		this.mapCanvasPage._directionsTool._clearTooltipHide();
+		this.mapCanvasPage._directionsTool._onEscMode();
 		this.resetPanel();
-		this._viewModal._directionsTool.clear();
+		this.mapCanvasPage._directionsTool.clear();
 		// if (this.travelScenario)
 		// {
 		// 	TF.RoutingMap.TravelScenariosPalette.TravelScenariosDataModel.unUseTravelScenario(this.travelScenario.Id, this.routeState);
@@ -1741,7 +1741,7 @@
 	DirectionPaletteViewModel.prototype.dispose = function()
 	{
 		this.destroySearches();
-		this._viewModal.menuDataUpdateEvent.unsubscribe(this._travelScenariosChange);
+		this.mapCanvasPage.menuDataUpdateEvent.unsubscribe(this._travelScenariosChange);
 		PubSub.unsubscribe(this._travelScenariosChange);
 		// if (this.travelScenario)
 		// {

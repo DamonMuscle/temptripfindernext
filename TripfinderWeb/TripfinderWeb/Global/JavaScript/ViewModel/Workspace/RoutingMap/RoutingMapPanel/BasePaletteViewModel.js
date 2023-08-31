@@ -2,27 +2,38 @@
 {
 	createNamespace("TF.RoutingMap").BasePaletteViewModel = BasePaletteViewModel;
 
-	function BasePaletteViewModel(viewModal, isOpen, routeState)
+	function BasePaletteViewModel(mapCanvasPage, isOpen, routeState)
 	{
-		this.panel = null;
-		this.isOpen = false;
-		this.needInit = true;
-		this.arcgis = tf.map.ArcGIS;
-		this.layers = [];
-		this._viewModal = viewModal;
-		this.routeState = routeState;
-		this.type = "";
-		this.title = "";
-		this.templateName = "";
-		this.className = "";
-		this.dockLeft = null;
-		this.obShow = ko.observable(false);
-		this.obShowRefreshToast = ko.observable(false);
-		this.showCount = 0;
-		this.isEyeVisible = ko.observable(false);
-		this.isShowMode = ko.observable(false);
-		this.eyeTitle = ko.observable("");
-		this.sections = [];
+		const self = this;
+		self.panel = null;
+		self.isOpen = false;
+		self.needInit = true;
+		self.arcgis = tf.map.ArcGIS;
+		self.layers = [];
+		self.mapCanvasPage = mapCanvasPage;
+		self.routeState = routeState;
+		self.type = "";
+		self.title = "";
+		self.templateName = "";
+		self.className = "";
+		self.dockLeft = null;
+		self.obShow = ko.observable(false);
+		self.obShowRefreshToast = ko.observable(false);
+		self.showCount = 0;
+		self.isEyeVisible = ko.observable(false);
+		self.isShowMode = ko.observable(false);
+		self.eyeTitle = ko.observable("");
+		self.sections = [];
+
+		Object.defineProperty(self, "_viewModal",
+		{
+			get()
+			{
+				console.log("This property is obsoleted, please use mapCanvasPage instead. it should be removed in future.(BasePaletteViewModel)")
+				return self.mapCanvasPage;
+			},
+			enumerable: false,
+		});
 	}
 
 	BasePaletteViewModel.prototype.getMap = function()

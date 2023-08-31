@@ -6,19 +6,19 @@
 	{
 		var options = {};
 		this.dataModel = dataModel;
-		this.viewModel = dataModel.viewModel;
+		this.viewModel = dataModel.fieldTripPaletteSectionVM;
 		options.type = function()
 		{
 			return "fieldtrip";
 		};
 		options.displayName = "Field Trip";
 		options.featureData = this.dataModel.featureData;
-		options.viewModel = dataModel.viewModel.viewModel;
+		options.viewModel = dataModel.fieldTripPaletteSectionVM.routingPaletteVM;
 		options.getAutoRefreshSetting = this.dataModel.getAutoRefreshSetting;
 		options.refreshOtherChangeData = this.refreshOtherChangeData.bind(this);
 		options.extraInfo = function()
 		{
-			return dataModel.viewModel.viewModel.routeState;
+			return dataModel.fieldTripPaletteSectionVM.routingPaletteVM.routeState;
 		};
 		TF.RoutingMap.LockData.call(this, options);
 	}

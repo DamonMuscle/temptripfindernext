@@ -67,7 +67,7 @@
 		self.traceManager = {obShow: ko.observable(false)}; // new TF.RoutingMap.TracingManager();
 		self.routingSnapManager = new TF.Document.RoutingSnapManger(self);
 		// self.routingSnapManager.snapToggleEvent.subscribe(self.snapToggleEvent.bind(self));
-		// self.routingPaletteViewModel.fieldTripPaletteSection.eventsManager.requireDetailsEvent.subscribe((e, data) =>
+		// self.routingPaletteViewModel.fieldTripPaletteSectionVM.eventsManager.requireDetailsEvent.subscribe((e, data) =>
 		// {
 		// });
 	};

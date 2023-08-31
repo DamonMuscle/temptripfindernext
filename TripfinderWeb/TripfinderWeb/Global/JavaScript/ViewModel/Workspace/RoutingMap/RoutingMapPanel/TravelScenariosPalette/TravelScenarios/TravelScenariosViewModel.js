@@ -8,7 +8,7 @@
 		self.$element = null;
 		self.routeState = routeState;
 		self.viewModel = viewModel;
-		self._viewModal = viewModel._viewModal;
+		self._viewModal = viewModel.mapCanvasPage;
 		self.obPreviousSelectedTravelScenarios = null;
 		self.obSelectedTravelScenarios = ko.observable();
 		self.obSelectedTravelScenarios.subscribe(this.setTravelScenariosToData, this);
@@ -16,7 +16,7 @@
 		self.obTravelScenariosFooterDisplay = ko.observable("");
 		self.dataModel = new TF.RoutingMap.TravelScenariosPalette.TravelScenariosDataModel(self);
 		self.eventsManager = new TF.RoutingMap.TravelScenariosPalette.TravelScenariosEventsManager(self);
-		this.streetCurbTurnDataModel = new TF.RoutingMap.TravelScenariosPalette.StreetCurbTurnDataModel(this._viewModal);
+		this.streetCurbTurnDataModel = new TF.RoutingMap.TravelScenariosPalette.StreetCurbTurnDataModel(self._viewModal);
 		self.dataModel.travelScenariosCollectionChangedEvent.subscribe(self.onTravelScenariosCollectionChanged.bind(self));
 		self.getStreetApprove().then(result =>
 		{

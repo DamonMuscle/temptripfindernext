@@ -243,7 +243,7 @@
 	{
 		// get the field trip data from palette.
 		// sort the result as same as palette.
-		const paletteFieldTripsData = tf.pageManager.obPages()[0].data.routingPaletteViewModel.fieldTripPaletteSection.display.treeview.dataSource.data();
+		const paletteFieldTripsData = tf.pageManager.obPages()[0].data.routingPaletteViewModel.fieldTripPaletteSectionVM.display.treeview.dataSource.data();
 		const paletteNameData = paletteFieldTripsData.map(item => item.text);
 		const aIndex = paletteNameData.findIndex(item => item === a.Name);
 		const bIndex = paletteNameData.findIndex(item => item === b.Name);

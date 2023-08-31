@@ -29,15 +29,15 @@
 
 		this.onUpdateRecords = this.onUpdateRecords.bind(this);
 		this.releaseUnEditLock = this.releaseUnEditLock.bind(this);
-		if (self.options.viewModel._viewModal)
+		if (self.options.viewModel.mapCanvasPage)
 		{
-			if (this.options.viewModel._viewModal.onUpdateRecordsEvent)
+			if (this.options.viewModel.mapCanvasPage.onUpdateRecordsEvent)
 			{
-				this.options.viewModel._viewModal.onUpdateRecordsEvent.subscribe(this.onUpdateRecords);
+				this.options.viewModel.mapCanvasPage.onUpdateRecordsEvent.subscribe(this.onUpdateRecords);
 			}
-			if (this.options.viewModel._viewModal.onStopEditingEvent)
+			if (this.options.viewModel.mapCanvasPage.onStopEditingEvent)
 			{
-				this.options.viewModel._viewModal.onStopEditingEvent.subscribe(this.releaseUnEditLock);
+				this.options.viewModel.mapCanvasPage.onStopEditingEvent.subscribe(this.releaseUnEditLock);
 			}
 		}
 	}
@@ -450,14 +450,14 @@
 	LockData.prototype._removeRefreshToast = function(data)
 	{
 		var self = this;
-		if (self.options.viewModel._viewModal.obToastMessages)
+		if (self.options.viewModel.mapCanvasPage.obToastMessages)
 		{
-			for (var i = 0; i < self.options.viewModel._viewModal.obToastMessages().length; i++)
+			for (var i = 0; i < self.options.viewModel.mapCanvasPage.obToastMessages().length; i++)
 			{
-				var item = self.options.viewModel._viewModal.obToastMessages()[i];
+				var item = self.options.viewModel.mapCanvasPage.obToastMessages()[i];
 				if (item == data || (!data && item.key == self.options.type()))
 				{
-					self.options.viewModel._viewModal.obToastMessages.remove(item);
+					self.options.viewModel.mapCanvasPage.obToastMessages.remove(item);
 					i--;
 				}
 			}
@@ -509,7 +509,7 @@
 				};
 				if (data.content)
 				{
-					self.options.viewModel._viewModal.obToastMessages.push(data);
+					self.options.viewModel.mapCanvasPage.obToastMessages.push(data);
 				}
 			}
 		}
@@ -687,9 +687,9 @@
 			self._removeRefreshToast();
 			self.refreshOtherChange().then(function(changeIds) 
 			{
-				if ((!changeIds || (changeIds && changeIds.length > 0)) && changeContent && self.options.viewModel._viewModal.obToastMessages)
+				if ((!changeIds || (changeIds && changeIds.length > 0)) && changeContent && self.options.viewModel.mapCanvasPage.obToastMessages)
 				{
-					self.options.viewModel._viewModal.obToastMessages.push(
+					self.options.viewModel.mapCanvasPage.obToastMessages.push(
 						{
 							type: "success",
 							content: changeContent,
@@ -853,8 +853,8 @@
 
 	LockData.prototype.dispose = function()
 	{
-		this.options.viewModel._viewModal.onUpdateRecordsEvent.unsubscribe(this.onUpdateRecords);
-		this.options.viewModel._viewModal.onStopEditingEvent.unsubscribe(this.releaseUnEditLock);
+		this.options.viewModel.mapCanvasPage.onUpdateRecordsEvent.unsubscribe(this.onUpdateRecords);
+		this.options.viewModel.mapCanvasPage.onStopEditingEvent.unsubscribe(this.releaseUnEditLock);
 		this.updatedRecords = {};
 		this.selfLockIds = [];
 		this.onLockedChangeEvent.unsubscribeAll();

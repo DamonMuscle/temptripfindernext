@@ -15,19 +15,9 @@
 		self.isOpen = !!isOpen;
 		self.templateName = "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/RoutingPalette";
 		self.$element = null;
-		self.mapCanvasPage = mapCanvasPage;
-		Object.defineProperty(self, "_viewModal",
-		{
-			get()
-			{
-				console.log("This property is obsoleted, please use mapCanvasPage instead. it should be removed in future.(RoutingPaletteViewModel)")
-				return self.mapCanvasPage;
-			},
-			enumerable: false,
-		});
-		self.fieldTripPaletteSection = new TF.RoutingMap.RoutingPalette.FieldTripPaletteSectionViewModel(self, routeState, trips);
-		self.dataModel = self.fieldTripPaletteSection.dataModel;
-		self.childViewModels =[self.fieldTripPaletteSection];
+		self.fieldTripPaletteSectionVM = new TF.RoutingMap.RoutingPalette.FieldTripPaletteSectionViewModel(self, routeState, trips);
+		self.dataModel = self.fieldTripPaletteSectionVM.dataModel;
+		self.childViewModels =[self.fieldTripPaletteSectionVM];
 		self.mapCanvasPage.onMapLoad.subscribe(this._onMapLoad.bind(this));
 		self.layers = [];
 
@@ -374,7 +364,7 @@
 		const trip = this.dataModel.getFieldTripById(data.fieldTrip.id);
 
 		this.dataModel.update(trip.FieldTripStops, true); // pass true to stop calling onTripStopsChangeEvent
-		this.fieldTripPaletteSection.display.resetTripInfo([trip]).then(()=>
+		this.fieldTripPaletteSectionVM.display.resetTripInfo([trip]).then(()=>
 		{
 			this.checkIfCompletedHandlerExists(data);
 		});
@@ -470,7 +460,7 @@
 
 	RoutingPaletteViewModel.prototype.onMapViewClickEventHandler = function(_, data)
 	{
-		if (this.fieldTripPaletteSection.eventsManager.viewModel.editFieldTripStopModal.obVisible())
+		if (this.fieldTripPaletteSectionVM.editFieldTripStopModal.obVisible())
 		{
 			// on Creating/Editing New Stop, skip map click event.
 			return;
@@ -524,7 +514,7 @@
 			tryUseLastSettings: false
 		};
 
-		this.fieldTripPaletteSection.editFieldTripStopModal.create({
+		this.fieldTripPaletteSectionVM.editFieldTripStopModal.create({
 			Street: stop.Name,
 			...stop
 		}, defaultOptions);
@@ -571,7 +561,7 @@
 
 	RoutingPaletteViewModel.prototype.unSaveCheck = function(openingName)
 	{
-		var viewModels = [this.fieldTripPaletteSection];
+		var viewModels = [this.fieldTripPaletteSectionVM];
 		return this._multiViewUnSaveCheck(openingName, viewModels);
 	};
 

@@ -6,7 +6,7 @@
 	function RoutingFeatureData(dataModel)
 	{
 		this.dataModel = dataModel;
-		this.viewModel = dataModel ? dataModel.viewModel.viewModel : null;
+		this.viewModel = dataModel ? dataModel.fieldTripPaletteSectionVM.routingPaletteVM : null;
 		this.tripPathFeatureData = this._createFeatureData(arcgisUrls.MapEditingOneService + "/37", namespace.TripPathDataModelMaps, "tripPath");
 		this.tripBoundaryFeatureData = this._createFeatureData(arcgisUrls.MapEditingOneService + "/38", namespace.TripBoundaryDataModelMaps, "tripBoundary");
 		this.curbApproachData = this._createFeatureData(arcgisUrls.MapEditingOneService + "/24", namespace.curbApproachDataModelMaps);

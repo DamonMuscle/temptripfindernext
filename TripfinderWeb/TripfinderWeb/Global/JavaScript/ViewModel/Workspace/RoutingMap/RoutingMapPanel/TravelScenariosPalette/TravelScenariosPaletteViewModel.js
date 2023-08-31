@@ -16,7 +16,7 @@
 		this.travelScenariosViewModel = new TF.RoutingMap.TravelScenariosPalette.TravelScenariosViewModel(this, true, routeState);
 		this.travelRegionsViewModel = new TF.RoutingMap.TravelScenariosPalette.TravelRegionsViewModel(this, true, routeState);
 
-		this._viewModal.onMapLoad.subscribe(this._onMapLoad.bind(this));
+		this.mapCanvasPage.onMapLoad.subscribe(this._onMapLoad.bind(this));
 	}
 
 	TravelScenariosPaletteViewModel.prototype = Object.create(TF.RoutingMap.BasePaletteViewModel.prototype);
@@ -75,7 +75,7 @@
 
 	TravelScenariosPaletteViewModel.prototype.checkWithLockConfirm = function()
 	{
-		return this._viewModal.mapEditingPaletteViewModel.checkRelateStreetScenarioChanged().then((ans) =>
+		return this.mapCanvasPage.mapEditingPaletteViewModel.checkRelateStreetScenarioChanged().then((ans) =>
 		{
 			if (ans)
 			{

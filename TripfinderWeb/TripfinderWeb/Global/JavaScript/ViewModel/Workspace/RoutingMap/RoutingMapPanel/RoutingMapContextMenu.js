@@ -151,6 +151,7 @@
 			default: []
 		};
 		let isAdmin = tf.authManager.authorizationInfo.isAdmin,
+			eventsManager = routingPaletteViewModel.fieldTripPaletteSectionVM.eventsManager,
 			hasAuthForRoutingMapAdd = tf.authManager.isAuthorizedFor("routingMap", "add"),
 			hasAuthForRoutingMapEdit = tf.authManager.isAuthorizedFor("routingMap", "edit"),
 			hasAuthForRoutingMap = hasAuthForRoutingMapAdd || hasAuthForRoutingMapEdit,
@@ -185,7 +186,7 @@
 						icon: 'record-details',
 						data: menuItemData,
 						disable: !menuItemData.trip.Id,
-						click: routingPaletteViewModel.fieldTripPaletteSection.eventsManager.tripDetailsClick.bind(routingPaletteViewModel.fieldTripPaletteSection.eventsManager, menuItemData.trip)
+						click: eventsManager.tripDetailsClick.bind(eventsManager, menuItemData.trip)
 					}));
 
 					tripItems[realTripName] = tripItem;
@@ -203,21 +204,21 @@
 						header: 'Directions',
 						icon: 'directions',
 						data: menuItemData,
-						click: routingPaletteViewModel.fieldTripPaletteSection.eventsManager.tripPathInfoClick.bind(routingPaletteViewModel.fieldTripPaletteSection.eventsManager, menuItemData)
+						click: eventsManager.tripPathInfoClick.bind(eventsManager, menuItemData)
 					}));
 					tempParentMenuItem.addChild(new TF.RoutingMap.MenuItem({
 						header: 'Edit',
 						icon: 'reshape',
 						data: menuItemData,
 						disable: !hasAuthForRoutingMap || menuItemData.trip.OpenType === 'View',
-						click: routingPaletteViewModel.fieldTripPaletteSection.eventsManager.tripPathEditClick.bind(routingPaletteViewModel.fieldTripPaletteSection.eventsManager, menuItemData)
+						click: eventsManager.tripPathEditClick.bind(eventsManager, menuItemData)
 					}));
 					tempParentMenuItem.addChild(new TF.RoutingMap.MenuItem({
 						header: 'Recalculate',
 						icon: 'refresh',
 						data: menuItemData,
 						disable: !hasAuthForRoutingMap || menuItemData.trip.OpenType === 'View',
-						click: routingPaletteViewModel.fieldTripPaletteSection.eventsManager.tripPathRefreshClick.bind(routingPaletteViewModel.fieldTripPaletteSection.eventsManager, menuItemData)
+						click: eventsManager.tripPathRefreshClick.bind(eventsManager, menuItemData)
 					}));
 					tempParentMenuItem.addChild(new TF.RoutingMap.MenuItem({
 						isDevider: true
@@ -227,16 +228,16 @@
 						icon: 'delete',
 						data: menuItemData,
 						disable: !hasAuthForRoutingMap || menuItemData.trip.OpenType === 'View',
-						click: routingPaletteViewModel.fieldTripPaletteSection.eventsManager.tripPathDeleteClick.bind(routingPaletteViewModel.fieldTripPaletteSection.eventsManager, menuItemData)
+						click: eventsManager.tripPathDeleteClick.bind(eventsManager, menuItemData)
 					}));
 					contextMenuCategories.tripPaths.push(tempParentMenuItem);
 				}
 			} else if (type == 'tripstop')
 			{
-				let trip = routingPaletteViewModel.fieldTripPaletteSection.dataModel.getFieldTripById(menuItemData.FieldTripId),
+				let trip = routingPaletteViewModel.dataModel.getFieldTripById(menuItemData.FieldTripId),
 					fieldTripStopId = menuItemData.type === "tripStop" ? menuItemData.id : menuItemData.FieldTripStopId,
-					fieldTripStop = menuItemData.Sequence ? routingPaletteViewModel.fieldTripPaletteSection.dataModel.getFieldTripStopBySequence(trip, menuItemData.Sequence) : 
-															routingPaletteViewModel.fieldTripPaletteSection.dataModel.getFieldTripStop(fieldTripStopId),
+					fieldTripStop = menuItemData.Sequence ? routingPaletteViewModel.dataModel.getFieldTripStopBySequence(trip, menuItemData.Sequence) : 
+															routingPaletteViewModel.dataModel.getFieldTripStop(fieldTripStopId),
 					tripName = trip.Name;
 				if (!tripItems[tripName])
 				{
@@ -251,7 +252,7 @@
 						icon: 'record-details',
 						data: menuItemData,
 						disable: !trip.Id,
-						click: routingPaletteViewModel.fieldTripPaletteSection.eventsManager.tripDetailsClick.bind(routingPaletteViewModel.fieldTripPaletteSection.eventsManager, trip)
+						click: eventsManager.tripDetailsClick.bind(eventsManager, trip)
 					}));
 
 					tripItems[tripName] = tripItem;
@@ -271,7 +272,7 @@
 					header: 'Info',
 					icon: 'info',
 					data: menuItemData,
-					click: routingPaletteViewModel.fieldTripPaletteSection.eventsManager.infoClick.bind(routingPaletteViewModel.fieldTripPaletteSection.eventsManager, menuItemData)
+					click: eventsManager.infoClick.bind(eventsManager, menuItemData)
 				}));
 				tempParentMenuItem.addChild(new TF.RoutingMap.MenuItem({
 					isDevider: true
@@ -282,7 +283,7 @@
 					icon: 'copy',
 					data: menuItemData,
 					disable: true, // FT-3291: Disabled for Future Implementation
-					click: routingPaletteViewModel.fieldTripPaletteSection.eventsManager.copyTripStopClick.bind(routingPaletteViewModel.fieldTripPaletteSection.eventsManager, fieldTripStop.id)
+					click: eventsManager.copyTripStopClick.bind(eventsManager, fieldTripStop.id)
 				}));
 
 				tempParentMenuItem.addChild(new TF.RoutingMap.MenuItem({
@@ -295,7 +296,7 @@
 					data: menuItemData,
 					disable: disableMove,
 					id: 'tripSessionMovePoint',
-					click: routingPaletteViewModel.fieldTripPaletteSection.eventsManager.editTripStopClick.bind(routingPaletteViewModel.fieldTripPaletteSection.eventsManager, 'movePoint', fieldTripStop.id, trip.id)
+					click: eventsManager.editTripStopClick.bind(eventsManager, 'movePoint', fieldTripStop.id, trip.id)
 				}));
 				tempParentMenuItem.addChild(new TF.RoutingMap.MenuItem({
 					isDevider: true
@@ -306,7 +307,7 @@
 					icon: 'delete',
 					data: menuItemData,
 					disable: disableDelete,
-					click: routingPaletteViewModel.fieldTripPaletteSection.eventsManager.deleteOneClick.bind(routingPaletteViewModel.fieldTripPaletteSection.eventsManager, fieldTripStop.id, trip.id)
+					click: eventsManager.deleteOneClick.bind(eventsManager, fieldTripStop.id, trip.id)
 				}));
 				contextMenuCategories.tripSessions.push(tempParentMenuItem);
 			}
@@ -855,7 +856,7 @@
 				});
 			}
 
-			if (TF.Helper.MapHelper.layerVisible(map, map.findLayerById("routingTripStopBoundaryLayer")) && routingPaletteViewModel.fieldTripPaletteSection.isShowMode())
+			if (TF.Helper.MapHelper.layerVisible(map, map.findLayerById("routingTripStopBoundaryLayer")) && routingPaletteViewModel.fieldTripPaletteSectionVM.isShowMode())
 			{
 				tripSessionResult = getGraphicLayerIntersects(map.findLayerById("routingTripStopBoundaryLayer"), extent);
 				var tripStopIds = tripSessionResult.map(x => x.TripStopId);
@@ -905,8 +906,8 @@
 		{
 
 			return Promise.all([
-				filterUnLockItems(routingPaletteViewModel.fieldTripPaletteSection.dataModel.tripLockData, tripSessionResult),
-				filterUnLockItems(routingPaletteViewModel.fieldTripPaletteSection.dataModel.tripLockData, tripPathResult),
+				filterUnLockItems(routingPaletteViewModel.fieldTripPaletteSectionVM.dataModel.tripLockData, tripSessionResult),
+				filterUnLockItems(routingPaletteViewModel.fieldTripPaletteSectionVM.dataModel.tripLockData, tripPathResult),
 				filterUnLockItems(travelScenariosPaletteViewModel.travelRegionsViewModel.dataModel.travelRegionLockData, travelRegionResult),
 			])
 				.then(function(items)

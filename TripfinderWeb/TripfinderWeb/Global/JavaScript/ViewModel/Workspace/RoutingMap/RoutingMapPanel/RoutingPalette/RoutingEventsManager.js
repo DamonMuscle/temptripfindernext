@@ -258,7 +258,7 @@
 	RoutingEventsManager.prototype._getLockedByOtherTrips = function()
 	{
 		var self = this;
-		var routeState = self.fieldTripPaletteSectionVM.viewModel.routeState;
+		var routeState = self.fieldTripPaletteSectionVM.routingPaletteVM.routeState;
 		return self.dataModel.tripLockData.getLockInfo().then(function(lockInfo)
 		{
 			return lockInfo.selfLockedList.filter(function(item)

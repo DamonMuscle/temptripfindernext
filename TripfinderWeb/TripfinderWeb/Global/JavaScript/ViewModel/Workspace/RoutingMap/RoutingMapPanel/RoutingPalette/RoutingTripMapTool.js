@@ -4,13 +4,13 @@
 	function RoutingTripMapTool(fieldTripPaletteSectionVM)
 	{
 		var self = this;
-		self._map = fieldTripPaletteSectionVM._viewModal._map;
+		self._map = fieldTripPaletteSectionVM.mapCanvasPage._map;
 		self.dataModel = fieldTripPaletteSectionVM.dataModel;
 		self._arcgis = tf.map.ArcGIS;
 		self.editModal = fieldTripPaletteSectionVM.editFieldTripStopModal;
-		self._viewModal = fieldTripPaletteSectionVM._viewModal;
+		self._viewModal = fieldTripPaletteSectionVM.mapCanvasPage;
 		self.viewModel = fieldTripPaletteSectionVM;
-		TF.RoutingMap.EsriTool.call(self, self._map, self._arcgis, fieldTripPaletteSectionVM.viewModel);
+		TF.RoutingMap.EsriTool.call(self, self._map, self._arcgis, fieldTripPaletteSectionVM.routingPaletteVM);
 
 		self.initialize();
 
@@ -199,7 +199,7 @@
 					self.dataModel.viewModel.drawTool._clearTempDrawing();
 				}
 				self.dataModel.viewModel.drawTool.stopTool.clearCandidateGraphics();
-				if (self.viewModel._viewModal.mode === 'Routing-Create')
+				if (self.viewModel.mapCanvasPage.mode === 'Routing-Create')
 				{
 					self.dataModel.viewModel.drawTool.create("point");
 				}
@@ -210,7 +210,7 @@
 					self.overlapDialog().then(function() 
 					{
 						self._clearTempDrawing();
-						if (self.viewModel._viewModal.mode === 'Routing-Create')
+						if (self.viewModel.mapCanvasPage.mode === 'Routing-Create')
 						{
 							self.dataModel.viewModel.drawTool.create("point");
 						}
@@ -226,7 +226,7 @@
 						if (self.editModal.showWalkout() && self.editModal.isShowWalkoutGuideType(lastType))
 						{
 							var travelScenarioId = self.dataModel.fieldTrips ? self.dataModel.fieldTrips[0].TravelScenarioId : 1;
-							var travelScenario = self._viewModal.travelScenariosPaletteViewModel.travelScenariosViewModel.dataModel.getTravelScenariosById(travelScenarioId);
+							var travelScenario = self.mapCanvasPage.travelScenariosPaletteViewModel.travelScenariosViewModel.dataModel.getTravelScenariosById(travelScenarioId);
 							const data = self.editModal.getWalkoutData();
 							self.stopPreviewTool.addPreview(graphic, data.walkoutDistance, data.distanceUnit, data.walkoutBuffer, data.bufferUnit,
 								self.editModal.walkoutType(), false, travelScenario);
@@ -363,7 +363,7 @@
 			}
 		});
 		self.selectionChange.notify(selectIds);
-		self._viewModal.setMode("", "Normal");
+		self.mapCanvasPage.setMode("", "Normal");
 	};
 
 	RoutingTripMapTool.prototype.redrawPath = function(trip)
@@ -999,7 +999,7 @@
 			});
 			self._studentCountLayer.visible = !!self._showAssignedStudentsCount;
 			self.refreshTripArrow();
-			self.viewModel._viewModal.geoSearchPaletteViewModel.childSections.TripStopSection.highlightedChangeSymbol();
+			self.viewModel.mapCanvasPage.geoSearchPaletteViewModel.childSections.TripStopSection.highlightedChangeSymbol();
 		});
 	};
 

@@ -2,15 +2,15 @@
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").BaseFieldTripStopEditModal = BaseFieldTripStopEditModal;
 
-	function BaseFieldTripStopEditModal(viewModel, template)
+	function BaseFieldTripStopEditModal(fieldTripPaletteSectionVM, template)
 	{
 		var self = this;
 		TF.RoutingMap.BaseEditModal.call(this, {
-			routingMapDocumentViewModel: viewModel._viewModal,
+			routingMapDocumentViewModel: fieldTripPaletteSectionVM.mapCanvasPage,
 			template: template
 		});
-		this.viewModel = viewModel;
-		this.dataModel = viewModel.dataModel;
+		this.viewModel = fieldTripPaletteSectionVM;
+		this.dataModel = fieldTripPaletteSectionVM.dataModel;
 		this.obIsMultipleCreate = ko.observable(false);
 		this.lastCreateData = null;
 		this.isReadOnly = ko.observable(false);
@@ -676,7 +676,7 @@
 			this.$form.data("bootstrapValidator").destroy();
 		}
 		this.onCloseEditModalEvent.notify();
-		this.viewModel._viewModal.onStopEditingEvent.notify();
+		this.viewModel.mapCanvasPage.onStopEditingEvent.notify();
 	};
 
 	BaseFieldTripStopEditModal.prototype.getAllHighlight = function()

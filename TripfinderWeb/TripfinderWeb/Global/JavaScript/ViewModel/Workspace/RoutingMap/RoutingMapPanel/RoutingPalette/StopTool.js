@@ -13,7 +13,7 @@
 			self.drawTool = drawTool;
 			self.dataModel = drawTool.dataModel;
 			self.viewModel = drawTool.viewModel;
-			self._viewModel = drawTool.viewModel._viewModal;
+			self._viewModel = drawTool.viewModel.mapCanvasPage;
 			self.editModal = drawTool.editModal;
 			self._map = drawTool._map;
 		}
