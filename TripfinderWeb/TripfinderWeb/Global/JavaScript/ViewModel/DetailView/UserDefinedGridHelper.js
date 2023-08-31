@@ -704,6 +704,11 @@
 				{
 					columnExtension = $.extend(columnExtension, { UnitTypeOfMeasureSupported: gridDefinition.UnitTypeOfMeasureSupported });
 				}
+
+				if (gridDefinition.UnitOfMeasureReverse)
+				{
+					columnExtension = $.extend(columnExtension, { UnitOfMeasureReverse: gridDefinition.UnitOfMeasureReverse });
+				}
 			}
 		}
 
