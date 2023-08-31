@@ -184,7 +184,7 @@
 	BaseFieldTripStopEditModal.prototype.initMap = function(stop)
 	{
 		var self = this;
-		var stopTool = self.dataModel.viewModel.drawTool.stopTool;
+		var stopTool = self.dataModel.fieldTripPaletteSectionVM.drawTool.stopTool;
 		if (!self.map)
 		{
 			var basemap = new tf.map.ArcGIS.Basemap({
@@ -754,12 +754,12 @@
 			{
 				self.pageLevelViewModel.clearError();
 				self.hide();
-				if (self.dataModel.viewModel.drawTool)
+				if (self.dataModel.fieldTripPaletteSectionVM.drawTool)
 				{
-					self.dataModel.viewModel.drawTool._previewLayer.removeAll();
-					self.dataModel.viewModel.drawTool._clearTempDrawing();
+					self.dataModel.fieldTripPaletteSectionVM.drawTool._previewLayer.removeAll();
+					self.dataModel.fieldTripPaletteSectionVM.drawTool._clearTempDrawing();
 				}
-				self.dataModel.viewModel.drawTool.stopTool.clearCandidateGraphics();
+				self.dataModel.fieldTripPaletteSectionVM.drawTool.stopTool.clearCandidateGraphics();
 				if (self.mode() == "new" && !self.obIsSearchCreate())
 				{
 					PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMap);
