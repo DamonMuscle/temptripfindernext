@@ -23,7 +23,8 @@
 		self.dataModel.onTripDisplayRefreshEvent.subscribe(self.onTripDisplayRefresh.bind(self));
 		self.dataModel.onOptimizeSequenceDiffRateChange.subscribe(self.showOptimizeInfo.bind(self));
 		self.dataModel.onShowChartChangeEvent.subscribe(self.onShowChartChange.bind(self));
-		self.dataModel.onSchoolLocationChangeEvent.subscribe(self.onSchoolLocationChange.bind(self));
+		// remove bindSchoolLocation codes
+		// self.dataModel.onSchoolLocationChangeEvent.subscribe(self.onSchoolLocationChange.bind(self));
 		self.dataModel.onTripSaveEvent.subscribe(self.onTripSaveEvent.bind(self));
 
 		self.routingDisplayFixTitle = new TF.RoutingMap.RoutingPalette.RoutingDisplayFixTitle();
@@ -655,11 +656,13 @@
 				$($(e.target).closest(".k-item")[0]).attr('suspend', 'false');
 			}
 			kendoTreeView.toggle($(e.target).closest(".k-item"));
-			var dataTemp = self.treeview.dataItem($(e.target).closest('li'));
-			if (dataTemp && dataTemp.customData && dataTemp.customData.isTrip)
-			{
-				self.fixSchoolNodeStyle($(e.target).closest('li'));
-			}
+
+			// remove bindSchoolLocation codes
+			// var dataTemp = self.treeview.dataItem($(e.target).closest('li'));
+			// if (dataTemp && dataTemp.customData && dataTemp.customData.isTrip)
+			// {
+			// 	self.fixSchoolNodeStyle($(e.target).closest('li'));
+			// }
 		});
 
 		routingtreeview.data("kendoTreeView").templates.dragClue = kendo.template("No. #=data.item.customData.sequence?data.item.customData.sequence:''#, #=data.item.text#<div style='padding-left:20px'>Field Trip: #=item.customData.tripName?item.customData.tripName:''#</div>");
@@ -689,7 +692,8 @@
 	RoutingDisplay.prototype.bindEventAndCustomElement = function()
 	{
 		this.bindEvent();
-		this.bindSchoolLocation();
+		// remove bindSchoolLocation codes
+		// this.bindSchoolLocation();
 	};
 
 	RoutingDisplay.prototype.setLineColorAndStyle = function(nodeElement)
@@ -718,160 +722,157 @@
 		self.obFooterDisplay(`${tripCount} ${self.routingDisplayHelper.getSingleOrMultiple(tripCount, 'Field Trip')}, ${tripStopCount} ${self.routingDisplayHelper.getSingleOrMultiple(tripStopCount, 'Field Trip Stop')}`);
 	}
 
-	RoutingDisplay.prototype.initSchoolLocationDropDownList = function(schoolLocationContainer, tripStop)
-	{
-		var schoolLocations = $.extend(true, [], this.dataModel.getSchoolLocationsBySchoolCode(tripStop.SchoolCode));
-		if (schoolLocations.length == 0)
-		{
-			return;
-		}
-		if (tripStop.SchoolLocation != null)
-		{
-			tripStop.SchoolLocation = schoolLocations.filter(function(schoolLocation) { return schoolLocation.Id == tripStop.SchoolLocation.Id })[0];
-		}
-		schoolLocations = schoolLocations.concat([{ Id: -1, Name: 'divide-line' }, { Id: -1, Name: 'School Location' }]);
-		var obSchoolLocations = ko.observable(schoolLocations);
-		var schoolLocationSelectTemplate = function(Name)
-		{
-			if (Name != 'divide-line')
-			{
-				return "<a href=\"#\" role=\"option\" >" + Name + "</a>";
-			}
-			else
-			{
-				return "<div style=\"border-top:1px solid;margin-left: 8px;\"></div>";
-			}
-		}
+	// remove bindSchoolLocation codes
+	// RoutingDisplay.prototype.initSchoolLocationDropDownList = function(schoolLocationContainer, tripStop)
+	// {
+	// 	var schoolLocations = $.extend(true, [], this.dataModel.getSchoolLocationsBySchoolCode(tripStop.SchoolCode));
+	// 	if (schoolLocations.length == 0)
+	// 	{
+	// 		return;
+	// 	}
+	// 	if (tripStop.SchoolLocation != null)
+	// 	{
+	// 		tripStop.SchoolLocation = schoolLocations.filter(function(schoolLocation) { return schoolLocation.Id == tripStop.SchoolLocation.Id })[0];
+	// 	}
+	// 	schoolLocations = schoolLocations.concat([{ Id: -1, Name: 'divide-line' }, { Id: -1, Name: 'School Location' }]);
+	// 	var obSchoolLocations = ko.observable(schoolLocations);
+	// 	var schoolLocationSelectTemplate = function(Name)
+	// 	{
+	// 		if (Name != 'divide-line')
+	// 		{
+	// 			return "<a href=\"#\" role=\"option\" >" + Name + "</a>";
+	// 		}
+	// 		else
+	// 		{
+	// 			return "<div style=\"border-top:1px solid;margin-left: 8px;\"></div>";
+	// 		}
+	// 	}
 
-		var obSelectedSchoolLocation = ko.observable(tripStop.SchoolLocation != null ? tripStop.SchoolLocation.Id : -1);
-		var obSelectedSchoolLocationText = ko.observable(tripStop.SchoolLocation != null ? tripStop.SchoolLocation.Name : 'School Location');
-		var source = { obSchoolLocations: obSchoolLocations, obSelectedSchoolLocation: obSelectedSchoolLocation, obSelectedSchoolLocationText: obSelectedSchoolLocationText, schoolLocationSelectTemplate: schoolLocationSelectTemplate }
-		var schoolLocationDom = $('<div class="input-group" ' + (tripStop.OpenType == 'View' ? 'style="opacity:0.5"' : '') + '><div data-bind="typeahead:{source:obSchoolLocations,format:function(obj){return obj.Name;},template:schoolLocationSelectTemplate,drowDownShow:true,selectedValue:obSelectedSchoolLocation ,notSort:true}" ><input data-bind="value:obSelectedSchoolLocationText" class="form-control" readonly="true" ' +
-			(tripStop.OpenType == 'View' ? 'disabled="disabled"' : '') + ' data-notTriggerOtherEvent="true"></div>'
-			+ '<div class="input-group-btn"><button type="button" class="btn btn-default btn-sharp"><span class="caret"></span></button></div></div>')
-		ko.applyBindings(source, schoolLocationDom[0]);
-		schoolLocationContainer.append(schoolLocationDom[0]);
-		obSelectedSchoolLocationText.subscribe(this.bindSchoolLocationValue.bind(this, obSchoolLocations, obSelectedSchoolLocation, tripStop));
-	};
+	// 	var obSelectedSchoolLocation = ko.observable(tripStop.SchoolLocation != null ? tripStop.SchoolLocation.Id : -1);
+	// 	var obSelectedSchoolLocationText = ko.observable(tripStop.SchoolLocation != null ? tripStop.SchoolLocation.Name : 'School Location');
+	// 	var source = { obSchoolLocations: obSchoolLocations, obSelectedSchoolLocation: obSelectedSchoolLocation, obSelectedSchoolLocationText: obSelectedSchoolLocationText, schoolLocationSelectTemplate: schoolLocationSelectTemplate }
+	// 	var schoolLocationDom = $('<div class="input-group" ' + (tripStop.OpenType == 'View' ? 'style="opacity:0.5"' : '') + '><div data-bind="typeahead:{source:obSchoolLocations,format:function(obj){return obj.Name;},template:schoolLocationSelectTemplate,drowDownShow:true,selectedValue:obSelectedSchoolLocation ,notSort:true}" ><input data-bind="value:obSelectedSchoolLocationText" class="form-control" readonly="true" ' +
+	// 		(tripStop.OpenType == 'View' ? 'disabled="disabled"' : '') + ' data-notTriggerOtherEvent="true"></div>'
+	// 		+ '<div class="input-group-btn"><button type="button" class="btn btn-default btn-sharp"><span class="caret"></span></button></div></div>')
+	// 	ko.applyBindings(source, schoolLocationDom[0]);
+	// 	schoolLocationContainer.append(schoolLocationDom[0]);
+	// 	obSelectedSchoolLocationText.subscribe(this.bindSchoolLocationValue.bind(this, obSchoolLocations, obSelectedSchoolLocation, tripStop));
+	// };
+	// RoutingDisplay.prototype.onSchoolLocationChange = function()
+	// {
+	// 	var self = this;
+	// 	self.dataModel._getSchoolLocations(self.dataModel.fieldTrips).then(function()
+	// 	{
+	// 		self.bindSchoolLocation();
+	// 	});
+	// };
+	// RoutingDisplay.prototype.bindSchoolLocationValue = function(obSchoolLocations, obSelectedSchoolLocation, tripStop)
+	// {
+	// 	if (tripStop.SchoolLocation != null && tripStop.SchoolLocation.Id == obSelectedSchoolLocation().Id)
+	// 	{
+	// 		return;
+	// 	}
+	// 	var self = this;
+	// 	tripStop = $.extend({}, tripStop);
+	// 	if (obSelectedSchoolLocation().Id == -1)
+	// 	{
+	// 		tripStop.SchoolLocation = null;
+	// 	} else
+	// 	{
+	// 		tripStop.SchoolLocation = obSchoolLocations().filter(function(location)
+	// 		{
+	// 			return location.Id == obSelectedSchoolLocation().Id;
+	// 		})[0];
+	// 	}
 
-	RoutingDisplay.prototype.onSchoolLocationChange = function()
-	{
-		var self = this;
-		self.dataModel._getSchoolLocations(self.dataModel.fieldTrips).then(function()
-		{
-			self.bindSchoolLocation();
-		});
-	};
+	// 	tripStop.StreetSegment = null;
+	// 	self.dataModel.fieldTripStopDataModel.update([tripStop], true);
+	// };
+	// RoutingDisplay.prototype.fixSchoolNodeStyle = function(nodeElement)
+	// {
+	// 	var self = this, $schoolNodeElements;
+	// 	if (!nodeElement)
+	// 	{
+	// 		var routingtreeview = self.viewModel.$element.find("#routingtreeview");
+	// 		$schoolNodeElements = routingtreeview.find(".school-row");
+	// 	}
+	// 	else
+	// 	{
+	// 		$schoolNodeElements = nodeElement.find(".school-row");
+	// 	}
+	// 	$schoolNodeElements.map(function()
+	// 	{
+	// 		var el = $(this);
+	// 		var data = self.treeview.dataItem(el);
+	// 		var trip = self.dataModel.getFieldTripById(data.customData.tripId);
+	// 		if (!trip)
+	// 		{
+	// 			return;
+	// 		}
+	// 		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(trip.id, 'trip', self.treeview.dataSource);
+	// 		if (!tripNode.expanded)
+	// 		{
+	// 			return;
+	// 		}
 
-	RoutingDisplay.prototype.bindSchoolLocationValue = function(obSchoolLocations, obSelectedSchoolLocation, tripStop)
-	{
-		if (tripStop.SchoolLocation != null && tripStop.SchoolLocation.Id == obSelectedSchoolLocation().Id)
-		{
-			return;
-		}
-		var self = this;
-		tripStop = $.extend({}, tripStop);
-		if (obSelectedSchoolLocation().Id == -1)
-		{
-			tripStop.SchoolLocation = null;
-		} else
-		{
-			tripStop.SchoolLocation = obSchoolLocations().filter(function(location)
-			{
-				return location.Id == obSelectedSchoolLocation().Id;
-			})[0];
-		}
+	// 		var schoolLine = el.find(".sequence-line.school-line"),
+	// 			insertStartArea = el.find(".insert-front-stops-area"),
+	// 			insertIcon = el.find(".insert-icon"),
+	// 			insertEndArea = el.find(".insert-behind-stops-area");
+	// 		schoolLine.css("lineHeight", 0);
+	// 		var totalHeight = el.height();
 
-		tripStop.StreetSegment = null;
-		self.dataModel.fieldTripStopDataModel.update([tripStop], true);
-	};
+	// 		if (totalHeight % 2 == 1)
+	// 		{
+	// 			totalHeight = totalHeight + 1;
+	// 		}
+	// 		schoolLine.css("lineHeight", totalHeight + 'px');
+	// 		insertStartArea.css("height", (totalHeight - 29) / 2 + 'px');
+	// 		insertIcon.css("top", totalHeight - 15 + 'px');
+	// 		insertEndArea.css("height", (totalHeight - 29) / 2 + 'px');
+	// 		insertEndArea.css("top", totalHeight / 2 + 15 + 'px');
+	// 	});
+	// };
+	// RoutingDisplay.prototype.bindSchoolLocation = function(nodeElement)
+	// {
+	// 	var self = this, $schoolLocationElements, data, tripStop;
+	// 	if (!nodeElement)
+	// 	{
+	// 		var routingtreeview = self.viewModel.$element.find("#routingtreeview");
+	// 		$schoolLocationElements = routingtreeview.find(".school-location");
+	// 	}
+	// 	else
+	// 	{
+	// 		$schoolLocationElements = nodeElement.find(".school-location");
+	// 	}
+	// 	$schoolLocationElements.map(function(index, schoolLocationContainer)
+	// 	{
+	// 		if (nodeElement)
+	// 		{
+	// 			data = self.treeview.dataItem(nodeElement);
+	// 		}
+	// 		else
+	// 		{
+	// 			data = self.treeview.dataItem(schoolLocationContainer.closest('li'));
+	// 		}
+	// 		if (data && data.id)
+	// 		{
+	// 			tripStop = self.dataModel.getFieldTripStopByStopId(data.id);
+	// 			if (isNullObj(tripStop) || (tripStop && IsEmptyString(tripStop.SchoolCode)))
+	// 			{
+	// 				return;
+	// 			}
+	// 		}
 
-	RoutingDisplay.prototype.fixSchoolNodeStyle = function(nodeElement)
-	{
-		var self = this, $schoolNodeElements;
-		if (!nodeElement)
-		{
-			var routingtreeview = self.viewModel.$element.find("#routingtreeview");
-			$schoolNodeElements = routingtreeview.find(".school-row");
-		}
-		else
-		{
-			$schoolNodeElements = nodeElement.find(".school-row");
-		}
-		$schoolNodeElements.map(function()
-		{
-			var el = $(this);
-			var data = self.treeview.dataItem(el);
-			var trip = self.dataModel.getFieldTripById(data.customData.tripId);
-			if (!trip)
-			{
-				return;
-			}
-			var tripNode = self.routingDisplayHelper.getExpandedTreeNode(trip.id, 'trip', self.treeview.dataSource);
-			if (!tripNode.expanded)
-			{
-				return;
-			}
+	// 		if ($(schoolLocationContainer).find('.input-group').length != 0)
+	// 		{
+	// 			$(schoolLocationContainer).empty();
+	// 		}
+	// 		self.initSchoolLocationDropDownList.call(self, schoolLocationContainer, tripStop);
+	// 	});
 
-			var schoolLine = el.find(".sequence-line.school-line"),
-				insertStartArea = el.find(".insert-front-stops-area"),
-				insertIcon = el.find(".insert-icon"),
-				insertEndArea = el.find(".insert-behind-stops-area");
-			schoolLine.css("lineHeight", 0);
-			var totalHeight = el.height();
-
-			if (totalHeight % 2 == 1)
-			{
-				totalHeight = totalHeight + 1;
-			}
-			schoolLine.css("lineHeight", totalHeight + 'px');
-			insertStartArea.css("height", (totalHeight - 29) / 2 + 'px');
-			insertIcon.css("top", totalHeight - 15 + 'px');
-			insertEndArea.css("height", (totalHeight - 29) / 2 + 'px');
-			insertEndArea.css("top", totalHeight / 2 + 15 + 'px');
-		});
-	};
-
-	RoutingDisplay.prototype.bindSchoolLocation = function(nodeElement)
-	{
-		var self = this, $schoolLocationElements, data, tripStop;
-		if (!nodeElement)
-		{
-			var routingtreeview = self.viewModel.$element.find("#routingtreeview");
-			$schoolLocationElements = routingtreeview.find(".school-location");
-		}
-		else
-		{
-			$schoolLocationElements = nodeElement.find(".school-location");
-		}
-		$schoolLocationElements.map(function(index, schoolLocationContainer)
-		{
-			if (nodeElement)
-			{
-				data = self.treeview.dataItem(nodeElement);
-			}
-			else
-			{
-				data = self.treeview.dataItem(schoolLocationContainer.closest('li'));
-			}
-			if (data && data.id)
-			{
-				tripStop = self.dataModel.getFieldTripStopByStopId(data.id);
-				if (isNullObj(tripStop) || (tripStop && IsEmptyString(tripStop.SchoolCode)))
-				{
-					return;
-				}
-			}
-
-			if ($(schoolLocationContainer).find('.input-group').length != 0)
-			{
-				$(schoolLocationContainer).empty();
-			}
-			self.initSchoolLocationDropDownList.call(self, schoolLocationContainer, tripStop);
-		});
-
-		self.fixSchoolNodeStyle(nodeElement);
-	}
+	// 	self.fixSchoolNodeStyle(nodeElement);
+	// }
 
 	RoutingDisplay.prototype.bindEvent = function()
 	{
@@ -1730,10 +1731,11 @@
 			nodeElement.find('.avg-speed').off('click').on('click', avgSpeedClick.bind(self));
 			nodeElement.find('.icon.lock-time').off('click').on('click', setLockTimeClick.bind(self));
 
-			if (tripStopData && tripStopData.SchoolCode)
-			{
-				self.bindSchoolLocation(nodeElement);
-			}
+			// remove bindSchoolLocation codes
+			// if (tripStopData && tripStopData.SchoolCode)
+			// {
+			// 	self.bindSchoolLocation(nodeElement);
+			// }
 		}
 	}
 
@@ -2376,7 +2378,9 @@
 		Promise.resolve(self.getDataSource(data)).then(function()
 		{
 			self.afterDataSourceBinding(data);
-			PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.Change, {...data, onCompleted: ()=> tf.loadingIndicator.tryHide() });
+			PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.Change, {...data, onCompleted: ()=> { 
+				tf.loadingIndicator.tryHide(); 
+			}});
 		});
 	}
 

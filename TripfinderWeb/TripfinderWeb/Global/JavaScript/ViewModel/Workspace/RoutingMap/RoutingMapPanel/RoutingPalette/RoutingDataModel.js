@@ -44,7 +44,8 @@
 		self.onTrialStopWalkoutPreviewChange = new TF.Events.Event();
 		self.onOptimizeSequenceDiffRateChange = new TF.Events.Event();
 		self.onShowChartChangeEvent = new TF.Events.Event();
-		self.onSchoolLocationChangeEvent = new TF.Events.Event();
+		// remove bindSchoolLocation codes
+		// self.onSchoolLocationChangeEvent = new TF.Events.Event();
 		self.onTripTreeColorChangeEvent = new TF.Events.Event();
 		self.onTripPathLineDisplayChangeEvent = new TF.Events.Event();
 
@@ -66,7 +67,8 @@
 
 		self.stopPathChange = self.stopPathChange.bind(this);
 		PubSub.subscribe(topicCombine(pb.DATA_CHANGE, "stoppath"), this.stopPathChange);
-		this.onSchoolLocationDataSourceChange = this.onSchoolLocationDataSourceChange.bind(this);
+		// remove bindSchoolLocation codes
+		// this.onSchoolLocationDataSourceChange = this.onSchoolLocationDataSourceChange.bind(this);
 		this.fieldTripEditBroadcast = new TF.RoutingMap.RoutingPalette.FieldTripEditBroadcast(this);
 		this.needUpdateTrip = ko.observable(true);
 		this.needUpdateTripColor = ko.observable(false);
@@ -97,7 +99,9 @@
 		var self = this;
 		// this.fieldTripEditBroadcast.init();
 		// self.subscribeStreetChange();
-		self.mapCanvasPage.onUpdateRecordsEvent.subscribe(this.onSchoolLocationDataSourceChange);
+		
+		// remove bindSchoolLocation codes
+		// self.mapCanvasPage.onUpdateRecordsEvent.subscribe(this.onSchoolLocationDataSourceChange);
 
 		return Promise.all([self.setUserProfileTripColor()]).then(function()
 		{
@@ -2732,14 +2736,15 @@
 		return pointGraphic.attributes.dataModel.boundary.id;
 	};
 
-	RoutingDataModel.prototype.onSchoolLocationDataSourceChange = function(e, data)
-	{
-		var isSchoolLocationChanged = Enumerable.From(data.UpdatedRecords).Any(function(c) { return c.Type == "SchoolLocation"; });
-		if (isSchoolLocationChanged && this.fieldTrips.length > 0)
-		{
-			this.onSchoolLocationChangeEvent.notify();
-		}
-	};
+	// remove bindSchoolLocation codes
+	// RoutingDataModel.prototype.onSchoolLocationDataSourceChange = function(e, data)
+	// {
+	// 	var isSchoolLocationChanged = Enumerable.From(data.UpdatedRecords).Any(function(c) { return c.Type == "SchoolLocation"; });
+	// 	if (isSchoolLocationChanged && this.fieldTrips.length > 0)
+	// 	{
+	// 		this.onSchoolLocationChangeEvent.notify();
+	// 	}
+	// };
 
 	RoutingDataModel.prototype.validateName = function(name, id)
 	{
@@ -2827,8 +2832,9 @@
 		self.onWalkTSRestrictionChangeEvent.unsubscribeAll();
 		// self.streetDataModel.onStreetModifyEvent.unsubscribe(self.onStreetModifyEvent);
 		self.onShowChartChangeEvent.unsubscribeAll();
-		self.mapCanvasPage.onUpdateRecordsEvent.unsubscribe(self.onSchoolLocationDataSourceChange);
-		self.onSchoolLocationChangeEvent.unsubscribeAll();
+		// remove bindSchoolLocation codes
+		// self.mapCanvasPage.onUpdateRecordsEvent.unsubscribe(self.onSchoolLocationDataSourceChange);
+		// self.onSchoolLocationChangeEvent.unsubscribeAll();
 		PubSub.unsubscribe(self.stopPathChange);
 		self.tripLockData.dispose();
 		self.fieldTripStopDataModel.dispose();
