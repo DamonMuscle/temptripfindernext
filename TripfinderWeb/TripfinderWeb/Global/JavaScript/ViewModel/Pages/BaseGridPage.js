@@ -139,7 +139,7 @@
 					self.obCanCopyFieldTrip(false);
 					self.obCanDeleteRecord(false);
 
-					if(self.obShowDetailPanel() || self.obShowFieldTripDEPanel())
+					if((self.obShowDetailPanel() || self.obShowFieldTripDEPanel()) && !self.obNewRequest())
 					{
 						tf.pageManager.resizablePage.closeRightPage();
 					}
