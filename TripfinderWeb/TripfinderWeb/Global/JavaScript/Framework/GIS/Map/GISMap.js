@@ -17,6 +17,15 @@
 		POLYGON: "polygon"
 	};
 
+	const CURSOR_TYPE = {
+		DEFAULT: "default",
+		POINTER: "pointer",
+		CROSSHAIR: "crosshair",
+		PIN: "pin",
+		LOCATE_LIGHT: "locate-white",
+		LOCATE_DARK: "locate",
+	};
+
 	const defaultOptions = {
 		baseMapId: "streets-vector",
 		center: [-73.9412, 42.8123],
@@ -47,6 +56,7 @@
 			onMapViewCreatedPromise: null,
 			onMapViewClick: null,
 			onMapViewDoubleClick: null,
+			onMapViewDrag: null,
 			onMapViewPointerMove: null,
 			onMapViewUpdated: null,
 			onMapViewUpdating: null,
@@ -64,6 +74,7 @@
 
 		this.onMapViewClickEvent = new TF.Events.Event();
 		this.onMapViewDoubleClickEvent = new TF.Events.Event();
+		this.onMapViewDragEvent = new TF.Events.Event();
 		this.onMapViewPointerMoveEvent = new TF.Events.Event();
 		this.onMapViewExtentChangeEvent = new TF.Events.Event();
 		this.onMapViewScaleChangeEvent = new TF.Events.Event();
@@ -304,6 +315,11 @@
 			self.onMapViewDoubleClickEvent.notify({ event });
 		});
 
+		self.eventHandler.onMapViewDrag = mapView.on("drag", (event) =>
+		{
+			self.onMapViewDragEvent.notify({ event });
+		});
+
 		self.eventHandler.onMapViewUpdating = mapView.watch('updating', (event) =>
 		{
 			self.onMapViewUpdatingEvent.notify({ event });
@@ -388,51 +404,13 @@
 
 		self.onMapViewClickEvent?.unsubscribeAll();
 		self.onMapViewDoubleClickEvent?.unsubscribeAll();
+		self.onMapViewDragEvent?.unsubscribeAll();
 		self.onMapViewPointerMoveEvent?.unsubscribeAll();
 		self.onMapViewExtentChangeEvent?.unsubscribeAll();
 		self.onMapViewScaleChangeEvent?.unsubscribeAll();
 		self.onMapViewKeyUpEvent?.unsubscribeAll();
 		self.onMapViewMouseWheelEvent?.unsubscribeAll();
 		self.onMapViewUpdatingEvent?.unsubscribeAll();
-	}
-
-	Map.prototype.getMapCursor = function()
-	{
-		return this.map.mapView.container.style.cursor;
-	}
-
-	Map.prototype.setMapCursor = function(cursorType)
-	{
-		const availableCursorTypes = ["default", "locate", "locate-white", "pin", "pointer", "crosshair"];
-
-		$(this.map.mapView.container).removeClass("pin-cursor");
-
-		let cursor = null;
-		switch (cursorType)
-		{
-			case "locate":
-				cursor = "url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAaCAYAAAC+aNwHAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAABZ0lEQVQ4y5WTMUsDQRCFvztSWBhr8Rek0EqslCg6oAYEwdY6tV1AbASxyd+wsRAECwmMYEArsdLCzk5SexZpJBbZC3tzt3fnwBX75r2ZtztzESZE5BA4AnaBOQePgQFwo6q3Pj/yhAvAFXBAedwBx6r6PSsgIvPAC9CiXnwAa6r6EzvgOiD+dZ+NltMQicgecG8II+AUeHTnLeASWDS8/QbQLRCvquqXh32KyAB4NUW6MdA2BXpGDIDDegZux0DTAyZMxxWKgeOk0YwLSJOSArlcDCTeOQI6JQU6eLsDJDEwNKS+iCxZpcP6Bh5GIrINPJjECDjzim8CF+THuJNu4hOwXnLnqCD3rKob6SOeB+4cBcQzjf8zvQHL1It3VV2B6RTS6NUUZ7gZezVdzLpbB3VdZDi5B6pwkele5KDKRS5XOKKAi1z3kIOQi0JnoSWxLgq7lzmwHf+zIxkXiYgkZZxGRY2TqiZ/HZNl0jX5bvAAAAAASUVORK5CYII=\") 8 24, auto";
-				break;
-			case "locate-white":
-				cursor = "url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAaCAYAAAC+aNwHAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAABC0lEQVQ4y5WSMapCQQxFo/xSbAU74a9EEORVrkAQN+Cefq2F4A7cwStcgqBWvkoQj80MDPmTybwLKSZzc3MnGREFYAX8ATfgGeIWciuxAIyBIz6OwFgXj4BLRXHEBRilAieD+A6RwykWLzOXV2ADzEJsQk5jKcAhUzzNzGiaETkI8FDJdWHQa8V9CPBKEh9gUhCYBE7Ea5jjiY1/d0MR6ZLzQESagkATOBGdAHv1rnthiHfF3QswN9a4BX5DbI01zqP62fgsHzW0FOfU3oL+WOg3tj2K29yOmx4C+U1VumjFQqWL0j9xXbTiwXHRuAIFF353x0Vdd8NFfXfDRb/uiUgHdCXOj6Ox85p8Aa3WhV7ZByO1AAAAAElFTkSuQmCC\") 8 24, auto";
-				break;
-			case "pin":
-				cursor = "pin";
-				$(this.map.mapView.container).addClass("pin-cursor");
-				break;
-			case "pointer":
-			case "crosshair":
-			default:
-				cursor = cursorType;
-				break;
-		}
-
-		this.map.mapView.container.style.cursor = cursor;
-
-		if (availableCursorTypes.indexOf(cursorType) >= 0)
-		{
-			$(this.map.mapView.container).find(".esri-view-surface[data-interacting='true']").attr("data-interacting", false);
-		}
 	}
 
 	Map.prototype.addLayer = function(options, layerType = LAYER_TYPE.GRAPHIC)
@@ -772,6 +750,74 @@
 	{
 		this.map.mapView.popup.close();
 	}
+
+	Map.prototype.toMapPoint = function(x, y)
+	{
+		return this.map.mapView.toMap({ x, y});
+	}
+
+	//#region Map Cursor
+
+	Map.prototype.getMapCursor = function()
+	{
+		return this.map.mapView.container.style.cursor;
+	}
+
+	Map.prototype.setDefaultCursor = function()
+	{
+		this._setMapCursor(CURSOR_TYPE.DEFAULT);
+	}
+
+	Map.prototype.setPointerCursor = function()
+	{
+		this._setMapCursor(CURSOR_TYPE.POINTER);
+	}
+
+	Map.prototype.setCrosshairCursor = function()
+	{
+		this._setMapCursor(CURSOR_TYPE.CROSSHAIR);
+	}
+
+	Map.prototype._setMapCursor = function(cursorType)
+	{
+		if (this.getMapCursor() === cursorType)
+		{
+			return;
+		}
+
+		const availableCursorTypes = [CURSOR_TYPE.DEFAULT, CURSOR_TYPE.LOCATE_DARK, CURSOR_TYPE.LOCATE_LIGHT, CURSOR_TYPE.PIN, CURSOR_TYPE.POINTER, CURSOR_TYPE.CROSSHAIR];
+
+		$(this.map.mapView.container).removeClass("pin-cursor");
+
+		let cursor = null;
+		switch (cursorType)
+		{
+			case CURSOR_TYPE.LOCATE_DARK:
+				cursor = "url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAaCAYAAAC+aNwHAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAABZ0lEQVQ4y5WTMUsDQRCFvztSWBhr8Rek0EqslCg6oAYEwdY6tV1AbASxyd+wsRAECwmMYEArsdLCzk5SexZpJBbZC3tzt3fnwBX75r2ZtztzESZE5BA4AnaBOQePgQFwo6q3Pj/yhAvAFXBAedwBx6r6PSsgIvPAC9CiXnwAa6r6EzvgOiD+dZ+NltMQicgecG8II+AUeHTnLeASWDS8/QbQLRCvquqXh32KyAB4NUW6MdA2BXpGDIDDegZux0DTAyZMxxWKgeOk0YwLSJOSArlcDCTeOQI6JQU6eLsDJDEwNKS+iCxZpcP6Bh5GIrINPJjECDjzim8CF+THuJNu4hOwXnLnqCD3rKob6SOeB+4cBcQzjf8zvQHL1It3VV2B6RTS6NUUZ7gZezVdzLpbB3VdZDi5B6pwkele5KDKRS5XOKKAi1z3kIOQi0JnoSWxLgq7lzmwHf+zIxkXiYgkZZxGRY2TqiZ/HZNl0jX5bvAAAAAASUVORK5CYII=\") 8 24, auto";
+				break;
+			case CURSOR_TYPE.LOCATE_LIGHT:
+				cursor = "url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAaCAYAAAC+aNwHAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAABC0lEQVQ4y5WSMapCQQxFo/xSbAU74a9EEORVrkAQN+Cefq2F4A7cwStcgqBWvkoQj80MDPmTybwLKSZzc3MnGREFYAX8ATfgGeIWciuxAIyBIz6OwFgXj4BLRXHEBRilAieD+A6RwykWLzOXV2ADzEJsQk5jKcAhUzzNzGiaETkI8FDJdWHQa8V9CPBKEh9gUhCYBE7Ea5jjiY1/d0MR6ZLzQESagkATOBGdAHv1rnthiHfF3QswN9a4BX5DbI01zqP62fgsHzW0FOfU3oL+WOg3tj2K29yOmx4C+U1VumjFQqWL0j9xXbTiwXHRuAIFF353x0Vdd8NFfXfDRb/uiUgHdCXOj6Ox85p8Aa3WhV7ZByO1AAAAAElFTkSuQmCC\") 8 24, auto";
+				break;
+			case CURSOR_TYPE.PIN:
+				cursor = CURSOR_TYPE.PIN;
+				$(this.map.mapView.container).addClass("pin-cursor");
+				break;
+			case CURSOR_TYPE.POINTER:
+			case CURSOR_TYPE.CROSSHAIR:
+			default:
+				cursor = cursorType;
+				break;
+		}
+
+		this.map.mapView.container.style.cursor = cursor;
+
+		if (availableCursorTypes.indexOf(cursorType) >= 0)
+		{
+			$(this.map.mapView.container).find(".esri-view-surface[data-interacting='true']").attr("data-interacting", false);
+		}
+	}
+
+	//#endregion
 
 	Map.prototype.dispose = function()
 	{

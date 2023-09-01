@@ -586,7 +586,7 @@
 		if (!this.editing.isAddingStop)
 		{
 			this.editing.isAddingStop = true;
-			this.mapInstance.setMapCursor("crosshair");
+			this.mapInstance.setCrosshairCursor();
 		}
 	}
 
@@ -595,7 +595,7 @@
 		if (this.editing.isAddingStop)
 		{
 			this.editing.isAddingStop = false;
-			this.mapInstance.setMapCursor("default");
+			this.mapInstance.setDefaultCursor();
 		}
 	}
 
@@ -1188,6 +1188,8 @@
 			feature.visible = fieldTrip?.visible;
 		}
 	}
+
+	//#endregion
 
 	//#endregion
 

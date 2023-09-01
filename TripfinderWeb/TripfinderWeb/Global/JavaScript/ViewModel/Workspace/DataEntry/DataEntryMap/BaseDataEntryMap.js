@@ -166,14 +166,19 @@
 		if (self.RoutingMapTool?.measurementTool?.isActive ||
 			self.RoutingMapTool?.googleStreetTool?.isActive)
 		{
-			const cursor = "crosshair";
-			mapInstance.setMapCursor(cursor);
+			mapInstance.setCrosshairCursor();
 			return;
 		}
 
 		const graphics = await mapInstance.findFeaturesByHitTest(event, ManuallyPinLayerId);
-		const cursor = graphics.length > 0 ? "pointer" : "default";
-		mapInstance.setMapCursor(cursor);
+		if (graphics.length > 0)
+		{
+			mapInstance.setPointerCursor();
+		}
+		else
+		{
+			mapInstance.setDefaultCursor();
+		}
 	}
 
 	BaseDataEntryMap.prototype._initMapTool = function(mapToolOptions, hasManuallyPin)

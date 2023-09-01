@@ -499,14 +499,19 @@
 		if (self.RoutingMapTool?.measurementTool?.isActive ||
 			self.RoutingMapTool?.googleStreetTool?.isActive)
 		{
-			const cursor = "crosshair";
-			self.mapInstance.setMapCursor(cursor);
+			self.mapInstance.setCrosshairCursor();
 			return;
 		}
 
 		const graphics = await self.mapInstance.findFeaturesByHitTest(event, LocationGridLayerId);
-		const cursor = graphics.length > 0 ? "pointer" : "default";
-		self.mapInstance.setMapCursor(cursor);
+		if (graphics.length > 0)
+		{
+			self.mapInstance.setPointerCursor();
+		}
+		else
+		{
+			self.mapInstance.setDefaultCursor();
+		}
 	}
 
 	LocationPage.prototype.refreshClick = function()
