@@ -474,6 +474,39 @@
 		return layerInstance;
 	}
 
+	Map.prototype.enableRightDoubleClickToZoomOut = function()
+	{
+		const self = this;
+		const calculatePreviousZoomLevelExtent = (extent) =>
+		{
+			const width = extent.width,
+				height = extent.height,
+				center = extent.center,
+				previousExtent = new TF.GIS.SDK.Extent({
+					xmin: center.x - width,
+					xmax: center.x + width,
+					ymin: center.y - height,
+					ymax: center.y + height,
+					spatialReference: {
+						wkid: WKID_WEB_MERCATOR
+					}
+				});
+			return previousExtent;
+		};
+
+		self.onMapViewDoubleClickEvent.subscribe((_, data) =>
+		{
+			const { event } = data;
+			if (event.button === 2)
+			{
+				const extent = self.getExtent(),
+					zoomOutExtent = calculatePreviousZoomLevelExtent(extent);
+				// add animation for zoom out.
+				self.goTo(zoomOutExtent);
+			}
+		});
+	}
+
 	Map.prototype.addLayerInstance = function(layerInstance, options)
 	{
 		if (this.map === null)
@@ -741,8 +774,8 @@
 		{
 			return graphics;
 		}
-		
-		const layerFeatures = graphics.filter(item => item.layer.id === layerId);
+
+		const layerFeatures = graphics.filter(item => item.layer?.id === layerId);
 		return layerFeatures;
 	}
 
@@ -797,6 +830,11 @@
 	Map.prototype.setCrosshairCursor = function()
 	{
 		this._setMapCursor(CURSOR_TYPE.CROSSHAIR);
+	}
+
+	Map.prototype.isPointerCursor = function()
+	{
+		return this.getMapCursor() === CURSOR_TYPE.POINTER;
 	}
 
 	Map.prototype._setMapCursor = function(cursorType)

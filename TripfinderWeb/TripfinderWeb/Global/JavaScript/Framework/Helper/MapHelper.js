@@ -671,6 +671,7 @@
 
 		const mapInstance = await TF.GIS.MapFactory.createInstance(mapElement, mapOptions);
 		mapInstance.restrictPanOutside();
+		mapInstance.enableRightDoubleClickToZoomOut();
 
 		return mapInstance;
 	}
