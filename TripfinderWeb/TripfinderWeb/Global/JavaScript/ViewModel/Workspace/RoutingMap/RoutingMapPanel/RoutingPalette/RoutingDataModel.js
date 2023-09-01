@@ -1293,35 +1293,6 @@
 		return null;
 	};
 
-	RoutingDataModel.prototype.getTripStopByTripId = function(tripId)
-	{
-		var self = this;
-		for (var i = 0; i < self.fieldTrips.length; i++)
-		{
-			if (tripId && self.fieldTrips[i].id != tripId)
-			{
-				continue;
-			}
-			return self.fieldTrips[i].FieldTripStops;
-		}
-	};
-
-	RoutingDataModel.prototype.getSchoolStopsByTripId = function(tripId)
-	{
-		var self = this;
-		for (var i = 0; i < self.fieldTrips.length; i++)
-		{
-			if (tripId && self.fieldTrips[i].id != tripId)
-			{
-				continue;
-			}
-			return self.fieldTrips[i].FieldTripStops.filter(function(item)
-			{
-				return !IsEmptyString(item.SchoolCode);
-			});
-		}
-	};
-
 	RoutingDataModel.prototype._getFieldTripPathFeatureData = function(tripIds, tripDataPromise)
 	{
 		if (tripIds.length === 0)
