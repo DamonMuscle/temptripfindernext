@@ -366,7 +366,11 @@
 	{
 		const trip = this.dataModel.getFieldTripById(data.fieldTrip.id);
 
-		this.dataModel.update(trip.FieldTripStops, true); // pass true to stop calling onTripStopsChangeEvent
+		if(data.OpenType == 'Edit')
+		{
+			this.dataModel.update(trip.FieldTripStops, true); // pass true to stop calling onTripStopsChangeEvent
+		}
+		
 		this.fieldTripPaletteSectionVM.display.resetTripInfo([trip]).then(()=>
 		{
 			this.checkIfCompletedHandlerExists(data);
