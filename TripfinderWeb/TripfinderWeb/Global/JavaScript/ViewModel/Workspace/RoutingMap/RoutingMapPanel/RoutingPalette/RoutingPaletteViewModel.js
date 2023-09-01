@@ -183,15 +183,13 @@
 		if (fieldTripCount > 0)
 		{
 			const self = this;
-			const lock = createLock();
-
-			lock(async () => {
+			(async () => {
 				self.fieldTripMapOperation.updateArrowRenderer();
 				await self.fieldTripMapOperation.setFieldTripStopVisibility(fieldTrips);
 				await self.fieldTripMapOperation.updateFieldTripPathVisibility(fieldTrips);
 				await self.fieldTripMapOperation.orderFeatures();
 				self.fieldTripMapOperation.zoomToFieldTripLayers(fieldTrips);	
-			});
+			})();
 		}
 	}
 

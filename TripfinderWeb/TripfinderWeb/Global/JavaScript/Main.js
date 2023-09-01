@@ -1560,7 +1560,7 @@ function createLock()
 
 			if (queue.length > 0)
 			{
-				queue.shift();
+				queue.shift()();
 			}
 			else
 			{
