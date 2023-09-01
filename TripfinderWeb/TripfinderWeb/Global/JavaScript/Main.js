@@ -1539,3 +1539,47 @@ $(function()
 						(s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
 							(s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
 });
+
+function createLock() 
+{
+	const queue = [];
+	let active = false;
+
+	const lock = (func) => {
+		let deferredResolve;
+		let deferredReject;
+
+		const deferred = new Promise((resolve, reject) => {
+			deferredResolve = resolve;
+			deferredReject = reject;
+		});
+
+		const exec = async () => {
+
+			await func().then(deferredResolve, deferredReject);
+
+			if (queue.length > 0)
+			{
+				queue.shift();
+			}
+			else
+			{
+				active = false;
+			}
+		};
+
+		if (active)
+		{
+			queue.push(exec);
+		}
+		else 
+		{
+			active = true;
+			exec();
+		}
+
+		return deferred;
+	};
+
+	return lock;
+};

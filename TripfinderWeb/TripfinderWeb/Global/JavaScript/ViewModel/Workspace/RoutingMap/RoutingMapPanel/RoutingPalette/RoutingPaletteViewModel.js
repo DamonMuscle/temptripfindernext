@@ -182,11 +182,28 @@
 		
 		if (fieldTripCount > 0)
 		{
-			this.fieldTripMapOperation.updateArrowRenderer();
-			await this.fieldTripMapOperation.setFieldTripStopVisibility(fieldTrips);
-			await this.fieldTripMapOperation.updateFieldTripPathVisibility(fieldTrips);
-			await this.fieldTripMapOperation.orderFeatures();
-			this.fieldTripMapOperation.zoomToFieldTripLayers(fieldTrips);
+			const self = this;
+			const lock = createLock();
+
+			lock(async () => {
+				self.fieldTripMapOperation.updateArrowRenderer();
+				// console.log(data, " start");
+	
+				// console.log('setFieldTripStopVisibility start');
+				await self.fieldTripMapOperation.setFieldTripStopVisibility(fieldTrips);
+				// console.log('setFieldTripStopVisibility end');
+				// console.log('updateFieldTripPathVisibility start');
+				await self.fieldTripMapOperation.updateFieldTripPathVisibility(fieldTrips);
+				// console.log('updateFieldTripPathVisibility end');
+				// console.log('orderFeatures start');
+				await self.fieldTripMapOperation.orderFeatures();
+				// console.log('orderFeatures end');
+				// console.log('zoomToFieldTripLayers start');
+				self.fieldTripMapOperation.zoomToFieldTripLayers(fieldTrips);
+				// console.log('zoomToFieldTripLayers end');
+	
+				// console.log(data, " end");
+			});
 		}
 	}
 
