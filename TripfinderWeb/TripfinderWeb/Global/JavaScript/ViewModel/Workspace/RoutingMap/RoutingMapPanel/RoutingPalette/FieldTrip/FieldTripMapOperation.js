@@ -1630,7 +1630,11 @@
 		if (!fieldTrip.routePath)
 		{
 			let effectedStops = this._getEffectStops(fieldTrip, effectSequences);
-			await this.calculateRouteByStops(fieldTrip, effectedStops);
+			const fieldTripStops = await this.calculateRouteByStops(fieldTrip, effectedStops);
+			if (fieldTripStops === null)
+			{
+				return null;
+			}
 
 			const data = { fieldTrip };
 
@@ -1760,7 +1764,7 @@
 			}
 
 			tf.promiseBootbox.alert(`Cannot solve path. One or more of your stops is invalid or unreachable.`);
-			return Promise.resolve();
+			return null;
 		}
 
 		const result = response?.results?.routeResults[0];
