@@ -58,6 +58,8 @@
 			onMapViewDoubleClick: null,
 			onMapViewDrag: null,
 			onMapViewPointerMove: null,
+			onMapViewPointerDown: null,
+			onMapViewPointerUp: null,
 			onMapViewUpdated: null,
 			onMapViewUpdating: null,
 			onMapViewExtentChanges: null,
@@ -76,6 +78,8 @@
 		this.onMapViewDoubleClickEvent = new TF.Events.Event();
 		this.onMapViewDragEvent = new TF.Events.Event();
 		this.onMapViewPointerMoveEvent = new TF.Events.Event();
+		this.onMapViewPointerDownEvent = new TF.Events.Event();
+		this.onMapViewPointerUpEvent = new TF.Events.Event();
 		this.onMapViewExtentChangeEvent = new TF.Events.Event();
 		this.onMapViewScaleChangeEvent = new TF.Events.Event();
 		this.onMapViewKeyUpEvent = new TF.Events.Event();
@@ -336,7 +340,17 @@
 
 		self.eventHandler.onMapViewPointerMove = mapView.on('pointer-move', (event) =>
 		{
-			self.onMapViewPointerMoveEvent.notify({event});
+			self.onMapViewPointerMoveEvent.notify({ event });
+		});
+
+		self.eventHandler.onMapViewPointerDown = mapView.on('pointer-down', (event) =>
+		{
+			self.onMapViewPointerDownEvent.notify({ event });
+		});
+
+		self.eventHandler.onMapViewPointerUp = mapView.on('pointer-up', (event) =>
+		{
+			self.onMapViewPointerUpEvent.notify({ event });
 		});
 
 		if (self.settings.eventHandlers.onMapViewCreated)
@@ -406,6 +420,8 @@
 		self.onMapViewDoubleClickEvent?.unsubscribeAll();
 		self.onMapViewDragEvent?.unsubscribeAll();
 		self.onMapViewPointerMoveEvent?.unsubscribeAll();
+		self.onMapViewPointerDownEvent?.unsubscribeAll();
+		self.onMapViewPointerUpEvent?.unsubscribeAll();
 		self.onMapViewExtentChangeEvent?.unsubscribeAll();
 		self.onMapViewScaleChangeEvent?.unsubscribeAll();
 		self.onMapViewKeyUpEvent?.unsubscribeAll();
@@ -754,6 +770,11 @@
 	Map.prototype.toMapPoint = function(x, y)
 	{
 		return this.map.mapView.toMap({ x, y});
+	}
+
+	Map.prototype.getMapContainer = function()
+	{
+		return this.map.mapView.container;
 	}
 
 	//#region Map Cursor

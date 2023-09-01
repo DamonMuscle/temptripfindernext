@@ -88,11 +88,6 @@
 		}
 	}
 
-	StopLayer.prototype.getCloneFeatures = function()
-	{
-		return this.layer.graphics.clone().items || [];
-	}
-
 	StopLayer.prototype._getMovedStopGraphic = function(graphics)
 	{
 		const self = this,
