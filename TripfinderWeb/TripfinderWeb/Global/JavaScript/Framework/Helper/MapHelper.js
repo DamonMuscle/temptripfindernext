@@ -671,7 +671,7 @@
 				eventHandlers: eventHandlers
 			};
 
-		const mapInstance = await TF.GIS.MapFactory.createInstance(mapElement, mapOptions);
+		const mapInstance = await TF.GIS.MapFactory.createMapInstance(mapElement, mapOptions);
 		mapInstance.restrictPanOutside();
 		mapInstance.enableRightDoubleClickToZoomOut();
 

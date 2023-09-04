@@ -55,7 +55,7 @@
 			}
 		};
 
-		var map = await TF.GIS.MapFactory.createInstance(mapElement, {eventHandlers:{onMapViewCreated:self._onMapLoad.bind(self)}});
+		var map = await TF.GIS.MapFactory.createMapInstance(mapElement, {eventHandlers:{onMapViewCreated:self._onMapLoad.bind(self)}});
 		self.mapInstance = map;
 		self._map = map.map;
 

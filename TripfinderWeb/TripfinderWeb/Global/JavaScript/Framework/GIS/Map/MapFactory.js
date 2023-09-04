@@ -1,32 +1,51 @@
 (function()
 {
-	const attrKey = "data-mapId";
+	const ATTR_DATA_MAP_ID = "data-mapId";
+	
+	const generateRandomMapId = () =>
+	{
+		const randomString = Math.random().toString(36).substring(7);
+		return `mapId_${randomString}`;
+	}
+
+	const bindMapId = ($container, options) =>
+	{
+		const mapId = generateRandomMapId();
+		$($container).attr(ATTR_DATA_MAP_ID, mapId);
+		options.mapId = mapId;
+	}
+
+	const loadArcGISJavaScriptSDKs = async () =>
+	{
+		await TF.GIS.Resources.Load();
+	}	
+	
 	const instances = [];
-	createNamespace("TF.GIS").MapFactory = {
-		createInstance: async function($mapContainer, options)
+
+	createNamespace("TF.GIS").MapFactory =
+	{
+		createMapInstance: async ($container, options) =>
 		{
-			if($($mapContainer).attr(attrKey))
+			if ($($container).attr(ATTR_DATA_MAP_ID))
 			{
 				throw new Error("Map instance has been created for this dom.");
 			}
 
-			const mapId = `mapId_${Math.random().toString(36).substring(7)}`;
-			$($mapContainer).attr(attrKey, mapId);
-			options.mapId = mapId;
+			bindMapId($container, options);
+			await loadArcGISJavaScriptSDKs();
 
-			await TF.GIS.Resources.Load();
-			const map = new TF.GIS.Map($mapContainer, options);
-			instances.push({instance: map, id: mapId, container: $mapContainer});
+			const map = new TF.GIS.Map($container, options);
+			instances.push({instance: map, id: map.ID, container: $container});
 			return map;
 		},
-		getMapInstance: function($mapContainer)
+		getMapInstance: ($container) =>
 		{
-			const id = $($mapContainer)?.attr(attrKey);
-			return instances.find(x=>x.id === id)?.instance;
+			const id = $($container)?.attr(ATTR_DATA_MAP_ID);
+			return instances.find(x=>x.id===id)?.instance;
 		},
-		destroyMapInstance: function(mapInstance)
+		destroyMapInstance: (mapInstance) =>
 		{
-			const id = mapInstance.settings.mapId;
+			const id = mapInstance.ID;
 			const index = instances.findIndex(x=>x.id === id);
 			if (index === -1)
 			{
@@ -35,7 +54,7 @@
 			}
 
 			const [{instance, container}] = instances.splice(index, 1);
-			$(container).removeAttr(attrKey);
+			$(container).removeAttr(ATTR_DATA_MAP_ID);
 			instance.dispose();
 		}
 	};

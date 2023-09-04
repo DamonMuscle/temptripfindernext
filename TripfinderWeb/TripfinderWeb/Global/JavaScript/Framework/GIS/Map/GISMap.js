@@ -72,6 +72,7 @@
 		this.defineReadOnlyProperty('LAYER_TYPE', LAYER_TYPE);
 		this.defineReadOnlyProperty('GEOMETRY_TYPE', GEOMETRY_TYPE);
 		this.defineReadOnlyProperty('WKID_WEB_MERCATOR', WKID_WEB_MERCATOR);
+		this.defineReadOnlyProperty('ID', this.settings.mapId);
 		this.create($mapContainer);
 
 		this.onMapViewClickEvent = new TF.Events.Event();
