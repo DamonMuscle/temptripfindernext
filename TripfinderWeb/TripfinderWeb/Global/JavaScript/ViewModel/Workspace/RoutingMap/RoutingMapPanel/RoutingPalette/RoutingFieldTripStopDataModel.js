@@ -603,15 +603,14 @@
 			var sequences = newSequence ? [newSequence] : null;
 			await self.moveTripStopsFromOtherTrip(tripStops, addTrip.FieldTripStops, sequences, false, isSequenceOptimize, isSmartSequence, isPreserve);
 
-			const updateData = {
+			self.onFieldTripStopUpdatedEvent.notify({
 				DBID: removeStopTrip.DBID,
 				fromFieldTripId: removeStopTrip.id,
 				toFieldTripId: fieldTripId,
 				fieldTripStopId: removeStop.id,
 				toStopSequence: newSequence,
 				color: addTrip.color
-			};
-			self.onFieldTripStopUpdatedEvent.notify(updateData);
+			});
 		}
 	};
 

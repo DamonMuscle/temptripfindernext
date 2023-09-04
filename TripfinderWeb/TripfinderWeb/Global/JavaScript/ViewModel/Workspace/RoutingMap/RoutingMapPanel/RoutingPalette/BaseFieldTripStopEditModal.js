@@ -464,25 +464,23 @@
 		{
 			self.obOverlayVisible(false);
 			self.removeOverlayToPanels();
-			var dataPromise;
-			if (editData)
-			{
-				dataPromise = Promise.resolve(editData);
-			} else
-			{
-				dataPromise = self.getAllHighlight();
-			}
+			let dataPromise = editData ? Promise.resolve(editData) : self.getAllHighlight();
 			dataPromise.then(function(data)
 			{
 				if (!data || data.length === 0)
 				{
-					return Promise.resolve();
+					return;
 				}
 				self.initing = true;
 				self.addOverlayToPanels();
 				self.normalizeData(data);
 				self.initTitle(false, data[0].OpenType);
-				self.init().then(function()
+				self.init().then(() =>
+				{
+					const [editingStop] = data,
+						totalStopMinutes = moment(editingStop.StopTimeDepart).diff(moment(editingStop.StopTimeArrive), "minutes");
+					self.obStopPauseMinutes(Number.isNaN(totalStopMinutes) ? null : totalStopMinutes);
+				}).then(function()
 				{
 					self.show();
 					self.showCurrentData();
@@ -553,69 +551,48 @@
 			}
 		};
 
-		if (!self.obIsMultipleCreate())
+		if (!self.isNewStop())
 		{
-			validatorFields.stopTimeArriveDate = {
-				trigger: "blur change",
-				validators: {
-					notEmpty: {
-						message: "required"
-					}
-				}
-			};
-
-			validatorFields.stopTimeArriveTime = {
-				trigger: "blur change",
-				validators: {
-					notEmpty: {
-						message: "required"
-					}
-				}
-			};
-
-			validatorFields.stopTimeArriveDisplay = {
-				trigger: "change",
-				validators: {
-					callback: {
-						message: "Stop arrive time should before departure time",
-						callback: function(value, validator, $field)
-						{
-							return self.validateStopTimeArriveAndDepart();
+			if (self.obIsFirstStop())
+			{
+				validatorFields.stopTimeDepartDate = {
+					trigger: "blur change",
+					validators: {
+						notEmpty: {
+							message: "required"
 						}
 					}
-				}
-			};
-
-			validatorFields.stopTimeDepartDate = {
-				trigger: "blur change",
-				validators: {
-					notEmpty: {
-						message: "required"
-					}
-				}
-			};
-
-			validatorFields.stopTimeDepartTime = {
-				trigger: "blur change",
-				validators: {
-					notEmpty: {
-						message: "required"
-					}
-				}
-			};
-
-			validatorFields.stopTimeDepartDisplay = {
-				trigger: "change",
-				validators: {
-					callback: {
-						message: "Stop departure time should after arrive time",
-						callback: function(value, validator, $field)
-						{
-							return self.validateStopTimeArriveAndDepart();
+				};
+	
+				validatorFields.stopTimeDepartTime = {
+					trigger: "blur change",
+					validators: {
+						notEmpty: {
+							message: "required"
 						}
 					}
-				}
-			};
+				};
+			}
+			else
+			{
+				validatorFields.stopTimeArriveDate = {
+					trigger: "blur change",
+					validators: {
+						notEmpty: {
+							message: "required"
+						}
+					}
+				};
+
+				validatorFields.stopTimeArriveTime = {
+					trigger: "blur change",
+					validators: {
+						notEmpty: {
+							message: "required"
+						}
+					}
+				};
+			}
 		}
 
 		self.$form.bootstrapValidator({
@@ -638,26 +615,6 @@
 		self.pageLevelViewModel.load(self.$form.data("bootstrapValidator"));
 		if (self.$form.data("bootstrapValidator")) self.$form.data("bootstrapValidator").validate();
 	};
-
-	BaseFieldTripStopEditModal.prototype.validateStopTimeArriveAndDepart = function()
-	{
-		const self = this;
-		const arrive = self.element.find('[name="stopTimeArriveDisplay"]').val();
-		const depart = self.element.find('[name="stopTimeDepartDisplay"]').val();
-
-		if(!arrive || !depart)
-		{
-			return true;
-		}
-
-		const dtArrive = moment(arrive), dtDepart = moment(depart);
-		if(!dtArrive.isValid() || !dtDepart.isValid())
-		{
-			return true;
-		}
-
-		return !dtArrive.isAfter(dtDepart);
-	}
 
 	BaseFieldTripStopEditModal.prototype.show = function()
 	{
@@ -789,16 +746,6 @@
 	BaseFieldTripStopEditModal.prototype.save = function()
 	{
 		var self = this;
-		self.data.forEach(function(stop)
-		{
-			if (stop.isFromDTD)
-			{
-				if (self.obSelectedStopType() != "Door-to-Door")
-				{
-					delete stop.isFromDTD;
-				}
-			}
-		})
 		self.data = self.data.filter(function(trip)
 		{
 			return trip.OpenType !== "View";

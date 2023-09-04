@@ -1489,28 +1489,31 @@
 			}
 			if (trips[i].FieldTripStops.length > 0)
 			{
-				trips[i].ActualStartTime = trips[i].FieldTripStops[0].ActualStopTime.format(stopTimeFormat);
-				trips[i].ActualEndTime = trips[i].FieldTripStops[trips[i].FieldTripStops.length - 1].ActualStopTime?.format(stopTimeFormat);
+				trips[i].ActualStartTime = _.first(trips[i].FieldTripStops).ActualStopTime.format(stopTimeFormat);
+				trips[i].ActualEndTime = _.last(trips[i].FieldTripStops).ActualStopTime?.format(stopTimeFormat);
 			}
 		}
 	};
 
-	RoutingDataModel.prototype.setStopTimeForEmptyRecords = function(trip)
+	RoutingDataModel.prototype.setStopTimeForEmptyRecords = function(fieldTrip)
 	{
-		if (!trip)
+		if (!fieldTrip)
 		{
 			return;
 		}
 
+		/**
+		 * the default stoptime value is defined in RoutingFieldTripStopDataModel.prototype.getDataModel
+		 */
 		const emptyValue = "00:00:00";
-		for (var i = 0; i < trip.FieldTripStops.length; i++)
+		for (var i = 0; i < fieldTrip.FieldTripStops.length; i++)
 		{
-			let stop = trip.FieldTripStops[i];
+			let stop = fieldTrip.FieldTripStops[i];
 			if (stop.StopTime == emptyValue)
 			{
 				stop.StopTime = stop.ActualStopTime;
-				var prevStop = i == 0 ? null : trip.FieldTripStops[i - 1];
-				var nextStop = i == trip.FieldTripStops.length - 1 ? null : trip.FieldTripStops[i + 1];
+				var prevStop = i == 0 ? null : fieldTrip.FieldTripStops[i - 1];
+				var nextStop = findNextExistingStop(fieldTrip.FieldTripStops, i);
 				if (prevStop && prevStop.StopTime != emptyValue && !!prevStop.StopTime && moment(stop.StopTime).diff(moment(prevStop.StopTime)) < 0)
 				{
 					stop.StopTime = prevStop.StopTime;
@@ -1536,12 +1539,33 @@
 						
 						stop.StopPauseMinutes = null;
 						stop.StopTimeArrive = stop.StopTime;
-						stop.StopTimeDepart = moment(stop.StopTimeArrive)
-														.add(Math.ceil(pauseDuration), "minutes")
-														.format("YYYY-MM-DDTHH:mm:ss");
-					}	
-				}		
+						stop.StopTimeDepart = moment(stop.StopTimeArrive).add(Math.ceil(pauseDuration), "minutes").format("YYYY-MM-DDTHH:mm:ss");
+					}
+				}
 			}
+		}
+
+		// avoid that the next stop is new added.
+		// for example, add 3 stops at a time.
+		function findNextExistingStop(stops, startIndex)
+		{
+			if (stops.length - 1 === startIndex)
+			{
+				return null;
+			}
+
+			let nextStop = stops[startIndex+1];
+			if (!nextStop)
+			{
+				return null;
+			}
+
+			if (nextStop.StopTime === emptyValue)
+			{
+				return findNextExistingStop(stops, startIndex+1);
+			}
+
+			return nextStop;
 		}
 	};
 

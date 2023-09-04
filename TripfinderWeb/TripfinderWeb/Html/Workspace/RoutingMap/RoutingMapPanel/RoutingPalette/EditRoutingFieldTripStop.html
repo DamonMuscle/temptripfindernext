@@ -91,27 +91,9 @@
             					</div> -->
 							</div>
 						</div>
+
+						<!-- ko if:!isNewStop() && !obIsFirstStop() -->
 						<div class="col-xs-24">
-							<div class="row">
-								<div class="col-xs-12" data-bind="visible:!obIsMultipleCreate()&&mode()!='new'">
-									<div class="form-group small-form-group">
-										<label>Stop Sequence #</label>
-										<div class="input-group">
-											<div data-bind="typeahead:{source:obSequenceSource,drowDownShow:true,notSort:true,selectedValue:obSelectedSequence}">
-												<!-- ko customInput:{type:"Select",value:obSelectedSequenceText,disable:obSelectedSequenceDisable,attributes:{class:"form-control"}} -->
-												<!-- /ko -->
-											</div>
-											<div class="input-group-btn">
-												<button type="button" class="btn btn-default btn-sharp" data-bind="disable:obSelectedSequenceDisable">
-													<span class="caret"></span>
-												</button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-xs-24" data-bind="visible:!obIsMultipleCreate()">
 							<div class="row">
 								<div class="col-xs-12">
 									<div class="form-group small-form-group">
@@ -127,12 +109,11 @@
 										<!-- /ko -->
 									</div>
 								</div>
-								<div class="col-xs-24" style="display:none;">
-									<input name="stopTimeArriveDisplay" data-bind="value:obStopTimeArriveDisplay"/>
-								</div>
 							</div>
 						</div>
-						<div class="col-xs-24" data-bind="visible:!obIsMultipleCreate()">
+						<!-- /ko -->
+						<!-- ko if:!isNewStop() && obIsFirstStop() -->
+						<div class="col-xs-24">
 							<div class="row">
 								<div class="col-xs-12" >
 									<div class="form-group small-form-group">
@@ -148,14 +129,19 @@
 										<!-- /ko -->
 									</div>
 								</div>
-								<div class="col-xs-24" style="display:none;">
-									<input name="stopTimeDepartDisplay" data-bind="value:obStopTimeDepartDisplay"/>
-								</div>
 							</div>
 						</div>
+						<!-- /ko -->
 						<div class="col-xs-24">
 							<div class="row">
-								<div class="col-xs-12" data-bind="visible:!obIsMultipleCreate()&&mode()=='new'">
+								<div class="col-xs-12" data-bind="visible:!obIsFirstStop()&&!obIsLastStop()">
+									<div class="form-group has-feedback has-feedback-left">
+										<label>Total Stop Minutes</label>
+										<!-- ko customInput:{type:"NaturalNumber",value:obStopPauseMinutes, disable:isReadOnly, attributes:{class:"form-control",name:"stopPauseMinutes"}} -->
+										<!-- /ko -->
+									</div>
+								</div>
+								<div class="col-xs-12" data-bind="visible:!obIsMultipleCreate()">
 									<div class="form-group small-form-group">
 										<label>Stop Sequence #</label>
 										<div class="input-group">
@@ -177,17 +163,6 @@
 							<div class="form-group small-form-group">
 								<label>Corner Stop</label>
 								<div class="stopLocationMap"></div>
-							</div>
-						</div>
-						<div class="col-xs-24" data-bind="visible:obIsMultipleCreate()">
-							<div class="row">
-								<div class="col-xs-12">
-									<div class="form-group has-feedback has-feedback-left">
-										<label>Total Stop Minutes</label>
-										<!-- ko customInput:{type:"NaturalNumber",value:obStopPauseMinutes, attributes:{class:"form-control",name:"stopPauseMinutes"}} -->
-										<!-- /ko -->
-									</div>
-								</div>
 							</div>
 						</div>
 						<div class="col-xs-24">
