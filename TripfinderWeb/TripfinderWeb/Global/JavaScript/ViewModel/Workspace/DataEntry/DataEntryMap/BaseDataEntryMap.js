@@ -97,14 +97,12 @@
 	{
 		var self = this;
 		const eventHandlers = {
-			onMapViewCreated: () =>
-			{
-				self.getMapInstance().setExtent(TF.createDefaultMapExtent());
-			},
 			onMapViewUpdated: self.onMapViewUpdated.bind(self, mapToolOptions, hasManuallyPin)
 		};
 		const mapInstance = await TF.Helper.MapHelper.createMapInstance(self.element, eventHandlers);
+		self.mapInstance = mapInstance;
 		mapInstance.onMapViewPointerMoveEvent.subscribe(self.onMapViewPointerMoveEventHandler.bind(self));
+		mapInstance.onMapViewCreatedEvent.subscribe(self.onMapViewCreatedEventHandler.bind(self));
 
 		self.mapClickEvent = mapInstance.map.mapView.on('click', async function(event) {
 
@@ -129,6 +127,11 @@
 
 		self.sketchTool = new TF.RoutingMap.SketchTool(mapInstance.map, self);
 	};
+
+	BaseDataEntryMap.prototype.onMapViewCreatedEventHandler = function()
+	{
+		this.mapInstance.setExtent(TF.createDefaultMapExtent());
+	}
 
 	BaseDataEntryMap.prototype.getMapPopup = function()
 	{

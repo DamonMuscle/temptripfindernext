@@ -633,16 +633,18 @@
 	{
 		const self = this,
 			eventHandlers = {
-				onMapViewCreated: () =>
-				{
-					self.mapInstance.setExtent(TF.createDefaultMapExtent());
-				},
 				onMapViewUpdated: self.onMapViewUpdated.bind(self),
 				onMapViewCustomizedEventHandler: self.onMapViewCustomizedEventHandler.bind(self),
 			};
 
-		self.mapInstance = await TF.Helper.MapHelper.createMapInstance(self.$mapDiv, eventHandlers);;
+		self.mapInstance = await TF.Helper.MapHelper.createMapInstance(self.$mapDiv, eventHandlers);
+		self.mapInstance.onMapViewCreatedEvent.subscribe(self.onMapViewCreatedEventHandler.bind(self));
 		self._map = self.mapInstance.map;
+	}
+
+	MapCanvasPage.prototype.onMapViewCreatedEventHandler = function()
+	{
+		this.mapInstance.setExtent(TF.createDefaultMapExtent());
 	}
 
 	MapCanvasPage.prototype._onMapLoad = function()

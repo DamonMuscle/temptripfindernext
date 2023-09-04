@@ -5,6 +5,7 @@
 	const MAP_MIN_ZOOM_LEVEL = 2;
 	const MAP_MAX_ZOOM_LEVEL = 23;
 	const WKID_WEB_MERCATOR = 102100;
+	const DEFAULT_MAP_SCALE = 5000;
 	
 	const LAYER_TYPE = {
 		FEATURE: "feature",
@@ -43,7 +44,6 @@
 			minZoom: MAP_MIN_ZOOM_LEVEL
 		},
 		eventHandlers: {
-			onMapViewCreated: null,
 			onMapViewUpdated: null,
 			onMapViewCustomizedEventHandler: null,
 		}
@@ -75,6 +75,7 @@
 		this.defineReadOnlyProperty('ID', this.settings.mapId);
 		this.create($mapContainer);
 
+		this.onMapViewCreatedEvent = new TF.Events.Event();
 		this.onMapViewClickEvent = new TF.Events.Event();
 		this.onMapViewDoubleClickEvent = new TF.Events.Event();
 		this.onMapViewDragEvent = new TF.Events.Event();
@@ -121,7 +122,7 @@
 
 		if (view.zoom < 0)
 		{
-			view.scale = 5000;
+			view.scale = DEFAULT_MAP_SCALE;
 		}
 
 		map.mapView = view;
@@ -189,10 +190,10 @@
 			self.onMapViewPointerUpEvent.notify({ event });
 		});
 
-		if (self.settings.eventHandlers.onMapViewCreated)
+		self.eventHandler.onMapViewCreatedPromise = mapView.when(() =>
 		{
-			self.eventHandler.onMapViewCreatedPromise = mapView.when(self.settings.eventHandlers.onMapViewCreated);
-		}
+			self.onMapViewCreatedEvent.notify();
+		});
 
 		self.eventHandler.onMapViewExtentChanges = mapView.watch('extent', (previous, extent, _) =>
 		{
@@ -252,6 +253,7 @@
 			self.settings.eventHandlers[name] = null;
 		}
 
+		self.onMapViewCreatedEvent?.unsubscribeAll();
 		self.onMapViewClickEvent?.unsubscribeAll();
 		self.onMapViewDoubleClickEvent?.unsubscribeAll();
 		self.onMapViewDragEvent?.unsubscribeAll();
@@ -505,7 +507,7 @@
 		return visibleFeatures;
 	}
 
-	Map.prototype.centerAndZoom = function(longitude, latitude, scale = 5000)
+	Map.prototype.centerAndZoom = function(longitude, latitude, scale = DEFAULT_MAP_SCALE)
 	{
 		this.centerAt(longitude, latitude);
 		this.setScale(scale);

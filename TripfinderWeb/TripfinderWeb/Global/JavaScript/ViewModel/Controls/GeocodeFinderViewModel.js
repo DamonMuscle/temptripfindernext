@@ -55,9 +55,10 @@
 			}
 		};
 
-		var map = await TF.GIS.MapFactory.createMapInstance(mapElement, {eventHandlers:{onMapViewCreated:self._onMapLoad.bind(self)}});
+		var map = await TF.GIS.MapFactory.createMapInstance(mapElement, {});
 		self.mapInstance = map;
 		self._map = map.map;
+		self.mapInstance.onMapViewCreatedEvent.subscribe(self._onMapLoad.bind(self));
 
 		self.RoutingMapTool = new TF.Map.RoutingMapTool(self, $.extend({
 			thematicLayerId: "",
