@@ -96,7 +96,7 @@
 	BaseDataEntryMap.prototype.initMap = async function(mapToolOptions, hasManuallyPin)
 	{
 		var self = this;
-		const mapInstance = await TF.Helper.MapHelper.createMapInstance(self.element, {});
+		const mapInstance = await TF.Helper.MapHelper.createMapInstance(self.element);
 		self.mapInstance = mapInstance;
 		mapInstance.onMapViewPointerMoveEvent.subscribe(self.onMapViewPointerMoveEventHandler.bind(self));
 		mapInstance.onMapViewCreatedEvent.subscribe(self.onMapViewCreatedEventHandler.bind(self));

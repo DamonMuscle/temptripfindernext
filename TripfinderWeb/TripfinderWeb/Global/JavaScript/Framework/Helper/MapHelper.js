@@ -650,7 +650,7 @@
 		return extent;
 	};
 
-	MapHelper.createMapInstance = async function(mapElement, eventHandlers)
+	MapHelper.createMapInstance = async function(mapElement, eventHandlers = {})
 	{
 		const baseMapId = tf.userPreferenceManager.get("rfweb.baseMapId"),
 			_basemap = TF.Helper.MapHelper.getBaseMapById(baseMapId),
