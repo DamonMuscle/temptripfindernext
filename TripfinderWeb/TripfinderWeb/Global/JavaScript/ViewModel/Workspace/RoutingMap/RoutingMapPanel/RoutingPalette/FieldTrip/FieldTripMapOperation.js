@@ -1248,9 +1248,15 @@
 
 			if (pathGraphics.length > 0)
 			{
-				const data = pathGraphics.map(path => {
-					const { DBID, FieldTripId, Sequence } = path.attributes;
-					return { DBID, FieldTripId, Sequence };
+				const data = pathGraphics.map(graphic => {
+					const { DBID, FieldTripId, Sequence } = graphic.attributes;
+					let geometry = graphic.geometry;
+					if (geometry.spatialReference.isWebMercator)
+					{
+						geometry = TF.GIS.GeometryHelper.ConvertToWGS1984(geometry);
+					}
+					const { paths } = geometry;
+					return { DBID, FieldTripId, Sequence, paths };
 				});
 				const dataWrapper = { data, event };
 				this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.FieldTripPathClick, data: dataWrapper });
