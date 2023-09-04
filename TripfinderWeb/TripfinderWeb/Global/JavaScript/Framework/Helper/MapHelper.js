@@ -480,6 +480,7 @@
 
 	MapHelper.createMap = function(element, creator, options)
 	{
+		console.log(`Deprecated method. Using MapHelper.createMapInstance instead.`);
 		options = options || {};
 		const baseMapId = _getBaseIdFromOptions(options);
 
@@ -580,6 +581,7 @@
 
 	MapHelper.restrictPanOutside = function(mapView)
 	{
+		console.log(`Deprecated method. Using mapInstance.restrictPanOutside instead.`);
 		var recenterTimer = null;
 		var recenterMap = function(extent)
 		{

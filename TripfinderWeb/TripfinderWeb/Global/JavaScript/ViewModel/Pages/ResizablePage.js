@@ -129,7 +129,7 @@
 				ko.applyBindings(ko.observable(self), $content[0]);
 				break;
 			case RightPageContentType.splitmap:
-				self.mapviewInstace = self.mapviewInstace || await TF.GIS.MapFactory.createInstance(self.$rightPage.find(".splitmap"), { eventHandlers });
+				self.mapviewInstace = self.mapviewInstace || await TF.Helper.MapHelper.createMapInstance(self.$rightPage.find(".splitmap"), { eventHandlers });
 				break;
 			case RightPageContentType.detailview:
 			default:
