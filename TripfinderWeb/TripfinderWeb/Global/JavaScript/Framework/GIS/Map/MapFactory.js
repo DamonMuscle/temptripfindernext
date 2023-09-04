@@ -14,7 +14,7 @@
 			$($mapContainer).attr(attrKey, mapId);
 			options.mapId = mapId;
 
-			await TF.GIS.Map.LoadResources();
+			await TF.GIS.Resources.Load();
 			const map = new TF.GIS.Map($mapContainer, options);
 			instances.push({instance: map, id: mapId, container: $mapContainer});
 			return map;
