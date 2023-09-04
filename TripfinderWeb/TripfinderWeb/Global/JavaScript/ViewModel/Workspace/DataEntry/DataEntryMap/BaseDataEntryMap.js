@@ -96,13 +96,11 @@
 	BaseDataEntryMap.prototype.initMap = async function(mapToolOptions, hasManuallyPin)
 	{
 		var self = this;
-		const eventHandlers = {
-			onMapViewUpdated: self.onMapViewUpdated.bind(self, mapToolOptions, hasManuallyPin)
-		};
-		const mapInstance = await TF.Helper.MapHelper.createMapInstance(self.element, eventHandlers);
+		const mapInstance = await TF.Helper.MapHelper.createMapInstance(self.element, {});
 		self.mapInstance = mapInstance;
 		mapInstance.onMapViewPointerMoveEvent.subscribe(self.onMapViewPointerMoveEventHandler.bind(self));
 		mapInstance.onMapViewCreatedEvent.subscribe(self.onMapViewCreatedEventHandler.bind(self));
+		mapInstance.onMapViewUpdatedEvent.subscribe(self.onMapViewUpdatedEventHandler.bind(self));
 
 		self.mapClickEvent = mapInstance.map.mapView.on('click', async function(event) {
 
@@ -151,7 +149,7 @@
 		return TF.GIS.MapFactory.getMapInstance(this.element);
 	}
 
-	BaseDataEntryMap.prototype.onMapViewUpdated = function(mapToolOptions, hasManuallyPin)
+	BaseDataEntryMap.prototype.onMapViewUpdatedEventHandler = function(mapToolOptions, hasManuallyPin)
 	{
 		this._initMapTool(mapToolOptions, hasManuallyPin);
 		this._onMapLoad();

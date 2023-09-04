@@ -85,7 +85,7 @@
 		await self._initMap();
 	};
 
-	MapCanvasPage.prototype.onMapViewUpdated = function()
+	MapCanvasPage.prototype.onMapViewUpdatedEventHandler = function()
 	{
 		const self = this;
 		if (!self.mapInstance)
@@ -95,16 +95,6 @@
 
 		try
 		{
-			if (self.mapInstance.eventHandler.onMapViewUpdated)
-			{
-				self.mapInstance.eventHandler.onMapViewUpdated.remove();
-			}
-			// self._map.mapView.on("drag", () =>
-			// {
-			// 	self._dragging = true;
-			// 	clearTimeout(self._draggingTimeout);
-			// 	self._draggingTimeout = setTimeout(() => { self._dragging = false; });
-			// }, 50);
 			self._map.mapView.on("click", self.onRightClickMenu.bind(self));
 			self.autoPan = TF.RoutingMap.AutoPanManager.getAutoPan(self._map);
 			self.autoPan.initialize(self.element, 20);
@@ -633,12 +623,12 @@
 	{
 		const self = this,
 			eventHandlers = {
-				onMapViewUpdated: self.onMapViewUpdated.bind(self),
 				onMapViewCustomizedEventHandler: self.onMapViewCustomizedEventHandler.bind(self),
 			};
 
 		self.mapInstance = await TF.Helper.MapHelper.createMapInstance(self.$mapDiv, eventHandlers);
 		self.mapInstance.onMapViewCreatedEvent.subscribe(self.onMapViewCreatedEventHandler.bind(self));
+		self.mapInstance.onMapViewUpdatedEvent.subscribe(self.onMapViewUpdatedEventHandler.bind(self));
 		self._map = self.mapInstance.map;
 	}
 

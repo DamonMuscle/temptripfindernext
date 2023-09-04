@@ -44,7 +44,6 @@
 			minZoom: MAP_MIN_ZOOM_LEVEL
 		},
 		eventHandlers: {
-			onMapViewUpdated: null,
 			onMapViewCustomizedEventHandler: null,
 		}
 	};
@@ -60,7 +59,6 @@
 			onMapViewPointerMove: null,
 			onMapViewPointerDown: null,
 			onMapViewPointerUp: null,
-			onMapViewUpdated: null,
 			onMapViewUpdating: null,
 			onMapViewExtentChanges: null,
 			onMapViewKeyUp: null,
@@ -87,6 +85,7 @@
 		this.onMapViewKeyUpEvent = new TF.Events.Event();
 		this.onMapViewMouseWheelEvent = new TF.Events.Event();
 		this.onMapViewUpdatingEvent = new TF.Events.Event();
+		this.onMapViewUpdatedEvent = new TF.Events.Event();
 	}
 
 	Map.prototype.constructor = Map;
@@ -166,15 +165,6 @@
 			self.onMapViewUpdatingEvent.notify({ event });
 		});
 
-		if (self.settings.eventHandlers.onMapViewUpdated)
-		{
-			const executeOnce = async () => {
-				await TF.GIS.SDK.reactiveUtils.whenOnce(() => !mapView.updating);
-				self.settings.eventHandlers.onMapViewUpdated && self.settings.eventHandlers.onMapViewUpdated();
-			};
-			executeOnce();
-		}
-
 		self.eventHandler.onMapViewPointerMove = mapView.on('pointer-move', (event) =>
 		{
 			self.onMapViewPointerMoveEvent.notify({ event });
@@ -214,6 +204,12 @@
 		{
 			self.onMapViewMouseWheelEvent.notify({ event });
 		});
+
+		const executeOnce = async () => {
+			await TF.GIS.SDK.reactiveUtils.whenOnce(() => !mapView.updating);
+			self.onMapViewUpdatedEvent.notify();
+		};
+		executeOnce();
 
 		this.defineReadOnlyProperty("fireCustomizedEvent", function ({ eventType, data = {} })
 		{
@@ -265,6 +261,7 @@
 		self.onMapViewKeyUpEvent?.unsubscribeAll();
 		self.onMapViewMouseWheelEvent?.unsubscribeAll();
 		self.onMapViewUpdatingEvent?.unsubscribeAll();
+		self.onMapViewUpdatedEvent?.unsubscribeAll();
 	}
 
 	Map.prototype.addLayer = function(options, layerType = LAYER_TYPE.GRAPHIC)
