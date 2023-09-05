@@ -20,7 +20,7 @@
 			var newTrip = JSON.parse(JSON.stringify(options.trip));
 			TF.loopCloneGeometry(newTrip, options.trip);
 			this.trip = newTrip;
-			this.addStopExtendAttributes(options.trip.TripStops);
+			this.addStopExtendAttributes(options.trip.FieldTripStops);
 		}
 		this.obEntityDataModel = ko.observable(new TF.DataModel.TripDataModel());
 
@@ -152,6 +152,13 @@
 
 		// direction
 		this.routingDirectionDetailViewModel = new TF.RoutingMap.RoutingPalette.RoutingDirectionDetailViewModel(this, this.isDisabled);
+
+		this.routingMapSearch = new TF.RoutingMap.RoutingMapSearch(this.dataModel.mapCanvasPage.mapInstance, {
+			addButtonVisible: true,
+			// onChoseFromFileEvent: this.addStopsFromFile.bind(this),
+			onAddButtonClick: this.addStopsFromSearch.bind(this),
+			isDisabled: this.isDisabled
+		});
 
 		this._lockWeekDayChange = false;
 		this._lockDateChange = false;
@@ -482,7 +489,7 @@
 			trip.OpenType = "Edit";
 			trip.visible = true;
 			trip.color = !trip.color ? this.color() : trip.color;
-			trip.TripStops = this.saveToNewTrip ? this.saveToNewTrip.TripStops : this.obTripStops();
+			trip.FieldTripStops = this.saveToNewTrip ? this.saveToNewTrip.FieldTripStops : this.obTripStops();
 			this.trip = trip;
 			this.refreshDirection();
 		}
@@ -556,19 +563,19 @@
 	{
 		var self = this, color = self.color();
 		self.trip.color = color;
-		self.trip.TripStops.map(function(tripStop)
+		self.trip.FieldTripStops.map(function(tripStop)
 		{
 			tripStop.color = color;
 		});
 		self.obTripStops([]);
-		self.obTripStops(self.trip.TripStops);
+		self.obTripStops(self.trip.FieldTripStops);
 		self.refreshDirection();
 		self.isColorChanged(true);
 	};
 
 	RoutingTripViewModel.prototype.refreshDirection = function()
 	{
-		this.routingDirectionDetailViewModel.onStopChangeEvent.notify({ tripStops: this.trip.TripStops, color: this.trip.color });
+		this.routingDirectionDetailViewModel.onStopChangeEvent.notify({ tripStops: this.trip.FieldTripStops, color: this.trip.color });
 	};
 
 	RoutingTripViewModel.prototype.setTripStopScheduleTime = function(data)
@@ -584,7 +591,7 @@
 				if (result)
 				{
 					self.obTripStops([]);
-					self.obTripStops(self.trip.TripStops);
+					self.obTripStops(self.trip.FieldTripStops);
 				}
 			});
 	};
@@ -685,7 +692,7 @@
 		if (this.saveToNewTrip)
 		{
 			this.obEntityDataModel().Distance = this.saveToNewTrip.Distance;
-			this.saveToNewTrip.TripStops.map(function(tripStop)
+			this.saveToNewTrip.FieldTripStops.map(function(tripStop)
 			{
 				tripStop.color = self.color();
 				if (tripStop.SchoolCode == "" || tripStop.SchoolCode == null)
@@ -696,8 +703,8 @@
 				}
 			});
 			this.obEntityDataModel().update(this.saveToNewTrip);
-			this.addStopExtendAttributes(this.saveToNewTrip.TripStops);
-			this.obTripStops(this.saveToNewTrip.TripStops);
+			this.addStopExtendAttributes(this.saveToNewTrip.FieldTripStops);
+			this.obTripStops(this.saveToNewTrip.FieldTripStops);
 		}
 	};
 
@@ -705,7 +712,7 @@
 	{
 		if (this.mode == "edit")
 		{
-			this.trip.TripStops.map(function(tripStop)
+			this.trip.FieldTripStops.map(function(tripStop)
 			{
 				if (tripStop.SchoolCode == "" || tripStop.SchoolCode == null)
 				{
@@ -729,8 +736,8 @@
 			{
 				this.obEntityDataModel().defaultSpeed(Number(this.trip.DefaultSpeed));
 			}
-			this.addStopExtendAttributes(this.trip.TripStops);
-			this.obTripStops(this.trip.TripStops);
+			this.addStopExtendAttributes(this.trip.FieldTripStops);
+			this.obTripStops(this.trip.FieldTripStops);
 			this.bindValueInArray(this.trip.VehicleId, this.obVehicles(), this.obSelectedVehicle);
 			this.bindValueInArray(this.trip.AideId, this.obBusAides(), this.obSelectedBusAide);
 			this.bindValueInArray(this.trip.DriverId, this.obDrivers(), this.obSelectedDriver);
@@ -1035,10 +1042,10 @@
 		{
 			tripStop.Sequence = i + 1;
 		});
-		self.trip.TripStops = self.obTripStops();
+		self.trip.FieldTripStops = self.obTripStops();
 		// refresh
 		self.obTripStops([]);
-		self.obTripStops(self.trip.TripStops);
+		self.obTripStops(self.trip.FieldTripStops);
 	};
 
 	RoutingTripViewModel.prototype.addSchoolStop = function(schoolIds)
@@ -1161,10 +1168,10 @@
 				// 	index++;
 				// }
 			});
-			self.trip.TripStops = self.obTripStops();
+			self.trip.FieldTripStops = self.obTripStops();
 			// refresh
 			self.obTripStops([]);
-			self.obTripStops(self.trip.TripStops);
+			self.obTripStops(self.trip.FieldTripStops);
 		});
 	};
 
@@ -1397,8 +1404,29 @@
 		{
 			tripStop.Sequence = index + 1;
 		});
-		this.trip.TripStops = tripStops;
+		this.trip.FieldTripStops = tripStops;
 	};
+
+	RoutingTripViewModel.prototype.addStopsFromSearch = function(data)
+	{
+		var self = this;
+		var stopTool = self.dataModel.viewModel.drawTool.stopTool;
+		stopTool.reverseGeocodeStop(data.geometry, data.address).then((result) =>
+		{
+			data.address = result;
+			this.dataModel.viewModel.eventsManager.createFieldTripStopFromSearchResult([data], {operate: "CreateNewTrip"}).then(function(trip)
+			{
+				if (trip)
+				{
+					self.fixStopTime(trip);
+					self.trip = trip;
+					self.obTripStops([]);
+					self.addStopExtendAttributes(self.trip.TripStops);
+					self.obTripStops(self.trip.TripStops);
+				}
+			});
+		});
+	};	
 
 	RoutingTripViewModel.prototype.fileOpenComplete = function(e, trip)
 	{
@@ -1408,19 +1436,19 @@
 			self.fixStopTime(trip);
 			self.trip = trip;
 			self.obTripStops([]);
-			self.addStopExtendAttributes(self.trip.TripStops);
-			self.obTripStops(self.trip.TripStops);
+			self.addStopExtendAttributes(self.trip.FieldTripStops);
+			self.obTripStops(self.trip.FieldTripStops);
 		}
 	};
 
 	RoutingTripViewModel.prototype.fixStopTime = function(trip)
 	{
 		var self = this;
-		for (var i = 0; i < trip.TripStops.length; i++)
+		for (var i = 0; i < trip.FieldTripStops.length; i++)
 		{
-			if (trip.TripStops[i].StopTime === "00:00:00")
+			if (trip.FieldTripStops[i].StopTime === "00:00:00")
 			{
-				self.setStopTime((i - 1 >= 0) ? trip.TripStops[i - 1] : null, (i + 1 <= trip.TripStops.length - 1) ? trip.TripStops[i + 1] : null, trip.TripStops[i]);
+				self.setStopTime((i - 1 >= 0) ? trip.FieldTripStops[i - 1] : null, (i + 1 <= trip.FieldTripStops.length - 1) ? trip.FieldTripStops[i + 1] : null, trip.FieldTripStops[i]);
 				break;
 			}
 		}
@@ -1443,27 +1471,27 @@
 			newTrip.UnsavedNewTrip = true;
 		}
 		self.routingDirectionDetailViewModel.applyDirection();
-		for (var i = 0; i < newTrip.TripStops.length; i++)
+		for (var i = 0; i < newTrip.FieldTripStops.length; i++)
 		{
-			if ((newTrip.TripStops[i].SchoolCode == "" || newTrip.TripStops[i].SchoolCode == null) && !newTrip.TripStops[i].boundary.geometry)
+			if ((newTrip.FieldTripStops[i].SchoolCode == "" || newTrip.FieldTripStops[i].SchoolCode == null) && !newTrip.FieldTripStops[i].boundary.geometry)
 			{
-				newStopList.push(newTrip.TripStops[i]);
-				if (newTrip.TripStops[i].sourceType == "student" && newTrip.TripStops[i].stopBoundaryType == "Door-to-Door")
+				newStopList.push(newTrip.FieldTripStops[i]);
+				if (newTrip.FieldTripStops[i].sourceType == "student" && newTrip.FieldTripStops[i].stopBoundaryType == "Door-to-Door")
 				{
-					pList.push(Promise.resolve(newTrip.TripStops[i].geometry.clone()));
+					pList.push(Promise.resolve(newTrip.FieldTripStops[i].geometry.clone()));
 				}
-				else if (newTrip.TripStops[i].stopBoundaryType == "Current Stop Boundary")
+				else if (newTrip.FieldTripStops[i].stopBoundaryType == "Current Stop Boundary")
 				{
-					pList.push(Promise.resolve({ walkoutZone: newTrip.TripStops[i].boundary }));
+					pList.push(Promise.resolve({ walkoutZone: newTrip.FieldTripStops[i].boundary }));
 				}
 				else
 				{
-					pList.push(stopTool.generateWalkoutZone(new tf.map.ArcGIS.Graphic(newTrip.TripStops[i].geometry),
-						newTrip.TripStops[i].stopBoundaryType == "Walkout" ? newTrip.TripStops[i].walkoutDistance : 15,
-						newTrip.TripStops[i].stopBoundaryType == "Walkout" ? newTrip.TripStops[i].distanceUnit : "meters",
-						newTrip.TripStops[i].walkoutBuffer,
-						newTrip.TripStops[i].BufferUnit,
-						newTrip.TripStops[i].stopBoundaryType == "Walkout" ? (newTrip.TripStops[i].walkoutType == "Street Path" ? 0 : 1) : 1,
+					pList.push(stopTool.generateWalkoutZone(new tf.map.ArcGIS.Graphic(newTrip.FieldTripStops[i].geometry),
+						newTrip.FieldTripStops[i].stopBoundaryType == "Walkout" ? newTrip.FieldTripStops[i].walkoutDistance : 15,
+						newTrip.FieldTripStops[i].stopBoundaryType == "Walkout" ? newTrip.FieldTripStops[i].distanceUnit : "meters",
+						newTrip.FieldTripStops[i].walkoutBuffer,
+						newTrip.FieldTripStops[i].BufferUnit,
+						newTrip.FieldTripStops[i].stopBoundaryType == "Walkout" ? (newTrip.FieldTripStops[i].walkoutType == "Street Path" ? 0 : 1) : 1,
 						self.trip.color));
 				}
 			}
@@ -1485,11 +1513,11 @@
 					}
 					newStopList[index].boundary.TripStopId = newStopList[index].id;
 
-					for (var i = 0; i < newTrip.TripStops.length; i++)
+					for (var i = 0; i < newTrip.FieldTripStops.length; i++)
 					{
-						if (newTrip.TripStops[i].id === newStopList[index].id)
+						if (newTrip.FieldTripStops[i].id === newStopList[index].id)
 						{
-							newTrip.TripStops[i] = self.dataModel.fieldTripStopDataModel.createNewData(newStopList[index], true);
+							newTrip.FieldTripStops[i] = self.dataModel.fieldTripStopDataModel.createNewData(newStopList[index], true);
 							break;
 						}
 					}
@@ -1498,8 +1526,8 @@
 
 			return self.getNewTripStops(newTrip, isTripStopPathChanged).then(function(newTripStops)
 			{
-				newTrip.TripStops = newTripStops;
-				self.changeTripStopSpeeds(newTrip.TripStops);
+				newTrip.FieldTripStops = newTripStops;
+				self.changeTripStopSpeeds(newTrip.FieldTripStops);
 
 				return self.dataModel.recalculate([newTrip]).then(function(response)
 				{
@@ -1507,11 +1535,11 @@
 					newTrip.Distance = tripData.Distance;
 					newTrip.FinishTime = tripData.FinishTime;
 					newTrip.StartTime = tripData.StartTime;
-					for (var j = 0; j < newTrip.TripStops.length; j++)
+					for (var j = 0; j < newTrip.FieldTripStops.length; j++)
 					{
-						newTrip.TripStops[j].TotalStopTime = tripData.TripStops[j].TotalStopTime;
-						newTrip.TripStops[j].Duration = tripData.TripStops[j].Duration;
-						newTrip.TripStops[j].OpenType = newTrip.OpenType;
+						newTrip.FieldTripStops[j].TotalStopTime = tripData.FieldTripStops[j].TotalStopTime;
+						newTrip.FieldTripStops[j].Duration = tripData.FieldTripStops[j].Duration;
+						newTrip.FieldTripStops[j].OpenType = newTrip.OpenType;
 					}
 					self.dataModel.setFieldTripActualStopTime([newTrip]);
 					return self.setTripOptimizeInfo(newTrip).then(function()
@@ -1536,11 +1564,11 @@
 
 		let newTrip = JSON.parse(JSON.stringify(this.trip));
 		delete newTrip.color;
-		delete newTrip.TripStops;
+		delete newTrip.FieldTripStops;
 		delete newTrip.IsToSchool;
 		let oldTrip = JSON.parse(JSON.stringify(this.openTrip));
 		delete oldTrip.color;
-		delete oldTrip.TripStops;
+		delete oldTrip.FieldTripStops;
 		delete oldTrip.IsToSchool;
 		if (!newTrip.TripAlias && !oldTrip.TripAlias)
 		{
@@ -1594,7 +1622,7 @@
 		var self = this, promise = Promise.resolve(true);
 		if (self.dataModel.showImpactDifferenceChart())
 		{
-			if (self.obOptimizeSequence() || trip.TripStops.length <= 1)
+			if (self.obOptimizeSequence() || trip.FieldTripStops.length <= 1)
 			{
 				trip.durationDiffRate = 0;
 				trip.distanceDiffRate = 0;
@@ -1635,7 +1663,7 @@
 
 	RoutingTripViewModel.prototype.other = function()
 	{
-		this.trip.TripStops.forEach(tripStop =>
+		this.trip.FieldTripStops.forEach(tripStop =>
 		{
 			tripStop.DrivingDirections = tripStop.openDrivingDirections;
 			tripStop.IsCustomDirection = false;
@@ -1687,7 +1715,7 @@
 		{
 			trip.TripAliasID = 0;
 		}
-		trip.TripStops = this.obTripStops();
+		trip.FieldTripStops = this.obTripStops();
 		trip.SpecialEquipments = currentTripData.SpecialEquipments;
 		trip.SpeedType = currentTripData.SpeedType;
 		let mappings = this.obEntityDataModel().getMapping();
@@ -1707,24 +1735,24 @@
 		var startIndex = 0;
 		var promiseList = [];
 		let isAdditional = false;
-		if ((isTripStopPathChanged || self.obOptimizeSequence()) && newTrip.TripStops.length > 1)
+		if ((isTripStopPathChanged || self.obOptimizeSequence()) && newTrip.FieldTripStops.length > 1)
 		{
-			newTrip.TripStops.map(function(tripStop)
+			newTrip.FieldTripStops.map(function(tripStop)
 			{
 				tripStop.vehicleCurbApproach = tripStop.obVehicleCurbApproach();
 			});
 			if (self.obOptimizeSequence())
 			{
-				for (var i = 0; i < newTrip.TripStops.length; i++)
+				for (var i = 0; i < newTrip.FieldTripStops.length; i++)
 				{
-					if (i != 0 && newTrip.TripStops[i].SchoolCode)
+					if (i != 0 && newTrip.FieldTripStops[i].SchoolCode)
 					{
-						promiseList.push(self.dataModel.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.TripStops.slice(startIndex, i + 1), self.obOptimizeSequence(), null, null, null, newTrip));
+						promiseList.push(self.dataModel.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.FieldTripStops.slice(startIndex, i + 1), self.obOptimizeSequence(), null, null, null, newTrip));
 						startIndex = i;
 					}
-					else if (i == newTrip.TripStops.length - 1 && (newTrip.TripStops[i].SchoolCode === "" || newTrip.TripStops[i].SchoolCode === null))
+					else if (i == newTrip.FieldTripStops.length - 1 && (newTrip.FieldTripStops[i].SchoolCode === "" || newTrip.FieldTripStops[i].SchoolCode === null))
 					{
-						promiseList.push(self.dataModel.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.TripStops.slice(startIndex, i + 1), self.obOptimizeSequence(), null, null, null, newTrip));
+						promiseList.push(self.dataModel.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.FieldTripStops.slice(startIndex, i + 1), self.obOptimizeSequence(), null, null, null, newTrip));
 					}
 				}
 			}
@@ -1738,13 +1766,13 @@
 				}
 				else
 				{
-					promiseList.push(self.dataModel.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.TripStops, false, null, null, null, newTrip));
+					promiseList.push(self.dataModel.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.FieldTripStops, false, null, null, null, newTrip));
 				}
 			}
 		}
 		else
 		{
-			promiseList.push(Promise.resolve(newTrip.TripStops));
+			promiseList.push(Promise.resolve(newTrip.FieldTripStops));
 		}
 		return Promise.all(promiseList).then(function(newList)
 		{
@@ -1766,17 +1794,17 @@
 						}
 					} else
 					{
-						newTripStops = newTrip.TripStops;
+						newTripStops = newTrip.FieldTripStops;
 					}
 				});
 			} else
 			{
-				newTripStops = newTrip.TripStops;
+				newTripStops = newTrip.FieldTripStops;
 			}
 
-			if (isAdditional && newTripStops.length != newTrip.TripStops.length)
+			if (isAdditional && newTripStops.length != newTrip.FieldTripStops.length)
 			{
-				let tripStops = newTrip.TripStops.map(r =>
+				let tripStops = newTrip.FieldTripStops.map(r =>
 				{
 					let tripStop = newTripStops.filter(p => p.id == r.id)[0];
 					return tripStop ? tripStop : r;
@@ -1801,15 +1829,15 @@
 			// newTripStops[newTripStops.length - 1].path = {};
 			if (newTripStops.length > 0)
 			{
-				newTrip.TripStops = newTripStops;
+				newTrip.FieldTripStops = newTripStops;
 			}
-			newTrip.TripStops.map(function(tripStop, index)
+			newTrip.FieldTripStops.map(function(tripStop, index)
 			{
 				tripStop.Sequence = index + 1;
 				tripStop.vehicleCurbApproach = tripStop.obVehicleCurbApproach();
 			});
 
-			self.setLockTimeStop(newTrip.TripStops);
+			self.setLockTimeStop(newTrip.FieldTripStops);
 			var lastStop = newTripStops[newTripStops.length - 1];
 			lastStop.path = {};
 			lastStop.Distance = 0;
@@ -1847,7 +1875,7 @@
 			return true;
 		}
 		var originalTrip = this.options.saveToNewTrip ? this.options.saveToNewTrip : this.options.trip;
-		var oldCompare = originalTrip.TripStops.map(function(item)
+		var oldCompare = originalTrip.FieldTripStops.map(function(item)
 		{
 			return item.id + "-" + item.vehicleCurbApproach;
 		});
@@ -1860,7 +1888,7 @@
 
 	RoutingTripViewModel.prototype.isDirectionChanged = function()
 	{
-		return this.trip.TripStops.some(x => x.openDirections && x.DrivingDirections && JSON.stringify(x.DrivingDirections) !== JSON.stringify(x.openDirections))
+		return this.trip.FieldTripStops.some(x => x.openDirections && x.DrivingDirections && JSON.stringify(x.DrivingDirections) !== JSON.stringify(x.openDirections))
 	}
 
 	RoutingTripViewModel.prototype.isTripStopsChanged = function()
@@ -1876,7 +1904,7 @@
 				DrivingDirections: item.DrivingDirections ? item.DrivingDirections : ''
 			}
 		});
-		let originalTripStops = this.openTrip.TripStops.map(item =>
+		let originalTripStops = this.openTrip.FieldTripStops.map(item =>
 		{
 			return {
 				...item,
@@ -1938,8 +1966,8 @@
 	RoutingTripViewModel.prototype._calculateTripPath = function(newTrip)
 	{
 		let self = this;
-		let originalTripStops = self.options.trip.TripStops;
-		let newTripStops = newTrip.TripStops;
+		let originalTripStops = self.options.trip.FieldTripStops;
+		let newTripStops = newTrip.FieldTripStops;
 
 		let count = newTripStops.length;
 		let calculateTripStops = [];

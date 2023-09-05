@@ -835,7 +835,8 @@
 								XCoord: item.Xcoord,
 								YCoord: item.Ycoord,
 								Street: item.Street || item.Title,
-								City: item.City
+								City: item.City,
+								geometry: TF.xyToGeometry(location.x, location.y) // add geometry to init Point object in suggestedResultAddClick method
 							};
 
 							return entity;
@@ -1296,7 +1297,8 @@
 				City: attributes.City,
 				XCoord: location.x,
 				YCoord: location.y,
-				Addr_type: attributes.Addr_type
+				Addr_type: attributes.Addr_type,
+				geometry: TF.xyToGeometry(location.x, location.y) // add geometry to init Point object in suggestedResultAddClick method
 			};
 		});
 	}

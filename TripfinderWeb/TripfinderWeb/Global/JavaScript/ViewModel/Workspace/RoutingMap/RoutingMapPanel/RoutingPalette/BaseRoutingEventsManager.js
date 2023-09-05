@@ -63,7 +63,7 @@
 			});
 	};
 
-	BaseRoutingEventsManager.prototype.createFieldTripStopFromSearchResult = async function(data)
+	BaseRoutingEventsManager.prototype.createFieldTripStopFromSearchResult = async function(data, option)
 	{
 		var self = this;
 		if (!data || data.length == 0)
@@ -71,30 +71,77 @@
 			return;
 		}
 
-		const isCreateFromStopSearch = data[0].type == "tripstop" || data[0].type == "poolStops",
-			options = {
-				student: null,
-				isCreateFromStopSearch,
-				isCreateFromSearch:true,
-				boundary: null,
-				insertBehindSpecialStop: null,
-				streetName: "",
-				isCopied: false,
-				selectLastSelectedTrip: true,
-				tryUseLastSettings: false
-			};
+		const isCreateFromStopSearch = data[0].type == "tripstop" || data[0].type == "poolStops";
+		let options = {
+			student: null,
+			isCreateFromStopSearch,
+			isCreateFromSearch:true,
+			boundary: null,
+			insertBehindSpecialStop: null,
+			streetName: "",
+			isCopied: false,
+			selectLastSelectedTrip: true,
+			tryUseLastSettings: false
+		};
 
+		if (option)
+		{
+			options = $.extend(options, option);
+		}
 
 		await self.fieldTripPaletteSectionVM.routingPaletteVM.onQuickAddStops(data);
-		if (data.length == 1)
+
+		if (options.operate && options.operate == 'CreateNewTrip')
 		{
-			self.fieldTripPaletteSectionVM.editFieldTripStopModal.create(data[0], options);
+			return self.fieldTripPaletteSectionVM.editFieldTripStopModal.createMultiple(data, options);
 		}
 		else
 		{
-			self.fieldTripPaletteSectionVM.editFieldTripStopModal.createMultiple(data, options);
+			if (data.length == 1)
+			{
+				self.fieldTripPaletteSectionVM.editFieldTripStopModal.create(data[0], options);
+			}
+			else
+			{
+				self.fieldTripPaletteSectionVM.editFieldTripStopModal.createMultiple(data, options);
+			}
 		}
 	};
+
+	BaseRoutingEventsManager.prototype.createTripStopFromSearchResult = function(data, option)
+	{
+		var self = this;
+		if (!data || data.length == 0)
+		{
+			return;
+		}
+		var isCreateFromStopSearch = false;
+
+		if (data[0].type == "tripstop" || data[0].type == "poolStops")
+		{
+			isCreateFromStopSearch = true;
+		}
+
+		if (option && option.operate == 'CreateNewTrip')
+		{
+			option.isCreateFromStopSearch = isCreateFromStopSearch;
+			option.isCreateFromSearch = true;
+			return self.createFromMultiple(data, option);
+		}
+		else
+		{
+			if (data.length == 1)
+			{
+				self.createFromSingle(data[0], data[0].geometry, isCreateFromStopSearch, true);
+			} else
+			{
+				self.createFromMultiple(data, {
+					isCreateFromStopSearch: isCreateFromStopSearch,
+					isCreateFromSearch: true
+				});
+			}
+		}
+	};	
 
 	BaseRoutingEventsManager.prototype.createFromSingle = function(point, isCreateFromStopSearch, isCreateFromSearch)
 	{

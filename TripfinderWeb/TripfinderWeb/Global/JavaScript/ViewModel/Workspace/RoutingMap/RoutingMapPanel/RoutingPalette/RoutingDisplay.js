@@ -1296,11 +1296,6 @@
 
 	function tripInfoClick(e)
 	{
-		e.preventDefault();
-		e.stopPropagation();
-		console.log("Tripfinder Next TODO: tripInfoClick");
-		return;
-
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();

@@ -721,7 +721,7 @@
 										<div class="icon refresh #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Refresh Path"></div>
 										<div class="icon delete trip-delete view-disabled-button" title="Delete"></div>
 										<div class="icon copy copyTrip #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="New Copy"></div>
-										<div class="icon info trip-info ${hideClassName}" title="Info"></div>
+										<div class="icon info trip-info" title="Info"></div>
 										<div class="icon zoom-map-to-layers" title="Center Map"></div>
 										<div class="icon show-eye #: item.visible? "" : "hide-eye"#" title="Hide field trip" ></div>
 									</div>
