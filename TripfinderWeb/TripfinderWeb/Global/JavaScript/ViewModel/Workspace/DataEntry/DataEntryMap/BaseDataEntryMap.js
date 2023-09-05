@@ -98,9 +98,9 @@
 		var self = this;
 		const mapInstance = await TF.Helper.MapHelper.createMapInstance(self.element);
 		self.mapInstance = mapInstance;
-		mapInstance.onMapViewPointerMoveEvent.subscribe(self.onMapViewPointerMoveEventHandler.bind(self));
-		mapInstance.onMapViewCreatedEvent.subscribe(self.onMapViewCreatedEventHandler.bind(self));
-		mapInstance.onMapViewUpdatedEvent.subscribe(self.onMapViewUpdatedEventHandler.bind(self));
+		mapInstance.events.onMapViewPointerMoveEvent.subscribe(self.onMapViewPointerMoveEventHandler.bind(self));
+		mapInstance.events.onMapViewCreatedEvent.subscribe(self.onMapViewCreatedEventHandler.bind(self));
+		mapInstance.events.onMapViewUpdatedEvent.subscribe(self.onMapViewUpdatedEventHandler.bind(self));
 
 		self.mapClickEvent = mapInstance.map.mapView.on('click', async function(event) {
 

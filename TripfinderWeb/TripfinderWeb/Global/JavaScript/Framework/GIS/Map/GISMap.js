@@ -50,19 +50,11 @@
 
 	function Map($mapContainer, options)
 	{
+		const events = new TF.GIS.Map.Events();
+		this.defineReadOnlyProperty('events', events);
+
 		this.settings = Object.assign({}, defaultOptions, options);
 		this.eventHandler = {
-			onMapViewCreatedPromise: null,
-			onMapViewClick: null,
-			onMapViewDoubleClick: null,
-			onMapViewDrag: null,
-			onMapViewPointerMove: null,
-			onMapViewPointerDown: null,
-			onMapViewPointerUp: null,
-			onMapViewUpdating: null,
-			onMapViewExtentChanges: null,
-			onMapViewKeyUp: null,
-			onMapViewMouseWheel: null,
 			onMapViewCustomizedEventHandler: null,
 		};
 
@@ -73,19 +65,7 @@
 		this.defineReadOnlyProperty('ID', this.settings.mapId);
 		this.create($mapContainer);
 
-		this.onMapViewCreatedEvent = new TF.Events.Event();
-		this.onMapViewClickEvent = new TF.Events.Event();
-		this.onMapViewDoubleClickEvent = new TF.Events.Event();
-		this.onMapViewDragEvent = new TF.Events.Event();
-		this.onMapViewPointerMoveEvent = new TF.Events.Event();
-		this.onMapViewPointerDownEvent = new TF.Events.Event();
-		this.onMapViewPointerUpEvent = new TF.Events.Event();
-		this.onMapViewExtentChangeEvent = new TF.Events.Event();
-		this.onMapViewScaleChangeEvent = new TF.Events.Event();
-		this.onMapViewKeyUpEvent = new TF.Events.Event();
-		this.onMapViewMouseWheelEvent = new TF.Events.Event();
-		this.onMapViewUpdatingEvent = new TF.Events.Event();
-		this.onMapViewUpdatedEvent = new TF.Events.Event();
+		events.init(this.map.mapView);
 	}
 
 	Map.prototype.constructor = Map;
@@ -143,73 +123,7 @@
 
 	Map.prototype.createMapEvents = function()
 	{
-		const self = this, mapView = self.map.mapView;
-
-		self.eventHandler.onMapViewClick = mapView.on("click", (event) =>
-		{
-			self.onMapViewClickEvent.notify({event});
-		});
-
-		self.eventHandler.onMapViewDoubleClick = mapView.on("double-click", (event) =>
-		{
-			self.onMapViewDoubleClickEvent.notify({ event });
-		});
-
-		self.eventHandler.onMapViewDrag = mapView.on("drag", (event) =>
-		{
-			self.onMapViewDragEvent.notify({ event });
-		});
-
-		self.eventHandler.onMapViewUpdating = mapView.watch('updating', (event) =>
-		{
-			self.onMapViewUpdatingEvent.notify({ event });
-		});
-
-		self.eventHandler.onMapViewPointerMove = mapView.on('pointer-move', (event) =>
-		{
-			self.onMapViewPointerMoveEvent.notify({ event });
-		});
-
-		self.eventHandler.onMapViewPointerDown = mapView.on('pointer-down', (event) =>
-		{
-			self.onMapViewPointerDownEvent.notify({ event });
-		});
-
-		self.eventHandler.onMapViewPointerUp = mapView.on('pointer-up', (event) =>
-		{
-			self.onMapViewPointerUpEvent.notify({ event });
-		});
-
-		self.eventHandler.onMapViewCreatedPromise = mapView.when(() =>
-		{
-			self.onMapViewCreatedEvent.notify();
-		});
-
-		self.eventHandler.onMapViewExtentChanges = mapView.watch('extent', (previous, extent, _) =>
-		{
-			self.onMapViewExtentChangeEvent.notify({ previous, extent });
-		});
-
-		self.eventHandler.onMapViewScaleChanges = mapView.watch('scale', (previous, scale, _) =>
-		{
-			self.onMapViewScaleChangeEvent.notify({ previous, scale });
-		});
-
-		self.eventHandler.onMapViewKeyUp = mapView.on('key-up', (event) =>
-		{
-			self.onMapViewKeyUpEvent.notify({ event });
-		});
-
-		self.eventHandler.onMapViewMouseWheel = mapView.on('mouse-wheel', (event) =>
-		{
-			self.onMapViewMouseWheelEvent.notify({ event });
-		});
-
-		const executeOnce = async () => {
-			await TF.GIS.SDK.reactiveUtils.whenOnce(() => !mapView.updating);
-			self.onMapViewUpdatedEvent.notify();
-		};
-		executeOnce();
+		const self = this;
 
 		this.defineReadOnlyProperty("fireCustomizedEvent", function ({ eventType, data = {} })
 		{
@@ -225,43 +139,6 @@
 				self.settings.eventHandlers.onMapViewCustomizedEventHandler({ eventType, data });
 			});
 		}, true);
-	}
-
-	Map.prototype.destroyMapEvents = function()
-	{
-		const self = this;
-		for (let name in self.settings.eventHandlers)
-		{
-			if (self.eventHandler[name])
-			{
-				if (self.eventHandler[name].remove)
-				{
-					self.eventHandler[name].remove();
-				}
-
-				self.eventHandler[name] = null;
-			}
-			else if (self.eventHandler[`${name}Promise`])
-			{
-				self.eventHandler[`${name}Promise`] = null;
-			}
-
-			self.settings.eventHandlers[name] = null;
-		}
-
-		self.onMapViewCreatedEvent?.unsubscribeAll();
-		self.onMapViewClickEvent?.unsubscribeAll();
-		self.onMapViewDoubleClickEvent?.unsubscribeAll();
-		self.onMapViewDragEvent?.unsubscribeAll();
-		self.onMapViewPointerMoveEvent?.unsubscribeAll();
-		self.onMapViewPointerDownEvent?.unsubscribeAll();
-		self.onMapViewPointerUpEvent?.unsubscribeAll();
-		self.onMapViewExtentChangeEvent?.unsubscribeAll();
-		self.onMapViewScaleChangeEvent?.unsubscribeAll();
-		self.onMapViewKeyUpEvent?.unsubscribeAll();
-		self.onMapViewMouseWheelEvent?.unsubscribeAll();
-		self.onMapViewUpdatingEvent?.unsubscribeAll();
-		self.onMapViewUpdatedEvent?.unsubscribeAll();
 	}
 
 	Map.prototype.addLayer = function(options, layerType = LAYER_TYPE.GRAPHIC)
@@ -329,7 +206,7 @@
 			return previousExtent;
 		};
 
-		self.onMapViewDoubleClickEvent.subscribe((_, data) =>
+		self.events.onMapViewDoubleClickEvent.subscribe((_, data) =>
 		{
 			const { event } = data;
 			if (event.button === 2)
@@ -554,7 +431,7 @@
 			}, 50);
 		}
 
-		this.onMapViewExtentChangeEvent.subscribe(() =>
+		this.events.onMapViewExtentChangeEvent.subscribe(() =>
 		{
 			const MERCATOR_MAX_Y = 19972000, MERCATOR_MIN_Y = -19972000, mapExtent = this.getExtent();
 
@@ -717,7 +594,7 @@
 	{
 		const self = this;
 		self.removeAllLayers();
-		self.destroyMapEvents();
+		self.events.dispose();
 
 		if (this.map)
 		{

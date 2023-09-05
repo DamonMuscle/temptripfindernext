@@ -58,7 +58,7 @@
 		var map = await TF.Helper.MapHelper.createMapInstance(mapElement);
 		self.mapInstance = map;
 		self._map = map.map;
-		self.mapInstance.onMapViewCreatedEvent.subscribe(self._onMapLoad.bind(self));
+		self.mapInstance.events.onMapViewCreatedEvent.subscribe(self._onMapLoad.bind(self));
 
 		self.RoutingMapTool = new TF.Map.RoutingMapTool(self, $.extend({
 			thematicLayerId: "",

@@ -627,8 +627,8 @@
 			};
 
 		self.mapInstance = await TF.Helper.MapHelper.createMapInstance(self.$mapDiv, eventHandlers);
-		self.mapInstance.onMapViewCreatedEvent.subscribe(self.onMapViewCreatedEventHandler.bind(self));
-		self.mapInstance.onMapViewUpdatedEvent.subscribe(self.onMapViewUpdatedEventHandler.bind(self));
+		self.mapInstance.events.onMapViewCreatedEvent.subscribe(self.onMapViewCreatedEventHandler.bind(self));
+		self.mapInstance.events.onMapViewUpdatedEvent.subscribe(self.onMapViewUpdatedEventHandler.bind(self));
 		self._map = self.mapInstance.map;
 	}
 

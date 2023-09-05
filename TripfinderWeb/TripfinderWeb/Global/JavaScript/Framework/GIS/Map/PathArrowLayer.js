@@ -50,8 +50,8 @@
 		self.onRedrawEvent = new TF.Events.Event();
 		self.onRedrawEvent.subscribe(self.settings.eventHandlers?.redraw.bind(self));
 
-		mapInstance.onMapViewExtentChangeEvent.subscribe(self.onMapViewExtentChangeHandler.bind(self));
-		mapInstance.onMapViewScaleChangeEvent.subscribe(self.onMapViewScaleChangeHandler.bind(self));
+		mapInstance.events.onMapViewExtentChangeEvent.subscribe(self.onMapViewExtentChangeHandler.bind(self));
+		mapInstance.events.onMapViewScaleChangeEvent.subscribe(self.onMapViewScaleChangeHandler.bind(self));
 		self.mapInstance = mapInstance;
 	}
 

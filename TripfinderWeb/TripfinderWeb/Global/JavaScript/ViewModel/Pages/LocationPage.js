@@ -159,9 +159,9 @@
 		{
 			await tf.pageManager.resizablePage.showMapView();
 			self.mapInstance = tf.pageManager.resizablePage.getRightData();
-			self.mapInstance.onMapViewClickEvent.subscribe(self.onMapViewClickEventHandler.bind(self));
-			self.mapInstance.onMapViewPointerMoveEvent.subscribe(self.onMapViewPointerMoveEventHandler.bind(self));
-			self.mapInstance.onMapViewCreatedEvent.subscribe(self.onMapViewCreatedEventHandler.bind(self));
+			self.mapInstance.events.onMapViewClickEvent.subscribe(self.onMapViewClickEventHandler.bind(self));
+			self.mapInstance.events.onMapViewPointerMoveEvent.subscribe(self.onMapViewPointerMoveEventHandler.bind(self));
+			self.mapInstance.events.onMapViewCreatedEvent.subscribe(self.onMapViewCreatedEventHandler.bind(self));
 			self.initMapTools();
 			self.initLocationMapGraphics();
 		}

@@ -62,8 +62,8 @@
 			childViewModel._onMapLoad();
 		});
 
-		self.mapInstance.onMapViewClickEvent.subscribe(self.onMapViewClickEventHandler.bind(self));
-		self.mapInstance.onMapViewMouseWheelEvent.subscribe(self.onMapViewMouseWheelHandler.bind(self));
+		self.mapInstance.events.onMapViewClickEvent.subscribe(self.onMapViewClickEventHandler.bind(self));
+		self.mapInstance.events.onMapViewMouseWheelEvent.subscribe(self.onMapViewMouseWheelHandler.bind(self));
 	};
 
 	RoutingPaletteViewModel.prototype.initLabelSetting = function()

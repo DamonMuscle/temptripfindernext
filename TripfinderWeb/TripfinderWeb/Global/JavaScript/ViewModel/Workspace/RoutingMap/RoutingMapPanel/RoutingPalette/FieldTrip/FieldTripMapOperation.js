@@ -54,7 +54,7 @@
 			}
 		};
 		this.defineReadOnlyProperty("PATH_LINE_TYPE", PATH_LINE_TYPE);
-		mapInstance.onMapViewKeyUpEvent.subscribe(this.onMapKeyUpEvent.bind(this));
+		mapInstance.events.onMapViewKeyUpEvent.subscribe(this.onMapKeyUpEvent.bind(this));
 	}
 
 	//#region Property
