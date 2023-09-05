@@ -280,6 +280,7 @@
 		var self = this;
 		const urlParams = TF.URLHelper.parseUrlParam(location.href);
 		const startupIndicatorName = "startup";
+		tf.appPrefix = "tfweb";
 		self.libraryInitialization().then(function()
 		{
 			tf.dataFormatHelper = new TF.DataFormatHelper();

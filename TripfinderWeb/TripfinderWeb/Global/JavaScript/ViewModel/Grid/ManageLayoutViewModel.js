@@ -98,6 +98,9 @@
 	ManageLayoutViewModel.prototype.getLayoutGridColumns = function()
 	{
 		const self = this;
+		const hasEditRight = tf.authManager.isAuthorizedFor("gridViewLayouts", "edit");
+		const hasDeleteRight = tf.authManager.isAuthorizedFor("gridViewLayouts", "delete");
+
 		return [{
 			field: "Name",
 			title: "Name",
@@ -140,23 +143,21 @@
 						e.preventDefault();
 						self.exportAndDownloadData(self.getGridLayoutDataModel(e));
 					}
-				},
-				{
+				}].concat(hasEditRight ? {
 					name: "edit",
 					click: function(e)
 					{
 						e.preventDefault();
 						self.editGridLayout(self.getGridLayoutDataModel(e));
 					}
-				},
-				{
+				} : []).concat(hasDeleteRight ? {
 					name: "delete",
 					click: function(e)
 					{
 						e.preventDefault();
 						self.deleteGridLayout(self.getGridLayoutDataModel(e));
 					}
-				}],
+				} : []),
 			width: "100px",
 			title: "Action",
 			attributes: {

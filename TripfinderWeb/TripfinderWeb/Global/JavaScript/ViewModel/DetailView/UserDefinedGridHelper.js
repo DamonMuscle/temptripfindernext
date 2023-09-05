@@ -686,13 +686,27 @@
 			{
 				// Get the isUTC from the systemField's targetField
 				let gridDefinition = TF.Form.FormConfigHelper.getSystemFieldRelatedColumnDefinition(col.editType.targetField, dataTypeId);
-				if (gridDefinition && gridDefinition.isUTC == true)
+				if (gridDefinition)
 				{
-					utcColumnExtension = {
-						isUTC: true
+					if (gridDefinition.isUTC)
+					{
+						columnExtension = $.extend(columnExtension, { isUTC: true });
 					}
 
-					columnExtension = $.extend(columnExtension, utcColumnExtension);
+					if (gridDefinition.UnitOfMeasureSupported)
+					{
+						columnExtension = $.extend(columnExtension, { UnitOfMeasureSupported: true });
+					}
+
+					if (gridDefinition.UnitTypeOfMeasureSupported)
+					{
+						columnExtension = $.extend(columnExtension, { UnitTypeOfMeasureSupported: gridDefinition.UnitTypeOfMeasureSupported });
+					}
+
+					if (gridDefinition.UnitOfMeasureReverse)
+					{
+						columnExtension = $.extend(columnExtension, { UnitOfMeasureReverse: true });
+					}
 				}
 			}
 		}
@@ -2724,6 +2738,8 @@
 			$el = TF.Form.FormConfigHelper.getFormColumnContent(editType.targetField, dataTypeId, contentOption);
 		}
 
+		formatOption.systemQuestionTargetField = col.editType.targetField; 
+		formatOption.dataTypeId = dataTypeId;
 		const val = tf.systemFieldsFormat(type, value, $el, attributeFlag, numberPrecision, trueDisplayName, falseDisplayName, formatOption);
 
 		if (isCopy)
@@ -3257,6 +3273,18 @@
 		var isAdmin = tf.authManager.authorizationInfo.isAdmin;
 		var isCreatedBy = udgrid.CreatedBy === tf.authManager.authorizationInfo.authorizationTree.userId;
 		var isPublic = udgrid.Public === true;
+
+		// remove delete udf system question
+		udgrid.UDGridFields = udgrid.UDGridFields.filter(function(field)
+		{
+			let fieldOption = field.FieldOptions;
+			if (typeof field.FieldOptions === 'string')
+			{
+				fieldOption = JSON.parse(field.FieldOptions);
+			}
+
+			return fieldOption.IsUDFSystemField ? tf.UDFDefinition.getUDFByGuid(fieldOption.DefaultText) !== undefined : true;
+		});
 
 		//check if udgrid is survey or public or isCreateBy
 		if (!udgrid || isAdmin || isCreatedBy)

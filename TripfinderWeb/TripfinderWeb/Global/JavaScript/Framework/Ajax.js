@@ -190,6 +190,7 @@
 					xmlHttpRequest.setRequestHeader('SurveyToken', tf.authManager.surveyToken);
 					xmlHttpRequest.setRequestHeader('authorizeBySurveyToken', true);
 				}
+				xmlHttpRequest.setRequestHeader('Prefix', tf.appPrefix);
 				xmlHttpRequest.setRequestHeader('UserDate', moment().format("YYYY-MM-DDTHH:mm:ss.SSS"));
 				if (settings.headers)
 				{

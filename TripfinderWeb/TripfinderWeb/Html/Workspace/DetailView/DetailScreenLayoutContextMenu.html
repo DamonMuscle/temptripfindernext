@@ -2,9 +2,12 @@
 	<ul class="tf-contextmenu">
 		<!-- ko if: obNewWindow -->
 		<!--ko if :!TF.isMobileDevice-->
+		<!-- ko if:tf.authManager.isAuthorizedFor('detailViewLayouts', 'add') -->
 		<li class="menu-item" data-bind="contextMenuClick:newLayoutClick">
 			New
 		</li>
+		<!-- /ko -->
+		<!-- ko if:tf.authManager.isAuthorizedFor('detailViewLayouts', 'edit') -->
 		<li class="menu-item" data-bind="contextMenuClick:editLayoutClick, css:{disabled:obSelectLayoutName() === ''}">
 			Edit
 			<!-- ko if: obSelectLayoutName() !== ""-->
@@ -12,6 +15,8 @@
 			<span data-bind="text:obSelectLayoutName"></span>)
 			<!--/ko -->
 		</li>
+		<!-- /ko -->
+		<!-- ko if:tf.authManager.isAuthorizedFor('detailViewLayouts', 'read') -->
 		<li class="menu-item" data-bind="contextMenuClick:manageLayoutClick">
 			Manage Layouts
 		</li>
@@ -20,6 +25,7 @@
 			<div class="rule"></div>
 		</li>
 		<!--/ko -->
+		<!--/ko-->
 		<!--/ko-->
 		<!--/ko -->
 		<!--ko foreach: obLayouts -->
