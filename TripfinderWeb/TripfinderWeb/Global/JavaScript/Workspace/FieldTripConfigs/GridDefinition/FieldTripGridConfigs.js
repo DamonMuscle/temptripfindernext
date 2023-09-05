@@ -142,7 +142,6 @@
 			sizeCss: "modal-dialog-md",
 			apiEndpoint: "FieldTripTemplates",
 			relationshipStr: "FieldTripSchool,FieldTripDepartment,FieldTripActivity,FieldTripDeparture",
-			disabled: true,
 			handleResponse: function(items)
 			{
 				items.sort(function(a, b)

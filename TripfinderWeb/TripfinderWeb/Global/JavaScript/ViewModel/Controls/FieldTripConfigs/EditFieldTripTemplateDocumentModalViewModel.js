@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.sizeCss = "modal-dialog-sm";
 		this.title(`${!!entity ? "Edit" : "Add"} Documents`);
-		this.contentTemplate('Workspace/FieldTripConfigs/Modal/EditFieldTripTemplateDocument');
+		this.contentTemplate('Workspace/Page/FieldTripConfigs/Modal/EditFieldTripTemplateDocument');
 		this.buttonTemplate('modal/positivenegative');
 		this.viewModel = new TF.Control.EditFieldTripTemplateDocumentViewModel(entity, classificationList);
 		this.data(this.viewModel);

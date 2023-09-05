@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.sizeCss = "modal-dialog-sm";
 		this.title(`${!!entity ? "Edit" : "Add"} Invoice Information`);
-		this.contentTemplate('Workspace/FieldTripConfigs/Modal/EditFieldTripTemplateInvoice');
+		this.contentTemplate('Workspace/Page/FieldTripConfigs/Modal/EditFieldTripTemplateInvoice');
 		this.buttonTemplate('modal/positivenegative');
 		this.viewModel = new TF.Control.EditFieldTripTemplateInvoiceViewModel(entity);
 		this.data(this.viewModel);
