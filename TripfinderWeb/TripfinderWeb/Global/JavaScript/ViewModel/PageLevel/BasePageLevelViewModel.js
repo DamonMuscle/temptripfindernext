@@ -19,13 +19,16 @@
 		self.obPageLevelCss = ko.observable("");
 		self.obCurrentErrorIndex = ko.observable(0);
 
-		self.obSuccessMessageSpecifedDivIsShow = ko.observable(false);
-		self.obSuccessMessageSpecifed = ko.observableArray([]);
-
+		self.obSuccessMessageArrayDivIsShow = ko.observable(false);
+		self.obSuccessMessageArray = ko.observableArray([]);
+		self.obWarningMessageArrayDivIsShow = ko.observable(false);
+		self.obWarningMessageArray = ko.observableArray([]);
 		self.toPreError = self.toPreError.bind(self);
 		self.toNextError = self.toNextError.bind(self);
 		self.validationMessage = null;
 		self.autoFocus = true;
+
+		self.closeMessageBox = self.closeMessageBox.bind(self);
 	}
 
 	BasePageLevelViewModel.prototype.constructor = BasePageLevelViewModel;
@@ -39,11 +42,10 @@
 
 	BasePageLevelViewModel.prototype.initialized = function(viewModel, el)
 	{
-		var self = this, $pageLevel = $(el), $container = $pageLevel.closest(".tfmodal-container");
-
-		if ($container.length > 0)
+		var self = this, $pageLevel = $(el);
+		if ($pageLevel.closest(".tfmodal-container").length > 0)
 		{
-			self.validationMessage = $container.find(".page-level-message-container");
+			self.validationMessage = $pageLevel.closest(".tfmodal-container").find(".page-level-message-container");
 			self.validationMessage.css("z-index", $pageLevel.closest(".tfmodal.modal").css("z-index"));
 			$("body").append(self.validationMessage);
 		}
@@ -97,11 +99,11 @@
 
 	BasePageLevelViewModel.prototype.displayError = function()
 	{
-		var self = this, totalCount = self.getErrorsCount(), errorDesp = self.$pageLevel.find(".error-description");
+		var self = this, totalCount = self.getErrorsCount();
 
 		if (totalCount === 0)
 		{
-			errorDesp.removeClass("hide");
+			self.$pageLevel.find(".error-description").removeClass("hide");
 			return;
 		}
 
@@ -109,8 +111,8 @@
 		{
 			self.obCurrentErrorIndex(totalCount - 1);
 		}
-		errorDesp.addClass("hide");
-		errorDesp.eq(self.obCurrentErrorIndex()).removeClass("hide");
+		self.$pageLevel.find(".error-description").addClass("hide");
+		self.$pageLevel.find(".error-description").eq(self.obCurrentErrorIndex()).removeClass("hide");
 	};
 
 	BasePageLevelViewModel.prototype.toNextError = function()
@@ -124,42 +126,50 @@
 		return self.obValidationErrors().length + self.obValidationErrorsSpecifed().length;
 	};
 
-	BasePageLevelViewModel.prototype.saveValidate = function($field)
+	BasePageLevelViewModel.prototype.getSuccessCount = function()
 	{
 		var self = this;
-		if (!self._validator) return Promise.resolve();
+		return self.obSuccessMessage().length + self.obSuccessMessageArray().length;
+	};
+
+	BasePageLevelViewModel.prototype.saveValidate = function($field, validationOption)
+	{
+		var self = this;
+		if (!self._validator)
+		{
+			return Promise.resolve(true);
+		}
 		if ($field)
 		{
-			var isContainingField = false, currentItem;
+			var isContainingField = false;
 			$.each(self.obValidationErrors().concat(self.obValidationErrorsSpecifed()), function(index, item)
 			{
 				if (item.field && $field[0] === item.field[0])
 				{
-					currentItem = item;
 					isContainingField = true;
-					return false;
+					return Promise.resolve(false);
 				}
 			});
 			if (!isContainingField)
 			{
 				return Promise.resolve();
 			}
-			else
-			{
-				self.obValidationErrors.remove(currentItem);
-				self.obValidationErrorsSpecifed.remove(currentItem);
-				return Promise.resolve(false);
-			}
 		}
 
 		self.obCurrentErrorIndex(0);
 		self.obValidationErrors.removeAll();
-		self.obValidationErrorsSpecifed.removeAll();
 		self.obErrorMessageDivIsShow(false);
 		self.obSuccessMessageDivIsShow(false);
+		self.obSuccessMessageArrayDivIsShow(false);
+		self.obWarningMessageArrayDivIsShow(false);
 		return self._validator.validate()
 			.then(function(valid)
 			{
+				if (validationOption && validationOption.hideToast)//If it is not needed to show toast message at top right corner
+				{
+					return valid;
+				}
+
 				self.obValidationErrors(self.getValidationErrors(valid));
 				self.obValidationErrorsSpecifed(self.getValidationErrorsSpecifed());
 				return self.getValidationErrorsSpecifedPromise()
@@ -185,7 +195,10 @@
 	BasePageLevelViewModel.prototype.saveValidateExtend = function($field)
 	{
 		var self = this;
-		if (!self._validator) return Promise.resolve();
+		if (!self._validator)
+		{
+			return Promise.resolve(true)
+		};
 		if ($field)
 		{
 			var isContainingField = false;
@@ -205,6 +218,8 @@
 
 		self.obCurrentErrorIndex(0);
 		self.obSuccessMessageDivIsShow(false);
+		self.obSuccessMessageArrayDivIsShow(false);
+		self.obWarningMessageArrayDivIsShow(false);
 		return self._validator.validate()
 			.then(function(valid)
 			{
@@ -243,6 +258,9 @@
 		self.obValidationErrorsSpecifed.removeAll();
 		self.obErrorMessageDivIsShow(false);
 		self.obSuccessMessageDivIsShow(false);
+		self.obSuccessMessageArrayDivIsShow(false);
+		self.obWarningMessageArrayDivIsShow(false);
+		self.obCurrentErrorIndex(0);
 	};
 
 	BasePageLevelViewModel.prototype.popupErrorMessage = function(errorMessage)
@@ -251,6 +269,8 @@
 		self.obValidationErrors.removeAll();
 		self.obErrorMessageDivIsShow(false);
 		self.obSuccessMessageDivIsShow(false);
+		self.obSuccessMessageArrayDivIsShow(false);
+		self.obWarningMessageArrayDivIsShow(false);
 
 		self.obValidationErrorsSpecifed.push({ message: errorMessage });
 		return self.getValidationErrorsSpecifedPromise()
@@ -277,6 +297,8 @@
 		self.obValidationErrors.removeAll();
 		self.obErrorMessageDivIsShow(false);
 		self.obSuccessMessageDivIsShow(false);
+		self.obSuccessMessageArrayDivIsShow(false);
+		self.obWarningMessageArrayDivIsShow(false);
 
 		self.obValidationErrorsSpecifed(messages.map(function(msg) { return { message: msg } }));
 		return self.getValidationErrorsSpecifedPromise()
@@ -302,34 +324,45 @@
 		var self = this, validationErrors = [];
 		if (!valid)
 		{
-			var messages = self._validator.getMessages(self._validator.getInvalidFields()),
-				$fields = self._validator.getInvalidFields();
-			$fields.each(function(i, fielddata)
+			var $fields = self.getInvalidFields(),
+				messages = self._validator.getMessages($fields);
+
+			$fields.each(function(i, el)
 			{
-				if (i === 0)
+				var $el = $(el);
+				if ($el.hasClass("data-bv-excluded") || self._validator._isExcluded($el))
+				{
+					return;
+				}
+
+				if (i == 0)
 				{
 					if (self.autoFocus)
 					{
-						$(fielddata).focus();
+						$el.focus();
 					}
-					if ($(fielddata).get(0).scrollIntoView)
-						$(fielddata).get(0).scrollIntoView();
 				}
 				var error = { name: "", leftMessage: "", rightMessage: "", field: null },
 					message = self.getMessage(messages[i]);
-				message = self.getMessageExpand(fielddata, message, error);
+				message = self.getMessageExpand(el, message, error);
 
-				if (!$(fielddata).data("noName"))
-				{
-					error.name = ($(fielddata).attr('data-bv-error-name') ? $(fielddata).attr('data-bv-error-name') : $($(fielddata).closest("div.form-group").find("label")[0]).text());
-				}
+				error.name = $el.attr('data-bv-error-name') || $el.closest("div.form-group").find("label").eq(0).text();
 				error.rightMessage = message;
-				error.field = $(fielddata);
+				if (message.toLowerCase().indexOf(error.name.toLowerCase()) != -1)
+				{
+					error.name = "";
+				}
+				error.field = $el;
 
 				validationErrors.push(error);
 			});
 		}
 		return validationErrors;
+	};
+
+	BasePageLevelViewModel.prototype.getInvalidFields = function()
+	{
+		return this._validator.getInvalidFields();
 	};
 
 	BasePageLevelViewModel.prototype.getValidationErrorsSpecifed = function()
@@ -364,6 +397,9 @@
 			case "required":
 				message = " is required";
 				break;
+			case "invalid name":
+				message = " is invalid";
+				break;
 			case "invalid date":
 				message = " is an invalid date";
 				break;
@@ -371,7 +407,7 @@
 				message = " syntax is invalid";
 				break;
 			case "invalid Zip Code":
-				message = " is an invalid Zip Code";
+				message = " is an invalid Postal Code";
 				break;
 			case "invalid City Name":
 				message = " is an invalid City Name";
@@ -401,6 +437,10 @@
 		{
 			message = " is not a valid email.";
 		}
+		else if (message.indexOf("Please remove special character(s)") != -1)
+		{
+			message = message.replace('<', '&lt;').replace('>', '&gt;');
+		}
 
 		return message;
 	};
@@ -418,6 +458,7 @@
 	BasePageLevelViewModel.prototype.successMessageShow = function()
 	{
 		this.obSuccessMessageDivIsShow(true);
+		this.obSuccessMessageArrayDivIsShow(true);
 	};
 
 	/**
@@ -433,10 +474,10 @@
 			message = message || self.defaultSuccessMessage;
 
 		clearTimeout(self.autoCloseSuccessMsg);
-		self.$pageLevel.find(".edit-success.single-success").stop().css("opacity", 1);
 		self.obSuccessMessage(message);
 		self.obSuccessMessageDivIsShow(true);
-
+		!tf.isViewfinder && $(".edit-success.single-success:visible").not(self.$pageLevel.find(".edit-success.single-success")).hide();
+		self.$pageLevel.find(".edit-success.single-success").stop().css("opacity", 1).show();
 		self.autoCloseSuccessMsg = setTimeout(function()
 		{
 			self.closeSingleSuccessMessage(true);
@@ -463,19 +504,111 @@
 		}
 	};
 
+	BasePageLevelViewModel.prototype.updateSuccessMessages = function(messages, duration)
+	{
+		var self = this,
+			duration = $.isNumeric(duration) ? duration : 4000;
+
+		clearTimeout(self.autoCloseSuccessArrayMsg);
+
+		self.obSuccessMessageArray(messages.map(function(msg) { return { message: msg } }));
+		self.obSuccessMessageArrayDivIsShow(true);
+
+		self.$pageLevel.find(".edit-success.mutiple-success").stop().css("opacity", 1).show();
+		self.autoCloseSuccessArrayMsg = setTimeout(function()
+		{
+			self.closeMutipleSuccessMessage(true);
+		}, duration);
+	};
+
+	/**
+	 * Close the mutiple success message box.
+	 * @param {boolean} fadeEffect Whether the success meessage should be closed with animation. 
+	 */
+	BasePageLevelViewModel.prototype.closeMutipleSuccessMessage = function(fadeEffect)
+	{
+		var self = this;
+		if (fadeEffect)
+		{
+			self.$pageLevel.find(".edit-success.mutiple-success").fadeOut("slow", function()
+			{
+				self.obSuccessMessageArrayDivIsShow(false);
+				self.obSuccessMessageArray.removeAll();
+			});
+		}
+		else
+		{
+			self.obSuccessMessageArrayDivIsShow(false);
+			self.obSuccessMessageArray.removeAll();
+		}
+	};
+
+	BasePageLevelViewModel.prototype.updateWarningMessages = function(messages, duration)
+	{
+		var self = this,
+			duration = $.isNumeric(duration) ? duration : 10000;
+
+		clearTimeout(self.autoCloseWarningArrayMsg);
+
+		self.obWarningMessageArray(messages.map(function(msg) { return { message: msg } }));
+		self.obWarningMessageArrayDivIsShow(true);
+
+		self.$pageLevel.find(".edit-warning").stop().css("opacity", 1).show();
+		self.autoCloseWarningArrayMsg = setTimeout(function()
+		{
+			self.closeWarningMessage(true);
+		}, duration);
+	};
+
+	/**
+	 * Close the warning message box.
+	 * @param {boolean} fadeEffect Whether the warning meessage should be closed with animation.
+	 */
+	BasePageLevelViewModel.prototype.closeWarningMessage = function(fadeEffect)
+	{
+		var self = this;
+		if (fadeEffect)
+		{
+			self.$pageLevel.find(".edit-warning").fadeOut("slow", function()
+			{
+				self.obWarningMessageArrayDivIsShow(false);
+				self.obWarningMessageArray.removeAll();
+			});
+		}
+		else
+		{
+			self.obWarningMessageArrayDivIsShow(false);
+			self.obWarningMessageArray.removeAll();
+		}
+	};
+
 	BasePageLevelViewModel.prototype.closeMessageBox = function(viewModel, e)
 	{
 		var self = this,
 			messageBox = $(e.target).parent();
 		if (messageBox.hasClass("edit-success"))
 		{
-			self.obSuccessMessageDivIsShow(false);
+			if (messageBox.hasClass("single-success"))
+			{
+				self.obSuccessMessageDivIsShow(false);
+			}
+			else
+			{
+				self.obSuccessMessageArrayDivIsShow(false);
+				self.obSuccessMessageArray.removeAll();
+			}
+		}
+		else if (messageBox.hasClass("edit-warning"))
+		{
+			self.obWarningMessageArrayDivIsShow(false);
+			self.obSuccessMessageArray.removeAll();
 		}
 		else
 		{
 			self.isClosed = true;
 			self.obValidationErrors.removeAll();
 			self.obValidationErrorsSpecifed.removeAll();
+			self.obCurrentErrorIndex(0);
 		}
 	};
 
@@ -483,24 +616,17 @@
 	{
 		if (viewModel.field)
 		{
-			if ($(viewModel.field).prop("tagName") === "DIV")
-			{
-				$(viewModel.field)[0].scrollIntoView();
-			}
-			else
-			{
-				$(viewModel.field).focus();
-			}
+			$(viewModel.field).focus();
 		}
 	};
 
 	BasePageLevelViewModel.prototype.dispose = function()
 	{
 		var self = this;
+		self.clearError();
 		if (self.validationMessage && self.validationMessage.length > 0)
 		{
 			self.validationMessage.remove();
 		}
 	};
 })();
-

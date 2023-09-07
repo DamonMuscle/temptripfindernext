@@ -425,5 +425,10 @@
 		}
 		tfModal.modal(options);
 		this.currentBaseModalViewModel.obPageElement(tfModal);
+
+		if (modalViewModel.afterRender)
+		{
+			modalViewModel.afterRender(el);
+		}
 	};
 })();

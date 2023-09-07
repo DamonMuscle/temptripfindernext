@@ -150,12 +150,12 @@
 		}
 	};
 
-	BaseModalViewModel.prototype.afterRender = function()
+	BaseModalViewModel.prototype.afterRender = function(el)
 	{
 		var data = this.data();
 		if (data && data.afterRender)
 		{
-			data.afterRender();
+			data.afterRender(el);
 		}
 	};
 

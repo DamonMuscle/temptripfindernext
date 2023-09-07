@@ -36,13 +36,27 @@
 		<div class="close-button" data-bind="click :closeMessageBox"></div>
 	</div>
 
-	<div data-bind="visible:obSuccessMessageSpecifedDivIsShow">
-		<!--ko foreach:obSuccessMessageSpecifed-->
-		<div class="edit-success" style="margin-left:0; margin-right:0; width:auto;">
+	<div data-bind="visible:obSuccessMessageArrayDivIsShow">
+		<!--ko foreach:obSuccessMessageArray-->
+		<div class="edit-success mutiple-success" style="margin-left:0; margin-right:0; width:auto;">
 			<div class="icon-container">
 				<span class="iconbutton success"></span>
 			</div>
 			<div class="success-description" data-bind="html:message">
+			</div>
+			<div class="close-button" data-bind="click :$parent.closeMessageBox">
+			</div>
+		</div>
+		<!-- /ko -->
+	</div>
+
+	<div data-bind="visible:obWarningMessageArrayDivIsShow">
+		<!--ko foreach:obWarningMessageArray-->
+		<div class="edit-warning" style="margin-left:0; margin-right:0; width:auto;">
+			<div class="icon-container">
+				<span class="iconbutton warning"></span>
+			</div>
+			<div class="warning-description" data-bind="html:message">
 			</div>
 			<div class="close-button" data-bind="click :$parent.closeMessageBox">
 			</div>
