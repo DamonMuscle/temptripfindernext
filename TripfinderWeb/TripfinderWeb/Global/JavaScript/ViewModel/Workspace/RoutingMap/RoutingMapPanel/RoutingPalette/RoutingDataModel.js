@@ -776,7 +776,7 @@
 			delete fieldTrip.routePathAttributes;
 			fieldTrip.FieldTripStops.forEach(function(fieldTripStop)
 			{
-				delete fieldTripStop._geoPath;
+				delete fieldTripStop.Paths;
 				if (!fieldTripStop)
 				{
 					cannotCalculate = true;

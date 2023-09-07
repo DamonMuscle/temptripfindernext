@@ -1647,8 +1647,7 @@
 			await this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated, data });
 		}
 
-		let routePath = fieldTrip.FieldTripStops.filter(stop => !!stop._geoPath).map(stop => stop._geoPath.paths);
-		routePath = _.flatMap(routePath);
+		const routePath = fieldTrip.FieldTripStops.filter(stop => !!stop.Paths && stop.Paths.length > 0).map(stop => stop.Paths);
 		return routePath;
 	}
 	
@@ -1748,13 +1747,13 @@
 							const isTerminalStop = _.last(array) == stop;
 							if (!findInvalidStop)
 							{
-								if (!stop._geoPath && !isTerminalStop)
+								if (!stop.Paths && !isTerminalStop)
 								{
 									message += ` No solution found from Stop ${stop.Sequence}`
 									return { message, findInvalidStop: true };
 								}
 							}
-							else if (findInvalidStop && (stop._geoPath || isTerminalStop))
+							else if (findInvalidStop && (stop.Paths || isTerminalStop))
 							{
 								message +=` to Stop ${ stop.Sequence }.`
 								return { message, findInvalidStop: false};
@@ -1833,10 +1832,11 @@
 		{
 			if (index < tripStops.length - 1)
 			{
-				var stops = self.createStopObjects([tripStops[index], tripStops[index + 1]]);
+				const tripStop = tripStops[index];
+				var stops = self.createStopObjects([tripStop, tripStops[index + 1]]);
 				var createStopsPromise = networkService.createStopFeatureSet(stops);
-				let beforeStop = tripStops[index - 1] ? tripStops[index - 1] : self._getBeforeStop(trip, tripStops[index]);
-				var vertexPromise = self._getVertexesCloseToStopOnPathSeperately(beforeStop, tripStops[index], networkService);
+				let beforeStop = tripStops[index - 1] ? tripStops[index - 1] : self._getBeforeStop(trip, tripStop);
+				var vertexPromise = self._getVertexesCloseToStopOnPathSeperately(beforeStop, tripStop, networkService);
 				return Promise.all([createStopsPromise, vertexPromise]).then(function(res)
 				{
 					var stopFeatureSet = res[0];
@@ -1853,13 +1853,13 @@
 						var result = res.results;
 						if (!result.routeResults)
 						{
-							tripStops[index]._geoPath = null;
+							tripStop.Paths = null;
 						}
 						else
 						{
 							var pathSegments = self._createPathSegments(result);
 							pathSegments = self._updatePathSegments(pathSegments, [vertex, null]);
-							tripStops[index] = self._createTripStops(trip, [tripStops[index]], pathSegments)[0];
+							tripStop = self._createTripStops(trip, [tripStop], pathSegments)[0];
 						}
 						index++;
 						solveRequest();
@@ -1867,10 +1867,10 @@
 					}, function(err)
 					{
 						errMessage = err;
-						tripStops[index]._geoPath = null;
-						tripStops[index].Distance = 0;
-						tripStops[index].DrivingDirections = "";
-						tripStops[index].Speed = 0;
+						tripStop.Paths = null;
+						tripStop.Distance = 0;
+						tripStop.DrivingDirections = "";
+						tripStop.Speed = 0;
 						index++;
 						solveRequest();
 						return promise;
@@ -1938,21 +1938,21 @@
 		{
 			if (beforeStop)
 			{
-				var prevPath = beforeStop._geoPath;
-				if (!prevPath)
+				var prevPaths = beforeStop.Paths;
+				if (!prevPaths)
 				{
 					return null;
 				}
-				return self._findVertexToStopOnPath(prevPath, afterStop, networkService);
+				return self._findVertexToStopOnPath(prevPaths, afterStop, networkService);
 			}
 			return null;
 		}
 	}
 
-	FieldTripMapOperation.prototype._findVertexToStopOnPath = function(path, stop, networkService)
+	FieldTripMapOperation.prototype._findVertexToStopOnPath = function(paths, stop, networkService)
 	{
-		if (!path || !path.paths || !path.paths[0] || !path.paths[0][0]) return;
-		var polyline = TF.GIS.GeometryHelper.ComputeWebMercatorPolyline(path.paths);
+		if (!paths || !paths[0]) return;
+		var polyline = TF.GIS.GeometryHelper.ComputeWebMercatorPolyline(paths);
 		var point = TF.GIS.GeometryHelper.ComputeWebMercatorPoint(stop.XCoord, stop.YCoord);
 		var startPoint = polyline.paths[0][0];
 		var distance1 = Math.sqrt((startPoint[0] - point.x) * (startPoint[0] - point.x) + (startPoint[1] - point.y) * (startPoint[1] - point.y));
@@ -1977,13 +1977,12 @@
 		const directions = (result && result.routeResults) ? result.routeResults[0].directions : null;
 		if (directions === null)
 		{
-			pathSegments.push({ geometry: TF.GIS.GeometryHelper.CreateWebMercatorPolyline([]) });
+			pathSegments.push({ paths: [] });
 			return pathSegments;
 		}
 
 		const directionFeatures = directions.features;
-		let stopToStopPathGeometry = TF.GIS.GeometryHelper.CreateWebMercatorPolyline([]);
-		stopToStopPathGeometry.paths = [[]];
+		let stopToStopPaths = [];
 		let stopToStopPathDirections = "";
 		let stopToStopPathLength = 0;
 		let stopToStopPathTime = 0;
@@ -1996,14 +1995,13 @@
 			if (maneuverType === "esriDMTStop")
 			{
 				pathSegments.push({
-					geometry: stopToStopPathGeometry.clone(),
-					paths: [...stopToStopPathGeometry.paths[0]],
+					paths: [...stopToStopPaths],
 					length: stopToStopPathLength,
 					time: stopToStopPathTime,
 					direction: stopToStopPathDirections
 				});
 
-				stopToStopPathGeometry.paths[0] = [];
+				stopToStopPaths = [];
 				stopToStopPathLength = 0;
 				stopToStopPathTime = 0;
 				stopToStopPathDirections = "";
@@ -2018,7 +2016,7 @@
 				stopToStopPathDirections += `${attributes.text} ${attributes.length.toFixed(2)} km. \n`;
 			}
 
-			stopToStopPathGeometry.paths[0] = stopToStopPathGeometry.paths[0].concat(feature.geometry.paths[0]);
+			stopToStopPaths = stopToStopPaths.concat(feature.geometry.paths[0]);
 			stopToStopPathLength += attributes.length;
 			stopToStopPathTime += attributes.time;
 		}
@@ -2031,19 +2029,21 @@
 		var self = this;
 		tripStops.forEach(function(stop, index)
 		{
-			if (pathSegments[index] && !stop.failedStop)
+			const segment = pathSegments[index];
+			if (segment && !stop.failedStop)
 			{
-				stop.DrivingDirections = pathSegments[index].direction;
+				stop.DrivingDirections = segment.direction;
 				stop.RouteDrivingDirections = stop.DrivingDirections;
 				stop.IsCustomDirection = false;
-				stop.Speed = (pathSegments[index].time && pathSegments[index].time != 0) ? (pathSegments[index].length / pathSegments[index].time) * 60 : 0;
+				stop.Speed = (segment.time && segment.time != 0) ? (segment.length / segment.time) * 60 : 0;
 				stop.StreetSpeed = stop.Speed;
-				stop.Distance = pathSegments[index].length ? pathSegments[index].length * 1 : -1;
-				stop._geoPath = pathSegments[index].geometry;
+				stop.Distance = segment.length ? segment.length * 1 : -1;
+				stop.Paths = segment.paths;
 			}
 			else if (stop.failedStop || self._isLastStop(fieldTrip, stop, tripStops))
 			{
 				stop.path = {};
+				stop.Paths = [];
 				stop.Distance = 0;
 				stop.Speed = 0;
 				stop.DrivingDirections = "";

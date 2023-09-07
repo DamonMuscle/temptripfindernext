@@ -656,7 +656,7 @@
 				stop.PrimaryDestination = true;
 				stop.StopTimeArrive = stop.StopTimeArrive || stop.StopTimeDepart;
 				stop.StopTimeDepart = null;
-				stop._geoPath = null;
+				stop.Paths = null;
 			}
 			else
 			{
