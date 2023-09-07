@@ -21,7 +21,7 @@
 
 		self.arrivalDateTime = ko.computed(function()
 		{
-			const arrivalDateTime = self.momentHelper.getDateTime(self.arrivalDate(), self.arrivalTime(), true);
+			const arrivalDateTime = self.momentHelper.compositeDateTime(self.arrivalDate(), self.arrivalTime(), true);
 			const stopTime = self.dataModel.getFieldTripStopTime(self.tripStop);
 
 			var minutesDiff = 0;

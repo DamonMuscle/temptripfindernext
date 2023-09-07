@@ -126,7 +126,11 @@
 		return dt.format("hh:mm A");
 	}
 
-	MomentHelper.prototype.getDateTime = function (datePart, timePart, isUtc)
+	/**
+	 * supporting time format: HH:mm:ss HH:mm:ss.SSS and hh:mm A(ignore case)
+	 * Let's assume this format("03:01:33.222 PM") is invalid
+	 */
+	MomentHelper.prototype.compositeDateTime = function (datePart, timePart, isUtc)
 	{
 		if (!datePart || !timePart)
 		{
@@ -139,10 +143,17 @@
 			datePart = datePart.substring(0, tDateIndex);
 		}
 
+		datePart = datePart.replaceAll("-", "/");
+
 		const tTimeIndex = timePart.indexOf("T")
 		if (tTimeIndex > -1)
 		{
 			timePart = timePart.substring(tTimeIndex + 1);
+		}
+		const dotIndex = timePart.indexOf(".");
+		if (dotIndex > -1)
+		{
+			timePart = timePart.substring(0, dotIndex);
 		}
 
 		const dtDate = moment(`${datePart} ${timePart}`);

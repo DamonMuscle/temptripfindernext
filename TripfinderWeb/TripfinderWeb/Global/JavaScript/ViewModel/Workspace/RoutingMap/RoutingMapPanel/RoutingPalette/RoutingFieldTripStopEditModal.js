@@ -674,7 +674,7 @@
 
 	RoutingFieldTripStopEditModal.prototype.obStopTimeArrivePartialChange = function()
 	{
-		const value = this.momentHelper.getDateTime(this.obStopTimeArriveDate(), this.obStopTimeArriveTime(), true);
+		const value = this.momentHelper.compositeDateTime(this.obStopTimeArriveDate(), this.obStopTimeArriveTime(), true);
 		if (value)
 		{
 			this.obDataModel.StopTimeArrive(value);
@@ -696,7 +696,7 @@
 
 	RoutingFieldTripStopEditModal.prototype.obStopTimeDepartPartialChange = function()
 	{
-		const value = this.momentHelper.getDateTime(this.obStopTimeDepartDate(), this.obStopTimeDepartTime(), true);
+		const value = this.momentHelper.compositeDateTime(this.obStopTimeDepartDate(), this.obStopTimeDepartTime(), true);
 		if (value)
 		{
 			this.obDataModel.StopTimeDepart(value);
