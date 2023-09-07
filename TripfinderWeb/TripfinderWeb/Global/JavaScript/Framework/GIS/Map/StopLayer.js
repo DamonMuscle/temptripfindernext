@@ -149,7 +149,7 @@
 		const geocodeStop = await this.getGeocodeStop(longitude, latitude);
 		if (geocodeStop?.Address !== "")
 		{
-			movingStopGraphic.attributes.Name = geocodeStop.Address;
+			movingStopGraphic.attributes.Name = geocodeStop?.Address || "Unnamed";
 		}
 
 		const data = Object.assign({}, { longitude, latitude }, geocodeStop);

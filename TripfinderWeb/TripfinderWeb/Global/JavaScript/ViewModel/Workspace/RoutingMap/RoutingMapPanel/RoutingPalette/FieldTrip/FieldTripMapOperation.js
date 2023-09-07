@@ -1899,8 +1899,8 @@
 					allPoints = allPoints.concat(path);
 				});
 				pathSegments[1].geometry.paths[0] = allPoints.concat(pathSegments[1].geometry.paths[0]);
-				pathSegments[1].length = parseFloat(pathSegments[0].length) + parseFloat(pathSegments[1].length);
-				pathSegments[1].time = parseFloat(pathSegments[0].time) + parseFloat(pathSegments[1].time);
+				pathSegments[1].length = pathSegments[0].length + pathSegments[1].length;
+				pathSegments[1].time = pathSegments[0].time + pathSegments[1].time;
 			}
 			pathSegments = pathSegments.slice(1, pathSegments.length);
 		}
@@ -1914,8 +1914,8 @@
 				{
 					pathSegments[pathSegments.length - 2].geometry.paths[0] = pathSegments[pathSegments.length - 2].geometry.paths[0].concat(path);
 				});
-				pathSegments[pathSegments.length - 2].length = parseFloat(pathSegments[pathSegments.length - 2].length) + parseFloat(pathSegments[pathSegments.length - 1].length);
-				pathSegments[pathSegments.length - 2].time = parseFloat(pathSegments[pathSegments.length - 2].time) + parseFloat(pathSegments[pathSegments.length - 1].time);
+				pathSegments[pathSegments.length - 2].length = pathSegments[pathSegments.length - 2].length + pathSegments[pathSegments.length - 1].length;
+				pathSegments[pathSegments.length - 2].time = pathSegments[pathSegments.length - 2].time + pathSegments[pathSegments.length - 1].time;
 			}
 			pathSegments = pathSegments.slice(0, pathSegments.length - 1);
 		}
@@ -1973,51 +1973,56 @@
 
 	FieldTripMapOperation.prototype._createPathSegments = function(result)
 	{
-		var self = this, pathSegments = [];
-		var stopToStopPathGeometry = TF.GIS.GeometryHelper.CreateWebMercatorPolyline([]);
-		var stopToStopPathDirections = "";
-		stopToStopPathGeometry.paths = [
-			[]
-		];
-		var stopToStopPathLength = 0;
-		var stopToStopPathTime = 0;
-		if (result && result.routeResults)
+		const pathSegments = [];
+		const directions = (result && result.routeResults) ? result.routeResults[0].directions : null;
+		if (directions === null)
 		{
-			result.routeResults[0].directions.features.forEach(function(feature)
-			{
-				if (feature.attributes.maneuverType == "esriDMTStop")
-				{
-					pathSegments.push({
-						geometry: TF.cloneGeometry(stopToStopPathGeometry),
-						length: stopToStopPathLength.toString(),
-						time: stopToStopPathTime.toString(),
-						direction: stopToStopPathDirections
-					});
-					stopToStopPathGeometry.paths[0] = [];
-					stopToStopPathLength = 0;
-					stopToStopPathTime = 0;
-					stopToStopPathDirections = "";
-				}
+			pathSegments.push({ geometry: TF.GIS.GeometryHelper.CreateWebMercatorPolyline([]) });
+			return pathSegments;
+		}
 
-				if (feature.attributes.maneuverType == "railroadStop")
-				{
-					stopToStopPathDirections += "WARNING CROSS OVER RAILROAD.\n";
-				}
-				else if (feature.attributes.maneuverType != "esriDMTDepart" && feature.attributes.maneuverType != "esriDMTStop")
-				{
-					stopToStopPathDirections += feature.attributes.text + " " + feature.attributes.length.toFixed(2) + " km. \n";
-				}
-				stopToStopPathGeometry.paths[0] = stopToStopPathGeometry.paths[0].concat(feature.geometry.paths[0]);
-				stopToStopPathLength += feature.attributes.length;
-				stopToStopPathTime += feature.attributes.time;
-			});
-		}
-		else
+		const directionFeatures = directions.features;
+		let stopToStopPathGeometry = TF.GIS.GeometryHelper.CreateWebMercatorPolyline([]);
+		stopToStopPathGeometry.paths = [[]];
+		let stopToStopPathDirections = "";
+		let stopToStopPathLength = 0;
+		let stopToStopPathTime = 0;
+
+		for (let i = 0, count = directionFeatures.length; i < count; i++)
 		{
-			pathSegments.push({
-				geometry: TF.GIS.GeometryHelper.CreateWebMercatorPolyline([])
-			});
+			const feature = directionFeatures[i];
+			const attributes = feature.attributes;
+			const maneuverType = feature.attributes.maneuverType;
+			if (maneuverType === "esriDMTStop")
+			{
+				pathSegments.push({
+					geometry: stopToStopPathGeometry.clone(),
+					paths: [...stopToStopPathGeometry.paths[0]],
+					length: stopToStopPathLength,
+					time: stopToStopPathTime,
+					direction: stopToStopPathDirections
+				});
+
+				stopToStopPathGeometry.paths[0] = [];
+				stopToStopPathLength = 0;
+				stopToStopPathTime = 0;
+				stopToStopPathDirections = "";
+			}
+
+			if (maneuverType == "railroadStop")
+			{
+				stopToStopPathDirections += "WARNING CROSS OVER RAILROAD.\n";
+			}
+			else if (maneuverType != "esriDMTDepart" && maneuverType != "esriDMTStop")
+			{
+				stopToStopPathDirections += `${attributes.text} ${attributes.length.toFixed(2)} km. \n`;
+			}
+
+			stopToStopPathGeometry.paths[0] = stopToStopPathGeometry.paths[0].concat(feature.geometry.paths[0]);
+			stopToStopPathLength += attributes.length;
+			stopToStopPathTime += attributes.time;
 		}
+
 		return pathSegments;
 	}
 
