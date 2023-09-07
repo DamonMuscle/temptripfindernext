@@ -477,9 +477,11 @@
 				self.initTitle(false, data[0].OpenType);
 				self.init().then(() =>
 				{
-					const [editingStop] = data,
-						totalStopMinutes = moment(editingStop.StopTimeDepart).diff(moment(editingStop.StopTimeArrive), "minutes");
-					self.obStopPauseMinutes(Number.isNaN(totalStopMinutes) ? null : totalStopMinutes);
+					if (typeof self.initStopPauseMinutes === "function")
+					{
+						const [editingStop] = data;
+						self.initStopPauseMinutes(editingStop);
+					}
 				}).then(function()
 				{
 					self.show();

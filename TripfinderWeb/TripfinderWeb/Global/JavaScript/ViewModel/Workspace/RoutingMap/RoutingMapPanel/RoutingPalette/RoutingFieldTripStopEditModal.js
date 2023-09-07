@@ -256,6 +256,16 @@
 		if (d.bufferUnit) self.obSelectedBufferUnit(d.bufferUnit);
 	};
 
+	/**
+	 * invoke this function when edit a stop
+	 */
+	RoutingFieldTripStopEditModal.prototype.initStopPauseMinutes = function(editingStop)
+	{
+		const self = this,
+			totalStopMinutes = moment(editingStop.StopTimeDepart).diff(moment(editingStop.StopTimeArrive), "minutes");
+		self.obStopPauseMinutes(Number.isNaN(totalStopMinutes) ? null : totalStopMinutes);
+	};
+
 	RoutingFieldTripStopEditModal.prototype.onTripStopsChangeEvent = function(e, items)
 	{
 		var self = this;
@@ -513,13 +523,6 @@
 		});
 	};
 
-	RoutingFieldTripStopEditModal.prototype.stopCreate = function()
-	{
-		var self = this;
-		self.fieldTripPaletteSectionVM.drawTool._clearTempDrawing();
-		self.reject();
-	};
-
 	RoutingFieldTripStopEditModal.prototype._update = function(data)
 	{
 		const canNotEditFields = ['LockStopTime', 'Speed', 'DrivingDirections', 'SchoolLocation'];
@@ -705,7 +708,6 @@
 		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.hide.call(this);
 		this.removeStopSequenceGraphics();
 		this.obIsMultipleCreate(false);
-		this.obStopPauseMinutes(null);
 	};
 
 	RoutingFieldTripStopEditModal.prototype._calculateSortedSequence = function(trip)
