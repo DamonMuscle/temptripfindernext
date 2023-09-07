@@ -1859,7 +1859,7 @@
 						{
 							var pathSegments = self._createPathSegments(result);
 							pathSegments = self._updatePathSegments(pathSegments, [vertex, null]);
-							tripStop = self._createTripStops(trip, [tripStop], pathSegments)[0];
+							tripStops[index] = self._createTripStops(trip, [tripStop], pathSegments)[0];
 						}
 						index++;
 						solveRequest();
@@ -1889,7 +1889,8 @@
 	{
 		if (vertexes && vertexes[0] && vertexes[0].geometry)
 		{
-			var firstSegmentGeom = TF.GIS.GeometryHelper.SimplifyGeometry(pathSegments[0].geometry);
+			const pathGeometry = TF.GIS.GeometryHelper.ComputeWebMercatorPolyline(pathSegments[0].paths);
+			var firstSegmentGeom = TF.GIS.GeometryHelper.SimplifyGeometry(pathGeometry);
 			if (firstSegmentGeom && firstSegmentGeom.paths[0].length > 2 && pathSegments[0] && pathSegments[1])
 			{
 				firstSegmentGeom.removePoint(0, 0);
@@ -1898,7 +1899,7 @@
 				{
 					allPoints = allPoints.concat(path);
 				});
-				pathSegments[1].geometry.paths[0] = allPoints.concat(pathSegments[1].geometry.paths[0]);
+				pathSegments[1].paths = allPoints.concat(pathSegments[1].paths);
 				pathSegments[1].length = pathSegments[0].length + pathSegments[1].length;
 				pathSegments[1].time = pathSegments[0].time + pathSegments[1].time;
 			}
@@ -1906,13 +1907,14 @@
 		}
 		if (vertexes && vertexes[1] && vertexes[1].geometry)
 		{
-			var lastSegmentGeom = TF.GIS.GeometryHelper.SimplifyGeometry(pathSegments[pathSegments.length - 1].geometry);
+			const pathGeometry = TF.GIS.GeometryHelper.ComputeWebMercatorPolyline(pathSegments[pathSegments.length - 1].paths);
+			var lastSegmentGeom = TF.GIS.GeometryHelper.SimplifyGeometry(pathGeometry);
 			if (lastSegmentGeom && lastSegmentGeom.paths[0].length > 2 && pathSegments[pathSegments.length - 2] && pathSegments[pathSegments.length - 1])
 			{
 				lastSegmentGeom.removePoint(0, lastSegmentGeom.paths[0].length - 1);
 				lastSegmentGeom.paths.forEach(function(path)
 				{
-					pathSegments[pathSegments.length - 2].geometry.paths[0] = pathSegments[pathSegments.length - 2].geometry.paths[0].concat(path);
+					pathSegments[pathSegments.length - 2].paths = pathSegments[pathSegments.length - 2].paths.concat(path);
 				});
 				pathSegments[pathSegments.length - 2].length = pathSegments[pathSegments.length - 2].length + pathSegments[pathSegments.length - 1].length;
 				pathSegments[pathSegments.length - 2].time = pathSegments[pathSegments.length - 2].time + pathSegments[pathSegments.length - 1].time;
