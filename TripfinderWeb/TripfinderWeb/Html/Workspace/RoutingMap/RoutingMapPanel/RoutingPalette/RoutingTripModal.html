@@ -14,7 +14,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="row trip-info-container" data-bind="visible:obTabPage() == TF.RoutingMap.RoutingPalette.RoutingTripViewModel.PageTab.TripInfo">
+	<div class="row trip-info-container" data-bind="visible:false">
 		<div class="row">
 			<div class="col-xs-13">
 				<div class="col-xs-24 form-group group-row">
@@ -23,7 +23,7 @@
 							<label class="requirestar normal-font-size">Name</label>
 						</div>
 						<div class="col-xs-9 group-error">
-							<input type="text" name="tripname" class="form-control notinput-required-message" data-bind="value:obNameError(), attr: { 'data-bv-error-name': 'TripName'}" required />
+							<!-- <input type="text" name="tripname" class="form-control notinput-required-message" data-bind="value:obNameError(), attr: { 'data-bv-error-name': 'TripName'}" required /> -->
 						</div>
 						<input type="text" name="name" maxlength="150" autocomplete="off" data-bind="value:obEntityDataModel().name,disable:isDisabled" class="form-control">
 					</div>
@@ -188,8 +188,8 @@
 								</div>
 								<div class="col-xs-12 group-error">
 									<!-- input for require message -->
-									<input type="text" name="triprequirements" class="form-control notinput-required-message" data-bind="value:obTripRequirements(), attr: { 'data-bv-error-name': tf.applicationTerm.getApplicationTermSingularByName(
-														'Trip Requirements')}" required />
+									<!-- <input type="text" name="triprequirements" class="form-control notinput-required-message" data-bind="value:obTripRequirements(), attr: { 'data-bv-error-name': tf.applicationTerm.getApplicationTermSingularByName(
+														'Trip Requirements')}" required /> -->
 								</div>
 							</div>
 							<div class="col-xs-24 group-element-row">
@@ -226,7 +226,7 @@
 						</div>
 						<div class="col-xs-12 group-error">
 							<!-- input for require message -->
-							<input type="text" name="dayofweek" class="form-control notinput-required-message" data-bind="value:obDayOfWeek(), attr: { 'data-bv-error-name': 'DayOfWeek'}" required />
+							<!-- <input type="text" name="dayofweek" class="form-control notinput-required-message" data-bind="value:obDayOfWeek(), attr: { 'data-bv-error-name': 'DayOfWeek'}" required /> -->
 						</div>
 					</div>
 					<div class="col-xs-24 group-element-row">
@@ -265,7 +265,7 @@
 								<span>Start Date :</span>
 							</div>
 							<div class="col-xs-13 group-error" style="padding:0;">
-								<input type="text" name="startdateerror" class="form-control notinput-required-message" data-bind="value:obStartDateValidFlag(), attr: { 'data-bv-error-name': 'TripStartDate'}" />
+								<!-- <input type="text" name="startdateerror" class="form-control notinput-required-message" data-bind="value:obStartDateValidFlag(), attr: { 'data-bv-error-name': 'TripStartDate'}" /> -->
 							</div>
 						</div>
 						<div class="col-xs-24 group-element-row">
@@ -279,7 +279,7 @@
 								<span>End Date :</span>
 							</div>
 							<div class="col-xs-13 group-error" style="padding:0;">
-								<input type="text" name="enddateerror" class="form-control notinput-required-message" data-bind="value:obEndDateValidFlag(), attr: { 'data-bv-error-name': 'TripEndDate'}" />
+								<!-- <input type="text" name="enddateerror" class="form-control notinput-required-message" data-bind="value:obEndDateValidFlag(), attr: { 'data-bv-error-name': 'TripEndDate'}" /> -->
 							</div>
 						</div>
 						<div class="col-xs-24 group-element-row">
@@ -294,7 +294,7 @@
 							<label class="requirestar normal-font-size" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('School')"></label>
 						</div>
 						<div class="col-xs-12 group-error">
-							<input type="text" name="schools" class="form-control notinput-required-message" data-bind="value:obEntityDataModel().schools, attr: { 'data-bv-error-name': tf.applicationTerm.getApplicationTermSingularByName( 'School')}" required />
+							<!-- <input type="text" name="schools" class="form-control notinput-required-message" data-bind="value:obEntityDataModel().schools, attr: { 'data-bv-error-name': tf.applicationTerm.getApplicationTermSingularByName( 'School')}" required /> -->
 						</div>
 					</div>
 					<div class="input-group">
@@ -319,7 +319,7 @@
 							<label class="requirestar normal-font-size">Travel Scenario</label>
 						</div>
 						<div class="col-xs-12 group-error">
-							<input type="text" name="travelScenario" class="form-control notinput-required-message" data-bind="value:obTravelScenario, attr: { 'data-bv-error-name': 'Travel Scenario'}" required />
+							<!-- <input type="text" name="travelScenario" class="form-control notinput-required-message" data-bind="value:obTravelScenario, attr: { 'data-bv-error-name': 'Travel Scenario'}" required /> -->
 						</div>
 					</div>
 					<div class="input-group">
@@ -346,24 +346,24 @@
 			<div class="col-xs-15 stop-info-container" style="width:62%">
 				<div class="stop-info-head">
 					<div class="col-xs-9" style="text-indent:41px">Stop Name</div>
-					<div class="col-xs-4 text-center">Stop Time</div>
+					<div class="col-xs-8 text-center">Stop Time</div>
 					<div class="col-xs-5 text-center" style="margin-top: -6px;">
 						<div>Curb Approach</div>
 						<div style="font-size: 10px;display: flex;justify-content: space-evenly;"><span>L</span><span>Either</span><span>R</span></div>
 					</div>
-					<div class="col-xs-5 text-center">Boundary Type</div>
+					<!-- <div class="col-xs-5 text-center">Boundary Type</div> -->
 				</div>
 				<div style="border: 1px solid #d8d8d8;">
 					<!--<div class="trip-empty-layer"></div>-->
 					<div id="trip-Stop-wrapper-sortable" style="overflow-y: auto;height: 459px;">
 						<!-- ko foreach: { data:obTripStops } -->
-						<div class="form-group underlined-blue stop-underlined-item">
+						<div class="form-group underlined-blue stop-underlined-item"  data-bind="css:{'first-stop': $data.PrimaryDeparture, 'last-stop': $data.PrimaryDestination, 'normal-stop': !$data.PrimaryDestination && !$data.PrimaryDeparture}">
 							<div style="width:100%">
 								<div class="col-xs-9 trip-stop-sort-column menu-item-title">
-									<span class="trip-stop-color-icon stop-info-tap" data-bind="text:Sequence, style:{'background-color':color, 'color':$parent.fontColor}" style="margin-top:1px; border:black solid 2px;"></span>
+									<span class="trip-stop-color-icon stop-info-tap" data-bind="text:Sequence, style:{'background-color':$parent.color, 'color':$parent.fontColor}" style="margin-top:1px; border:black solid 2px;"></span>
 									<span data-bind="text:Street"></span>
 								</div>
-								<div class="col-xs-4 trip-stop-sort-column trip-stop-click-able text-center" data-bind="text:convertToMoment(StopTime).format( 'h:mm a'), click:$parent.setTripStopScheduleTime.bind($parent)" style="border-bottom-width:0px;">
+								<div class="col-xs-8 trip-stop-sort-column trip-stop-click-able text-center" data-bind="text:utcToClientTimeZone($parent.dataModel.getFieldTripStopTime($data)).format('YYYY-MM-DDThh:mm a'), click:$parent.setTripStopScheduleTime.bind($parent)" style="border-bottom-width:0px;">
 
 								</div>
 								<div class="col-xs-5 trip-stop-sort-column trip-stop-click-able text-center" style="height: 30px;padding-top:6px;">
@@ -372,8 +372,8 @@
 									<input style="left: 91px;margin-top:4px;cursor:pointer;" type="radio" data-bind="disable:$parent.isDisabled,checkedValue:1,checked:obVehicleCurbApproach" value="1">
 									<div class="stop-curb-line"></div>
 								</div>
-								<div class="col-xs-5 trip-stop-sort-column trip-stop-click-able text-center" data-bind="css: (SchoolCode !=''&&SchoolCode !=null) ? 'disabled' : '', text:(SchoolCode==''||SchoolCode==null) ? (stopBoundaryType=='Walkout' ? (stopBoundaryType + ' (' + (walkoutType === 'Street Path' ? (walkoutDistance + '/' + walkoutBuffer ) : walkoutDistance) + ')') : stopBoundaryType) : 'School', click:$parent.setStopType.bind($parent)">
-								</div>
+								<!-- <div class="col-xs-5 trip-stop-sort-column trip-stop-click-able text-center" data-bind="css: (SchoolCode !=''&&SchoolCode !=null) ? 'disabled' : '', text:(SchoolCode==''||SchoolCode==null) ? (stopBoundaryType=='Walkout' ? (stopBoundaryType + ' (' + (walkoutType === 'Street Path' ? (walkoutDistance + '/' + walkoutBuffer ) : walkoutDistance) + ')') : stopBoundaryType) : 'School', click:$parent.setStopType.bind($parent)">
+								</div> -->
 								<div class="conditional-delete" data-bind="visible:!($parent.hasTripOpen()&& (SchoolCode !=''&&SchoolCode !=null)) && !$parent.isDisabled
 								,click:$parent.deleteTripStop.bind($parent)"></div>
 							</div>
