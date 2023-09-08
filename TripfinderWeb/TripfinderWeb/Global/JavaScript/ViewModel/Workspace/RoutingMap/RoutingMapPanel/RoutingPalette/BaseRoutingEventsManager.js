@@ -152,7 +152,7 @@
 	{
 		for(var i = 0; i < data.length; ++i)
 		{
-			data[i] = $.extend(this.dataModel.fieldTripStopDataModel.getDataModel(), data[i]);
+			data[i] = this.dataModel.fieldTripStopDataModel.createNewData(data[i]);
 		}
 
 		return this.dataModel.fieldTripStopDataModel.addTripStopsToNewTrip(data, options.trip.FieldTripStops, options.trip);

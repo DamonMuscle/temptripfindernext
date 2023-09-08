@@ -1880,7 +1880,9 @@
 		{
 			let tripStop = newTripStops[i];
 
-			if (tripStop.id == 0)
+			let isNewStop = !originalTripStops.some(originalStop => originalStop.id == tripStop.id);
+
+			if (isNewStop)
 			{
 				updatedStops.push(tripStop);
 			}
@@ -1888,7 +1890,7 @@
 			{
 				let orignalTripStop = originalTripStops.filter(r => r.id == tripStop.id)[0];
 
-				if (orignalTripStop.Sequence != tripStop.Sequence)
+				if (orignalTripStop.Sequence != tripStop.Sequence || orignalTripStop.obVehicleCurbApproach() != tripStop.obVehicleCurbApproach())
 				{
 					updatedStops.push(tripStop);
 				}
