@@ -1493,33 +1493,6 @@
 				});
 			});
 		});
-
-		return Promise.all(pList).then(function(result)
-		{
-			result.map(function(r, index)
-			{
-				if (r)
-				{
-					if (newStopList[index].sourceType == "student" && newStopList[index].stopBoundaryType == "Door-to-Door")
-					{
-						newStopList[index].boundary.geometry = stopTool.createDoorToDoorPolygon(r, newStopList[index].sourceStudentGeom).geometry;
-					} else
-					{
-						newStopList[index].boundary = r.walkoutZone;
-					}
-					newStopList[index].boundary.TripStopId = newStopList[index].id;
-
-					for (var i = 0; i < newTrip.FieldTripStops.length; i++)
-					{
-						if (newTrip.FieldTripStops[i].id === newStopList[index].id)
-						{
-							newTrip.FieldTripStops[i] = self.dataModel.fieldTripStopDataModel.createNewData(newStopList[index], true);
-							break;
-						}
-					}
-				}
-			});
-		});
 	};
 
 	RoutingTripViewModel.prototype.needUpdateTrip = function()
@@ -1894,6 +1867,37 @@
 			self._lockWeekDayChange = false;
 		}
 	};
+
+	RoutingTripViewModel.prototype.getUpdatedStops = function(newFieldTrip)
+	{
+		const self = this;
+		let originalTripStops = self.options.trip.FieldTripStops;
+		let newTripStops = newFieldTrip.FieldTripStops;
+
+		let updatedStops = [];
+
+		for(let i = 0; i < newTripStops.length; ++i)
+		{
+			let tripStop = newTripStops[i];
+
+			if (tripStop.id == 0)
+			{
+				updatedStops.push(tripStop);
+			}
+			else
+			{
+				let orignalTripStop = originalTripStops.filter(r => r.id == tripStop.id)[0];
+
+				if (orignalTripStop.Sequence != tripStop.Sequence)
+				{
+					updatedStops.push(tripStop);
+				}
+			}
+		}
+
+		return updatedStops;
+
+	}
 
 	RoutingTripViewModel.prototype._calculateTripPath = function(newTrip)
 	{

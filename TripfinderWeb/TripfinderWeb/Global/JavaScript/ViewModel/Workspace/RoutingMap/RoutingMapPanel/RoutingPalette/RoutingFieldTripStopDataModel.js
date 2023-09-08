@@ -141,12 +141,6 @@
 
 		return solvePromise.then(function(tripStops)
 		{
-			newTripStops.forEach(function(tripStop)
-			{
-				tripStop.FieldTripId = targetTrip.id;
-				tripStop.DBID = targetTrip.DBID;
-			});
-
 			targetTrip.FieldTripStops = targetTrip.FieldTripStops.concat(newTripStops);
 
 			// trip stops is solved
