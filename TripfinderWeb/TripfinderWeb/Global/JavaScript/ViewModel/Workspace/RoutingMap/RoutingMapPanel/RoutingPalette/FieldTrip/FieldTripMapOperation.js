@@ -45,6 +45,7 @@
 		this.layerManager = new TF.GIS.LayerManager(mapInstance);
 		this._pathLineType = tf.storageManager.get('pathLineType') === 'Sequence' ? PATH_LINE_TYPE.Sequence : PATH_LINE_TYPE.Path;
 		this._fieldTripsData = null;
+		this._fieldTripRoutes = [];
 		this._editing = {
 			isAddingStop: false,
 			isMovingStop: false,
@@ -217,6 +218,8 @@
 	FieldTripMapOperation.prototype.addFieldTripPath = async function(fieldTrip, effectSequences)
 	{
 		await this.drawFieldTripPath(fieldTrip, effectSequences);
+		// TODO: Upgrade with FieldTripRoute
+		// await this._drawFieldTripPath(fieldTrip, effectSequences);
 		await this.drawSequenceLine(fieldTrip);
 	}
 
@@ -1385,9 +1388,45 @@
 			return;
 		}
 
+		this._calculatePathAttributesAndDraw(fieldTrip, routePath);
+	}
+
+	FieldTripMapOperation.prototype._drawFieldTripPath = async function(fieldTrip, effectSequences)
+	{
+		let fieldTripRoute = this._fieldTripRoutes.find(item => item.Id === fieldTrip.id);
+		if (fieldTripRoute === undefined)
+		{
+			fieldTripRoute = new TF.GIS.ADT.FieldTripRoute(fieldTrip);
+			this._fieldTripRoutes.push(fieldTripRoute);
+		}
+		else
+		{
+			if (effectSequences && effectSequences.length !== fieldTrip.FieldTripStops.length)
+			{
+				return;
+			}
+
+			fieldTripRoute.reset();
+		}
+
+		await fieldTripRoute.calculateRoute();
+		const routePath = fieldTripRoute.getRoutePaths();
+		if (routePath.length === 0)
+		{
+			return;
+		}
+
+		const data = { fieldTrip };
+		await this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated, data });
+
+		this._calculatePathAttributesAndDraw(fieldTrip, routePath);
+	}
+
+	FieldTripMapOperation.prototype._calculatePathAttributesAndDraw = function(fieldTrip, routePath)
+	{
 		if (!fieldTrip.routePathAttributes)
 		{
-			fieldTrip.routePathAttributes = this._computePathAttributes(fieldTrip, null);
+			fieldTrip.routePathAttributes = this._computePathAttributes(fieldTrip);
 		}
 
 		if (this.isNewCopy(fieldTrip))
@@ -1679,12 +1718,11 @@
 		});
 	}
 
-	FieldTripMapOperation.prototype._computePathAttributes = function(fieldTrip, routeResult)
+	FieldTripMapOperation.prototype._computePathAttributes = function(fieldTrip)
 	{
 		const Color = this._getColor(fieldTrip),
 			{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip),
-			route = routeResult?.route,
-			attributes = Object.assign({}, route?.attributes, {DBID, FieldTripId, Color});
+			attributes = { DBID, FieldTripId, Color };
 		return attributes;
 	}
 

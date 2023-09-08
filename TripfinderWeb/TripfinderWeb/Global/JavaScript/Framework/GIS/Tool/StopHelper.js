@@ -17,7 +17,7 @@
 			const x = clonePolyline.paths[0][0][0], y = clonePolyline.paths[0][0][1];
 			return TF.GIS.GeometryHelper.CreateWebMercatorPoint(x, y);
 		}
-		
+
 		let totalSegmentLength = 0;
 		for (let i = 0; i < clonePolyline.paths[0].length - 1; i++)
 		{
