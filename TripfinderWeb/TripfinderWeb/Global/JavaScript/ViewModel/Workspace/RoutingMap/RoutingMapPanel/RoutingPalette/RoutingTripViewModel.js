@@ -145,6 +145,7 @@
 		this.isColorChanged = ko.observable(false);
 
 		this.isDisabled = !!(options.trip && options.trip.OpenType == "View");
+		this.disableOptimizeSequence = true;
 
 
 		// tap
