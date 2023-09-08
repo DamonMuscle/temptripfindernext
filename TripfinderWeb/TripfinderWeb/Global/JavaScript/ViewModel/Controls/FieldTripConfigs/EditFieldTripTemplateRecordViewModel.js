@@ -207,7 +207,7 @@
 			self.isEdit ? tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "documents"), {
 				paramData: {
 					"@relationships": "FieldTripTemplate,DocumentClassification,LastUpdatedName,DocumentRelationship",
-					"@fields": "Id,FileName,DocumentClassificationName,Attached,FileSizeKB,LastUpdated,LastUpdatedName",
+					"@fields": "Id,FileName,DocumentClassificationName,Attached,FileSizeKB,LastUpdated,LastUpdatedName,DocumentRelationships",
 					attachedToTypeID: self.getDataTypeIdOfFieldTripTemplate(),
 					attachedToID: self.entity.Id
 				}
