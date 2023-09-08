@@ -93,7 +93,7 @@
 
 		if (options.operate && options.operate == 'CreateNewTrip')
 		{
-			return self.fieldTripPaletteSectionVM.editFieldTripStopModal.createMultiple(data, options);
+			return self.createFromMultiple(data, options);
 		}
 		else
 		{
@@ -148,8 +148,14 @@
 
 	};
 
-	BaseRoutingEventsManager.prototype.createFromMultiple = function(pointArray, options)
+	BaseRoutingEventsManager.prototype.createFromMultiple = function(data, options)
 	{
+		for(var i = 0; i < data.length; ++i)
+		{
+			data[i] = $.extend(this.dataModel.fieldTripStopDataModel.getDataModel(), data[i]);
+		}
+
+		return this.dataModel.fieldTripStopDataModel.addTripStopsToNewTrip(data, options.trip.FieldTripStops, options.trip);
 	};
 
 	/**

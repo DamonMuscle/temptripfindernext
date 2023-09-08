@@ -392,6 +392,14 @@
 		return schoolIndex + 1;
 	};
 
+
+	TripHelper.getFieldTripStopInsertSequence = function(stops)
+	{
+		const primaryDestination = stops.find(stop => stop.PrimaryDestination);
+
+		return primaryDestination.Sequence;
+	};	
+
 	TripHelper.confirmDateChangeAffectStudent = function(changedScheduleStds)
 	{
 		if (!changedScheduleStds)

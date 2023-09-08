@@ -111,8 +111,8 @@
 		this.obSelectedFilter.subscribe(this.setFilter, this);
 
 		// trip requirements
-		this.obTripRequirements = ko.observable();
-		ko.computed(this.tripRequirementsImpactedStudentsComputer, this);
+		// this.obTripRequirements = ko.observable();
+		// ko.computed(this.tripRequirementsImpactedStudentsComputer, this);
 
 		this.hasTripOpen = ko.computed(this.hasMultipleOpen, this);
 		this.hasEditTrip = this.dataModel.getEditTrips().length > 0;
@@ -658,11 +658,11 @@
 
 		this.obEntityDataModel().startDate(currentOpenTrip.StartDate);
 		this.obEntityDataModel().endDate(currentOpenTrip.EndDate);
-		var schoolList = (currentOpenTrip.SchoolIds || "").split("!").filter(Boolean);
-		this.setSchools(self.obSchoolsDataModels().filter(function(item)
-		{
-			return schoolList.some(function(c) { return c == item.Id; });
-		}));
+		// var schoolList = (currentOpenTrip.SchoolIds || "").split("!").filter(Boolean);
+		// this.setSchools(self.obSchoolsDataModels().filter(function(item)
+		// {
+		// 	return schoolList.some(function(c) { return c == item.Id; });
+		// }));
 
 		this.setTravelScenario(currentOpenTrip.TravelScenarioId);
 
@@ -1261,14 +1261,14 @@
 	// #endregion
 
 	// #region tripRequirements
-	RoutingTripViewModel.prototype.tripRequirementsImpactedStudentsComputer = function()
-	{
-		this.obTripRequirements((this.obEntityDataModel().hasBusAide() || this.obEntityDataModel().nonDisabled() || this.obEntityDataModel().disabled()) ? "1" : "");
-		if (this.$form)
-		{
-			this.$form.find("input[name=\"triprequirements\"]").change();
-		}
-	};
+	// RoutingTripViewModel.prototype.tripRequirementsImpactedStudentsComputer = function()
+	// {
+	// 	this.obTripRequirements((this.obEntityDataModel().hasBusAide() || this.obEntityDataModel().nonDisabled() || this.obEntityDataModel().disabled()) ? "1" : "");
+	// 	if (this.$form)
+	// 	{
+	// 		this.$form.find("input[name=\"triprequirements\"]").change();
+	// 	}
+	// };
 	// #endregion
 
 	/**
@@ -1377,6 +1377,8 @@
 		$("#trip-Stop-wrapper-sortable").sortable({
 			axis: "y",
 			containment: $("#trip-Stop-wrapper-sortable").closest(".stop-info-container"),
+			cancel: ".first-stop,.last-stop",
+			items: ".normal-stop",
 			start: function(event, ui)
 			{
 				self.lineOriginalIndex = ui.item.index();
@@ -1414,15 +1416,15 @@
 		stopTool.reverseGeocodeStop(data.geometry, data.address).then((result) =>
 		{
 			data.address = result;
-			this.dataModel.viewModel.eventsManager.createFieldTripStopFromSearchResult([data], {operate: "CreateNewTrip"}).then(function(trip)
+			this.dataModel.viewModel.eventsManager.createFieldTripStopFromSearchResult([data], { trip: this.trip, operate: "CreateNewTrip" }).then(function(trip)
 			{
 				if (trip)
 				{
 					self.fixStopTime(trip);
 					self.trip = trip;
 					self.obTripStops([]);
-					self.addStopExtendAttributes(self.trip.TripStops);
-					self.obTripStops(self.trip.TripStops);
+					self.addStopExtendAttributes(self.trip.FieldTripStops);
+					self.obTripStops(self.trip.FieldTripStops);
 				}
 			});
 		});
@@ -1443,15 +1445,8 @@
 
 	RoutingTripViewModel.prototype.fixStopTime = function(trip)
 	{
-		var self = this;
-		for (var i = 0; i < trip.FieldTripStops.length; i++)
-		{
-			if (trip.FieldTripStops[i].StopTime === "00:00:00")
-			{
-				self.setStopTime((i - 1 >= 0) ? trip.FieldTripStops[i - 1] : null, (i + 1 <= trip.FieldTripStops.length - 1) ? trip.FieldTripStops[i + 1] : null, trip.FieldTripStops[i]);
-				break;
-			}
-		}
+		this.dataModel.setFieldTripActualStopTime([trip]);
+		this.dataModel.setStopTimeForEmptyRecords(trip);
 	};
 
 	// #endregion
@@ -1464,40 +1459,41 @@
 		var newTrip = self.trip;
 		var pList = [];
 		var newStopList = [];
-		newTrip.SessionName = TF.RoutingMap.RoutingPalette.RoutingDataModel.sessions[newTrip.Session].name;
 
 		if (this.mode == "create")
 		{
 			newTrip.UnsavedNewTrip = true;
 		}
-		self.routingDirectionDetailViewModel.applyDirection();
-		for (var i = 0; i < newTrip.FieldTripStops.length; i++)
-		{
-			if ((newTrip.FieldTripStops[i].SchoolCode == "" || newTrip.FieldTripStops[i].SchoolCode == null) && !newTrip.FieldTripStops[i].boundary.geometry)
-			{
-				newStopList.push(newTrip.FieldTripStops[i]);
-				if (newTrip.FieldTripStops[i].sourceType == "student" && newTrip.FieldTripStops[i].stopBoundaryType == "Door-to-Door")
-				{
-					pList.push(Promise.resolve(newTrip.FieldTripStops[i].geometry.clone()));
-				}
-				else if (newTrip.FieldTripStops[i].stopBoundaryType == "Current Stop Boundary")
-				{
-					pList.push(Promise.resolve({ walkoutZone: newTrip.FieldTripStops[i].boundary }));
-				}
-				else
-				{
-					pList.push(stopTool.generateWalkoutZone(new tf.map.ArcGIS.Graphic(newTrip.FieldTripStops[i].geometry),
-						newTrip.FieldTripStops[i].stopBoundaryType == "Walkout" ? newTrip.FieldTripStops[i].walkoutDistance : 15,
-						newTrip.FieldTripStops[i].stopBoundaryType == "Walkout" ? newTrip.FieldTripStops[i].distanceUnit : "meters",
-						newTrip.FieldTripStops[i].walkoutBuffer,
-						newTrip.FieldTripStops[i].BufferUnit,
-						newTrip.FieldTripStops[i].stopBoundaryType == "Walkout" ? (newTrip.FieldTripStops[i].walkoutType == "Street Path" ? 0 : 1) : 1,
-						self.trip.color));
-				}
-			}
-		}
 
 		tf.loadingIndicator.show();
+
+		return self.getNewFieldTripStops(newTrip, isTripStopPathChanged).then(function(newTripStops)
+		{
+			newTrip.FieldTripStops = newTripStops;
+			self.changeTripStopSpeeds(newTrip.FieldTripStops);
+
+			return self.dataModel.recalculate([newTrip]).then(function(response)
+			{
+				var tripData = response[0];
+				newTrip.Distance = tripData.Distance;
+				newTrip.FinishTime = tripData.FinishTime;
+				newTrip.StartTime = tripData.StartTime;
+				for (var j = 0; j < newTrip.FieldTripStops.length; j++)
+				{
+					newTrip.FieldTripStops[j].TotalStopTime = tripData.FieldTripStops[j].TotalStopTime;
+					newTrip.FieldTripStops[j].Duration = tripData.FieldTripStops[j].Duration;
+					newTrip.FieldTripStops[j].OpenType = newTrip.OpenType;
+				}
+				self.dataModel.setFieldTripActualStopTime([newTrip]);
+				return self.setTripOptimizeInfo(newTrip).then(function()
+				{
+					tf.loadingIndicator.tryHide();
+
+					return Promise.resolve(newTrip);
+				});
+			});
+		});
+
 		return Promise.all(pList).then(function(result)
 		{
 			result.map(function(r, index)
@@ -1522,34 +1518,6 @@
 						}
 					}
 				}
-			});
-
-			return self.getNewTripStops(newTrip, isTripStopPathChanged).then(function(newTripStops)
-			{
-				newTrip.FieldTripStops = newTripStops;
-				self.changeTripStopSpeeds(newTrip.FieldTripStops);
-
-				return self.dataModel.recalculate([newTrip]).then(function(response)
-				{
-					var tripData = response[0];
-					newTrip.Distance = tripData.Distance;
-					newTrip.FinishTime = tripData.FinishTime;
-					newTrip.StartTime = tripData.StartTime;
-					for (var j = 0; j < newTrip.FieldTripStops.length; j++)
-					{
-						newTrip.FieldTripStops[j].TotalStopTime = tripData.FieldTripStops[j].TotalStopTime;
-						newTrip.FieldTripStops[j].Duration = tripData.FieldTripStops[j].Duration;
-						newTrip.FieldTripStops[j].OpenType = newTrip.OpenType;
-					}
-					self.dataModel.setFieldTripActualStopTime([newTrip]);
-					return self.setTripOptimizeInfo(newTrip).then(function()
-					{
-						tf.loadingIndicator.tryHide();
-						self.needUpdateTrip();
-						self.dataModel.needUpdateTripColor(!self.needUpdateTrip() && self.isColorChanged());
-						return Promise.resolve(newTrip);
-					});
-				});
 			});
 		});
 	};
@@ -1729,51 +1697,15 @@
 		});
 	};
 
-	RoutingTripViewModel.prototype.getNewTripStops = function(newTrip, isTripStopPathChanged)
+	RoutingTripViewModel.prototype.getNewFieldTripStops = function(newTrip, isTripStopPathChanged)
 	{
 		var self = this;
 		var startIndex = 0;
 		var promiseList = [];
 		let isAdditional = false;
-		if ((isTripStopPathChanged || self.obOptimizeSequence()) && newTrip.FieldTripStops.length > 1)
-		{
-			newTrip.FieldTripStops.map(function(tripStop)
-			{
-				tripStop.vehicleCurbApproach = tripStop.obVehicleCurbApproach();
-			});
-			if (self.obOptimizeSequence())
-			{
-				for (var i = 0; i < newTrip.FieldTripStops.length; i++)
-				{
-					if (i != 0 && newTrip.FieldTripStops[i].SchoolCode)
-					{
-						promiseList.push(self.dataModel.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.FieldTripStops.slice(startIndex, i + 1), self.obOptimizeSequence(), null, null, null, newTrip));
-						startIndex = i;
-					}
-					else if (i == newTrip.FieldTripStops.length - 1 && (newTrip.FieldTripStops[i].SchoolCode === "" || newTrip.FieldTripStops[i].SchoolCode === null))
-					{
-						promiseList.push(self.dataModel.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.FieldTripStops.slice(startIndex, i + 1), self.obOptimizeSequence(), null, null, null, newTrip));
-					}
-				}
-			}
-			else
-			{
-				if (self.options && self.options.trip)
-				{
-					isAdditional = true;
-					let tripStopsArray = self._calculateTripPath(newTrip);
-					tripStopsArray.forEach(tripStops => promiseList.push(self.dataModel.viewModel.drawTool.NAtool.refreshTripByMultiStops(tripStops, false, null, null, null, newTrip)));
-				}
-				else
-				{
-					promiseList.push(self.dataModel.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.FieldTripStops, false, null, null, null, newTrip));
-				}
-			}
-		}
-		else
-		{
-			promiseList.push(Promise.resolve(newTrip.FieldTripStops));
-		}
+
+		promiseList.push(Promise.resolve(newTrip.FieldTripStops));
+
 		return Promise.all(promiseList).then(function(newList)
 		{
 			var newTripStops = [];

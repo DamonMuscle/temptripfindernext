@@ -45,10 +45,26 @@
 
 	RoutingTripModalViewModel.prototype.positiveClick = function()
 	{
+		const self = this;
+
 		this.viewModel.apply().then(function(result)
 		{
 			if (result)
 			{
+				var newAddedStops = result.FieldTripStops.filter((stop) => stop.id == 0);
+				const routingDataModel = self.viewModel.dataModel;
+
+				newAddedStops.forEach((stop) => {
+					routingDataModel.fieldTripStopDataModel.insertTripStopToTrip(stop, stop.Sequence - 1);
+				})
+
+				routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.applyAddFieldTripStops(newAddedStops, () => {
+					const fieldTripId = newAddedStops[0].FieldTripId;
+	
+					routingDataModel.changeTripVisibility(fieldTripId, true);
+				});
+	
+
 				this.positiveClose(result);
 			}
 		}.bind(this));
@@ -62,6 +78,19 @@
 			if (result)
 			{
 				self.hide();
+
+				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.ClearHighlightFieldTripStop);
+
+				var drawTool = self.viewModel.dataModel.fieldTripPaletteSectionVM.drawTool;
+
+				if (drawTool)
+				{
+					drawTool._previewLayer.removeAll();
+					drawTool._clearTempDrawing();
+					drawTool.stopTool.clearCandidateGraphics();
+				}
+				
+
 				self.resolve();
 			}
 		});

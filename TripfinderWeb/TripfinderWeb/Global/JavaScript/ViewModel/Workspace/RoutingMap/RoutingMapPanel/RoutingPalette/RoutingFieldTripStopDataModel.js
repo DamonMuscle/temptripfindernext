@@ -121,6 +121,54 @@
 		this.dataModel.onTripsChangeEvent.notify({ add: [], edit: trips, delete: [] });
 	}
 
+	RoutingFieldTripStopDataModel.prototype.addTripStopsToNewTrip = function(newTripStops, insertToStops, targetTrip)
+	{
+		var self = this, stops;
+		self.bindTripDataToTripStop(newTripStops, targetTrip);
+		var solvePromise = Promise.resolve([]);
+
+		if (!self.dataModel.getSmartSequenceSetting())
+		{
+			stops = insertToStops.slice().map(function(stop) { return $.extend({}, stop); });
+			stops = self.appendNewStopsToTrip(newTripStops, stops, targetTrip);
+			solvePromise = Promise.resolve(stops);
+		}
+		else
+		{
+			solvePromise = insertToStops.length === 0 ? Promise.resolve(newTripStops) :
+				self._refreshTripByAddMultiStopsSmart(newTripStops, insertToStops, targetTrip); // if there only a stop, don't need to calculate the path
+		}
+
+		return solvePromise.then(function(tripStops)
+		{
+			newTripStops.forEach(function(tripStop)
+			{
+				tripStop.FieldTripId = targetTrip.id;
+				tripStop.DBID = targetTrip.DBID;
+			});
+
+			targetTrip.FieldTripStops = targetTrip.FieldTripStops.concat(newTripStops);
+
+			// trip stops is solved
+			if (tripStops && tripStops[0])
+			{
+				tripStops.forEach(function(data, i)
+				{
+					var sequence = i + 1;
+					var sourceTripStop = Enumerable.From(targetTrip.FieldTripStops).FirstOrDefault(null, function(c) { return c.id == data.id; });
+					if (sourceTripStop)
+					{
+						sourceTripStop.Sequence = sequence;
+					}
+				});
+
+				targetTrip.FieldTripStops = self._sortTripStops(targetTrip.FieldTripStops);
+			}
+
+			return targetTrip;
+		});
+	};
+
 	RoutingFieldTripStopDataModel.prototype.bindTripDataToTripStop = function(newTripStops, trip)
 	{
 		newTripStops.forEach(function(tripStop)
@@ -359,7 +407,7 @@
 	RoutingFieldTripStopDataModel.prototype.appendNewStopsToTrip = function(newTripStops, stops, targetTrip)
 	{
 		var session = targetTrip && targetTrip.Session ? targetTrip.Session : this.dataModel.getSession();
-		var sequence = TF.Helper.TripHelper.getTripStopInsertSequence(stops, session);
+		var sequence = TF.Helper.TripHelper.getFieldTripStopInsertSequence(stops);
 		stops = stops.slice(0, sequence - 1).concat(newTripStops).concat(stops.slice(sequence - 1, stops.length));
 		stops.forEach(function(stop, i)
 		{
@@ -833,6 +881,11 @@
 	RoutingFieldTripStopDataModel.prototype.insertToRevertData = function(data)
 	{
 		this.mapCanvasPage.revertData.push($.extend({}, data, { geometry: data && data.geometry ? TF.cloneGeometry(data.geometry) : null }));
+	};
+
+	RoutingFieldTripStopDataModel.prototype._sortTripStops = function(stops)
+	{
+		return stops.sort(function(a, b) { return a.Sequence > b.Sequence ? 1 : -1; });
 	};
 
 	RoutingFieldTripStopDataModel.prototype.getDataModel = function()
