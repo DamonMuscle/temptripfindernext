@@ -16,9 +16,79 @@
 		configurable: false
 	});
 
-	FieldTripRoute.prototype._init = function()
+
+	FieldTripRoute.prototype.compute = async function()
 	{
+		if (this._routeStops.length < TF.GIS.NetworkEnum.MIN_ROUTING_STOP_COUNT)
+		{
+			return;
+		}
+
+		try
+		{
+			const routeParameters = await this._getRouteParameters();
+			const response = await networkService.solveRoute(routeParameters);
+			const routeResult = response?.results?.routeResults[0];
+			this._calculateRoutePaths(routeResult);
+
+			this._updateFieldTripStops();
+		}
+		catch (ex)
+		{
+			const errorMessages = ex.details.messages;
+			if (errorMessages && errorMessages.length > 0)
+			{
+				const message = errorMessages[0];
+				if (message.indexOf(TF.GIS.NetworkEnum.ERROR_MESSAGE.NO_SOLUTION) > -1 ||
+					message.indexOf(TF.GIS.NetworkEnum.ERROR_MESSAGE.INVALID_LOCATION) > -1)
+				{
+					console.log("TODO: calculate routePath stop by stop.");
+				}
+			}
+
+			tf.promiseBootbox.alert(`Cannot solve path. One or more of your stops is invalid or unreachable.`);
+			return;
+		}
+	}
+
+	FieldTripRoute.prototype.getRoutePaths = function()
+	{
+		return this._routePaths.map(item => item.Paths);
+	}
+
+	FieldTripRoute.prototype.moveStop = function(routeStopOptions)
+	{
+		const { sequence } = routeStopOptions;
+		const routeStop = new TF.GIS.ADT.RouteStop(options);
+		this._routeStops.find(item => item.Sequence === sequence) = routeStop;
+	}
+
+	FieldTripRoute.prototype.reset = function()
+	{
+		this._routeStops = [];
+		this._routePaths = [];
 		this._initRouteStops();
+	}
+
+	//#region Private Methods
+	
+	FieldTripRoute.prototype._getRouteParameters = async function()
+	{
+		const travelModeName = TF.GIS.ADT.FieldTripRouteConfiguration.TRAVEL_MODE;
+		const travelMode = await networkService.fetchSupportedTravelModes(travelModeName);
+		return {
+			travelMode: travelMode,
+			preserveFirstStop: true,
+			preserveLastStop: true,
+			restrictUTurns: TF.GIS.ADT.FieldTripRouteConfiguration.U_TURN_POLICY,
+			stops: this._getRouteStopFeatureSet()
+		};
+	}
+
+	FieldTripRoute.prototype._getRouteStopFeatureSet = function()
+	{
+		const routeStopGraphics = this._routeStops.map(item => item.toGraphic());
+		return new TF.GIS.SDK.FeatureSet({ features: routeStopGraphics});
 	}
 
 	FieldTripRoute.prototype._initRouteStops = function()
@@ -97,13 +167,13 @@
 			return;
 		}
 
-		let stopToStopPaths, stopToStopPathDirections, stopToStopPathLength, stopToStopPathTime;
+		let routePath, routePathDirections, routePathDistance, routePathTime;
 		const initAccumulator = () =>
 		{
-			stopToStopPaths = [];
-			stopToStopPathLength = 0;
-			stopToStopPathTime = 0;
-			stopToStopPathDirections = "";
+			routePath = [];
+			routePathDistance = 0;
+			routePathTime = 0;
+			routePathDirections = "";
 		}
 
 		initAccumulator();
@@ -112,101 +182,52 @@
 		{
 			const feature = directionFeatures[i];
 			const attributes = feature.attributes;
-			stopToStopPaths = stopToStopPaths.concat(feature.geometry.paths[0]);
-			stopToStopPathLength += attributes.length;
-			stopToStopPathTime += attributes.time;
+			routePath = routePath.concat(feature.geometry.paths[0]);
+			routePathDistance += attributes.length;
+			routePathTime += attributes.time;
 			
 			const maneuverType = attributes.maneuverType;
 			if (maneuverType === TF.GIS.NetworkEnum.MANEUVER_TYPE.STOP)
 			{
 				const options = {
-					distance: stopToStopPathLength,
-					time: stopToStopPathTime,
-					drivingDirections: stopToStopPathDirections,
-					paths: [...stopToStopPaths]
+					distance: routePathDistance,
+					time: routePathTime,
+					drivingDirections: routePathDirections,
+					paths: [...routePath]
 				};
-				const routePath = new TF.GIS.ADT.RoutePath(options);
-				routePath.RouteDrivingDirections = routePath.DrivingDirections;
-				routePath.Speed = (routePath.Time && routePath.Time != 0) ? (routePath.Distance / routePath.Time) * 60 : 0;
-				routePath.StreetSpeed = routePath.Speed;
-				routePaths.push(routePath);
+				const path = new TF.GIS.ADT.RoutePath(options);
+				path.RouteDrivingDirections = path.DrivingDirections;
+				path.Speed = (path.Time && path.Time != 0) ? (path.Distance / path.Time) * 60 : 0;
+				path.StreetSpeed = path.Speed;
+				routePaths.push(path);
 
 				initAccumulator();
 			}
 
 			if (maneuverType == TF.GIS.NetworkEnum.MANEUVER_TYPE.RAILROAD_STOP)
 			{
-				stopToStopPathDirections += "WARNING CROSS OVER RAILROAD.\n";
+				routePathDirections += "WARNING CROSS OVER RAILROAD.\n";
 			}
 			else if (maneuverType != TF.GIS.NetworkEnum.MANEUVER_TYPE.DEPART &&
 					 maneuverType != TF.GIS.NetworkEnum.MANEUVER_TYPE.STOP)
 			{
-				stopToStopPathDirections += `${attributes.text} ${attributes.length.toFixed(2)} km. \n`;
+				routePathDirections += `${attributes.text} ${attributes.length.toFixed(2)} km. \n`;
 			}
 		}
 
 		this._routePaths = routePaths;
 	}
 
-	FieldTripRoute.prototype.calculateRoute = async function()
-	{
-		if (this._routeStops.length < TF.GIS.NetworkEnum.MIN_ROUTING_STOP_COUNT)
-		{
-			return;
-		}
+	//#endregion
+})();
 
-		try
-		{
-			const routeParameters = this._getRouteParameters();
-			const response = await networkService.solveRoute(routeParameters);
-			const routeResult = response?.results?.routeResults[0];
-			this._calculateRoutePaths(routeResult);
+(function()
+{
+	createNamespace("TF.GIS.ADT").FieldTripRouteConfiguration = FieldTripRouteConfiguration;
 
-			this._updateFieldTripStops();
-		}
-		catch (ex)
-		{
-			const errorMessages = ex.details.messages;
-			if (errorMessages && errorMessages.length > 0)
-			{
-				const message = errorMessages[0];
-				if (message.indexOf(TF.GIS.NetworkEnum.ERROR_MESSAGE.NO_SOLUTION) > -1 ||
-					message.indexOf(TF.GIS.NetworkEnum.ERROR_MESSAGE.INVALID_LOCATION) > -1)
-				{
-					console.log("TODO: calculate routePath stop by stop.");
-				}
-			}
+	function FieldTripRouteConfiguration() { }
 
-			tf.promiseBootbox.alert(`Cannot solve path. One or more of your stops is invalid or unreachable.`);
-			return;
-		}
-	}
-
-	FieldTripRoute.prototype.getRoutePaths = function()
-	{
-		return this._routePaths.map(item => item.Paths);
-	}
-
-	FieldTripRoute.prototype.reset = function()
-	{
-		this._routeStops = [];
-		this._routePaths = [];
-		this._init();
-	}
-	
-	FieldTripRoute.prototype._getRouteParameters = function()
-	{
-		return {
-			impedanceAttribute: null,
-			preserveFirstStop: true,
-			preserveLastStop: true,
-			stops: this._getRouteStopFeatureSet()
-		};
-	}
-
-	FieldTripRoute.prototype._getRouteStopFeatureSet = function()
-	{
-		const routeStopGraphics = this._routeStops.map(item => item.toGraphic());
-		return new TF.GIS.SDK.FeatureSet({ features: routeStopGraphics});
-	}
+	FieldTripRouteConfiguration.TRAVEL_MODE = TF.GIS.NetworkEnum.SUPPORT_TRAVEL_MODE.DRIVING_TIME;
+	FieldTripRouteConfiguration.U_TURN_POLICY = TF.GIS.NetworkEnum.U_TURN_POLICY.NOT_ALLOWED;
+	FieldTripRouteConfiguration.PATH_ARROW_POSITION = null;
 })();

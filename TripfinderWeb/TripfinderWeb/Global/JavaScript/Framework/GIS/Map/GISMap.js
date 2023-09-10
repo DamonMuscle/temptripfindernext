@@ -4,18 +4,11 @@
 
 	const MAP_MIN_ZOOM_LEVEL = 2;
 	const MAP_MAX_ZOOM_LEVEL = 23;
-	const WKID_WEB_MERCATOR = 102100;
 	const DEFAULT_MAP_SCALE = 5000;
 	
 	const LAYER_TYPE = {
 		FEATURE: "feature",
 		GRAPHIC: "graphic"
-	};
-
-	const GEOMETRY_TYPE = {
-		POINT: "point",
-		POLYLINE: "polyline",
-		POLYGON: "polygon"
 	};
 
 	const CURSOR_TYPE = {
@@ -33,7 +26,7 @@
 		minZoom: MAP_MIN_ZOOM_LEVEL,
 		zoom: 12,
 		spatialReference: {
-			wkid: WKID_WEB_MERCATOR
+			wkid: TF.GIS.GeometryEnum.WKID.WEB_MERCATOR
 		},
 		highlightOptions: null,
 		background: {
@@ -60,8 +53,6 @@
 
 		this.defineReadOnlyProperty('mapLayerInstances', []);
 		this.defineReadOnlyProperty('LAYER_TYPE', LAYER_TYPE);
-		this.defineReadOnlyProperty('GEOMETRY_TYPE', GEOMETRY_TYPE);
-		this.defineReadOnlyProperty('WKID_WEB_MERCATOR', WKID_WEB_MERCATOR);
 		this.defineReadOnlyProperty('ID', this.settings.mapId);
 		this.create($mapContainer);
 
@@ -200,7 +191,7 @@
 					ymin: center.y - height,
 					ymax: center.y + height,
 					spatialReference: {
-						wkid: WKID_WEB_MERCATOR
+						wkid: TF.GIS.GeometryEnum.WKID.WEB_MERCATOR
 					}
 				});
 			return previousExtent;
@@ -352,7 +343,7 @@
 	{
 		const visibleFeatures = await this.getFullVisibleFeatures();
 		if (visibleFeatures.length === 1 &&
-			visibleFeatures[0].geometry.type === GEOMETRY_TYPE.POINT)
+			visibleFeatures[0].geometry.type === TF.GIS.GeometryEnum.GEOMETRY_TYPE.POINT)
 		{
 			const point = visibleFeatures[0].geometry;
 			this.centerAndZoom(point.longitude, point.latitude);
@@ -461,7 +452,7 @@
 		}
 
 		let spatialQueryGeometry = queryGeometry, findFeatureResults = [];
-		if (queryGeometry && queryGeometry.type === GEOMETRY_TYPE.POINT)
+		if (queryGeometry && queryGeometry.type === TF.GIS.GeometryEnum.GEOMETRY_TYPE.POINT)
 		{
 			// use event extent to check the clicked graphic
 			const queryDistance = this.getScale() / searchScaleFactor;

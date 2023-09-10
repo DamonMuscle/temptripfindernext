@@ -10,7 +10,7 @@
 	const defaultOptions = {
 		id: `layerId_${Date.now()}`,
 		index: null,
-		spatialReference: { wkid: 102100 },
+		spatialReference: { wkid: TF.GIS.GeometryEnum.WKID.WEB_MERCATOR },
 		eventHandlers: {
 			onLayerCreated: null
 		}
@@ -276,7 +276,7 @@
 				queryParams.geometry = geometry;
 			}
 			queryParams.where = condition;
-			queryParams.outSpatialReference = { wkid: 102100 };
+			queryParams.outSpatialReference = { wkid: TF.GIS.GeometryEnum.WKID.WEB_MERCATOR };
 			queryParams.returnGeometry = true;
 			queryParams.outFields = ['*'];
 

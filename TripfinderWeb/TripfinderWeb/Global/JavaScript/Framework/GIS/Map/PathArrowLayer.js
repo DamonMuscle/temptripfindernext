@@ -32,9 +32,9 @@
 	{
 		const self = this;
 		const baseArrowOptions = {
-			geometryType: mapInstance.GEOMETRY_TYPE.POINT,
+			geometryType: TF.GIS.GeometryEnum.GEOMETRY_TYPE.POINT,
 			spatialReference: {
-				wkid: mapInstance.WKID_WEB_MERCATOR
+				wkid: TF.GIS.GeometryEnum.WKID.WEB_MERCATOR
 			},
 			minScale: TF.Helper.MapHelper.zoomToScale(mapInstance.map, 13),
 		};

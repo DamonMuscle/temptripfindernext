@@ -15,34 +15,11 @@
 		serverNetworkServiceRouteUrl: null,
 	};
 
-	const CURB_APPROACH = {
-		'EITHER_SIDE': 0,
-		'RIGHT_SIDE': 1,
-		'LEFT_SIDE': 2,
-		'NO_U_TURN': 3
-	};
-
-	const LOCATION_TYPE = {
-		'STOP': 0,
-		'WAY_POINT': 1,
-		'BREAK': 2
-	};
-
-	const U_TURN_POLICY = {
-		'ALLOWED': 'allow-backtrack',
-		'INTERSECTION_AND_DEAD_ENDS_ONLY': 'at-dead-ends-and-intersections',
-		'DEAD_ENDS_ONLY': 'at-dead-ends-only',
-		'NOT_ALLOWED': 'no-backtrack'
-	};
-
 	function NetworkService(options)
 	{
 		this.settings = Object.assign({}, defaultOptions, options);
 		this._mode = this.settings.mode;
 		this.name = `NetworkService - ${Date.now()}`;
-		this.defineReadOnlyProperty('CURB_APPROACH', CURB_APPROACH);
-		this.defineReadOnlyProperty('LOCATION_TYPE', LOCATION_TYPE);
-		this.defineReadOnlyProperty('U_TURN_POLICY', U_TURN_POLICY);
 	}
 
 	Object.defineProperty(NetworkService.prototype, 'mode', {
@@ -77,14 +54,14 @@
 			outputGeometryPrecision: 0,
 			outputGeometryPrecisionUnits: "feet",
 			outputLines: 'true-shape',
-			outSpatialReference: "3857",
+			outSpatialReference: TF.GIS.GeometryEnum.WKID.WEB_MERCATOR.toString(),
 			pointBarriers: null,
 			polylineBarriers: null,
 			polygonBarriers: null,
 			preserveFirstStop: false,
 			preserveLastStop: false,
 			restrictionAttributes: [],
-			restrictUTurns: U_TURN_POLICY.DEAD_ENDS_ONLY,
+			restrictUTurns: TF.GIS.NetworkEnum.U_TURN_POLICY.DEAD_ENDS_ONLY,
 			returnBarriers: false,
 			returnDirections: true,
 			returnPolygonBarriers: false,
@@ -174,8 +151,8 @@
 	NetworkService.prototype.createStopFeatureSet = async function(stops)
 	{
 		const defaultOptions = {
-			curbApproach: CURB_APPROACH.EITHER_SIDE,
-			locationType: LOCATION_TYPE.STOP,
+			curbApproach: TF.GIS.NetworkEnum.CURB_APPROACH.EITHER_SIDE,
+			locationType: TF.GIS.NetworkEnum.LOCATION_TYPE.STOP,
 			name: "defaultStopName",
 			sequence: null
 		};
@@ -220,7 +197,7 @@
 		});
 	}
 
-	NetworkService.prototype.fetchSupportedTravelModes = async function()
+	NetworkService.prototype.fetchSupportedTravelModes = async function(travelModeName = null)
 	{
 		const self = this;
 
@@ -237,6 +214,11 @@
 				{
 					const serviceDescription = await networkService.fetchServiceDescription(url, self.settings.onlineToken);
 					const { supportedTravelModes } = serviceDescription;
+					if (travelModeName !== null)
+					{
+						const travelMode = supportedTravelModes.filter(item => item.name === travelModeName)[0];
+						resolve(travelMode);
+					}
 					
 					resolve(supportedTravelModes);
 				})();
@@ -256,13 +238,13 @@
 	NetworkService.prototype.unitTest = async function()
 	{
 		const stop1 = {
-			curbApproach: CURB_APPROACH.RIGHT_SIDE,
+			curbApproach: TF.GIS.NetworkEnum.CURB_APPROACH.RIGHT_SIDE,
 			name: "Stop 1 - Transfinder",
 			sequence: 1,
 			longitude: -73.940962,
 			latitude: 42.813198,
 		}, stop2 = {
-			curbApproach: CURB_APPROACH.RIGHT_SIDE,
+			curbApproach: TF.GIS.NetworkEnum.CURB_APPROACH.RIGHT_SIDE,
 			name: "Stop 2 - 43 New Scotland Ave.",
 			sequence: 2,
 			longitude: -73.755210,
@@ -278,6 +260,9 @@
 		{
 			console.log(JSON.stringify(response));
 		});
+
+		const travelModes = await this.fetchSupportedTravelModes(TF.GIS.NetworkEnum.SUPPORT_TRAVEL_MODE.DRIVING_TIME);
+		console.log(travelModes);
 	}
 
 })();

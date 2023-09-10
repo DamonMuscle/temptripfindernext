@@ -906,7 +906,6 @@
 		stop.YCoord = +latitude.toFixed(6);
 
 		const effectSequences = self._computeEffectSequences(fieldTrip, {moveStop: stop});
-
 		await self.refreshFieldTripPath(fieldTrip, effectSequences);
 
 		self.editing.isMovingStop = false;
@@ -1393,7 +1392,7 @@
 
 	FieldTripMapOperation.prototype._drawFieldTripPath = async function(fieldTrip, effectSequences)
 	{
-		let fieldTripRoute = this._fieldTripRoutes.find(item => item.Id === fieldTrip.id);
+		let fieldTripRoute = this.getFieldTripRoute(fieldTrip.id);
 		if (fieldTripRoute === undefined)
 		{
 			fieldTripRoute = new TF.GIS.ADT.FieldTripRoute(fieldTrip);
@@ -1409,7 +1408,7 @@
 			fieldTripRoute.reset();
 		}
 
-		await fieldTripRoute.calculateRoute();
+		await fieldTripRoute.compute();
 		const routePath = fieldTripRoute.getRoutePaths();
 		if (routePath.length === 0)
 		{
@@ -2185,6 +2184,11 @@
 			FieldTripId = fieldTrip.oldId || fieldTrip.id;
 
 		return { DBID, FieldTripId };
+	}
+
+	FieldTripMapOperation.prototype.getFieldTripRoute = function(fieldTripId)
+	{
+		return this._fieldTripRoutes.find(item => item.Id === fieldTripId);
 	}
 
 	FieldTripMapOperation.prototype.showLoadingIndicator = function()
