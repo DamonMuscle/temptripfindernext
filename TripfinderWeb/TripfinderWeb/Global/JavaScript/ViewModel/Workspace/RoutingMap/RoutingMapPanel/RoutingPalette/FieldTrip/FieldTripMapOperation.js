@@ -5,27 +5,27 @@
 
 	//#region Constant
 
-	const RoutingPalette_FieldTripPathArrowLayerId = "RoutingPalette_FieldTrip_PathArrowLayer";
-	const RoutingPalette_FieldTripPathArrowLayer_Index = 1;
-	const RoutingPalette_FieldTripPathLayerId = "RoutingPalette_FieldTrip_PathLayer";
-	const RoutingPalette_FieldTripPathLayer_Index = 2;
-	const RoutingPalette_FieldTripSequenceLineArrowLayerId = "RoutingPalette_FieldTrip_SequenceLineArrowLayer";
-	const RoutingPalette_FieldTripSequenceLineArrowLayer_Index = 3;
-	const RoutingPalette_FieldTripHighlightLayerId = "RoutingPalette_FieldTrip_HighlightLayer";
-	const RoutingPalette_FieldTripHighlightLayer_Index = 4;
-	const RoutingPalette_FieldTripSequenceLineLayerId = "RoutingPalette_FieldTrip_SequenceLineLayer";
-	const RoutingPalette_FieldTripSequenceLineLayer_Index = 5;
-	const RoutingPalette_FieldTripStopLayerId = "RoutingPalette_FieldTrip_StopLayer";
-	const RoutingPalette_FieldTripStopLayer_Index = 6;
-	const RoutingPalette_FieldTripHighlightStopLayerId = "RoutingPalette_FieldTrip_HighlightStopLayer";
-	const RoutingPalette_FieldTripHighlightStopLayer_Index = 8;
+	const FieldTripMap_PathArrowLayerId = "FieldTripMap_PathArrowLayer";
+	const FieldTripMap_PathArrowLayer_Index = 1;
+	const FieldTripMap_PathLayerId = "FieldTripMap_PathLayer";
+	const FieldTripMap_PathLayer_Index = 2;
+	const FieldTripMap_SequenceLineArrowLayerId = "FieldTripMap_SequenceLineArrowLayer";
+	const FieldTripMap_SequenceLineArrowLayer_Index = 3;
+	const FieldTripMap_HighlightLayerId = "FieldTripMap_HighlightLayer";
+	const FieldTripMap_HighlightLayer_Index = 4;
+	const FieldTripMap_SequenceLineLayerId = "FieldTripMap_SequenceLineLayer";
+	const FieldTripMap_SequenceLineLayer_Index = 5;
+	const FieldTripMap_StopLayerId = "FieldTripMap_StopLayer";
+	const FieldTripMap_StopLayer_Index = 6;
+	const FieldTripMap_HighlightStopLayerId = "FieldTripMap_HighlightStopLayer";
+	const FieldTripMap_HighlightStopLayer_Index = 8;
 
 	const PATH_LINE_TYPE = {
 		Path: "Path",
 		Sequence: "Sequence"
 	};
 	const INFO_STOP_COLOR = "#FFFFFF";
-	const FIELD_TRIP_LAYER_TYPE = {
+	const LAYER_TYPE = {
 		PATH: "PathLayer",
 		STOP: "StopLayer"
 	};
@@ -115,24 +115,24 @@
 		}
 
 		const layerOptions = [{
-			id: RoutingPalette_FieldTripPathLayerId,
-			index: RoutingPalette_FieldTripPathLayer_Index,
-			layerType: FIELD_TRIP_LAYER_TYPE.PATH
+			id: FieldTripMap_PathLayerId,
+			index: FieldTripMap_PathLayer_Index,
+			layerType: LAYER_TYPE.PATH
 		}, {
-			id: RoutingPalette_FieldTripSequenceLineLayerId,
-			index: RoutingPalette_FieldTripSequenceLineLayer_Index,
-			layerType: FIELD_TRIP_LAYER_TYPE.PATH
+			id: FieldTripMap_SequenceLineLayerId,
+			index: FieldTripMap_SequenceLineLayer_Index,
+			layerType: LAYER_TYPE.PATH
 		}, {
-			id: RoutingPalette_FieldTripStopLayerId,
-			index: RoutingPalette_FieldTripStopLayer_Index,
-			layerType: FIELD_TRIP_LAYER_TYPE.STOP
+			id: FieldTripMap_StopLayerId,
+			index: FieldTripMap_StopLayer_Index,
+			layerType: LAYER_TYPE.STOP
 		}, {
-			id: RoutingPalette_FieldTripHighlightLayerId,
-			index: RoutingPalette_FieldTripHighlightLayer_Index
+			id: FieldTripMap_HighlightLayerId,
+			index: FieldTripMap_HighlightLayer_Index
 		}, {
-			id: RoutingPalette_FieldTripHighlightStopLayerId,
-			index: RoutingPalette_FieldTripHighlightStopLayer_Index,
-			layerType: FIELD_TRIP_LAYER_TYPE.STOP
+			id: FieldTripMap_HighlightStopLayerId,
+			index: FieldTripMap_HighlightStopLayer_Index,
+			layerType: LAYER_TYPE.STOP
 		}];
 		const layerInstances = await self.layerManager.createLayerInstances(layerOptions);
 
@@ -162,19 +162,19 @@
 
 		if (self.pathArrowLayerInstance && self.sequenceLineArrowLayerInstance)
 		{
-			self.mapInstance.removeLayer(RoutingPalette_FieldTripPathArrowLayerId);
+			self.mapInstance.removeLayer(FieldTripMap_PathArrowLayerId);
 			self.pathArrowLayerInstance.dispose();
 			self.pathArrowLayerInstance = null;
 
-			self.mapInstance.removeLayer(RoutingPalette_FieldTripSequenceLineArrowLayerId);
+			self.mapInstance.removeLayer(FieldTripMap_SequenceLineArrowLayerId);
 			self.sequenceLineArrowLayerInstance.dispose();
 			self.sequenceLineArrowLayerInstance = null;
 		}
 
 		const arrowRenderer = self._getArrowRenderer();
 		const pathArrowLayerOptions = {
-			id: RoutingPalette_FieldTripPathArrowLayerId,
-			index: RoutingPalette_FieldTripPathArrowLayer_Index,
+			id: FieldTripMap_PathArrowLayerId,
+			index: FieldTripMap_PathArrowLayer_Index,
 			renderer: arrowRenderer,
 			eventHandlers: {
 				redraw: self.redrawPathArrowLayer.bind(self)
@@ -184,8 +184,8 @@
 		self.mapInstance.addLayerInstance(self.pathArrowLayerInstance);
 
 		const sequenceArrowLayerOptions = {
-			id: RoutingPalette_FieldTripSequenceLineArrowLayerId,
-			index: RoutingPalette_FieldTripSequenceLineArrowLayer_Index,
+			id: FieldTripMap_SequenceLineArrowLayerId,
+			index: FieldTripMap_SequenceLineArrowLayer_Index,
 			renderer: arrowRenderer,
 			eventHandlers: {
 				redraw: self.redrawSequenceArrowLayer.bind(self)
@@ -768,7 +768,6 @@
 
 	FieldTripMapOperation.prototype.refreshFieldTripPath = async function(fieldTrip, effectSequences, callZoomToLayers = true)
 	{
-		console.log("refreshFieldTripPath");
 		this.clearFieldTripPath(fieldTrip);
 		await this.clearFieldTripPathArrow(fieldTrip);
 
@@ -1232,8 +1231,8 @@
 		{
 			// right click
 
-			const stopGraphics = await self.mapInstance?.findFeaturesByHitTest(event, RoutingPalette_FieldTripStopLayerId);
-			const pathGraphics = await self.mapInstance?.findFeaturesByHitTest(event, RoutingPalette_FieldTripPathLayerId);
+			const stopGraphics = await self.mapInstance?.findFeaturesByHitTest(event, FieldTripMap_StopLayerId);
+			const pathGraphics = await self.mapInstance?.findFeaturesByHitTest(event, FieldTripMap_PathLayerId);
 			if (stopGraphics.length > 0 || pathGraphics.length > 0)
 			{
 				await this.confirmToExitAddingStop(false);
