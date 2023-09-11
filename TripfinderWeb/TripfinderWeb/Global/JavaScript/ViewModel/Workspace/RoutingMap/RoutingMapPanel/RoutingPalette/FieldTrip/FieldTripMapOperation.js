@@ -210,16 +210,14 @@
 
 		this._sortBySequence(fieldTrip.FieldTripStops);
 
+		const fieldTripRoute = this.getFieldTripRoute(fieldTrip);
+
 		this.drawStops(fieldTrip);
 
-		await this.addFieldTripPath(fieldTrip);
-	}
-
-	FieldTripMapOperation.prototype.addFieldTripPath = async function(fieldTrip, effectSequences)
-	{
-		await this.drawFieldTripPath(fieldTrip, effectSequences);
+		// await this.drawFieldTripPath(fieldTrip);
 		// TODO: Upgrade with FieldTripRoute
-		// await this._drawFieldTripPath(fieldTrip, effectSequences);
+		await this._drawFieldTripPath(fieldTrip, fieldTripRoute);
+
 		await this.drawSequenceLine(fieldTrip);
 	}
 
@@ -770,13 +768,16 @@
 
 	FieldTripMapOperation.prototype.refreshFieldTripPath = async function(fieldTrip, effectSequences, callZoomToLayers = true)
 	{
+		console.log("refreshFieldTripPath");
 		this.clearFieldTripPath(fieldTrip);
 		await this.clearFieldTripPathArrow(fieldTrip);
 
 		this.clearSequenceLine(fieldTrip);
 		await this.clearSequenceLineArrow(fieldTrip);
 
-		await this.addFieldTripPath(fieldTrip, effectSequences);
+		await this.drawFieldTripPath(fieldTrip, effectSequences);
+		await this.drawSequenceLine(fieldTrip);
+
 		await this.updateFieldTripPathVisibility([fieldTrip]);
 
 		this.orderFeatures();
@@ -1390,25 +1391,11 @@
 		this._calculatePathAttributesAndDraw(fieldTrip, routePath);
 	}
 
-	FieldTripMapOperation.prototype._drawFieldTripPath = async function(fieldTrip, effectSequences)
+	FieldTripMapOperation.prototype._drawFieldTripPath = async function(fieldTrip, fieldTripRoute)
 	{
-		let fieldTripRoute = this.getFieldTripRoute(fieldTrip.id);
-		if (fieldTripRoute === undefined)
-		{
-			fieldTripRoute = new TF.GIS.ADT.FieldTripRoute(fieldTrip);
-			this._fieldTripRoutes.push(fieldTripRoute);
-		}
-		else
-		{
-			if (effectSequences && effectSequences.length !== fieldTrip.FieldTripStops.length)
-			{
-				return;
-			}
-
-			fieldTripRoute.reset();
-		}
-
+		fieldTripRoute.reset();
 		await fieldTripRoute.compute();
+
 		const routePath = fieldTripRoute.getRoutePaths();
 		if (routePath.length === 0)
 		{
@@ -2186,11 +2173,6 @@
 		return { DBID, FieldTripId };
 	}
 
-	FieldTripMapOperation.prototype.getFieldTripRoute = function(fieldTripId)
-	{
-		return this._fieldTripRoutes.find(item => item.Id === fieldTripId);
-	}
-
 	FieldTripMapOperation.prototype.showLoadingIndicator = function()
 	{
 		if (tf.loadingIndicator)
@@ -2209,6 +2191,33 @@
 
 	//#endregion
 
+
+	//#region Manage FieldTripRoute
+
+	FieldTripMapOperation.prototype.createFieldTripRoute = function(fieldTrip)
+	{
+		const fieldTripRoute = new TF.GIS.ADT.FieldTripRoute(fieldTrip);
+		this._fieldTripRoutes.push(fieldTripRoute);
+		return fieldTripRoute;
+	}
+
+	FieldTripMapOperation.prototype.findFieldTripRoute = function(fieldTripId)
+	{
+		return this._fieldTripRoutes.find(item => item.Id === fieldTripId);
+	}
+
+	FieldTripMapOperation.prototype.getFieldTripRoute = function(fieldTrip)
+	{
+		let fieldTripRoute = this.findFieldTripRoute(fieldTrip.id);
+		if (fieldTripRoute === undefined)
+		{
+			fieldTripRoute = this.createFieldTripRoute(fieldTrip);
+		}
+		return fieldTripRoute;
+	}
+
+	//#endregion
+
 	FieldTripMapOperation.prototype.dispose = function()
 	{
 		const self = this;
@@ -2218,6 +2227,12 @@
 			self.arrowLayerHelper.dispose();
 			self.arrowLayerHelper = null;
 		}
+
+		for (let i = 0; i < self._fieldTripRoutes.length; i++)
+		{
+			self._fieldTripRoutes[i].dispose();
+		}
+		self._fieldTripRoutes = null;
 
 		const layerInstances = [
 			self.stopLayerInstance,

@@ -48,7 +48,7 @@
 					message.indexOf(TF.GIS.NetworkEnum.ERROR_MESSAGE.INVALID_LOCATION) > -1)
 				{
 					const fieldTripStops = _getFieldTripStops(this._fieldTrip);
-					this._routePaths = await this.computeByEachStop(fieldTripStops);
+					this._routePaths = await _computeByEachStop(fieldTripStops, this._routeStops);
 					const alertInformation = _getNoSolutionStopInformation(fieldTripStops);
 					tf.promiseBootbox.alert(alertInformation);
 					return;
@@ -58,61 +58,6 @@
 			tf.promiseBootbox.alert(`Cannot solve path. One or more of your stops is invalid or unreachable.`);
 			return;
 		}
-	}
-
-	FieldTripRoute.prototype.computeByEachStop = async function(fieldTripStops)
-	{
-		let result = [];
-		if (!_meetMinimumRoutingStopsRequirement(this._routeStops))
-		{
-			return result;
-		}
-
-		const stopCount = fieldTripStops.length;
-		if (stopCount !== this._routeStops.length)
-		{
-			return result;
-		}
-
-		let index = 0;
-		while (index < stopCount)
-		{
-			const fieldTripStop = fieldTripStops[index];
-			const routeStop = this._routeStops[index];
-			const nextRouteStop = this._routeStops[index + 1];
-			if (nextRouteStop)
-			{
-				try
-				{
-					const stopFeatureSet = _toRouteStopFeatureSet([routeStop, nextRouteStop]);
-					const routeParameters = await _getRouteParameters(stopFeatureSet);
-					const response = await networkService.solveRoute(routeParameters);
-					const routeResult = response?.results?.routeResults[0];
-					if (!routeResult)
-					{
-						_setEmptyPaths(fieldTripStop);
-					}
-					else
-					{
-						const routePaths = _calculateRoutePaths(routeResult);
-						_updateFieldTripStop(fieldTripStop, routePaths[0]);
-						result = result.concat(routePaths);
-					}
-				}
-				catch (ex)
-				{
-					_setEmptyPaths(fieldTripStop);
-				}
-			}
-			else
-			{
-				_setEmptyPaths(fieldTripStop);
-			}
-
-			index++;
-		}
-
-		return result;
 	}
 
 	FieldTripRoute.prototype.getRoutePaths = function()
@@ -135,6 +80,13 @@
 		_setMaximumStopSequence(this._routeStops);
 
 		this._routePaths = [];
+	}
+
+	FieldTripRoute.prototype.dispose = function()
+	{
+		this._fieldTrip = null;
+		this._routeStops = null;
+		this._routePaths = null;
 	}
 
 	//#region Private Methods
@@ -290,11 +242,12 @@
 	{
 		const travelModeName = TF.GIS.ADT.FieldTripRouteConfiguration.TRAVEL_MODE;
 		const travelMode = await networkService.fetchSupportedTravelModes(travelModeName);
+		travelMode.uturnAtJunctions = TF.GIS.ADT.FieldTripRouteConfiguration.U_TURN_POLICY;
+
 		return {
 			travelMode: travelMode,
 			preserveFirstStop: true,
 			preserveLastStop: true,
-			restrictUTurns: TF.GIS.ADT.FieldTripRouteConfiguration.U_TURN_POLICY,
 			stops: stopFeatureSet
 		};
 	}
@@ -328,6 +281,61 @@
 
 				return { message, findInvalidStop };
 			}, { message: "Cannot solve path.", findInvalidStop: false});
+	}
+
+	const _computeByEachStop = async (fieldTripStops, routeStops) =>
+	{
+		let result = [];
+		if (!_meetMinimumRoutingStopsRequirement(routeStops))
+		{
+			return result;
+		}
+
+		const stopCount = fieldTripStops.length;
+		if (stopCount !== routeStops.length)
+		{
+			return result;
+		}
+
+		let index = 0;
+		while (index < stopCount)
+		{
+			const fieldTripStop = fieldTripStops[index];
+			const routeStop = routeStops[index];
+			const nextRouteStop = routeStops[index + 1];
+			if (nextRouteStop)
+			{
+				try
+				{
+					const stopFeatureSet = _toRouteStopFeatureSet([routeStop, nextRouteStop]);
+					const routeParameters = await _getRouteParameters(stopFeatureSet);
+					const response = await networkService.solveRoute(routeParameters);
+					const routeResult = response?.results?.routeResults[0];
+					if (!routeResult)
+					{
+						_setEmptyPaths(fieldTripStop);
+					}
+					else
+					{
+						const routePaths = _calculateRoutePaths(routeResult);
+						_updateFieldTripStop(fieldTripStop, routePaths[0]);
+						result = result.concat(routePaths);
+					}
+				}
+				catch (ex)
+				{
+					_setEmptyPaths(fieldTripStop);
+				}
+			}
+			else
+			{
+				_setEmptyPaths(fieldTripStop);
+			}
+
+			index++;
+		}
+
+		return result;
 	}
 
 	//#endregion
