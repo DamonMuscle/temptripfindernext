@@ -4,6 +4,8 @@
 
 	const networkService = TF.GIS.Analysis.getInstance().networkService;
 
+	let MAX_STOP_SEQUENCE = -1;
+
 	function FieldTripRoute(fieldTrip)
 	{
 		this._fieldTrip = fieldTrip;
@@ -16,22 +18,25 @@
 		configurable: false
 	});
 
-
 	FieldTripRoute.prototype.compute = async function()
 	{
-		if (this._routeStops.length < TF.GIS.NetworkEnum.MIN_ROUTING_STOP_COUNT)
+		if (!_meetMinimumRoutingStopsRequirement(this._routeStops))
 		{
 			return;
 		}
 
+		this._routePaths = [];
+
 		try
 		{
-			const routeParameters = await this._getRouteParameters();
+			const stopFeatureSet = _toRouteStopFeatureSet(this._routeStops);
+			const routeParameters = await _getRouteParameters(stopFeatureSet);
 			const response = await networkService.solveRoute(routeParameters);
 			const routeResult = response?.results?.routeResults[0];
-			this._calculateRoutePaths(routeResult);
+			this._routePaths = _calculateRoutePaths(routeResult);
 
-			this._updateFieldTripStops();
+			const fieldTripStops = _getFieldTripStops(this._fieldTrip);
+			_updateFieldTripStops(fieldTripStops, this._routePaths);
 		}
 		catch (ex)
 		{
@@ -42,13 +47,72 @@
 				if (message.indexOf(TF.GIS.NetworkEnum.ERROR_MESSAGE.NO_SOLUTION) > -1 ||
 					message.indexOf(TF.GIS.NetworkEnum.ERROR_MESSAGE.INVALID_LOCATION) > -1)
 				{
-					console.log("TODO: calculate routePath stop by stop.");
+					const fieldTripStops = _getFieldTripStops(this._fieldTrip);
+					this._routePaths = await this.computeByEachStop(fieldTripStops);
+					const alertInformation = _getNoSolutionStopInformation(fieldTripStops);
+					tf.promiseBootbox.alert(alertInformation);
+					return;
 				}
 			}
 
 			tf.promiseBootbox.alert(`Cannot solve path. One or more of your stops is invalid or unreachable.`);
 			return;
 		}
+	}
+
+	FieldTripRoute.prototype.computeByEachStop = async function(fieldTripStops)
+	{
+		let result = [];
+		if (!_meetMinimumRoutingStopsRequirement(this._routeStops))
+		{
+			return result;
+		}
+
+		const stopCount = fieldTripStops.length;
+		if (stopCount !== this._routeStops.length)
+		{
+			return result;
+		}
+
+		let index = 0;
+		while (index < stopCount)
+		{
+			const fieldTripStop = fieldTripStops[index];
+			const routeStop = this._routeStops[index];
+			const nextRouteStop = this._routeStops[index + 1];
+			if (nextRouteStop)
+			{
+				try
+				{
+					const stopFeatureSet = _toRouteStopFeatureSet([routeStop, nextRouteStop]);
+					const routeParameters = await _getRouteParameters(stopFeatureSet);
+					const response = await networkService.solveRoute(routeParameters);
+					const routeResult = response?.results?.routeResults[0];
+					if (!routeResult)
+					{
+						_setEmptyPaths(fieldTripStop);
+					}
+					else
+					{
+						const routePaths = _calculateRoutePaths(routeResult);
+						_updateFieldTripStop(fieldTripStop, routePaths[0]);
+						result = result.concat(routePaths);
+					}
+				}
+				catch (ex)
+				{
+					_setEmptyPaths(fieldTripStop);
+				}
+			}
+			else
+			{
+				_setEmptyPaths(fieldTripStop);
+			}
+
+			index++;
+		}
+
+		return result;
 	}
 
 	FieldTripRoute.prototype.getRoutePaths = function()
@@ -60,40 +124,23 @@
 	{
 		const { sequence } = routeStopOptions;
 		const routeStop = new TF.GIS.ADT.RouteStop(options);
-		this._routeStops.find(item => item.Sequence === sequence) = routeStop;
+		let _routeStop = this._routeStops.find(item => item.Sequence === sequence);
+		_routeStop = routeStop;
 	}
 
 	FieldTripRoute.prototype.reset = function()
 	{
-		this._routeStops = [];
+		const fieldTripStops = _getFieldTripStops(this._fieldTrip);
+		this._routeStops = _toRouteStops(fieldTripStops);
+		_setMaximumStopSequence(this._routeStops);
+
 		this._routePaths = [];
-		this._initRouteStops();
 	}
 
 	//#region Private Methods
-	
-	FieldTripRoute.prototype._getRouteParameters = async function()
-	{
-		const travelModeName = TF.GIS.ADT.FieldTripRouteConfiguration.TRAVEL_MODE;
-		const travelMode = await networkService.fetchSupportedTravelModes(travelModeName);
-		return {
-			travelMode: travelMode,
-			preserveFirstStop: true,
-			preserveLastStop: true,
-			restrictUTurns: TF.GIS.ADT.FieldTripRouteConfiguration.U_TURN_POLICY,
-			stops: this._getRouteStopFeatureSet()
-		};
-	}
 
-	FieldTripRoute.prototype._getRouteStopFeatureSet = function()
+	const _toRouteStops = (fieldTripStops) =>
 	{
-		const routeStopGraphics = this._routeStops.map(item => item.toGraphic());
-		return new TF.GIS.SDK.FeatureSet({ features: routeStopGraphics});
-	}
-
-	FieldTripRoute.prototype._initRouteStops = function()
-	{
-		const fieldTripStops = this._getFieldTripStops();
 		const routeStops = [];
 		for (let i = 0, count = fieldTripStops.length; i < count; i++)
 		{
@@ -109,26 +156,31 @@
 			routeStops.push(routeStop);
 		}
 
-		this._routeStops = routeStops;
+		return routeStops;
 	}
 
-	FieldTripRoute.prototype._isLastStop = function(fieldTripStop)
+	const _setMaximumStopSequence = (routeStops) =>
 	{
-		const stopSequences = this._routeStops.map(item => item.Sequence).sort((a, b) => a - b);
-		const lastSequence = stopSequences[stopSequences.length - 1];
-		return fieldTripStop.Sequence === lastSequence;
+		if (routeStops.length === 0)
+		{
+			MAX_STOP_SEQUENCE = -1;
+		}
+		else
+		{
+			const stopSequences = routeStops.map(item => item.Sequence).sort((a, b) => a - b);
+			const lastSequence = stopSequences[stopSequences.length - 1];
+			MAX_STOP_SEQUENCE = lastSequence;
+		}
 	}
 
-	FieldTripRoute.prototype._getFieldTripStops = function()
-	{
-		return this._fieldTrip.FieldTripStops;
-	}
+	const _isLastStop = (fieldTripStop) => fieldTripStop.Sequence === MAX_STOP_SEQUENCE;
 
-	FieldTripRoute.prototype._updateFieldTripStops = function()
+	const _getFieldTripStops = (fieldTrip) => fieldTrip.FieldTripStops;
+
+	const _updateFieldTripStops = (fieldTripStops, routePaths) =>
 	{
-		const fieldTripStops = this._getFieldTripStops();
 		const stopCount = fieldTripStops.length;
-		if (this._routePaths.length !== stopCount - 1)
+		if (routePaths.length !== stopCount - 1)
 		{
 			return;
 		}
@@ -136,35 +188,43 @@
 		for (let i = 0; i < stopCount; i++)
 		{
 			const fieldTripStop = fieldTripStops[i];
-			const routePath = this._routePaths[i];
+			const routePath = routePaths[i];
 			if (routePath)
 			{
-				fieldTripStop.DrivingDirections = routePath.DrivingDirections;
-				fieldTripStop.RouteDrivingDirections = routePath.RouteDrivingDirections;
-				fieldTripStop.IsCustomDirection = routePath.IsCustomDirection;
-				fieldTripStop.Speed = routePath.Speed;
-				fieldTripStop.StreetSpeed = routePath.StreetSpeed;
-				fieldTripStop.Distance = routePath.Distance;
-				fieldTripStop.Paths = routePath.Paths;
+				_updateFieldTripStop(fieldTripStop, routePath);
 			}
-			else if (this._isLastStop(fieldTripStop))
+			else if (_isLastStop(fieldTripStop))
 			{
-				fieldTripStop.DrivingDirections = "";
-				fieldTripStop.Speed = 0;
-				fieldTripStop.Distance = 0;
-				fieldTripStop.Paths = [];
+				_setEmptyPaths(fieldTripStop);
 			}
 		}
 	}
 
-	FieldTripRoute.prototype._calculateRoutePaths = function(routeResult)
+	const _updateFieldTripStop = (fieldTripStop, routePath) =>
+	{
+		if (routePath)
+		{
+			fieldTripStop.DrivingDirections = routePath.DrivingDirections;
+			fieldTripStop.RouteDrivingDirections = routePath.RouteDrivingDirections;
+			fieldTripStop.IsCustomDirection = routePath.IsCustomDirection;
+			fieldTripStop.Speed = routePath.Speed;
+			fieldTripStop.StreetSpeed = routePath.StreetSpeed;
+			fieldTripStop.Distance = routePath.Distance;
+			fieldTripStop.Paths = routePath.Paths;
+		}
+		else
+		{
+			_setEmptyPaths(fieldTripStop);
+		}
+	}
+
+	const _calculateRoutePaths = (routeResult) =>
 	{
 		const routePaths = [];
 		const directions = routeResult.directions;
 		if (directions === null)
 		{
-			this._routePaths = [];
-			return;
+			return routePaths;
 		}
 
 		let routePath, routePathDirections, routePathDistance, routePathTime;
@@ -215,7 +275,59 @@
 			}
 		}
 
-		this._routePaths = routePaths;
+		return routePaths;
+	}
+
+	const _meetMinimumRoutingStopsRequirement = (stops) => stops.length >= TF.GIS.NetworkEnum.MIN_ROUTING_STOP_COUNT;
+
+	const _toRouteStopFeatureSet = (routeStops) =>
+	{
+		const routeStopGraphics = routeStops.map(item => item.toGraphic());
+		return new TF.GIS.SDK.FeatureSet({ features: routeStopGraphics});
+	}
+
+	const _getRouteParameters = async (stopFeatureSet) =>
+	{
+		const travelModeName = TF.GIS.ADT.FieldTripRouteConfiguration.TRAVEL_MODE;
+		const travelMode = await networkService.fetchSupportedTravelModes(travelModeName);
+		return {
+			travelMode: travelMode,
+			preserveFirstStop: true,
+			preserveLastStop: true,
+			restrictUTurns: TF.GIS.ADT.FieldTripRouteConfiguration.U_TURN_POLICY,
+			stops: stopFeatureSet
+		};
+	}
+
+	const _setEmptyPaths = (fieldTripStop) =>
+	{
+		fieldTripStop.Paths = [];
+		fieldTripStop.DrivingDirections = "";
+		fieldTripStop.Speed = 0;
+		fieldTripStop.Distance = 0;
+	}
+
+	const _getNoSolutionStopInformation = (fieldTripStops) =>
+	{
+		return fieldTripStops.reduce(({message, findInvalidStop}, stop, index, array) =>
+			{
+				const isTerminalStop = _.last(array) == stop;
+				if (!findInvalidStop)
+				{
+					if (stop.Paths.length === 0 && !isTerminalStop)
+					{
+						message += ` No solution found from Stop ${stop.Sequence}`
+						return { message, findInvalidStop: true };
+					}
+				}
+				else if (findInvalidStop && (stop.Paths.length > 0 || isTerminalStop))
+				{
+					message +=` to Stop ${ stop.Sequence }.`
+					return { message, findInvalidStop: false};
+				}
+
+				return { message, findInvalidStop };
+			}, { message: "Cannot solve path.", findInvalidStop: false});
 	}
 
 	//#endregion
