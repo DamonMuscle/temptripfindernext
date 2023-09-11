@@ -374,7 +374,7 @@
 				columns: [
 					{ field: "AccountName", title: `Account Name`, width: "60%" },
 					{
-						field: "Amount", title: "Amount", width: "40%", template: '#= kendo.toString(kendo.parseFloat(Amount), "n") #'
+						field: "Amount", title: "Amount", width: "40%", template: '#= Amount ? kendo.toString(kendo.parseFloat(Amount), "n") : "" #'
 					},
 				],
 				height: 300,
