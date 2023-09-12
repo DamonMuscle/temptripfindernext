@@ -214,10 +214,10 @@
 
 		const fieldTripRoute = _getFieldTripRoute(fieldTrip);
 
-		this.drawStops(fieldTrip);
+		const color = _getFieldTripColor(fieldTrip);
+		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip);
+		_drawStops(DBID, FieldTripId, color, fieldTripRoute);
 
-		// await this.drawFieldTripPath(fieldTrip);
-		// TODO: Upgrade with FieldTripRoute
 		await this._drawFieldTripPath(fieldTrip, fieldTripRoute);
 
 		await this.drawSequenceLine(fieldTrip);
@@ -565,12 +565,9 @@
 
 	//#region New Copy
 
-	FieldTripMapOperation.prototype.isNewCopy = function(fieldTrip)
-	{
-		return fieldTrip.Id === 0;
-	}
+	const _isNewCopy = (fieldTrip) => fieldTrip.Id === 0;
 
-	FieldTripMapOperation.prototype.updateCopyFieldTripAttribute = function(fieldTrip)
+	const _updateCopyFieldTripAttribute = (fieldTrip) =>
 	{
 		if (fieldTrip.id !== fieldTrip.routePathAttributes.FieldTripId)
 		{
@@ -1376,6 +1373,32 @@
 		}
 	}
 
+	const _drawStops = (DBID, FieldTripId, Color, fieldTripRoute) =>
+	{
+		const DEFAULT_STOP_VISIBILITY = false,
+			routeStops = fieldTripRoute.getRouteStops(),
+			graphics = [];
+
+		for (let i = routeStops.length - 1; i >=0; i--)
+		{
+			const stop = routeStops[i],
+				attributes = {
+					DBID,
+					FieldTripId,
+					id: stop.Id,
+					Name: stop.Street,
+					CurbApproach: stop.CurbApproach,
+					Sequence: stop.Sequence,
+					Color
+				};
+			// hide by default for UX.
+			const graphic = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(stop.Longitude, stop.Latitude, attributes, null, DEFAULT_STOP_VISIBILITY);
+			graphics.push(graphic);
+		}
+
+		_stopLayerInstance.addStops(graphics);
+	}
+
 	FieldTripMapOperation.prototype.drawFieldTripPath = async function(fieldTrip, effectSequences)
 	{
 		const routePath = await this._updateRoutepathAndDirection(fieldTrip, effectSequences);
@@ -1412,9 +1435,9 @@
 			fieldTrip.routePathAttributes = this._computePathAttributes(fieldTrip);
 		}
 
-		if (this.isNewCopy(fieldTrip))
+		if (_isNewCopy(fieldTrip))
 		{
-			this.updateCopyFieldTripAttribute(fieldTrip);
+			_updateCopyFieldTripAttribute(fieldTrip);
 		}
 
 		for (let i = 0; i < routePath.length; i++)

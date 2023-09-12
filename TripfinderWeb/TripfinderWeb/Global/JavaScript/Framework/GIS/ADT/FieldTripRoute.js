@@ -65,10 +65,15 @@
 		return this._routePaths.map(item => item.Paths);
 	}
 
+	FieldTripRoute.prototype.getRouteStops = function() 
+	{
+		return this._routeStops;
+	}
+
 	FieldTripRoute.prototype.moveStop = function(routeStopOptions)
 	{
 		const { sequence } = routeStopOptions;
-		const routeStop = new TF.GIS.ADT.RouteStop(options);
+		const routeStop = new TF.GIS.ADT.RouteStop(routeStopOptions);
 		let _routeStop = this._routeStops.find(item => item.Sequence === sequence);
 		_routeStop = routeStop;
 	}
@@ -98,6 +103,7 @@
 		{
 			const fieldTripStop = fieldTripStops[i];
 			const options = {
+				id: fieldTripStop.id,
 				curbApproach: fieldTripStop.vehicleCurbApproach,
 				sequence: fieldTripStop.Sequence,
 				street: fieldTripStop.Street,

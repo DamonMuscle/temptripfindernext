@@ -4,9 +4,11 @@
 
 	const DEFAULT_LONGITUDE = 0;
 	const DEFAULT_LATITUDE = 0;
+	const DEFAULT_STOP_ID = 0;
 
 	function RouteStop(options)
 	{
+		this._id = options.id || DEFAULT_STOP_ID;
 		this._curbApproach = options.curbApproach || TF.GIS.NetworkEnum.CURB_APPROACH.EITHER_SIDE;
 		this._locationType = options.locationType || TF.GIS.NetworkEnum.LOCATION_TYPE.STOP;
 		this._name = options.name || options.sequence;
@@ -17,6 +19,12 @@
 	}
 
 	//#region Property
+
+	Object.defineProperty(RouteStop.prototype, "Id", {
+		get() { return this._id; },
+		enumerable: false,
+		configurable: false
+	});
 
 	Object.defineProperty(RouteStop.prototype, "CurbApproach", {
 		get() { return this._curbApproach; },
