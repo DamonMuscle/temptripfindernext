@@ -4,7 +4,7 @@
 	<div class="row">
 		<div class="tab-selection-header">
 			<div class="trip-tab tab-selection active" data-bind="click:switchTabClick.bind($data)">
-				<p>Trip Info</p>
+				<p>Field Trip Info</p>
 			</div>
 			<div class="stop-tab tab-selection" data-bind="click:switchTabClick.bind($data)">
 				<p>Stops</p>
@@ -363,7 +363,7 @@
 									<span class="trip-stop-color-icon stop-info-tap" data-bind="text:Sequence, style:{'background-color':$parent.color, 'color':$parent.fontColor}" style="margin-top:1px; border:black solid 2px;"></span>
 									<span data-bind="text:Street"></span>
 								</div>
-								<div class="col-xs-8 trip-stop-sort-column trip-stop-click-able text-center" data-bind="text:utcToClientTimeZone($parent.dataModel.getFieldTripStopTime($data)).format('YYYY-MM-DDThh:mm a'), click:$parent.setTripStopScheduleTime.bind($parent)" style="border-bottom-width:0px;">
+								<div class="col-xs-8 trip-stop-sort-column trip-stop-click-able text-center" data-bind="text:utcToClientTimeZone($parent.dataModel.getFieldTripStopTime($data)).format('MM/DD/YYYY hh:mm a'), click:$parent.setTripStopScheduleTime.bind($parent)" style="border-bottom-width:0px;">
 
 								</div>
 								<div class="col-xs-5 trip-stop-sort-column trip-stop-click-able text-center" style="height: 30px;padding-top:6px;">

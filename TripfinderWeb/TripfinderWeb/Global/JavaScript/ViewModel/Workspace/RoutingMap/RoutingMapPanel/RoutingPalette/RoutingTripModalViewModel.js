@@ -21,16 +21,16 @@
 		if (options.trip)
 		{
 			this.obPositiveButtonLabel("Apply");
-			this.title("Edit Trip");
+			this.title("Edit Field Trip");
 			if (options.trip.OpenType == "View")
 			{
-				this.title("View Trip");
+				this.title("View Field Trip");
 				this.buttonTemplate("modal/Negative");
 			}
 		} else 
 		{
 			this.obPositiveButtonLabel("Create");
-			this.title("New Trip");
+			this.title("New Field Trip");
 			this.buttonTemplate("modal/PositiveNegative");
 		}
 		this.obNegativeButtonLabel("Cancel");

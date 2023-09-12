@@ -1877,27 +1877,6 @@
 
 		let addedStops = [], updatedStops = [], deletedStops = [];
 
-		// deal with add and update
-		for (let i = 0; i < newTripStops.length; ++i)
-		{
-			const tripStop = newTripStops[i];
-			const isNewStop = !originalTripStops.some(originalStop => originalStop.id == tripStop.id);
-
-			if (isNewStop)
-			{
-				addedStops.push(tripStop);
-			}
-			else
-			{
-				let orignalTripStop = originalTripStops.filter(r => r.id == tripStop.id)[0];
-
-				if (orignalTripStop.Sequence != tripStop.Sequence || orignalTripStop.obVehicleCurbApproach() != tripStop.obVehicleCurbApproach())
-				{
-					updatedStops.push(tripStop);
-				}
-			}
-		}
-
 		// deal with delete
 		for (let i = 0; i < originalTripStops.length; ++i)
 		{
@@ -1907,6 +1886,34 @@
 			if (isDeleted)
 			{
 				deletedStops.push(originalStop);
+			}
+		}
+
+		if (deletedStops.length > 0)
+		{
+			originalTripStops = originalTripStops.filter(originalStop => !deletedStops.some(deletedStop => deletedStop.id == originalStop.id));
+			self._resetStopSequence(originalTripStops);
+		}
+
+		// deal with add and update
+		for (let i = 0; i < newTripStops.length; ++i)
+		{
+			const tripStop = newTripStops[i];
+			const isNewStop = !originalTripStops.some(originalStop => originalStop.id == tripStop.id);
+			const isNotDeletedStop = !deletedStops.some(stop => stop.id == tripStop.id);
+
+			if (isNewStop)
+			{
+				addedStops.push(tripStop);
+			}
+			else if(isNotDeletedStop)
+			{
+				let orignalTripStop = originalTripStops.filter(r => r.id == tripStop.id)[0];
+
+				if (orignalTripStop.Sequence != tripStop.Sequence || orignalTripStop.obVehicleCurbApproach() != tripStop.obVehicleCurbApproach())
+				{
+					updatedStops.push(tripStop);
+				}
 			}
 		}
 

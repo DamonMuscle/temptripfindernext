@@ -89,14 +89,14 @@
 			options = $.extend(options, option);
 		}
 
-		await self.fieldTripPaletteSectionVM.routingPaletteVM.onQuickAddStops(data);
-
 		if (options.operate && options.operate == 'CreateNewTrip')
 		{
 			return self.createFromMultiple(data, options);
 		}
 		else
 		{
+			await self.fieldTripPaletteSectionVM.routingPaletteVM.onQuickAddStops(data);
+
 			if (data.length == 1)
 			{
 				self.fieldTripPaletteSectionVM.editFieldTripStopModal.create(data[0], options);
