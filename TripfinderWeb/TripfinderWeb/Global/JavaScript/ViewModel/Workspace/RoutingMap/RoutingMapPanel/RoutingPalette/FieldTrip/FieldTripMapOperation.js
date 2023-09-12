@@ -5,20 +5,21 @@
 
 	//#region Constant
 
+	const BASE_LAYER_ID = 0;
 	const FieldTripMap_PathArrowLayerId = "FieldTripMap_PathArrowLayer";
-	const FieldTripMap_PathArrowLayer_Index = 1;
+	const FieldTripMap_PathArrowLayer_Index = BASE_LAYER_ID + 1;
 	const FieldTripMap_PathLayerId = "FieldTripMap_PathLayer";
-	const FieldTripMap_PathLayer_Index = 2;
+	const FieldTripMap_PathLayer_Index = BASE_LAYER_ID + 2;
 	const FieldTripMap_SequenceLineArrowLayerId = "FieldTripMap_SequenceLineArrowLayer";
-	const FieldTripMap_SequenceLineArrowLayer_Index = 3;
+	const FieldTripMap_SequenceLineArrowLayer_Index = BASE_LAYER_ID +3;
 	const FieldTripMap_HighlightLayerId = "FieldTripMap_HighlightLayer";
-	const FieldTripMap_HighlightLayer_Index = 4;
+	const FieldTripMap_HighlightLayer_Index = BASE_LAYER_ID + 4;
 	const FieldTripMap_SequenceLineLayerId = "FieldTripMap_SequenceLineLayer";
-	const FieldTripMap_SequenceLineLayer_Index = 5;
+	const FieldTripMap_SequenceLineLayer_Index = BASE_LAYER_ID + 5;
 	const FieldTripMap_StopLayerId = "FieldTripMap_StopLayer";
-	const FieldTripMap_StopLayer_Index = 6;
+	const FieldTripMap_StopLayer_Index = BASE_LAYER_ID + 6;
 	const FieldTripMap_HighlightStopLayerId = "FieldTripMap_HighlightStopLayer";
-	const FieldTripMap_HighlightStopLayer_Index = 8;
+	const FieldTripMap_HighlightStopLayer_Index = BASE_LAYER_ID + 7;
 
 	const INFO_STOP_COLOR = "#FFFFFF";
 	const LAYER_TYPE = {
@@ -102,13 +103,13 @@
 	let _arrowLayerHelper = null;
 	let _layerManager = null;
 
-	let _stopLayerInstance = null;
-	let _pathLayerInstance = null;
-	let _sequenceLineLayerInstance = null;
-	let _highlightLayerInstance = null;
-	let _highlightStopLayerInstance = null;
 	let _pathArrowLayerInstance = null;
+	let _pathLayerInstance = null;
 	let _sequenceLineArrowLayerInstance = null;
+	let _highlightLayerInstance = null;
+	let _sequenceLineLayerInstance = null;
+	let _stopLayerInstance = null;
+	let _highlightStopLayerInstance = null;
 
 	let _fieldTripRoutes = [];
 
@@ -130,6 +131,9 @@
 			index: FieldTripMap_PathLayer_Index,
 			layerType: LAYER_TYPE.PATH
 		}, {
+			id: FieldTripMap_HighlightLayerId,
+			index: FieldTripMap_HighlightLayer_Index
+		}, {
 			id: FieldTripMap_SequenceLineLayerId,
 			index: FieldTripMap_SequenceLineLayer_Index,
 			layerType: LAYER_TYPE.PATH
@@ -138,15 +142,13 @@
 			index: FieldTripMap_StopLayer_Index,
 			layerType: LAYER_TYPE.STOP
 		}, {
-			id: FieldTripMap_HighlightLayerId,
-			index: FieldTripMap_HighlightLayer_Index
-		}, {
 			id: FieldTripMap_HighlightStopLayerId,
 			index: FieldTripMap_HighlightStopLayer_Index,
 			layerType: LAYER_TYPE.STOP
 		}];
+
 		const layerInstances = await _layerManager.createLayerInstances(layerOptions);
-		[_pathLayerInstance, _sequenceLineLayerInstance, _stopLayerInstance, _highlightLayerInstance, _highlightStopLayerInstance] = layerInstances;
+		[_pathLayerInstance, _highlightLayerInstance, _sequenceLineLayerInstance, _stopLayerInstance, _highlightStopLayerInstance] = layerInstances;
 	}
 
 	FieldTripMapOperation.prototype.initArrowLayers = function()

@@ -55,7 +55,7 @@
 		var map = self.mapCanvasPage._map;
 		self.mapInstance = self.mapCanvasPage.mapInstance;
 		self.map = map;
-		self.initLabelSetting();
+		// self.initLabelSetting();
 		(self.obShow() && self.showCount == 0) && self.addShowCount();
 		self.childViewModels.forEach(function(childViewModel)
 		{

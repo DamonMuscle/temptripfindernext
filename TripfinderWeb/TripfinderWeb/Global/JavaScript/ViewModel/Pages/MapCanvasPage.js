@@ -641,9 +641,9 @@
 	{
 		var self = this;
 		tf.loadingIndicator.tryHide();
-		self.routingSnapManager.init(this._map);
+		// self.routingSnapManager.init(this._map);
 		// self._initToggleTrace();
-		self._initSketchTool();
+		// self._initSketchTool();
 		self.initShortKeyDownEvent();
 		self.onMapLoad.notify();
 

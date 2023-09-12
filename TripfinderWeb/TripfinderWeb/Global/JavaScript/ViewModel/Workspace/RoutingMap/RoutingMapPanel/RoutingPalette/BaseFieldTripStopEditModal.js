@@ -184,7 +184,7 @@
 	BaseFieldTripStopEditModal.prototype.initMap = function(stop)
 	{
 		var self = this;
-		var stopTool = self.dataModel.fieldTripPaletteSectionVM.drawTool.stopTool;
+		// var stopTool = self.dataModel.fieldTripPaletteSectionVM.drawTool.stopTool;
 		if (!self.map)
 		{
 			var basemap = new tf.map.ArcGIS.Basemap({
@@ -207,10 +207,10 @@
 				constraints: { rotationEnabled: false },
 			});
 			self._disableMapNavagation(view);
-			view.on("pointer-move", function(e)
-			{
-				stopTool.mouseMoveEventOnJunctionMap(e, self.map);
-			});
+			// view.on("pointer-move", function(e)
+			// {
+			// 	stopTool.mouseMoveEventOnJunctionMap(e, self.map);
+			// });
 			self.map.mapView = view;
 		}
 		console.log("todo: init stop info control on junction");
@@ -718,7 +718,7 @@
 					self.dataModel.fieldTripPaletteSectionVM.drawTool._previewLayer.removeAll();
 					self.dataModel.fieldTripPaletteSectionVM.drawTool._clearTempDrawing();
 				}
-				self.dataModel.fieldTripPaletteSectionVM.drawTool.stopTool.clearCandidateGraphics();
+				self.dataModel.fieldTripPaletteSectionVM.drawTool?.stopTool.clearCandidateGraphics();
 				if (self.mode() == "new" && !self.obIsSearchCreate())
 				{
 					PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMap);

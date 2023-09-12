@@ -68,13 +68,13 @@
 
 	FieldTripPaletteSectionViewModel.prototype._onMapLoad = function()
 	{
-		var self = this;
-		if (!self.drawTool)
-		{
-			self.drawTool = self.routingPaletteVM.drawTool = new TF.RoutingMap.RoutingPalette.RoutingTripMapTool(self);
-		}
-		self.drawTool.selectionChange.subscribe(self.eventsManager.selectionChange_routing.bind(self));
-		self.routingChangePath = new TF.RoutingMap.RoutingPalette.RoutingChangePath(self);
+		// var self = this;
+		// if (!self.drawTool)
+		// {
+		// 	self.drawTool = self.routingPaletteVM.drawTool = new TF.RoutingMap.RoutingPalette.RoutingTripMapTool(self);
+		// }
+		// self.drawTool.selectionChange.subscribe(self.eventsManager.selectionChange_routing.bind(self));
+		// self.routingChangePath = new TF.RoutingMap.RoutingPalette.RoutingChangePath(self);
 	};
 
 	FieldTripPaletteSectionViewModel.prototype.cancelStopClick = function()
