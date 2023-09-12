@@ -1875,17 +1875,17 @@
 		let originalTripStops = self.options.trip.FieldTripStops;
 		let newTripStops = newFieldTrip.FieldTripStops;
 
-		let updatedStops = [];
+		let addedStops = [], updatedStops = [], deletedStops = [];
 
-		for(let i = 0; i < newTripStops.length; ++i)
+		// deal with add and update
+		for (let i = 0; i < newTripStops.length; ++i)
 		{
-			let tripStop = newTripStops[i];
-
-			let isNewStop = !originalTripStops.some(originalStop => originalStop.id == tripStop.id);
+			const tripStop = newTripStops[i];
+			const isNewStop = !originalTripStops.some(originalStop => originalStop.id == tripStop.id);
 
 			if (isNewStop)
 			{
-				updatedStops.push(tripStop);
+				addedStops.push(tripStop);
 			}
 			else
 			{
@@ -1898,8 +1898,19 @@
 			}
 		}
 
-		return updatedStops;
+		// deal with delete
+		for (let i = 0; i < originalTripStops.length; ++i)
+		{
+			const originalStop = originalTripStops[i];
+			const isDeleted = !newTripStops.some(newStop => originalStop.id == newStop.id);
 
+			if (isDeleted)
+			{
+				deletedStops.push(originalStop);
+			}
+		}
+
+		return [addedStops, updatedStops, deletedStops];
 	}
 
 	RoutingTripViewModel.prototype._calculateTripPath = function(newTrip)

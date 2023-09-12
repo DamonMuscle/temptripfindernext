@@ -374,7 +374,7 @@
 								</div>
 								<!-- <div class="col-xs-5 trip-stop-sort-column trip-stop-click-able text-center" data-bind="css: (SchoolCode !=''&&SchoolCode !=null) ? 'disabled' : '', text:(SchoolCode==''||SchoolCode==null) ? (stopBoundaryType=='Walkout' ? (stopBoundaryType + ' (' + (walkoutType === 'Street Path' ? (walkoutDistance + '/' + walkoutBuffer ) : walkoutDistance) + ')') : stopBoundaryType) : 'School', click:$parent.setStopType.bind($parent)">
 								</div> -->
-								<div class="conditional-delete" data-bind="visible:!($parent.hasTripOpen()&& (SchoolCode !=''&&SchoolCode !=null)) && !$parent.isDisabled
+								<div class="conditional-delete" data-bind="visible:(!($parent.hasTripOpen()) && !$parent.isDisabled )
 								,click:$parent.deleteTripStop.bind($parent)"></div>
 							</div>
 						</div>

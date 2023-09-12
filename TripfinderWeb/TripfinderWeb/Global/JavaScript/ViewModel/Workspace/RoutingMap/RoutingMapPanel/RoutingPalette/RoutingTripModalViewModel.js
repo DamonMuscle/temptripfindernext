@@ -47,14 +47,42 @@
 	{
 		const self = this;
 
-		this.viewModel.apply().then(function(result)
+		this.viewModel.apply().then(async function(result)
 		{
 			if (result)
 			{
-				var updatedStops = self.viewModel.getUpdatedStops(result);
+				var updatedResult = self.viewModel.getUpdatedStops(result);
 				const routingDataModel = self.viewModel.dataModel;
 
-				if(updatedStops.length > 0)
+				const addedStops = updatedResult[0];
+				if (addedStops.length > 0)
+				{
+					addedStops.forEach(function(tripStop)
+					{
+						tripStop.FieldTripId = result.id;
+						tripStop.DBID = result.DBID;
+					});
+
+					addedStops.forEach((stop) => {
+						routingDataModel.fieldTripStopDataModel.insertTripStopToTrip(stop, stop.Sequence - 1);
+					})
+					
+					await routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.applyAddFieldTripStops(addedStops, () => {
+						const fieldTripId = addedStops[0].FieldTripId;
+
+						addedStops.forEach(data =>
+						{
+							data.StopTime = data.ActualStopTime;
+							routingDataModel.fieldTripStopDataModel.insertToRevertData(data);
+						});
+			
+						routingDataModel.changeTripVisibility(fieldTripId, true);
+						routingDataModel.fieldTripStopDataModel.changeRevertStack(addedStops, false);
+					});
+				}
+
+				const updatedStops = updatedResult[1];
+				if (updatedStops && updatedStops.length > 0)
 				{
 					updatedStops.forEach(function(tripStop)
 					{
@@ -62,14 +90,32 @@
 						tripStop.DBID = result.DBID;
 					});
 
-					updatedStops.forEach((stop) => {
+					routingDataModel.fieldTripStopDataModel.deleteTripStop(updatedStops);
+
+					updatedStops.forEach(stop => {
 						routingDataModel.fieldTripStopDataModel.insertTripStopToTrip(stop, stop.Sequence - 1);
 					})
-					
-					routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.applyAddFieldTripStops(updatedStops, () => {
+
+					await routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.applyAddFieldTripStops(updatedStops, (stop) => {
 						const fieldTripId = updatedStops[0].FieldTripId;
-						
+
+						updatedStops.forEach(data =>
+						{
+							data.StopTime = data.ActualStopTime;
+							routingDataModel.fieldTripStopDataModel.insertToRevertData(data);
+						});
+			
 						routingDataModel.changeTripVisibility(fieldTripId, true);
+						routingDataModel.fieldTripStopDataModel.changeRevertStack(updatedStops, false);
+					});
+				}
+
+				const deletedStops = updatedResult[2];
+				if (deletedStops && deletedStops.length > 0)
+				{
+					deletedStops.forEach(async (stop) => {
+						const data = { fieldTripId: stop.FieldTripId, fieldTripStopId: stop.id };
+						await routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.deleteStopLocation(result, stop);
 					});
 				}
 
