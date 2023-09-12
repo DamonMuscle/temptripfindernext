@@ -1413,21 +1413,18 @@
 	RoutingTripViewModel.prototype.addStopsFromSearch = function(data)
 	{
 		var self = this;
-		var stopTool = self.dataModel.viewModel.drawTool.stopTool;
-		stopTool.reverseGeocodeStop(data.geometry, data.address).then((result) =>
+		data.address = data.address.split(",")[0];
+
+		this.dataModel.viewModel.eventsManager.createFieldTripStopFromSearchResult([data], { trip: this.trip, operate: "CreateNewTrip" }).then(function(trip)
 		{
-			data.address = result;
-			this.dataModel.viewModel.eventsManager.createFieldTripStopFromSearchResult([data], { trip: this.trip, operate: "CreateNewTrip" }).then(function(trip)
+			if (trip)
 			{
-				if (trip)
-				{
-					self.fixStopTime(trip);
-					self.trip = trip;
-					self.obTripStops([]);
-					self.addStopExtendAttributes(self.trip.FieldTripStops);
-					self.obTripStops(self.trip.FieldTripStops);
-				}
-			});
+				self.fixStopTime(trip);
+				self.trip = trip;
+				self.obTripStops([]);
+				self.addStopExtendAttributes(self.trip.FieldTripStops);
+				self.obTripStops(self.trip.FieldTripStops);
+			}
 		});
 	};	
 
@@ -1454,7 +1451,7 @@
 
 	RoutingTripViewModel.prototype.save = function()
 	{
-		var self = this, stopTool = self.dataModel.viewModel.drawTool.stopTool;
+		var self = this;
 		self.setTripByDataModel(self.trip);
 		var isTripStopPathChanged = this.isTripStopPathChanged();
 		var newTrip = self.trip;

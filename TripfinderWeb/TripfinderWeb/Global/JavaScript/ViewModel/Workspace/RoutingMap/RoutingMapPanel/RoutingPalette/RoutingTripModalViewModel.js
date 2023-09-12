@@ -61,6 +61,8 @@
 					{
 						tripStop.FieldTripId = result.id;
 						tripStop.DBID = result.DBID;
+						tripStop.OpenType = "Edit";
+						tripStop.type = "tripStop";
 					});
 
 					addedStops.forEach((stop) => {
@@ -75,6 +77,12 @@
 							data.StopTime = data.ActualStopTime;
 							routingDataModel.fieldTripStopDataModel.insertToRevertData(data);
 						});
+
+						routingDataModel.onTripStopsChangeEvent.notify({
+							add: addedStops,
+							delete: [],
+							edit: []
+						});						
 			
 						routingDataModel.changeTripVisibility(fieldTripId, true);
 						routingDataModel.fieldTripStopDataModel.changeRevertStack(addedStops, false);
@@ -88,6 +96,8 @@
 					{
 						tripStop.FieldTripId = result.id;
 						tripStop.DBID = result.DBID;
+						tripStop.OpenType = "Edit";
+						tripStop.type = "tripStop";
 					});
 
 					routingDataModel.fieldTripStopDataModel.deleteTripStop(updatedStops);
@@ -103,6 +113,12 @@
 						{
 							data.StopTime = data.ActualStopTime;
 							routingDataModel.fieldTripStopDataModel.insertToRevertData(data);
+						});
+
+						routingDataModel.onTripStopsChangeEvent.notify({
+							add: [],
+							delete: [],
+							edit: updatedStops
 						});
 			
 						routingDataModel.changeTripVisibility(fieldTripId, true);
