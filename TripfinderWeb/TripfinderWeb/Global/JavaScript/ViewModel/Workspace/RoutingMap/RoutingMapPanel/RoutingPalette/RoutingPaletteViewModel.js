@@ -222,7 +222,7 @@
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapTripPathTypeChange = function(_, isSequenceLine)
 	{
-		const type = isSequenceLine ? this.fieldTripMapOperation?.PATH_LINE_TYPE.Sequence : this.fieldTripMapOperation?.PATH_LINE_TYPE.Path;
+		const type = isSequenceLine ? TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE : TF.RoutingPalette.FieldTripEnum.PATH_TYPE.PATH_LINE;
 		if (type === this.fieldTripMapOperation?.pathLineType)
 		{
 			return;

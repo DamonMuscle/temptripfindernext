@@ -20,10 +20,6 @@
 	const FieldTripMap_HighlightStopLayerId = "FieldTripMap_HighlightStopLayer";
 	const FieldTripMap_HighlightStopLayer_Index = 8;
 
-	const PATH_LINE_TYPE = {
-		Path: "Path",
-		Sequence: "Sequence"
-	};
 	const INFO_STOP_COLOR = "#FFFFFF";
 	const LAYER_TYPE = {
 		PATH: "PathLayer",
@@ -43,7 +39,8 @@
 		this.mapInstance = mapInstance;
 		this.arrowLayerHelper = new TF.GIS.ArrowLayerHelper(mapInstance);
 		this.layerManager = new TF.GIS.LayerManager(mapInstance);
-		this._pathLineType = tf.storageManager.get('pathLineType') === 'Sequence' ? PATH_LINE_TYPE.Sequence : PATH_LINE_TYPE.Path;
+		this._pathLineType = tf.storageManager.get('pathLineType') === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE ?
+			TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE : TF.RoutingPalette.FieldTripEnum.PATH_TYPE.PATH_LINE;
 		this._fieldTripsData = null;
 		this._fieldTripRoutes = [];
 		this._editing = {
@@ -54,7 +51,6 @@
 				movingStop: null
 			}
 		};
-		this.defineReadOnlyProperty("PATH_LINE_TYPE", PATH_LINE_TYPE);
 		mapInstance.events.onMapViewKeyUpEvent.subscribe(this.onMapKeyUpEvent.bind(this));
 	}
 
@@ -381,14 +377,14 @@
 	FieldTripMapOperation.prototype.setFieldTripPathVisibility = function(fieldTrips)
 	{
 		const pathFeatures = this._getPathFeatures();
-		const precondition = this.pathLineType === PATH_LINE_TYPE.Path;
+		const precondition = this.pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.PATH_LINE;
 		this._setFieldTripLayerVisibility(fieldTrips, _pathLayerInstance, pathFeatures, precondition);
 	}
 
 	FieldTripMapOperation.prototype.setFieldTripSequenceLineVisibility = function(fieldTrips)
 	{
 		const sequenceLineFeatures = this._getSequenceLineFeatures();
-		const precondition = this.pathLineType === PATH_LINE_TYPE.Sequence;
+		const precondition = this.pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE;
 		this._setFieldTripLayerVisibility(fieldTrips, _sequenceLineLayerInstance, sequenceLineFeatures, precondition);
 	}
 
@@ -801,8 +797,8 @@
 	{
 		const self = this,
 			{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
-			sequenceLineFeatures = this._getSequenceLineFeatures();
-			sequenceLines = this._queryMapFeatures(sequenceLineFeatures, DBID, FieldTripId);
+			sequenceLineFeatures = self._getSequenceLineFeatures();
+			sequenceLines = self._queryMapFeatures(sequenceLineFeatures, DBID, FieldTripId);
 
 		for (let i = 0; i < sequenceLines.length; i++)
 		{
@@ -969,7 +965,7 @@
 		}
 
 		const data = { fieldTripStopId: stop.id };
-		this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocationCompleted, data });
+		self.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocationCompleted, data });
 
 		const effectSequences = self._computeEffectSequences(fieldTrip, {deleteStop: stop});
 
@@ -1076,7 +1072,6 @@
 
 	FieldTripMapOperation.prototype.clearHighlightFeatures = async function()
 	{
-		const self = this;
 		if (!_highlightLayerInstance)
 		{
 			return;
@@ -1089,7 +1084,6 @@
 
 	FieldTripMapOperation.prototype.drawHighlightFeatures = async function(data, paths, stops, isShowHighlightPath)
 	{
-		const self = this;
 		if (!_pathLayerInstance)
 		{
 			return;
@@ -1477,7 +1471,6 @@
 
 	FieldTripMapOperation.prototype.hideArrowLayer = function()
 	{
-		const self = this;
 		_pathArrowLayerInstance.hide();
 		_sequenceLineArrowLayerInstance.hide();
 	}
@@ -1485,7 +1478,7 @@
 	FieldTripMapOperation.prototype.redrawPathArrowLayer = async function(_, data = {}, fieldTrips = null)
 	{
 		const self = this;
-		if (self.pathLineType === PATH_LINE_TYPE.Sequence)
+		if (self.pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE)
 		{
 			return;
 		}
@@ -1504,7 +1497,7 @@
 	FieldTripMapOperation.prototype.redrawSequenceArrowLayer = async function(_, data, fieldTrips = null)
 	{
 		const self = this;
-		if (self.pathLineType === PATH_LINE_TYPE.Path)
+		if (self.pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.PATH_LINE)
 		{
 			return;
 		}
@@ -1617,7 +1610,7 @@
 
 	FieldTripMapOperation.prototype._isArrowOnPath = function()
 	{
-		return this.pathLineType === PATH_LINE_TYPE.Sequence;
+		return this.pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE;
 	}
 
 	FieldTripMapOperation.prototype._extractArrowCondition = function(DBID, fieldTripId)
