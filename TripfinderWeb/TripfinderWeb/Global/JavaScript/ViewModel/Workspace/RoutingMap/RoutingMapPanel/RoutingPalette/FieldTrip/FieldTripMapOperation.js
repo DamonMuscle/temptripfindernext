@@ -726,19 +726,15 @@
 
 	FieldTripMapOperation.prototype._drawNewStopPathsFromMap = async function(data)
 	{
-		let effectSequences = data.map(item => item.Sequence);
-
 		const self = this,
 			{ DBID, FieldTripId } = data[0],
 			fieldTrip = self.fieldTripsData.find(item => item.DBID === DBID && item.id === FieldTripId),
+			effectSequences = data.map(item => item.Sequence),
 			previousSequence = effectSequences[0] - 1,
 			nextSequence = effectSequences[effectSequences.length - 1] + 1;
 
 		effectSequences.unshift(previousSequence);
 		effectSequences.push(nextSequence);
-
-		// ensure effectSequences exist in current FieldTripStops
-		effectSequences = effectSequences.filter((sequence) => self.fieldTripsData.some(stop => stop.Sequence == sequence));
 
 		await self.refreshFieldTripPath(fieldTrip, effectSequences);
 	}
