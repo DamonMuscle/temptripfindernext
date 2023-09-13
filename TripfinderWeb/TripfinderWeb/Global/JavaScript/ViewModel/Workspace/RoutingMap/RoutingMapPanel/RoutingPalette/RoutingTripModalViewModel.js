@@ -82,7 +82,7 @@
 							add: addedStops,
 							delete: [],
 							edit: []
-						});						
+						});
 			
 						routingDataModel.changeTripVisibility(fieldTripId, true);
 						routingDataModel.fieldTripStopDataModel.changeRevertStack(addedStops, false);
@@ -100,7 +100,7 @@
 						tripStop.type = "tripStop";
 					});
 
-					routingDataModel.fieldTripStopDataModel.deleteTripStop(updatedStops);
+					routingDataModel.fieldTripStopDataModel.removeTripStopsFromTrip(updatedStops);
 
 					updatedStops.forEach(stop => {
 						routingDataModel.fieldTripStopDataModel.insertTripStopToTrip(stop, stop.Sequence - 1);
@@ -134,6 +134,8 @@
 						await routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.deleteStopLocation(result, stop);
 					});
 				}
+
+				result = routingDataModel.getFieldTripById(result.FieldTripId);
 
 				this.positiveClose(result);
 			}

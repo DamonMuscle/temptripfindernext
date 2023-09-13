@@ -833,6 +833,22 @@
 		}
 	};
 
+	RoutingFieldTripStopDataModel.prototype.removeTripStopsFromTrip = function(stops)
+	{
+		const trip = this.dataModel.getFieldTripById(stops[0].FieldTripId);
+
+		stops.forEach(stop => {
+			const positionIndex = stop.Sequence - 1;
+
+			trip.FieldTripStops.splice(positionIndex, 1);
+		})
+
+		if (!this.dataModel.getSmartSequenceSetting() || positionIndex != undefined)
+		{
+			this.updateSequence(trip);
+		}
+	}
+
 	/**
 	 * calculate trip stop smart sequence
 	 * @param {*} trip
