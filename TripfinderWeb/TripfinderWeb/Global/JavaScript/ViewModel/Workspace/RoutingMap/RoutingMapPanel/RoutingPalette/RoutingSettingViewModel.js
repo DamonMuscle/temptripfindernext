@@ -68,7 +68,7 @@
 			self.obAvgSpeed(setting.avgSpeed);
 		}
 		self.obSpeedType(setting.speedType);
-		self.labelSetting.obShowLabel(setting.showLabel);
+		// self.labelSetting.obShowLabel(setting.showLabel);
 	};
 
 	RoutingSettingViewModel.prototype.avgSpeedNotEmpty = function()
@@ -116,7 +116,7 @@
 		self.saveKey(storages.arrowPosition.key, self.obArrowPosition().toString());
 		self.saveKey(storages.showAssignedStudentsCount.key, self.obShowAssignedStudentsCount().toString());
 		self.saveKey(storages.studentCountLabelColor.key, self.obCountLabelColor().toString());
-		self.saveKey(storages.showLabel.key, self.labelSetting.obShowLabel().toString());
+		// self.saveKey(storages.showLabel.key, self.labelSetting.obShowLabel().toString());
 		self.saveKey(storages.geoLink.key, self.obGeoLink().toString());
 		if (self.isImperialUnit)
 		{

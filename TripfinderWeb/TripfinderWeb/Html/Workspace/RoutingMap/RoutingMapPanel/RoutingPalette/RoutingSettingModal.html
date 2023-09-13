@@ -20,13 +20,13 @@
 			</div>
 			<div class="checkbox">
 				<label>
-					<input type="checkbox" data-bind="checked:labelSetting.obShowLabel">
+					<input type="checkbox" data-bind="checked:labelSetting && labelSetting.obShowLabel">
 					<span>Label</span>
 				</label>
 				<div class="input-group" style="margin: 0 0 10px 5px;float:right;width:84%;">
-					<input type="text" data-bind="value:labelSetting.obShowLabelAttributeDisplay" class="form-control" maxlength="20">
+					<input type="text" data-bind="value:labelSetting && labelSetting.obShowLabelAttributeDisplay" class="form-control" maxlength="20">
 					<div class="input-group-btn">
-						<button data-bind="click:labelSetting.setLabelOptions.bind(labelSetting)" type="button" class="btn btn-default btn-sharp" tabindex="-1">
+						<button data-bind="click:labelSetting && labelSetting.setLabelOptions.bind(labelSetting)" type="button" class="btn btn-default btn-sharp" tabindex="-1">
 							<span class="glyphicon glyphicon-option-horizontal"></span>
 						</button>
 					</div>
