@@ -279,7 +279,7 @@
 
 	FieldTripMapOperation.prototype.updateFieldTripPathVisibility = async function(fieldTrips)
 	{
-		console.log("13 FieldTripMapOperation.prototype.updateFieldTripPathVisibility");
+		console.log("13[DONE] FieldTripMapOperation.prototype.updateFieldTripPathVisibility");
 
 		await _fieldTripMap.redrawArrowLayer(this.fieldTripsData, fieldTrips);
 		await _fieldTripMap.updateFieldTripPathVisibility(this.fieldTripsData, fieldTrips);
@@ -698,7 +698,6 @@
 	//#region Update Stop
 	FieldTripMapOperation.prototype.updateStopSymbol = function(fieldTrip, stops)
 	{
-		const self = this;
 		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
 			stopFeatures = _getStopFeatures().filter(f => f.attributes.DBID === DBID && f.attributes.FieldTripId === FieldTripId);
 
@@ -718,150 +717,12 @@
 
 	FieldTripMapOperation.prototype.addHighlightFeatures = async function(data)
 	{
-		const self = this;
-		if (!_stopLayerInstance ||
-			!_pathLayerInstance ||
-			!_highlightLayerInstance ||
-			!_highlightStopLayerInstance)
-		{
-			return;
-		}
-
-		// avoid add duplicate features.
-		await _highlightLayerInstance.clearLayer();
-
-		const isAllFieldTripsInvisible = self.fieldTripsData.map(item => item.visible).every(item => item === false);
-		if (isAllFieldTripsInvisible)
-		{
-			return;
-		}
-
-		const { toFieldTrip, previousStop, currentStop, nextStop, AssignSequence } = data;
-		const isToFieldTripVisible = toFieldTrip.visible;
-		// show highlight stop
-		if (!!currentStop)
-		{
-			await _highlightStopLayerInstance.clearLayer();
-		}
-
-		_drawHighlightStop(data, currentStop, AssignSequence);
-
-		// show highlight line
-		let fieldTripStops = null;
-		if (!!currentStop)
-		{
-			fieldTripStops = [previousStop, currentStop, nextStop].filter(item => item);
-		}
-		else
-		{
-			// create stop
-			const highlightStop = _getHighlightStop();
-			if (highlightStop === null)
-			{
-				return;
-			}
-
-			const midStop = {
-				XCoord: highlightStop.geometry.longitude,
-				YCoord: highlightStop.geometry.latitude,
-				id: 0
-			};
-			fieldTripStops = [previousStop, midStop, nextStop].filter(item => item);
-		}
-
-		const vertex = [],
-			stops = [],
-			DBID = toFieldTrip.DBID,
-			FieldTripId = toFieldTrip.id,
-			Color = toFieldTrip.color;
-		fieldTripStops.forEach(stop =>
-		{
-			const { XCoord, YCoord, id } = stop,
-				attributes = { DBID, FieldTripId, id },
-				graphic = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateHighlightBackgroundStop(XCoord, YCoord, attributes);
-			stops.push(graphic);
-
-			vertex.push([XCoord, YCoord]);
-		});
-
-		const paths = [vertex];
-		const params = { DBID, FieldTripId, Color };
-		await _drawHighlightFeatures(params, paths, stops, isToFieldTripVisible);
+		await _fieldTripMap.focusOnRouteStop(data, this.fieldTripsData);
 	}
 
 	FieldTripMapOperation.prototype.clearHighlightFeatures = async function()
 	{
-		if (!_highlightLayerInstance)
-		{
-			return;
-		}
-
-		await _highlightLayerInstance.clearLayer();
-
-		await _highlightStopLayerInstance.clearLayer();
-	}
-
-	const _drawHighlightFeatures = async (data, paths, stops, isShowHighlightPath) =>
-	{
-		if (!_pathLayerInstance)
-		{
-			return;
-		}
-
-		let highlightGraphics = [];
-		if (isShowHighlightPath)
-		{
-			// add highlight sequence line
-			const { DBID, FieldTripId, Color } = data,
-				pathAttributes = { DBID, FieldTripId, Color },
-				basePathGraphic = TF.RoutingPalette.FieldTripMap.PathGraphicWrapper.CreateHighlightBackgroundPath(paths, pathAttributes);
-			highlightGraphics.push(basePathGraphic);
-
-			const topPathGraphic = TF.RoutingPalette.FieldTripMap.PathGraphicWrapper.CreatePath(paths, pathAttributes);
-			highlightGraphics.push(topPathGraphic);
-		}
-
-		// add highlight stop
-		highlightGraphics = highlightGraphics.concat(stops);
-
-		await _highlightLayerInstance.addMany(highlightGraphics);
-	}
-
-	const _drawHighlightStop = function(data, currentStop, sequence)
-	{
-		const isEditStop = !!currentStop;
-		let stopGraphic = null;
-		if (isEditStop)
-		{
-			const attributes = {
-				id: currentStop.id,
-				DBID: data.DBID,
-				FieldTripId: data.FieldTripId,
-				CurbApproach: currentStop.vehicleCurbApproach,
-				Name: currentStop.Street,
-				Sequence: currentStop.Sequence,
-				Color: INFO_STOP_COLOR
-			},
-			longitude = currentStop.XCoord,
-			latitude = currentStop.YCoord;
-
-			stopGraphic = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes, sequence);
-		}
-
-		const highlightStop = _getHighlightStop();
-		if (highlightStop)
-		{
-			if (isEditStop)
-			{
-				highlightStop.geometry = stopGraphic.geometry;
-				highlightStop.attributes = stopGraphic.attributes;
-			}
-			highlightStop.symbol = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.GetHighlightSymbol(sequence);
-		}
-		else
-		{
-			_highlightStopLayerInstance.addStops([stopGraphic]);
-		}
+		await _fieldTripMap.unfocusedRouteStop();
 	}
 
 	const _getHighlightStop = () =>
