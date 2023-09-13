@@ -837,11 +837,7 @@
 	{
 		const trip = this.dataModel.getFieldTripById(stops[0].FieldTripId);
 
-		stops.forEach(stop => {
-			const positionIndex = stop.Sequence - 1;
-
-			trip.FieldTripStops.splice(positionIndex, 1);
-		})
+		trip.FieldTripStops = trip.FieldTripStops.filter(stop => !stops.some(removeStop => removeStop.Sequence == stop.Sequence));
 
 		if (!this.dataModel.getSmartSequenceSetting() || positionIndex != undefined)
 		{

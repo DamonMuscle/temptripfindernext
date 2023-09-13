@@ -1898,12 +1898,13 @@
 			const tripStop = newTripStops[i];
 			const isNewStop = !originalTripStops.some(originalStop => originalStop.id == tripStop.id);
 			const isNotDeletedStop = !deletedStops.some(stop => stop.id == tripStop.id);
+			const isPrimaryStop = tripStop.PrimaryDeparture || tripStop.PrimaryDestination;
 
 			if (isNewStop)
 			{
 				addedStops.push(tripStop);
 			}
-			else if(isNotDeletedStop)
+			else if(isNotDeletedStop && !isPrimaryStop)
 			{
 				let orignalTripStop = originalTripStops.filter(r => r.id == tripStop.id)[0];
 

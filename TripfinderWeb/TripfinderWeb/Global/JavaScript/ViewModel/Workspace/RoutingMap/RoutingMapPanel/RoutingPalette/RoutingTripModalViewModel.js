@@ -77,12 +77,6 @@
 							data.StopTime = data.ActualStopTime;
 							routingDataModel.fieldTripStopDataModel.insertToRevertData(data);
 						});
-
-						routingDataModel.onTripStopsChangeEvent.notify({
-							add: addedStops,
-							delete: [],
-							edit: []
-						});
 			
 						routingDataModel.changeTripVisibility(fieldTripId, true);
 						routingDataModel.fieldTripStopDataModel.changeRevertStack(addedStops, false);
@@ -113,12 +107,6 @@
 						{
 							data.StopTime = data.ActualStopTime;
 							routingDataModel.fieldTripStopDataModel.insertToRevertData(data);
-						});
-
-						routingDataModel.onTripStopsChangeEvent.notify({
-							add: [],
-							delete: [],
-							edit: updatedStops
 						});
 			
 						routingDataModel.changeTripVisibility(fieldTripId, true);
