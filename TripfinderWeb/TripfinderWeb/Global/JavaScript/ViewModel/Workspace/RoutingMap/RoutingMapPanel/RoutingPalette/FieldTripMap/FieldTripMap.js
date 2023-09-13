@@ -275,6 +275,43 @@
 		await this.updateFieldTripPathVisibility(sortedFieldTrips, fieldTrips);
 	};
 
+	FieldTripMap.prototype.updateRouteColor = async function(fieldTrip, allFieldTrips)
+	{
+		const createStopSymbol = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.GetSymbol;
+		const createPathSymbol = TF.RoutingPalette.FieldTripMap.PathGraphicWrapper.GetSymbol;
+		
+		const color = _getFieldTripColor(fieldTrip),
+			{ DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
+			stopFeatures = _getStopFeatures(),
+			pathFeatures = _getPathFeatures(),
+			sequenceLineFeatures = _getSequenceLineFeatures(),
+			fieldTripHighlightFeatures = _getHighlightFeatures();
+
+		const fieldTripStops = _queryMapFeatures(stopFeatures, DBID, FieldTripId);
+		_stopLayerInstance.updateColor(fieldTripStops, color, createStopSymbol);
+
+		const fieldTripPaths = _queryMapFeatures(pathFeatures, DBID, FieldTripId);
+		_pathLayerInstance.updateColor(fieldTripPaths, color, createPathSymbol);
+
+		const fieldTripSequenceLines = _queryMapFeatures(sequenceLineFeatures, DBID, FieldTripId);
+		_sequenceLineLayerInstance.updateColor(fieldTripSequenceLines, color, createPathSymbol);
+
+		// verify
+		const fieldTripHighlights = _queryMapFeatures(fieldTripHighlightFeatures, DBID, FieldTripId);
+		// prevent update highlight path symbol.
+		const highlightLines = fieldTripHighlights.filter(item => item.geometry.type === TF.GIS.GeometryEnum.GEOMETRY_TYPE.POLYLINE && item.symbol.color.a === 1);
+		_sequenceLineLayerInstance.updateColor(highlightLines, color, createPathSymbol);
+
+		// update path arrow color
+		const condition = _extractArrowCondition(DBID, FieldTripId);
+		const arrowOnPath = _isArrowOnPath();
+		_updatePathArrowFeatureColor(_pathArrowLayerInstance, condition, color, arrowOnPath);
+		_updatePathArrowFeatureColor(_sequenceLineArrowLayerInstance, condition, color, arrowOnPath);
+
+		await _redrawPathArrowLayer(null, {}, [fieldTrip], allFieldTrips);
+		await _redrawSequenceArrowLayer(null, {}, [fieldTrip], allFieldTrips);
+	};
+
 	FieldTripMap.prototype.dispose = function()
 	{
 		if (_arrowLayerHelper)
@@ -713,7 +750,7 @@
 
 			await arrowLayerInstance.layer.applyEdits(edits);
 		}
-	}
+	};
 
 	const _computeArrowFeatures = (polylineFeature, arrowOnPath) =>
 	{
@@ -738,7 +775,7 @@
 		}
 
 		return arrows;
-	}
+	};
 
 	const _calculateArrowLayerExpression = (fieldTripsData) =>
 	{
@@ -751,6 +788,16 @@
 			expression = (conditions.length > 1) ? `(${conditions.join(") OR (")})` :
 				(conditions.length === 0) ? "1 = 0" : conditions;
 		return expression;
+	};
+
+	const _updatePathArrowFeatureColor = (arrowLayerInstance, condition, color, arrowOnPath) =>
+	{
+		const layerRenderer = arrowLayerInstance.getRenderer().clone();
+		const valueInfo = layerRenderer.uniqueValueInfos.filter(item => item.description === condition)[0];
+		valueInfo.value = color;
+		valueInfo.symbol = _arrowLayerHelper.getArrowSymbol(arrowOnPath, color);
+
+		arrowLayerInstance.setRenderer(layerRenderer);
 	};
 
 	//#endregion

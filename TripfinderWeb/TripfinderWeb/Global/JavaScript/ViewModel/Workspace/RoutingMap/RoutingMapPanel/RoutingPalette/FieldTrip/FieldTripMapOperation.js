@@ -97,8 +97,6 @@
 
 	//#region Private Property
 
-	let _arrowLayerHelper = null;
-
 	let _pathArrowLayerInstance = null;
 	let _pathLayerInstance = null;
 	let _sequenceLineArrowLayerInstance = null;
@@ -213,7 +211,7 @@
 
 	FieldTripMapOperation.prototype.setFieldTripVisibility = async function(fieldTrips)
 	{
-		console.log("6 FieldTripMapOperation.prototype.setFieldTripVisibility");
+		console.log("6[DONE] FieldTripMapOperation.prototype.setFieldTripVisibility");
 
 		this.setFieldTripStopVisibility(fieldTrips);
 
@@ -262,49 +260,9 @@
 
 	FieldTripMapOperation.prototype.updateSymbolColor = async function(fieldTrip)
 	{
-		console.log("11 FieldTripMapOperation.prototype.updateSymbolColor");
+		console.log("11[DONE] FieldTripMapOperation.prototype.updateSymbolColor");
 
-		const color = _getFieldTripColor(fieldTrip),
-			{ DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
-			stopFeatures = _getStopFeatures(),
-			pathFeatures = _getPathFeatures(),
-			sequenceLineFeatures = _getSequenceLineFeatures(),
-			fieldTripHighlightFeatures = _getHighlightFeatures();
-
-		const createStopSymbol = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.GetSymbol;
-		const createPathSymbol = TF.RoutingPalette.FieldTripMap.PathGraphicWrapper.GetSymbol;
-
-		const fieldTripStops = _queryMapFeatures(stopFeatures, DBID, FieldTripId);
-		_stopLayerInstance.updateColor(fieldTripStops, color, createStopSymbol);
-
-		const fieldTripPaths = _queryMapFeatures(pathFeatures, DBID, FieldTripId);
-		_pathLayerInstance.updateColor(fieldTripPaths, color, createPathSymbol);
-
-		const fieldTripSequenceLines = _queryMapFeatures(sequenceLineFeatures, DBID, FieldTripId);
-		_sequenceLineLayerInstance.updateColor(fieldTripSequenceLines, color, createPathSymbol);
-
-		const fieldTripHighlights = _queryMapFeatures(fieldTripHighlightFeatures, DBID, FieldTripId);
-		// prevent update highlight path symbol.
-		const highlightLines = fieldTripHighlights.filter(item => item.geometry.type === TF.GIS.GeometryEnum.GEOMETRY_TYPE.POLYLINE && item.symbol.color.a === 1);
-		_sequenceLineLayerInstance.updateColor(highlightLines, color, createPathSymbol);
-
-		// update path arrow color
-		const condition = _extractArrowCondition(DBID, FieldTripId);
-		const arrowOnPath = this._isArrowOnPath();
-		_updatePathArrowFeatureColor(_pathArrowLayerInstance, condition, color, arrowOnPath);
-		_updatePathArrowFeatureColor(_sequenceLineArrowLayerInstance, condition, color, arrowOnPath);
-		this.redrawPathArrowLayer(null, {}, [fieldTrip]);
-		this.redrawSequenceArrowLayer(null, {}, [fieldTrip]);
-	}
-
-	const _updatePathArrowFeatureColor = (arrowLayerInstance, condition, color, arrowOnPath) =>
-	{
-		const layerRenderer = arrowLayerInstance.getRenderer().clone();
-		const valueInfo = layerRenderer.uniqueValueInfos.filter(item => item.description === condition)[0];
-		valueInfo.value = color;
-		valueInfo.symbol = _arrowLayerHelper.getArrowSymbol(arrowOnPath, color);
-
-		arrowLayerInstance.setRenderer(layerRenderer);
+		await _fieldTripMap.updateRouteColor(fieldTrip, this.fieldTripsData);
 	}
 
 	//#endregion
@@ -313,7 +271,7 @@
 
 	FieldTripMapOperation.prototype.switchPathType = async function(fieldTrips)
 	{
-		console.log("12 FieldTripMapOperation.prototype.switchPathType");
+		console.log("12[DONE] FieldTripMapOperation.prototype.switchPathType");
 
 		const sortedFieldTrips = _getSortedFieldTrips(this.fieldTripsData);
 		await _fieldTripMap.onPathTypeChanged(sortedFieldTrips, fieldTrips);
@@ -1153,7 +1111,7 @@
 
 	FieldTripMapOperation.prototype.updateArrowRenderer = function()
 	{
-		console.log("25 FieldTripMapOperation.prototype.updateArrowRenderer");
+		console.log("25[DONE] FieldTripMapOperation.prototype.updateArrowRenderer");
 		const sortedFieldTrips = _getSortedFieldTrips(this.fieldTripsData);
 
 		_fieldTripMap.updateArrowRenderer(sortedFieldTrips);
