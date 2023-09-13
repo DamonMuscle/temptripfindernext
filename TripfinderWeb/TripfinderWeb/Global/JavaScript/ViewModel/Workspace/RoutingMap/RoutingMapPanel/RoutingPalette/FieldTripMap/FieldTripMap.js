@@ -42,6 +42,9 @@
 
 	let _fieldTripRoutes = [];
 
+	let _allFieldTrips = null;
+	let _pathLineType = null;
+
 	//#endregion
 
 	function FieldTripMap(mapInstance)
@@ -50,7 +53,18 @@
 
 		_arrowLayerHelper = new TF.GIS.ArrowLayerHelper(mapInstance);
 		_layerManager = new TF.GIS.LayerManager(mapInstance);
+		_initPathType();
 	}
+
+	Object.defineProperty(FieldTripMap.prototype, 'PathLineType', {
+		get() { return _pathLineType; },
+		set(value)
+		{
+			_pathLineType = value;
+		},
+		enumerable: false,
+		configurable: false
+	});
 
 	//#region Public Methods
 
@@ -88,19 +102,19 @@
 		[_pathLayerInstance, _highlightLayerInstance, _sequenceLineLayerInstance, _stopLayerInstance, _highlightStopLayerInstance] = layerInstances;
 	};
 
-	FieldTripMap.prototype.initArrowLayers = function(sortedFieldTrips, arrowOnPath)
+	FieldTripMap.prototype.initArrowLayers = function(sortedFieldTrips)
 	{
 		const self = this;
 		_disposeArrowLayers(self.mapInstance);
 
-		const arrowRenderer = _getArrowRenderer(sortedFieldTrips, arrowOnPath);
+		const arrowRenderer = _getArrowRenderer(sortedFieldTrips);
 
 		const pathArrowLayerOptions = {
 			id: FieldTripMap_PathArrowLayerId,
 			index: FieldTripMap_PathArrowLayer_Index,
 			renderer: arrowRenderer,
 			eventHandlers: {
-				redraw: redrawPathArrowLayer
+				redraw: _redrawPathArrowLayer
 			}
 		};
 		_pathArrowLayerInstance = new TF.GIS.Layer.PathArrowLayer(self.mapInstance, pathArrowLayerOptions);
@@ -111,7 +125,7 @@
 			index: FieldTripMap_SequenceLineArrowLayer_Index,
 			renderer: arrowRenderer,
 			eventHandlers: {
-				redraw: redrawSequenceArrowLayer
+				redraw: _redrawSequenceArrowLayer
 			}
 		};
 		_sequenceLineArrowLayerInstance = new TF.GIS.Layer.PathArrowLayer(self.mapInstance, sequenceArrowLayerOptions);
@@ -123,7 +137,7 @@
 		return _getFieldTripRoute(fieldTrip);
 	};
 
-	FieldTripMap.prototype.drawRoute = async function(DBID, FieldTripId, color, fieldTripRoute)
+	FieldTripMap.prototype.addRoute = async function(DBID, FieldTripId, color, fieldTripRoute)
 	{
 		_drawRouteStops(DBID, FieldTripId, color, fieldTripRoute);
 
@@ -139,9 +153,34 @@
 		return isEmptyRoute;
 	};
 
-	FieldTripMap.prototype.updateArrowRenderer = function(sortedFieldTrips, arrowOnPath)
+	FieldTripMap.prototype.removeRoute = async function(DBID, fieldTripId)
 	{
-		const arrowRenderer = _getArrowRenderer(sortedFieldTrips, arrowOnPath);
+		const stopFeatures = _getStopFeatures(),
+			pathArrowFeatures = await _getPathArrowFeatures(),
+			pathFeatures = _getPathFeatures(),
+			sequenceLineArrowFeatures = await _getSequenceLineArrowFeatures(),
+			sequenceLineFeatures = _getSequenceLineFeatures(),
+			mapFeaturesTable = [stopFeatures, pathFeatures, sequenceLineFeatures],
+			mapLayerInstanceTable = [_stopLayerInstance, _pathLayerInstance, _sequenceLineLayerInstance],
+			mapArrowFeaturesTable = [pathArrowFeatures, sequenceLineArrowFeatures],
+			mapArrowLayerInstanceTable = [_pathArrowLayerInstance, _sequenceLineArrowLayerInstance];
+
+		for (let i = 0; i < mapFeaturesTable.length; i++)
+		{
+			const features = _queryMapFeatures(mapFeaturesTable[i], DBID, fieldTripId);
+			_removeMapLayerFeatures(mapLayerInstanceTable[i], features);
+		}
+
+		for (let i = 0; i < mapArrowFeaturesTable.length; i++)
+		{
+			const features = _queryArrowFeatures(mapArrowFeaturesTable[i], DBID, fieldTripId);
+			_removeMapLayerFeatures(mapArrowLayerInstanceTable[i], features);
+		}
+	};
+
+	FieldTripMap.prototype.updateArrowRenderer = function(sortedFieldTrips)
+	{
+		const arrowRenderer = _getArrowRenderer(sortedFieldTrips);
 		_pathArrowLayerInstance.setRenderer(arrowRenderer);
 		_sequenceLineArrowLayerInstance.setRenderer(arrowRenderer);
 	};
@@ -152,12 +191,31 @@
 		_setFieldTripLayerVisibility(fieldTrips, _stopLayerInstance, stopFeatures);
 	};
 
-	FieldTripMap.prototype.updateFieldTripPathVisibility = async function(fieldTrips, pathLineType)
+	FieldTripMap.prototype.redrawArrowLayer = async function(allFieldTrips, fieldTrips)
 	{
-		console.log("TODO: REDRAW ARROW LAYERS");
+		switch (_pathLineType)
+		{
+			case TF.RoutingPalette.FieldTripEnum.PATH_TYPE.PATH_LINE:
+				await _redrawPathArrowLayer(null, {}, fieldTrips, allFieldTrips);
+				break;
+			case TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE:
+				await _redrawSequenceArrowLayer(null, {}, fieldTrips, allFieldTrips);
+				break;
+		}
+	};
 
-		_setFieldTripPathVisibility(fieldTrips, pathLineType);
-		_setFieldTripSequenceLineVisibility(fieldTrips, pathLineType);
+	FieldTripMap.prototype.updateFieldTripPathVisibility = async function(fieldTripsData, fieldTrips)
+	{
+		const expression = _calculateArrowLayerExpression(fieldTripsData);
+
+		_setFieldTripPathVisibility(fieldTrips);
+		_setFieldTripPathArrowVisibility(expression);
+
+		_setFieldTripSequenceLineVisibility(fieldTrips);
+		_setFieldTripSequenceLineArrowVisibility(expression);
+
+		// verify
+		_setFieldTripHighlightLayerVisibility(fieldTrips);
 	};
 
 	FieldTripMap.prototype.reorderFeatures = async function(sortedFieldTrips)
@@ -197,6 +255,26 @@
 		this.mapInstance.goTo(graphics);
 	};
 
+	FieldTripMap.prototype.zoomToRouteStop = function(fieldTripId, stopSequence)
+	{
+		const fieldTripRoute = _findFieldTripRoute(fieldTripId),
+			routeStops = fieldTripRoute.getRouteStops(),
+			routeStop = routeStops.find(item => item.Sequence === stopSequence);
+
+		this.mapInstance.centerAndZoom(routeStop.Longitude, routeStop.Latitude);
+	};
+
+	FieldTripMap.prototype.onPathTypeChanged = async function(sortedFieldTrips, fieldTrips)
+	{
+		_pathArrowLayerInstance.hide();
+		_sequenceLineArrowLayerInstance.hide();
+
+		this.updateArrowRenderer(sortedFieldTrips);
+
+		await this.redrawArrowLayer(sortedFieldTrips, fieldTrips);
+		await this.updateFieldTripPathVisibility(sortedFieldTrips, fieldTrips);
+	};
+
 	FieldTripMap.prototype.dispose = function()
 	{
 		if (_arrowLayerHelper)
@@ -206,11 +284,19 @@
 		}
 
 		_disposeLayers();
+
+		_layerManager = null;
 	};
 
 	//#endregion
 
 	//#region Private Methods
+
+	const _initPathType = () =>
+	{
+		_pathLineType = tf.storageManager.get('pathLineType') === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE ?
+			TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE : TF.RoutingPalette.FieldTripEnum.PATH_TYPE.PATH_LINE;
+	};
 
 	const _disposeLayers = () =>
 	{
@@ -224,7 +310,6 @@
 			_sequenceLineArrowLayerInstance,
 		];
 		_layerManager.removeLayerInstances(layerInstances);
-		_layerManager = null;
 
 		_stopLayerInstance = null;
 		_pathLayerInstance = null;
@@ -249,9 +334,10 @@
 		}
 	};
 
-	const _getArrowRenderer = (fieldTrips, arrowOnPath) =>
+	const _getArrowRenderer = (fieldTrips) =>
 	{
 		const uniqueValueInfos = [];
+		const arrowOnPath = _isArrowOnPath();
 
 		for (let i = 0; i < fieldTrips.length; i++)
 		{
@@ -266,14 +352,71 @@
 		return _arrowLayerHelper.createUniqueValueRenderer(uniqueValueInfos);
 	};
 
-	const redrawPathArrowLayer = () =>
+	const _redrawPathArrowLayer = async (_, data = {}, fieldTrips = null, allFieldTrips) =>
 	{
-		console.log("TODO: redrawPathArrowLayer");
+		if (_pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE)
+		{
+			return;
+		}
+
+		if (allFieldTrips === undefined)
+		{
+			if (_allFieldTrips === null)
+			{
+				return;
+			}
+
+			allFieldTrips = _allFieldTrips;
+		}
+		else
+		{
+			_allFieldTrips = allFieldTrips;
+		}
+
+		const fieldTripsData = fieldTrips || allFieldTrips,
+			arrowLayerInstance = _pathArrowLayerInstance,
+			pathFeatures = _getPathFeatures();
+
+		arrowLayerInstance.hide();
+
+		await _redrawArrowLayer(fieldTripsData, arrowLayerInstance, pathFeatures, data);
+		const expression = _calculateArrowLayerExpression(allFieldTrips);
+		_setFieldTripPathArrowVisibility(expression);
+		arrowLayerInstance.show();
 	};
 
-	const redrawSequenceArrowLayer = () =>
+	const _redrawSequenceArrowLayer = async (_, data = {}, fieldTrips = null, allFieldTrips) =>
 	{
-		console.log("TODO: redrawSequenceArrowLayer");
+		if (_pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.PATH_LINE)
+		{
+			return;
+		}
+
+		if (allFieldTrips === undefined)
+		{
+			// temporary solution
+			if (_allFieldTrips === null)
+			{
+				return;
+			}
+
+			allFieldTrips = _allFieldTrips;
+		}
+		else
+		{
+			_allFieldTrips = allFieldTrips;
+		}
+
+		const fieldTripsData = fieldTrips || allFieldTrips,
+			arrowLayerInstance = _sequenceLineArrowLayerInstance,
+			sequenceLineFeatures = _getSequenceLineFeatures();
+
+		arrowLayerInstance.hide();
+
+		await _redrawArrowLayer(fieldTripsData, arrowLayerInstance, sequenceLineFeatures, data);
+		const expression = _calculateArrowLayerExpression(allFieldTrips);
+		_setFieldTripSequenceLineArrowVisibility(expression);
+		arrowLayerInstance.show();
 	};
 
 	const _computeRoutePaths = async (fieldTripRoute) =>
@@ -338,6 +481,8 @@
 		});
 	};
 
+	const _removeMapLayerFeatures = (layerInstance, removeFeatures) => layerInstance.removeMany(removeFeatures);
+
 	//#region Query Map Features
 
 	const _getStopFeatures = () => _stopLayerInstance.getFeatures();
@@ -382,22 +527,47 @@
 		return results;
 	};
 
+	const _queryArrowFeatures = (features, DBID, Id) =>
+	{
+		const results = [];
+		for (let i = 0; i < features.length; i++)
+		{
+			const feature = features[i];
+			if (feature.attributes.DBID === DBID &&
+				feature.attributes.Id === Id)
+			{
+				results.push(feature);
+			}
+		}
+
+		return results;
+	}
+
 	//#endregion
 
 	//#region Visibility
 
-	const _setFieldTripPathVisibility = (fieldTrips, pathLineType) =>
+	const _setFieldTripPathVisibility = (fieldTrips) =>
 	{
 		const pathFeatures = _getPathFeatures();
-		const precondition = pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.PATH_LINE;
+		const precondition = _pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.PATH_LINE;
 		_setFieldTripLayerVisibility(fieldTrips, _pathLayerInstance, pathFeatures, precondition);
 	};
 
-	const _setFieldTripSequenceLineVisibility = (fieldTrips, pathLineType) =>
+	const _setFieldTripSequenceLineVisibility = (fieldTrips) =>
 	{
 		const sequenceLineFeatures = _getSequenceLineFeatures();
-		const precondition = pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE;
+		const precondition = _pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE;
 		_setFieldTripLayerVisibility(fieldTrips, _sequenceLineLayerInstance, sequenceLineFeatures, precondition);
+	};
+
+	const _setFieldTripHighlightLayerVisibility = (fieldTrips) =>
+	{
+		const fieldTripHighlightFeatures = _getHighlightFeatures();
+		_setFieldTripLayerVisibility(fieldTrips, _highlightLayerInstance, fieldTripHighlightFeatures);
+
+		const fieldTripHighlightStopFeatures = _getHighlightStopFeatures();
+		_setFieldTripLayerVisibility(fieldTrips, _highlightStopLayerInstance, fieldTripHighlightStopFeatures);
 	};
 
 	const _setFieldTripLayerVisibility = (fieldTrips, layerInstance, layerFeatures, precondition = null) =>
@@ -416,6 +586,10 @@
 			}
 		}
 	};
+
+	const _setFieldTripPathArrowVisibility = (expression) => _pathArrowLayerInstance.setLayerDefinitionExpression(expression);
+
+	const _setFieldTripSequenceLineArrowVisibility = (expression) => _sequenceLineArrowLayerInstance.setLayerDefinitionExpression(expression);
 
 	//#endregion
 
@@ -499,8 +673,91 @@
 
 	//#endregion
 
+	//#region Arrow
+
+	const _isArrowOnPath = () => _pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE;
+
+	const _redrawArrowLayer = async (fieldTrips, arrowLayerInstance, pathFeatures, data) =>
+	{
+		const arrowOnPath = _isArrowOnPath();
+		for (let i = 0; i < fieldTrips.length; i++)
+		{
+			const fieldTrip = fieldTrips[i];
+			const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip);
+			const features = pathFeatures.filter(feature => feature.attributes.DBID === DBID && feature.attributes.FieldTripId === FieldTripId);
+			if (!arrowLayerInstance.isPathWithinMapExtentChanged(features, data))
+			{
+				continue;
+			}
+
+			const edits = {};
+			const condition = _extractArrowCondition(DBID, FieldTripId);
+			const arrowFeatures = await arrowLayerInstance.queryArrowFeatures(condition);
+			const deleteArrows = arrowFeatures;
+			if (deleteArrows.length > 0)
+			{
+				edits.deleteFeatures = deleteArrows;
+			}
+
+			let arrows = [];
+			for (let j = 0; j < features.length; j++)
+			{
+				const feature = features[j];
+				arrows = arrows.concat(_computeArrowFeatures(feature, arrowOnPath));
+			}
+
+			if (arrows.length >= 0)
+			{
+				edits.addFeatures = arrows;
+			}
+
+			await arrowLayerInstance.layer.applyEdits(edits);
+		}
+	}
+
+	const _computeArrowFeatures = (polylineFeature, arrowOnPath) =>
+	{
+		let arrows = [];
+		if (!polylineFeature)
+		{
+			return arrows;
+		}
+
+		const { DBID, FieldTripId, Color } = polylineFeature.attributes,
+			attributes = { DBID, Color };
+
+		attributes.Id = FieldTripId;
+		arrows = _arrowLayerHelper.computeArrowFeatures(polylineFeature, arrowOnPath);
+
+		for (let k = 0; k < arrows.length; k++)
+		{
+			const graphic = arrows[k];
+			graphic.attributes = Object.assign({}, graphic.attributes, attributes);
+			// hide by default for UX.
+			graphic.visible = false;
+		}
+
+		return arrows;
+	}
+
+	const _calculateArrowLayerExpression = (fieldTripsData) =>
+	{
+		const visibleFieldTrips = _getVisibleFieldTrips(fieldTripsData),
+			conditions = visibleFieldTrips.map(item =>
+			{
+				const { DBID, FieldTripId } = _extractFieldTripFeatureFields(item);
+				return _extractArrowCondition(DBID, FieldTripId);
+			}),
+			expression = (conditions.length > 1) ? `(${conditions.join(") OR (")})` :
+				(conditions.length === 0) ? "1 = 0" : conditions;
+		return expression;
+	};
+
+	//#endregion
 
 	//#region FieldTrip
+
+	const _getVisibleFieldTrips = (fieldTripsData) => fieldTripsData.filter(item => item.visible);
 
 	const _getFieldTripColor = (fieldTrip) => fieldTrip.color;
 

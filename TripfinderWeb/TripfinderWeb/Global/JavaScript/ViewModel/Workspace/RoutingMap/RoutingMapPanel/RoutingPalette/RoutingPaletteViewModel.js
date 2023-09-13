@@ -201,11 +201,7 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapZoomToStop = function(_, data)
 	{
 		const { tripId, sequence } = data;
-		const fieldTrip = this.dataModel.getFieldTripById(tripId);
-		const stop = fieldTrip?.FieldTripStops.find(item => item.Sequence === sequence);
-		const coordinates = { longitude: stop?.XCoord, latitude: stop?.YCoord };
-
-		this.fieldTripMapOperation?.zoomToFieldTripStop(coordinates);
+		this.fieldTripMapOperation?.zoomToFieldTripStop(tripId, sequence);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapShowHide = function(_, data)
@@ -223,13 +219,11 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapTripPathTypeChange = function(_, isSequenceLine)
 	{
 		const type = isSequenceLine ? TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE : TF.RoutingPalette.FieldTripEnum.PATH_TYPE.PATH_LINE;
-		if (type === this.fieldTripMapOperation?.pathLineType)
+		if (this.fieldTripMapOperation?.isPathLineTypeChanged(type))
 		{
-			return;
+			this.fieldTripMapOperation.setPathLineType(type);
+			this.fieldTripMapOperation.switchPathType(this.dataModel.fieldTrips);
 		}
-
-		this.fieldTripMapOperation?.setPathLineType(type);
-		this.fieldTripMapOperation?.switchPathType(this.dataModel.fieldTrips);
 	}
 
 	RoutingPaletteViewModel.prototype.onMapCanvas_RecalculateTripMove = function(_, data)
