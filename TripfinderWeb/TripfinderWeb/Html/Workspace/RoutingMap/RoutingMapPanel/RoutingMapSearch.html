@@ -84,11 +84,14 @@
 				</div>
 			</div>
 		</div>
-		<div class="upload-file-container hide">
-			<div class="geocode-label-container">
+		<div class="upload-file-container">
+			<div class="upload-file-empty-holder">
+				<label class="btn">&nbsp;</label>
+			</div>
+			<div class="geocode-label-container hide">
 				Geocode
 			</div>
-			<div class="geocode-list">
+			<div class="geocode-list hide">
 				<div class="form-group small-form-group">
 					<div class="input-group" data-bind="">
 						<div id="GeocodeTypeDropDown" data-bind="typeahead:{source:obGeocodeTpyes,format:function(obj){return obj.text;},drowDownShow:true,notSort:true,selectedValue:obGeocodeSelectType}">
@@ -103,10 +106,10 @@
 					</div>
 				</div>
 			</div>
-			<div class="drop-container">
+			<div class="drop-container hide">
 				Drop file to add stops or
 			</div>
-			<div class="upload-btn-wrapper">
+			<div class="upload-btn-wrapper hide">
 				<label for="fileCreateFromFile" class="upload-button btn">
 					Upload File
 				</label>
