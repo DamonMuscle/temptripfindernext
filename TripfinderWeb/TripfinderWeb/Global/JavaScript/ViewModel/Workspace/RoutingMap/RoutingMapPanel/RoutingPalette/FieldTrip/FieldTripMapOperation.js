@@ -5,24 +5,27 @@
 
 	//#region Constant
 
-	const BASE_LAYER_ID = 0;
-	const FieldTripMap_PathArrowLayerId = "FieldTripMap_PathArrowLayer";
-	const FieldTripMap_PathArrowLayer_Index = BASE_LAYER_ID + 1;
-	const FieldTripMap_PathLayerId = "FieldTripMap_PathLayer";
-	const FieldTripMap_PathLayer_Index = BASE_LAYER_ID + 2;
-	const FieldTripMap_SequenceLineArrowLayerId = "FieldTripMap_SequenceLineArrowLayer";
-	const FieldTripMap_SequenceLineArrowLayer_Index = BASE_LAYER_ID +3;
-	const FieldTripMap_HighlightLayerId = "FieldTripMap_HighlightLayer";
-	const FieldTripMap_HighlightLayer_Index = BASE_LAYER_ID + 4;
-	const FieldTripMap_SequenceLineLayerId = "FieldTripMap_SequenceLineLayer";
-	const FieldTripMap_SequenceLineLayer_Index = BASE_LAYER_ID + 5;
-	const FieldTripMap_StopLayerId = "FieldTripMap_StopLayer";
-	const FieldTripMap_StopLayer_Index = BASE_LAYER_ID + 6;
-	const FieldTripMap_HighlightStopLayerId = "FieldTripMap_HighlightStopLayer";
-	const FieldTripMap_HighlightStopLayer_Index = BASE_LAYER_ID + 7;
+	const RoutingPalette_FieldTripPathArrowLayerId = "RoutingPalette_FieldTrip_PathArrowLayer";
+	const RoutingPalette_FieldTripPathArrowLayer_Index = 1;
+	const RoutingPalette_FieldTripPathLayerId = "RoutingPalette_FieldTrip_PathLayer";
+	const RoutingPalette_FieldTripPathLayer_Index = 2;
+	const RoutingPalette_FieldTripSequenceLineArrowLayerId = "RoutingPalette_FieldTrip_SequenceLineArrowLayer";
+	const RoutingPalette_FieldTripSequenceLineArrowLayer_Index = 3;
+	const RoutingPalette_FieldTripHighlightLayerId = "RoutingPalette_FieldTrip_HighlightLayer";
+	const RoutingPalette_FieldTripHighlightLayer_Index = 4;
+	const RoutingPalette_FieldTripSequenceLineLayerId = "RoutingPalette_FieldTrip_SequenceLineLayer";
+	const RoutingPalette_FieldTripSequenceLineLayer_Index = 5;
+	const RoutingPalette_FieldTripStopLayerId = "RoutingPalette_FieldTrip_StopLayer";
+	const RoutingPalette_FieldTripStopLayer_Index = 6;
+	const RoutingPalette_FieldTripHighlightStopLayerId = "RoutingPalette_FieldTrip_HighlightStopLayer";
+	const RoutingPalette_FieldTripHighlightStopLayer_Index = 8;
 
+	const PATH_LINE_TYPE = {
+		Path: "Path",
+		Sequence: "Sequence"
+	};
 	const INFO_STOP_COLOR = "#FFFFFF";
-	const LAYER_TYPE = {
+	const FIELD_TRIP_LAYER_TYPE = {
 		PATH: "PathLayer",
 		STOP: "StopLayer"
 	};
@@ -38,10 +41,9 @@
 		}
 
 		this.mapInstance = mapInstance;
-		_arrowLayerHelper = new TF.GIS.ArrowLayerHelper(mapInstance);
-		_layerManager = new TF.GIS.LayerManager(mapInstance);
-		this._pathLineType = tf.storageManager.get('pathLineType') === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE ?
-			TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE : TF.RoutingPalette.FieldTripEnum.PATH_TYPE.PATH_LINE;
+		this.arrowLayerHelper = new TF.GIS.ArrowLayerHelper(mapInstance);
+		this.layerManager = new TF.GIS.LayerManager(mapInstance);
+		this._pathLineType = tf.storageManager.get('pathLineType') === 'Sequence' ? PATH_LINE_TYPE.Sequence : PATH_LINE_TYPE.Path;
 		this._fieldTripsData = null;
 		this._editing = {
 			isAddingStop: false,
@@ -51,6 +53,7 @@
 				movingStop: null
 			}
 		};
+		this.defineReadOnlyProperty("PATH_LINE_TYPE", PATH_LINE_TYPE);
 		mapInstance.events.onMapViewKeyUpEvent.subscribe(this.onMapKeyUpEvent.bind(this));
 	}
 
@@ -98,57 +101,54 @@
 
 	//#endregion
 
-	//#region Private Property
-
-	let _arrowLayerHelper = null;
-	let _layerManager = null;
-
-	let _pathArrowLayerInstance = null;
-	let _pathLayerInstance = null;
-	let _sequenceLineArrowLayerInstance = null;
-	let _highlightLayerInstance = null;
-	let _sequenceLineLayerInstance = null;
-	let _stopLayerInstance = null;
-	let _highlightStopLayerInstance = null;
-
-	let _fieldTripRoutes = [];
-
-	//#endregion
-
 	//#region Initialization
 
 	FieldTripMapOperation.prototype.initLayers = async function()
 	{
-		if (_stopLayerInstance &&
-			_pathLayerInstance &&
-			_sequenceLineLayerInstance)
+		const self = this;
+		if (self.stopLayerInstance &&
+			self.pathLayerInstance &&
+			self.sequenceLineLayerInstance)
 		{
 			return;
 		}
 
 		const layerOptions = [{
-			id: FieldTripMap_PathLayerId,
-			index: FieldTripMap_PathLayer_Index,
-			layerType: LAYER_TYPE.PATH
+			id: RoutingPalette_FieldTripPathLayerId,
+			index: RoutingPalette_FieldTripPathLayer_Index,
+			layerType: FIELD_TRIP_LAYER_TYPE.PATH
 		}, {
-			id: FieldTripMap_HighlightLayerId,
-			index: FieldTripMap_HighlightLayer_Index
+			id: RoutingPalette_FieldTripSequenceLineLayerId,
+			index: RoutingPalette_FieldTripSequenceLineLayer_Index,
+			layerType: FIELD_TRIP_LAYER_TYPE.PATH
 		}, {
-			id: FieldTripMap_SequenceLineLayerId,
-			index: FieldTripMap_SequenceLineLayer_Index,
-			layerType: LAYER_TYPE.PATH
+			id: RoutingPalette_FieldTripStopLayerId,
+			index: RoutingPalette_FieldTripStopLayer_Index,
+			layerType: FIELD_TRIP_LAYER_TYPE.STOP
 		}, {
-			id: FieldTripMap_StopLayerId,
-			index: FieldTripMap_StopLayer_Index,
-			layerType: LAYER_TYPE.STOP
+			id: RoutingPalette_FieldTripHighlightLayerId,
+			index: RoutingPalette_FieldTripHighlightLayer_Index
 		}, {
-			id: FieldTripMap_HighlightStopLayerId,
-			index: FieldTripMap_HighlightStopLayer_Index,
-			layerType: LAYER_TYPE.STOP
+			id: RoutingPalette_FieldTripHighlightStopLayerId,
+			index: RoutingPalette_FieldTripHighlightStopLayer_Index,
+			layerType: FIELD_TRIP_LAYER_TYPE.STOP
 		}];
+		const layerInstances = await self.layerManager.createLayerInstances(layerOptions);
 
-		const layerInstances = await _layerManager.createLayerInstances(layerOptions);
-		[_pathLayerInstance, _highlightLayerInstance, _sequenceLineLayerInstance, _stopLayerInstance, _highlightStopLayerInstance] = layerInstances;
+		self.pathLayerInstance = layerInstances[0];
+		self.defineReadOnlyProperty("pathLayerInstance", self.pathLayerInstance);
+
+		self.sequenceLineLayerInstance = layerInstances[1];
+		self.defineReadOnlyProperty("sequenceLineLayerInstance", self.sequenceLineLayerInstance);
+
+		self.stopLayerInstance = layerInstances[2];
+		self.defineReadOnlyProperty("stopLayerInstance", self.stopLayerInstance);
+
+		self.highlightLayerInstance = layerInstances[3];
+		self.defineReadOnlyProperty("highlightLayerInstance", self.highlightLayerInstance);
+
+		self.highlightStopLayerInstance = layerInstances[4];
+		self.defineReadOnlyProperty("highlightStopLayerInstance", self.highlightStopLayerInstance);
 	}
 
 	FieldTripMapOperation.prototype.initArrowLayers = function()
@@ -159,42 +159,39 @@
 			return;
 		}
 
-		if (_pathArrowLayerInstance && _sequenceLineArrowLayerInstance)
+		if (self.pathArrowLayerInstance && self.sequenceLineArrowLayerInstance)
 		{
-			self.mapInstance.removeLayer(FieldTripMap_PathArrowLayerId);
-			_pathArrowLayerInstance.dispose();
-			_pathArrowLayerInstance = null;
+			self.mapInstance.removeLayer(RoutingPalette_FieldTripPathArrowLayerId);
+			self.pathArrowLayerInstance.dispose();
+			self.pathArrowLayerInstance = null;
 
-			self.mapInstance.removeLayer(FieldTripMap_SequenceLineArrowLayerId);
-			_sequenceLineArrowLayerInstance.dispose();
-			_sequenceLineArrowLayerInstance = null;
+			self.mapInstance.removeLayer(RoutingPalette_FieldTripSequenceLineArrowLayerId);
+			self.sequenceLineArrowLayerInstance.dispose();
+			self.sequenceLineArrowLayerInstance = null;
 		}
 
-		const fieldTrips = _getSortedFieldTrips(self.fieldTripsData);
-		const arrowOnPath = self._isArrowOnPath();
-		const arrowRenderer = _getArrowRenderer(fieldTrips, arrowOnPath);
-
+		const arrowRenderer = self._getArrowRenderer();
 		const pathArrowLayerOptions = {
-			id: FieldTripMap_PathArrowLayerId,
-			index: FieldTripMap_PathArrowLayer_Index,
+			id: RoutingPalette_FieldTripPathArrowLayerId,
+			index: RoutingPalette_FieldTripPathArrowLayer_Index,
 			renderer: arrowRenderer,
 			eventHandlers: {
 				redraw: self.redrawPathArrowLayer.bind(self)
 			}
 		};
-		_pathArrowLayerInstance = new TF.GIS.Layer.PathArrowLayer(self.mapInstance, pathArrowLayerOptions);
-		self.mapInstance.addLayerInstance(_pathArrowLayerInstance);
+		self.pathArrowLayerInstance = new TF.GIS.Layer.PathArrowLayer(self.mapInstance, pathArrowLayerOptions);
+		self.mapInstance.addLayerInstance(self.pathArrowLayerInstance);
 
 		const sequenceArrowLayerOptions = {
-			id: FieldTripMap_SequenceLineArrowLayerId,
-			index: FieldTripMap_SequenceLineArrowLayer_Index,
+			id: RoutingPalette_FieldTripSequenceLineArrowLayerId,
+			index: RoutingPalette_FieldTripSequenceLineArrowLayer_Index,
 			renderer: arrowRenderer,
 			eventHandlers: {
 				redraw: self.redrawSequenceArrowLayer.bind(self)
 			}
 		};
-		_sequenceLineArrowLayerInstance = new TF.GIS.Layer.PathArrowLayer(self.mapInstance, sequenceArrowLayerOptions);
-		self.mapInstance.addLayerInstance(_sequenceLineArrowLayerInstance);
+		self.sequenceLineArrowLayerInstance = new TF.GIS.Layer.PathArrowLayer(self.mapInstance, sequenceArrowLayerOptions);
+		self.mapInstance.addLayerInstance(self.sequenceLineArrowLayerInstance);
 	}
 
 	//#endregion
@@ -210,39 +207,39 @@
 			return;
 		}
 
-		_sortBySequence(fieldTrip.FieldTripStops);
+		this._sortBySequence(fieldTrip.FieldTripStops);
 
-		const fieldTripRoute = _getFieldTripRoute(fieldTrip);
+		this.drawStops(fieldTrip);
 
-		const color = _getFieldTripColor(fieldTrip);
-		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip);
-		_drawStops(DBID, FieldTripId, color, fieldTripRoute);
+		await this.addFieldTripPath(fieldTrip);
+	}
 
-		await this._drawFieldTripPath(fieldTrip, fieldTripRoute);
-
-		await _drawSequenceLine(fieldTrip);
+	FieldTripMapOperation.prototype.addFieldTripPath = async function(fieldTrip, effectSequences)
+	{
+		await this.drawFieldTripPath(fieldTrip, effectSequences);
+		await this.drawSequenceLine(fieldTrip);
 	}
 
 	FieldTripMapOperation.prototype.orderFeatures = async function()
 	{
 		const self = this,
 			fieldTrips = self.fieldTripsData,
-			sortedFieldTrips = _sortFieldTripByName(fieldTrips),
-			sortedStopFeatures = _sortStopFeaturesByFieldTrips(sortedFieldTrips),
-			sortedPathFeatures = _sortPathFeaturesByFieldTrips(sortedFieldTrips),
-			sortedSequenceLineFeatures = _sortSequenceLineFeaturesByFieldTrips(sortedFieldTrips);
+			sortedFieldTrips = self._sortFieldTripByName(fieldTrips),
+			sortedStopFeatures = self._sortStopFeaturesByFieldTrips(sortedFieldTrips),
+			sortedPathFeatures = self._sortPathFeaturesByFieldTrips(sortedFieldTrips),
+			sortedSequenceLineFeatures = self._sortSequenceLineFeaturesByFieldTrips(sortedFieldTrips);
 		// update map features
-		await _stopLayerInstance.clearLayer();
-		await _stopLayerInstance.addMany(sortedStopFeatures);
+		await self.stopLayerInstance.clearLayer();
+		await self.stopLayerInstance.addMany(sortedStopFeatures);
 
-		await _pathLayerInstance.clearLayer();
-		await _pathLayerInstance.addMany(sortedPathFeatures);
+		await self.pathLayerInstance.clearLayer();
+		await self.pathLayerInstance.addMany(sortedPathFeatures);
 
-		await _sequenceLineLayerInstance.clearLayer();
-		await _sequenceLineLayerInstance.addMany(sortedSequenceLineFeatures);
+		await self.sequenceLineLayerInstance.clearLayer();
+		await self.sequenceLineLayerInstance.addMany(sortedSequenceLineFeatures);
 	}
 
-	const _compareFieldTripNames = (a, b) =>
+	FieldTripMapOperation.prototype._compareFieldTripNames = function(a, b)
 	{
 		// get the field trip data from palette.
 		// sort the result as same as palette.
@@ -259,11 +256,12 @@
 		return a.id - b.id;
 	}
 
-	const _sortFieldTripByName = (fieldTrips) =>
+	FieldTripMapOperation.prototype._sortFieldTripByName = function(fieldTrips)
 	{
+		const self = this;
 		const fieldTripIdMapping = fieldTrips.map(item =>
 		{
-			const { DBID, FieldTripId } = _extractFieldTripFeatureFields(item);
+			const { DBID, FieldTripId } = self._extractFieldTripFeatureFields(item);
 			const data = {
 				DBID: DBID,
 				Name: item.Name,
@@ -272,7 +270,7 @@
 			return data;
 		});
 
-		const sortedFieldTrips = fieldTripIdMapping.sort(_compareFieldTripNames).map(item => {
+		const sortedFieldTrips = fieldTripIdMapping.sort(self._compareFieldTripNames).map(item => {
 			const { DBID, id } = item;
 			return { DBID, id };
 		});
@@ -280,10 +278,11 @@
 		return sortedFieldTrips;
 	}
 
-	const _sortStopFeaturesByFieldTrips = (sortedFieldTrips) =>
+	FieldTripMapOperation.prototype._sortStopFeaturesByFieldTrips = function(sortedFieldTrips)
 	{
-		const stopFeatures = _getStopFeatures();
-
+		const self = this,
+			stopFeatures = self._getStopFeatures();
+		
 		const sortedStopFeatures = stopFeatures.sort((a, b) =>
 		{
 			let aValue, bValue;
@@ -313,19 +312,23 @@
 		return [...sortedStopFeatures];
 	}
 
-	const _sortPathFeaturesByFieldTrips = (sortedFieldTrips) =>
+	FieldTripMapOperation.prototype._sortPathFeaturesByFieldTrips = function(sortedFieldTrips)
 	{
-		const pathFeatures = _getPathFeatures();
-		return _sortLineFeatures(sortedFieldTrips, pathFeatures);
+		const self = this,
+			pathFeatures = self._getPathFeatures();
+
+		return self._sortLineFeatures(sortedFieldTrips, pathFeatures);
 	}
 
-	const _sortSequenceLineFeaturesByFieldTrips = (sortedFieldTrips) =>
+	FieldTripMapOperation.prototype._sortSequenceLineFeaturesByFieldTrips = function(sortedFieldTrips)
 	{
-		const sequenceLineFeatures = _getSequenceLineFeatures();
-		return _sortLineFeatures(sortedFieldTrips, sequenceLineFeatures);
+		const self = this,
+			sequenceLineFeatures = self._getSequenceLineFeatures();
+
+		return self._sortLineFeatures(sortedFieldTrips, sequenceLineFeatures);
 	}
 
-	const _sortLineFeatures = (sortedFieldTrips, lineFeatures) =>
+	FieldTripMapOperation.prototype._sortLineFeatures = function(sortedFieldTrips, lineFeatures)
 	{
 		const sortedLineFeatures = lineFeatures.sort((a, b) =>
 		{
@@ -364,53 +367,53 @@
 	{
 		this.setFieldTripStopVisibility(fieldTrips);
 
-		const expression = _calculateArrowLayerExpression(this.fieldTripsData);
-		_setFieldTripPathVisibility(fieldTrips, this.pathLineType);
-		_setFieldTripPathArrowVisibility(expression);
+		const expression = this._calculateArrowLayerExpression();
+		this.setFieldTripPathVisibility(fieldTrips);
+		this.setFieldTripPathArrowVisibility(expression);
 
-		_setFieldTripSequenceLineVisibility(fieldTrips, this.pathLineType);
-		_setFieldTripSequenceLineArrowVisibility(expression);
+		this.setFieldTripSequenceLineVisibility(fieldTrips);
+		this.setFieldTripSequenceLineArrowVisibility(expression);
 
-		_setFieldTripHighlightLayerVisibility(fieldTrips);
+		this.setFieldTripHighlightLayerVisibility(fieldTrips);
 	}
 
 	FieldTripMapOperation.prototype.setFieldTripStopVisibility = function(fieldTrips)
 	{
-		const stopFeatures = _getStopFeatures();
-		_setFieldTripLayerVisibility(fieldTrips, _stopLayerInstance, stopFeatures);
+		const stopFeatures = this._getStopFeatures();
+		this._setFieldTripLayerVisibility(fieldTrips, this.stopLayerInstance, stopFeatures);
 	}
 
-	const _setFieldTripPathVisibility = (fieldTrips, pathLineType) =>
+	FieldTripMapOperation.prototype.setFieldTripPathVisibility = function(fieldTrips)
 	{
-		const pathFeatures = _getPathFeatures();
-		const precondition = pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.PATH_LINE;
-		_setFieldTripLayerVisibility(fieldTrips, _pathLayerInstance, pathFeatures, precondition);
+		const pathFeatures = this._getPathFeatures();
+		const precondition = this.pathLineType === PATH_LINE_TYPE.Path;
+		this._setFieldTripLayerVisibility(fieldTrips, this.pathLayerInstance, pathFeatures, precondition);
 	}
 
-	const _setFieldTripSequenceLineVisibility = (fieldTrips, pathLineType) =>
+	FieldTripMapOperation.prototype.setFieldTripSequenceLineVisibility = function(fieldTrips)
 	{
-		const sequenceLineFeatures = _getSequenceLineFeatures();
-		const precondition = pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE;
-		_setFieldTripLayerVisibility(fieldTrips, _sequenceLineLayerInstance, sequenceLineFeatures, precondition);
+		const sequenceLineFeatures = this._getSequenceLineFeatures();
+		const precondition = this.pathLineType === PATH_LINE_TYPE.Sequence;
+		this._setFieldTripLayerVisibility(fieldTrips, this.sequenceLineLayerInstance, sequenceLineFeatures, precondition);
 	}
 
-	const _setFieldTripHighlightLayerVisibility = (fieldTrips) =>
+	FieldTripMapOperation.prototype.setFieldTripHighlightLayerVisibility = function(fieldTrips)
 	{
-		const fieldTripHighlightFeatures = _getHighlightFeatures();
-		_setFieldTripLayerVisibility(fieldTrips, _highlightLayerInstance, fieldTripHighlightFeatures);
+		const fieldTripHighlightFeatures = this._getHighlightFeatures();
+		this._setFieldTripLayerVisibility(fieldTrips, this.highlightLayerInstance, fieldTripHighlightFeatures);
 
-		const fieldTripHighlightStopFeatures = _getHighlightStopFeatures();
-		_setFieldTripLayerVisibility(fieldTrips, _highlightStopLayerInstance, fieldTripHighlightStopFeatures);
+		const fieldTripHighlightStopFeatures = this._getHighlightStopFeatures();
+		this._setFieldTripLayerVisibility(fieldTrips, this.highlightStopLayerInstance, fieldTripHighlightStopFeatures);
 	}
 
-	const _setFieldTripLayerVisibility = (fieldTrips, layerInstance, layerFeatures, precondition = null) =>
+	FieldTripMapOperation.prototype._setFieldTripLayerVisibility = function(fieldTrips, layerInstance, layerFeatures, precondition = null)
 	{
 		for (let i = 0; i < fieldTrips.length; i++)
 		{
 			const fieldTrip = fieldTrips[i],
-				{ DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
+				{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip),
 				visible = (precondition === null) ? fieldTrip.visible : (precondition && fieldTrip.visible),
-				features = _queryMapFeatures(layerFeatures, DBID, FieldTripId),
+				features = this._queryMapFeatures(layerFeatures, DBID, FieldTripId),
 				updateFeatures = features.filter(item => item.visible !== visible);
 
 			if (updateFeatures.length > 0)
@@ -426,20 +429,20 @@
 
 	FieldTripMapOperation.prototype.zoomToFieldTripLayers = function(fieldTrips)
 	{
-		const stopFeatures = _getStopFeatures(),
-			pathFeatures = _getPathFeatures(),
-			sequenceLineFeatures = _getSequenceLineFeatures();
+		const stopFeatures = this._getStopFeatures(),
+			pathFeatures = this._getPathFeatures(),
+			sequenceLineFeatures = this._getSequenceLineFeatures();
 
 		let graphics = [];
 
 		for (let j = 0; j < fieldTrips.length; j++)
 		{
 			const fieldTrip = fieldTrips[j],
-				{ DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip);
+				{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip);
 
-			graphics = graphics.concat(_queryMapFeatures(stopFeatures, DBID, FieldTripId));
-			graphics = graphics.concat(_queryMapFeatures(pathFeatures, DBID, FieldTripId));
-			graphics = graphics.concat(_queryMapFeatures(sequenceLineFeatures, DBID, FieldTripId));
+			graphics = graphics.concat(this._queryMapFeatures(stopFeatures, DBID, FieldTripId));
+			graphics = graphics.concat(this._queryMapFeatures(pathFeatures, DBID, FieldTripId));
+			graphics = graphics.concat(this._queryMapFeatures(sequenceLineFeatures, DBID, FieldTripId));
 		}
 
 		this.mapInstance.goTo(graphics);
@@ -456,31 +459,34 @@
 
 	FieldTripMapOperation.prototype.removeFieldTrip = async function(fieldTrip)
 	{
-		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
-			stopFeatures = _getStopFeatures(),
-			pathArrowFeatures = await _getPathArrowFeatures(),
-			pathFeatures = _getPathFeatures(),
-			sequenceLineArrowFeatures = await _getSequenceLineArrowFeatures(),
-			sequenceLineFeatures = _getSequenceLineFeatures(),
+		const { DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip),
+			stopFeatures = this._getStopFeatures(),
+			pathArrowFeatures = await this._getPathArrowFeatures(),
+			pathFeatures = this._getPathFeatures(),
+			sequenceLineArrowFeatures = await this._getSequenceLineArrowFeatures(),
+			sequenceLineFeatures = this._getSequenceLineFeatures(),
 			mapFeaturesTable = [stopFeatures, pathFeatures, sequenceLineFeatures],
-			mapLayerInstanceTable = [_stopLayerInstance, _pathLayerInstance, _sequenceLineLayerInstance],
+			mapLayerInstanceTable = [this.stopLayerInstance,  this.pathLayerInstance, this.sequenceLineLayerInstance],
 			mapArrowFeaturesTable = [pathArrowFeatures, sequenceLineArrowFeatures],
-			mapArrowLayerInstanceTable = [_pathArrowLayerInstance, _sequenceLineArrowLayerInstance];
+			mapArrowLayerInstanceTable = [this.pathArrowLayerInstance, this.sequenceLineArrowLayerInstance];
 
 		for (let i = 0; i < mapFeaturesTable.length; i++)
 		{
-			const features = _queryMapFeatures(mapFeaturesTable[i], DBID, FieldTripId);
-			_removeMapLayerFeatures(mapLayerInstanceTable[i], features);
+			const features = this._queryMapFeatures(mapFeaturesTable[i], DBID, FieldTripId);
+			this.removeMapLayerFeatures(mapLayerInstanceTable[i], features);
 		}
 
 		for (let i = 0; i < mapArrowFeaturesTable.length; i++)
 		{
-			const features = _queryArrowFeatures(mapArrowFeaturesTable[i], DBID, FieldTripId);
-			_removeMapLayerFeatures(mapArrowLayerInstanceTable[i], features);
+			const features = this._queryArrowFeatures(mapArrowFeaturesTable[i], DBID, FieldTripId);
+			this.removeMapLayerFeatures(mapArrowLayerInstanceTable[i], features);
 		}
 	}
 
-	const _removeMapLayerFeatures = (layerInstance, removeFeatures) => layerInstance.removeMany(removeFeatures);
+	FieldTripMapOperation.prototype.removeMapLayerFeatures = function(layerInstance, removeFeatures)
+	{
+		layerInstance.removeMany(removeFeatures);
+	}
 
 	//#endregion
 
@@ -488,45 +494,45 @@
 
 	FieldTripMapOperation.prototype.updateSymbolColor = async function(fieldTrip)
 	{
-		const color = _getFieldTripColor(fieldTrip),
-			{ DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
-			stopFeatures = _getStopFeatures(),
-			pathFeatures = _getPathFeatures(),
-			sequenceLineFeatures = _getSequenceLineFeatures(),
-			fieldTripHighlightFeatures = _getHighlightFeatures();
+		const color = this._getColor(fieldTrip),
+			{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip),
+			stopFeatures = this._getStopFeatures(),
+			pathFeatures = this._getPathFeatures(),
+			sequenceLineFeatures = this._getSequenceLineFeatures(),
+			fieldTripHighlightFeatures = this._getHighlightFeatures();
 
 		const createStopSymbol = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.GetSymbol;
 		const createPathSymbol = TF.RoutingPalette.FieldTripMap.PathGraphicWrapper.GetSymbol;
 
-		const fieldTripStops = _queryMapFeatures(stopFeatures, DBID, FieldTripId);
-		_stopLayerInstance.updateColor(fieldTripStops, color, createStopSymbol);
+		const fieldTripStops = this._queryMapFeatures(stopFeatures, DBID, FieldTripId);
+		this.stopLayerInstance.updateColor(fieldTripStops, color, createStopSymbol);
 
-		const fieldTripPaths = _queryMapFeatures(pathFeatures, DBID, FieldTripId);
-		_pathLayerInstance.updateColor(fieldTripPaths, color, createPathSymbol);
+		const fieldTripPaths = this._queryMapFeatures(pathFeatures, DBID, FieldTripId);
+		this.pathLayerInstance.updateColor(fieldTripPaths, color, createPathSymbol);
 
-		const fieldTripSequenceLines = _queryMapFeatures(sequenceLineFeatures, DBID, FieldTripId);
-		_sequenceLineLayerInstance.updateColor(fieldTripSequenceLines, color, createPathSymbol);
+		const fieldTripSequenceLines = this._queryMapFeatures(sequenceLineFeatures, DBID, FieldTripId);
+		this.sequenceLineLayerInstance.updateColor(fieldTripSequenceLines, color, createPathSymbol);
 
-		const fieldTripHighlights = _queryMapFeatures(fieldTripHighlightFeatures, DBID, FieldTripId);
+		const fieldTripHighlights = this._queryMapFeatures(fieldTripHighlightFeatures, DBID, FieldTripId);
 		// prevent update highlight path symbol.
-		const highlightLines = fieldTripHighlights.filter(item => item.geometry.type === TF.GIS.GeometryEnum.GEOMETRY_TYPE.POLYLINE && item.symbol.color.a === 1);
-		_sequenceLineLayerInstance.updateColor(highlightLines, color, createPathSymbol);
+		const highlightLines = fieldTripHighlights.filter(item => item.geometry.type === "polyline" && item.symbol.color.a === 1);
+		this.sequenceLineLayerInstance.updateColor(highlightLines, color, createPathSymbol);
 
 		// update path arrow color
-		const condition = _extractArrowCondition(DBID, FieldTripId);
-		const arrowOnPath = this._isArrowOnPath();
-		_updatePathArrowFeatureColor(_pathArrowLayerInstance, condition, color, arrowOnPath);
-		_updatePathArrowFeatureColor(_sequenceLineArrowLayerInstance, condition, color, arrowOnPath);
+		const condition = this._extractArrowCondition(DBID, FieldTripId);
+		this._updatePathArrowFeatureColor(this.pathArrowLayerInstance, condition, color);
+		this._updatePathArrowFeatureColor(this.sequenceLineArrowLayerInstance, condition, color);
 		this.redrawPathArrowLayer(null, {}, [fieldTrip]);
 		this.redrawSequenceArrowLayer(null, {}, [fieldTrip]);
 	}
 
-	const _updatePathArrowFeatureColor = (arrowLayerInstance, condition, color, arrowOnPath) =>
+	FieldTripMapOperation.prototype._updatePathArrowFeatureColor = function(arrowLayerInstance, condition, color)
 	{
+		const arrowOnPath = this._isArrowOnPath();
 		const layerRenderer = arrowLayerInstance.getRenderer().clone();
 		const valueInfo = layerRenderer.uniqueValueInfos.filter(item => item.description === condition)[0];
 		valueInfo.value = color;
-		valueInfo.symbol = _arrowLayerHelper.getArrowSymbol(arrowOnPath, color);
+		valueInfo.symbol = this.arrowLayerHelper.getArrowSymbol(arrowOnPath, color);
 
 		arrowLayerInstance.setRenderer(layerRenderer);
 	}
@@ -537,8 +543,8 @@
 
 	FieldTripMapOperation.prototype.switchPathType = async function(fieldTrips)
 	{
-		_pathArrowLayerInstance.hide();
-		_sequenceLineArrowLayerInstance.hide();
+		this.pathArrowLayerInstance.hide();
+		this.sequenceLineArrowLayerInstance.hide();
 
 		this.updateArrowRenderer();
 		await this.updateFieldTripPathVisibility(fieldTrips);
@@ -549,17 +555,20 @@
 		await this.redrawPathArrowLayer(null, {}, fieldTrips);
 		await this.redrawSequenceArrowLayer(null, {}, fieldTrips);
 
-		_setFieldTripPathVisibility(fieldTrips, this.pathLineType);
-		_setFieldTripSequenceLineVisibility(fieldTrips, this.pathLineType);
+		this.setFieldTripPathVisibility(fieldTrips);
+		this.setFieldTripSequenceLineVisibility(fieldTrips);
 	}
 
 	//#endregion
 
 	//#region New Copy
 
-	const _isNewCopy = (fieldTrip) => fieldTrip.Id === 0;
+	FieldTripMapOperation.prototype.isNewCopy = function(fieldTrip)
+	{
+		return fieldTrip.Id === 0;
+	}
 
-	const _updateCopyFieldTripAttribute = (fieldTrip) =>
+	FieldTripMapOperation.prototype.updateCopyFieldTripAttribute = function(fieldTrip)
 	{
 		if (fieldTrip.id !== fieldTrip.routePathAttributes.FieldTripId)
 		{
@@ -599,10 +608,10 @@
 		}
 
 		this.showLoadingIndicator();
-		_refreshStopsSequenceLabel(stops);
-		_drawNewStopsFromMap(this.fieldTripsData, stops);
+		this._refreshStopsSequenceLabel(stops);
+		this._drawNewStopsFromMap(stops);
 		this.clearHighlightFeatures();
-		await this._drawNewStopPathsFromMap(this.fieldTripsData, stops);
+		await this._drawNewStopPathsFromMap(stops);
 		this.hideLoadingIndicator();
 
 		callback();
@@ -618,12 +627,13 @@
 			graphics.push(graphic);
 		}
 
-		_highlightStopLayerInstance.addStops(graphics);
+		self.highlightStopLayerInstance.addStops(graphics);
 	}
 
 	FieldTripMapOperation.prototype.addHighlightStops = function(addGraphic)
 	{
-		const highlightStop = _getHighlightStop();
+		const self = this,
+			highlightStop = self.getHighlightStop();
 
 		let newStopGraphic = null;
 		if (highlightStop)
@@ -635,16 +645,16 @@
 		else
 		{
 			newStopGraphic = addGraphic;
-			_highlightStopLayerInstance.addStops([newStopGraphic]);
+			self.highlightStopLayerInstance.addStops([newStopGraphic]);
 		}
 	}
 
 	FieldTripMapOperation.prototype.createNewStop = function(stop)
 	{
-		return _createNewStop(stop.XCoord, stop.YCoord, stop.Street);
+		return this._createNewStop(stop.XCoord, stop.YCoord, stop.Street);
 	}
 
-	const _createNewStop = (longitude, latitude, stopName) =>
+	FieldTripMapOperation.prototype._createNewStop = function(longitude, latitude, stopName)
 	{
 		const NEW_STOP_ID = 0,
 			NEW_STOP_SEQUENCE = 0,
@@ -656,9 +666,10 @@
 		return TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes);
 	}
 
-	const _createGeocodingNewStop = async (longitude, latitude) =>
+	FieldTripMapOperation.prototype._createGeocodingNewStop = async function(longitude, latitude)
 	{
-		const data = await _highlightStopLayerInstance.getGeocodeStop(longitude, latitude);
+		const self = this,
+			data = await self.highlightStopLayerInstance.getGeocodeStop(longitude, latitude);
 		if (!data)
 		{
 			return null;
@@ -667,15 +678,16 @@
 		const UNNAMED_ADDRESS = "unnamed",
 			{ Address, City, RegionAbbr, CountryCode } = data,
 			Name = Address || UNNAMED_ADDRESS,
-			newStop = _createNewStop(longitude, latitude, Name);
+			newStop = self._createNewStop(longitude, latitude, Name);
 
 		return { Name, City, RegionAbbr, CountryCode, newStop, XCoord: +longitude.toFixed(6), YCoord: +latitude.toFixed(6) };
 	}
 
-	const _refreshStopsSequenceLabel = (data) =>
+	FieldTripMapOperation.prototype._refreshStopsSequenceLabel = function(data)
 	{
-		const { DBID, FieldTripId } = data[0],
-			fieldTripStops = _getStopFeatures(),
+		const self = this,
+			{ DBID, FieldTripId } = data[0],
+			fieldTripStops = self._getStopFeatures(),
 			stopGraphics = fieldTripStops.filter(item => item.attributes.DBID === DBID && item.attributes.FieldTripId === FieldTripId);
 
 		for (let j = 0, jCount = data.length; j < jCount; j++)
@@ -690,16 +702,17 @@
 				if (stopSequence >= Sequence)
 				{
 					attributes.Sequence += 1;
-					_updateStopGraphicSequenceLabel(stop);
+					self._updateStopGraphicSequenceLabel(stop);
 				}
 			}
 		}
 	}
 
-	const _drawNewStopsFromMap = (fieldTripsData, data) =>
+	FieldTripMapOperation.prototype._drawNewStopsFromMap = function(data)
 	{
-		const { FieldTripId } = data[0],
-			Color = fieldTripsData.find(item => item.id === FieldTripId)?.color || INFO_STOP_COLOR,  // prevent Color is undefined
+		const self = this,
+			{ FieldTripId } = data[0],
+			Color = self.fieldTripsData.find(item => item.id === FieldTripId)?.color || INFO_STOP_COLOR,  // prevent Color is undefined
 			graphics = [];
 
 		for (let i = 0; i < data.length; i++)
@@ -711,20 +724,20 @@
 			graphics.push(stop);
 		}
 
-		_stopLayerInstance.addStops(graphics);
+		self.stopLayerInstance.addStops(graphics);
 	}
 
-	const _updateStopGraphicSequenceLabel = (stopGraphic) =>
+	FieldTripMapOperation.prototype._updateStopGraphicSequenceLabel = function(stopGraphic)
 	{
 		const attributes = stopGraphic.attributes;
 		stopGraphic.symbol = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.GetSymbol(attributes.Sequence, attributes.Color);
 	}
 
-	FieldTripMapOperation.prototype._drawNewStopPathsFromMap = async function(fieldTripsData, data)
+	FieldTripMapOperation.prototype._drawNewStopPathsFromMap = async function(data)
 	{
 		const self = this,
 			{ DBID, FieldTripId } = data[0],
-			fieldTrip = fieldTripsData.find(item => item.DBID === DBID && item.id === FieldTripId),
+			fieldTrip = self.fieldTripsData.find(item => item.DBID === DBID && item.id === FieldTripId),
 			effectSequences = data.map(item => item.Sequence),
 			previousSequence = effectSequences[0] - 1,
 			nextSequence = effectSequences[effectSequences.length - 1] + 1;
@@ -735,39 +748,51 @@
 		await self.refreshFieldTripPath(fieldTrip, effectSequences);
 	}
 
+
+	//#endregion
+
+	//#region TODO: Insert Field Trip Stop
+
+	//#endregion
+
+	//#region TODO: Geo Select Field Trip Stop
+
+	//#endregion
+
+	//#region TODO: Optimize Field Trip
+
 	//#endregion
 
 	//#region Refresh Field Trip Path
 
 	FieldTripMapOperation.prototype.refreshFieldTripPath = async function(fieldTrip, effectSequences, callZoomToLayers = true)
 	{
-		_clearFieldTripPath(fieldTrip);
-		await _clearFieldTripPathArrow(fieldTrip);
+		this.clearFieldTripPath(fieldTrip);
+		await this.clearFieldTripPathArrow(fieldTrip);
 
-		_clearSequenceLine(fieldTrip);
-		await _clearSequenceLineArrow(fieldTrip);
+		this.clearSequenceLine(fieldTrip);
+		await this.clearSequenceLineArrow(fieldTrip);
 
-		await this.drawFieldTripPath(fieldTrip, effectSequences);
-		await _drawSequenceLine(fieldTrip);
-
+		await this.addFieldTripPath(fieldTrip, effectSequences);
 		await this.updateFieldTripPathVisibility([fieldTrip]);
 
-		await this.orderFeatures();
+		this.orderFeatures();
 		if (callZoomToLayers)
 		{
 			this.zoomToFieldTripLayers([fieldTrip]);
 		}
 	}
 
-	const _clearFieldTripPath = (fieldTrip) =>
+	FieldTripMapOperation.prototype.clearFieldTripPath = function(fieldTrip)
 	{
-		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
-			pathFeatures = _getPathFeatures(),
-			fieldTripPaths = _queryMapFeatures(pathFeatures, DBID, FieldTripId);
+		const self = this,
+			{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
+			pathFeatures = self._getPathFeatures(),
+			fieldTripPaths = self._queryMapFeatures(pathFeatures, DBID, FieldTripId);
 		
 		for (let i = 0; i < fieldTripPaths.length; i++)
 		{
-			_pathLayerInstance.deletePath(fieldTripPaths[i]);
+			self.pathLayerInstance.deletePath(fieldTripPaths[i]);
 		}
 
 		fieldTrip.routePath = null;
@@ -775,46 +800,49 @@
 		fieldTrip.directions = null;
 	}
 
-	const _clearSequenceLine = (fieldTrip) =>
+	FieldTripMapOperation.prototype.clearSequenceLine = function(fieldTrip)
 	{
-		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
-			sequenceLineFeatures = _getSequenceLineFeatures();
-			sequenceLines = _queryMapFeatures(sequenceLineFeatures, DBID, FieldTripId);
+		const self = this,
+			{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
+			sequenceLineFeatures = this._getSequenceLineFeatures();
+			sequenceLines = this._queryMapFeatures(sequenceLineFeatures, DBID, FieldTripId);
 
 		for (let i = 0; i < sequenceLines.length; i++)
 		{
-			_sequenceLineLayerInstance.deletePath(sequenceLines[i]);
+			self.sequenceLineLayerInstance.deletePath(sequenceLines[i]);
 		}
 	}
 
-	const _clearFieldTripPathArrow = async (fieldTrip) =>
+	FieldTripMapOperation.prototype.clearFieldTripPathArrow = async function(fieldTrip)
 	{
-		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
+		const self = this,
+			{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
 			edits = {},
-			condition = _extractArrowCondition(DBID, FieldTripId);
-			deleteArrows = await _getPathArrowFeatures(condition);
+			condition = self._extractArrowCondition(DBID, FieldTripId);
+			deleteArrows = await self._getPathArrowFeatures(condition);
 
 		if (deleteArrows.length >= 0)
 		{
 			edits.deleteFeatures = deleteArrows;
 		}
 
-		await _pathArrowLayerInstance.layer.applyEdits(edits);
+		await self.pathArrowLayerInstance.layer.applyEdits(edits);
 	}
 
-	const _clearSequenceLineArrow = async (fieldTrip) =>
+	FieldTripMapOperation.prototype.clearSequenceLineArrow = async function(fieldTrip)
 	{
-		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
+		const self = this,
+			{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
 			edits = {},
-			condition = _extractArrowCondition(DBID, FieldTripId);
-			deleteArrows = await _getSequenceLineArrowFeatures(condition);
+			condition = self._extractArrowCondition(DBID, FieldTripId);
+			deleteArrows = await self._getSequenceLineArrowFeatures(condition);
 
 		if (deleteArrows.length >= 0)
 		{
 			edits.deleteFeatures = deleteArrows;
 		}
 
-		await _sequenceLineArrowLayerInstance.layer.applyEdits(edits);
+		await self.sequenceLineArrowLayerInstance.layer.applyEdits(edits);
 	}
 
 	//#endregion
@@ -828,7 +856,7 @@
 	FieldTripMapOperation.prototype.moveStopLocation = async function(fieldTrip, stop, sketchTool)
 	{
 		const self = this;
-		if (!_stopLayerInstance || !sketchTool)
+		if (!self.stopLayerInstance || !sketchTool)
 		{
 			return;
 		}
@@ -839,7 +867,7 @@
 		}
 
 		const sequence = stop.Sequence, fieldTripId = fieldTrip.id;
-		const fieldTripStops = _getStopFeatures();
+		const fieldTripStops = self._getStopFeatures();
 		const stopGraphic = fieldTripStops.find(item => item.attributes.FieldTripId === fieldTripId && item.attributes.Sequence === sequence);
 		if (!stopGraphic)
 		{
@@ -852,7 +880,7 @@
 			stop: stop
 		};
 
-		_stopLayerInstance?.moveStop(stopGraphic, sketchTool, function(movedStopData){
+		self.stopLayerInstance?.moveStop(stopGraphic, sketchTool, function(movedStopData){
 			self.onStopLayerMoveStopCompleted(movedStopData);
 			self.onStopLayerMoveStopCompleted_UpdateDataModel({graphic: stopGraphic});
 		});
@@ -875,6 +903,7 @@
 		stop.YCoord = +latitude.toFixed(6);
 
 		const effectSequences = self._computeEffectSequences(fieldTrip, {moveStop: stop});
+
 		await self.refreshFieldTripPath(fieldTrip, effectSequences);
 
 		self.editing.isMovingStop = false;
@@ -912,7 +941,7 @@
 	FieldTripMapOperation.prototype.deleteStopLocation = async function(fieldTrip, stop)
 	{
 		const self = this;
-		if (!_stopLayerInstance)
+		if (!self.stopLayerInstance)
 		{
 			return;
 		}
@@ -921,9 +950,9 @@
 
 		self.stopAddFieldTripStop();
 
-		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
+		const { DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
 			sequence = stop.Sequence,
-			fieldTripStops = _getStopFeatures();
+			fieldTripStops = self._getStopFeatures();
 
 		for (let i = 0; i < fieldTripStops.length; i++)
 		{
@@ -933,18 +962,18 @@
 			{
 				if (attributes.Sequence === sequence)
 				{
-					_stopLayerInstance.deleteStop(stop);
+					self.stopLayerInstance.deleteStop(stop);
 				}
 				else if (attributes.Sequence > sequence)
 				{
 					attributes.Sequence -= 1;
-					_updateStopGraphicSequenceLabel(stop);
+					self._updateStopGraphicSequenceLabel(stop);
 				}
 			}
 		}
 
 		const data = { fieldTripStopId: stop.id };
-		self.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocationCompleted, data });
+		this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocationCompleted, data });
 
 		const effectSequences = self._computeEffectSequences(fieldTrip, {deleteStop: stop});
 
@@ -959,8 +988,8 @@
 	FieldTripMapOperation.prototype.updateStopSymbol = function(fieldTrip, stops)
 	{
 		const self = this;
-		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
-			stopFeatures = _getStopFeatures().filter(f => f.attributes.DBID === DBID && f.attributes.FieldTripId === FieldTripId);
+		const { DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
+			stopFeatures = self._getStopFeatures().filter(f => f.attributes.DBID === DBID && f.attributes.FieldTripId === FieldTripId);
 
 		stops.forEach(stop =>
 		{
@@ -979,16 +1008,16 @@
 	FieldTripMapOperation.prototype.addHighlightFeatures = async function(data)
 	{
 		const self = this;
-		if (!_stopLayerInstance ||
-			!_pathLayerInstance ||
-			!_highlightLayerInstance ||
-			!_highlightStopLayerInstance)
+		if (!self.stopLayerInstance ||
+			!self.pathLayerInstance ||
+			!self.highlightLayerInstance ||
+			!self.highlightStopLayerInstance)
 		{
 			return;
 		}
 
 		// avoid add duplicate features.
-		await _highlightLayerInstance.clearLayer();
+		await self.highlightLayerInstance.clearLayer();
 
 		const isAllFieldTripsInvisible = self.fieldTripsData.map(item => item.visible).every(item => item === false);
 		if (isAllFieldTripsInvisible)
@@ -1001,10 +1030,10 @@
 		// show highlight stop
 		if (!!currentStop)
 		{
-			await _highlightStopLayerInstance.clearLayer();
+			await self.highlightStopLayerInstance.clearLayer();
 		}
 
-		_drawHighlightStop(data, currentStop, AssignSequence);
+		self.drawHighlightStop(data, currentStop, AssignSequence);
 
 		// show highlight line
 		let fieldTripStops = null;
@@ -1015,7 +1044,7 @@
 		else
 		{
 			// create stop
-			const highlightStop = _getHighlightStop();
+			const highlightStop = self.getHighlightStop();
 			if (highlightStop === null)
 			{
 				return;
@@ -1046,24 +1075,26 @@
 
 		const paths = [vertex];
 		const params = { DBID, FieldTripId, Color };
-		await _drawHighlightFeatures(params, paths, stops, isToFieldTripVisible);
+		await self.drawHighlightFeatures(params, paths, stops, isToFieldTripVisible);
 	}
 
 	FieldTripMapOperation.prototype.clearHighlightFeatures = async function()
 	{
-		if (!_highlightLayerInstance)
+		const self = this;
+		if (!self.highlightLayerInstance)
 		{
 			return;
 		}
 
-		await _highlightLayerInstance.clearLayer();
+		await self.highlightLayerInstance.clearLayer();
 
-		await _highlightStopLayerInstance.clearLayer();
+		await self.highlightStopLayerInstance.clearLayer();
 	}
 
-	const _drawHighlightFeatures = async (data, paths, stops, isShowHighlightPath) =>
+	FieldTripMapOperation.prototype.drawHighlightFeatures = async function(data, paths, stops, isShowHighlightPath)
 	{
-		if (!_pathLayerInstance)
+		const self = this;
+		if (!self.pathLayerInstance)
 		{
 			return;
 		}
@@ -1084,12 +1115,12 @@
 		// add highlight stop
 		highlightGraphics = highlightGraphics.concat(stops);
 
-		await _highlightLayerInstance.addMany(highlightGraphics);
+		await self.highlightLayerInstance.addMany(highlightGraphics);
 	}
 
-	const _drawHighlightStop = function(data, currentStop, sequence)
+	FieldTripMapOperation.prototype.drawHighlightStop = function(data, currentStop, sequence)
 	{
-		const isEditStop = !!currentStop;
+		const self = this, isEditStop = !!currentStop;
 		let stopGraphic = null;
 		if (isEditStop)
 		{
@@ -1108,7 +1139,7 @@
 			stopGraphic = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes, sequence);
 		}
 
-		const highlightStop = _getHighlightStop();
+		const highlightStop = self.getHighlightStop();
 		if (highlightStop)
 		{
 			if (isEditStop)
@@ -1120,13 +1151,14 @@
 		}
 		else
 		{
-			_highlightStopLayerInstance.addStops([stopGraphic]);
+			self.highlightStopLayerInstance.addStops([stopGraphic]);
 		}
 	}
 
-	const _getHighlightStop = () =>
+	FieldTripMapOperation.prototype.getHighlightStop = function()
 	{
-		const features = _getHighlightStopFeatures();
+		const self = this;
+		const features = self._getHighlightStopFeatures();
 		let highlightStop = null;
 		if (features && features.length === 1)
 		{
@@ -1141,7 +1173,7 @@
 		const self = this,
 			{ DBID, fieldTripStopId, fromFieldTripId, toFieldTripId, toStopSequence, color } = data,
 			fieldTrip = self.fieldTripsData.find(item => item.id === toFieldTripId),
-			stopFeatures = _getStopFeatures().filter(f => f.attributes.DBID === DBID &&
+			stopFeatures = self._getStopFeatures().filter(f => f.attributes.DBID === DBID &&
 				f.attributes.FieldTripId === fromFieldTripId &&
 				f.attributes.id === fieldTripStopId);
 
@@ -1179,7 +1211,7 @@
 				const mapPoint = data.event.mapPoint;
 				const { longitude, latitude } = mapPoint;
 				self.showLoadingIndicator();
-				const newStopData = await _createGeocodingNewStop(longitude, latitude);
+				const newStopData = await self._createGeocodingNewStop(longitude, latitude);
 				if (newStopData === null)
 				{
 					self.hideLoadingIndicator();
@@ -1197,8 +1229,8 @@
 		{
 			// right click
 
-			const stopGraphics = await self.mapInstance?.findFeaturesByHitTest(event, FieldTripMap_StopLayerId);
-			const pathGraphics = await self.mapInstance?.findFeaturesByHitTest(event, FieldTripMap_PathLayerId);
+			const stopGraphics = await self.mapInstance?.findFeaturesByHitTest(event, RoutingPalette_FieldTripStopLayerId);
+			const pathGraphics = await self.mapInstance?.findFeaturesByHitTest(event, RoutingPalette_FieldTripPathLayerId);
 			if (stopGraphics.length > 0 || pathGraphics.length > 0)
 			{
 				await this.confirmToExitAddingStop(false);
@@ -1300,10 +1332,11 @@
 
 	FieldTripMapOperation.prototype.drawStops = function(fieldTrip)
 	{
-		const DEFAULT_STOP_VISIBILITY = false,
-		 	color = _getFieldTripColor(fieldTrip),
+		const self = this,
+			DEFAULT_STOP_VISIBILITY = false,
+		 	color = self._getColor(fieldTrip),
 			Color = color,
-			{ DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip);
+			{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip);
 
 		let Sequence = null, Name = null, CurbApproach = 0, attributes = null, id = 0;
 		if (fieldTrip.FieldTripStops.length === 0)
@@ -1320,7 +1353,7 @@
 			attributes = {DBID, FieldTripId, id, Name, CurbApproach, Sequence, Color};
 			const destination = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(fieldTrip.FieldTripDestinationXCoord, fieldTrip.FieldTripDestinationYCoord, attributes);
 
-			_stopLayerInstance?.addStops([destination, school]);
+			self.stopLayerInstance?.addStops([destination, school]);
 		}
 		else
 		{
@@ -1339,34 +1372,8 @@
 				graphics.push(graphic);
 			}
 
-			_stopLayerInstance?.addStops(graphics);
+			self.stopLayerInstance?.addStops(graphics);
 		}
-	}
-
-	const _drawStops = (DBID, FieldTripId, Color, fieldTripRoute) =>
-	{
-		const DEFAULT_STOP_VISIBILITY = false,
-			routeStops = fieldTripRoute.getRouteStops(),
-			graphics = [];
-
-		for (let i = routeStops.length - 1; i >=0; i--)
-		{
-			const stop = routeStops[i],
-				attributes = {
-					DBID,
-					FieldTripId,
-					id: stop.Id,
-					Name: stop.Street,
-					CurbApproach: stop.CurbApproach,
-					Sequence: stop.Sequence,
-					Color
-				};
-			// hide by default for UX.
-			const graphic = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(stop.Longitude, stop.Latitude, attributes, null, DEFAULT_STOP_VISIBILITY);
-			graphics.push(graphic);
-		}
-
-		_stopLayerInstance.addStops(graphics);
 	}
 
 	FieldTripMapOperation.prototype.drawFieldTripPath = async function(fieldTrip, effectSequences)
@@ -1378,36 +1385,14 @@
 			return;
 		}
 
-		_calculatePathAttributesAndDraw(fieldTrip, routePath);
-	}
-
-	FieldTripMapOperation.prototype._drawFieldTripPath = async function(fieldTrip, fieldTripRoute)
-	{
-		fieldTripRoute.reset();
-		await fieldTripRoute.compute();
-
-		const routePath = fieldTripRoute.getRoutePaths();
-		if (routePath.length === 0)
-		{
-			return;
-		}
-
-		const data = { fieldTrip };
-		await this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated, data });
-
-		_calculatePathAttributesAndDraw(fieldTrip, routePath);
-	}
-
-	const _calculatePathAttributesAndDraw = (fieldTrip, routePath) =>
-	{
 		if (!fieldTrip.routePathAttributes)
 		{
-			fieldTrip.routePathAttributes = _computePathAttributes(fieldTrip);
+			fieldTrip.routePathAttributes = this._computePathAttributes(fieldTrip, null);
 		}
 
-		if (_isNewCopy(fieldTrip))
+		if (this.isNewCopy(fieldTrip))
 		{
-			_updateCopyFieldTripAttribute(fieldTrip);
+			this.updateCopyFieldTripAttribute(fieldTrip);
 		}
 
 		for (let i = 0; i < routePath.length; i++)
@@ -1417,21 +1402,22 @@
 			const pathAttributes = fieldTrip.routePathAttributes;
 			// hide by default for UX.
 			const graphic = TF.RoutingPalette.FieldTripMap.PathGraphicWrapper.CreatePath([stopPath], pathAttributes, false);
-			_pathLayerInstance.addPath(graphic);
+			this.pathLayerInstance?.addPath(graphic);
 		}
 	}
 
-	const _drawSequenceLine = async (fieldTrip) =>
+	FieldTripMapOperation.prototype.drawSequenceLine = async function(fieldTrip)
 	{
+		const self = this;
 		return new Promise((resolve, reject) =>
 		{
-			const sequenceLine = _computeSequenceLine(fieldTrip);
-			const Color = _getFieldTripColor(fieldTrip),
-				{ DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
+			const sequenceLine = self._computeSequenceLine(fieldTrip);
+			const Color = self._getColor(fieldTrip),
+				{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
 				attributes = { DBID, FieldTripId, Color };
 			// hide by default for UX.
 			const graphic = TF.RoutingPalette.FieldTripMap.PathGraphicWrapper.CreatePath(sequenceLine, attributes, false);
-			_sequenceLineLayerInstance?.addPath(graphic, () =>
+			self.sequenceLineLayerInstance?.addPath(graphic, () =>
 			{
 				resolve();
 			});
@@ -1440,88 +1426,90 @@
 
 	//#region - Path Arrows
 
-	const _getArrowRenderer = (fieldTrips, arrowOnPath) =>
+	FieldTripMapOperation.prototype._getArrowRenderer = function()
 	{
-		const uniqueValueInfos = [];
+		const self = this,
+		 	uniqueValueInfos = [],
+			arrowOnPath = self._isArrowOnPath(),
+			fieldTrips = this.fieldTripsData;
 
-		for (let i = 0; i < fieldTrips.length; i++)
+		// sort by Name to make sure the arrow z-index is correct.
+		const fieldTripsClone = [...fieldTrips];
+		fieldTripsClone.sort(self._compareFieldTripNames);
+
+		for (let i = 0; i < fieldTripsClone.length; i++)
 		{
-			const fieldTrip = fieldTrips[i],
-				value = _getFieldTripColor(fieldTrip),
-				{ DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
-				description = _extractArrowCondition(DBID,  FieldTripId),
-				symbol = _arrowLayerHelper.getArrowSymbol(arrowOnPath, value);
+			const fieldTrip = fieldTripsClone[i],
+				value = self._getColor(fieldTrip),
+				{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip),
+				description = self._extractArrowCondition(DBID,  FieldTripId),
+				symbol = self.arrowLayerHelper.getArrowSymbol(arrowOnPath, value);
 			uniqueValueInfos.push({ value, symbol, description });
 		}
 
-		return _arrowLayerHelper.createUniqueValueRenderer(uniqueValueInfos);
+		return self.arrowLayerHelper.createUniqueValueRenderer(uniqueValueInfos);
 	}
-
-	const _getSortedFieldTrips = (fieldTrips) =>
-	{
-		const fieldTripsClone = [...fieldTrips];
-		fieldTripsClone.sort(_compareFieldTripNames);
-
-		return fieldTripsClone;
-	};
 
 	FieldTripMapOperation.prototype.updateArrowRenderer = function()
 	{
-		const fieldTrips = _getSortedFieldTrips(this.fieldTripsData);
-		const arrowOnPath = this._isArrowOnPath();
-		const arrowRenderer = _getArrowRenderer(fieldTrips, arrowOnPath);
-		_pathArrowLayerInstance.setRenderer(arrowRenderer);
-		_sequenceLineArrowLayerInstance.setRenderer(arrowRenderer);
+		const arrowRenderer = this._getArrowRenderer();
+		this.pathArrowLayerInstance.setRenderer(arrowRenderer);
+		this.sequenceLineArrowLayerInstance.setRenderer(arrowRenderer);
+	}
+
+	FieldTripMapOperation.prototype.hideArrowLayer = function()
+	{
+		const self = this;
+		self.pathArrowLayerInstance.hide();
+		self.sequenceLineArrowLayerInstance.hide();
 	}
 
 	FieldTripMapOperation.prototype.redrawPathArrowLayer = async function(_, data = {}, fieldTrips = null)
 	{
 		const self = this;
-		if (self.pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE)
+		if (self.pathLineType === PATH_LINE_TYPE.Sequence)
 		{
 			return;
 		}
 
 		const fieldTripsData = fieldTrips || self.fieldTripsData,
-			arrowLayerInstance = _pathArrowLayerInstance,
-			pathFeatures = _getPathFeatures();
+			arrowLayerInstance = self.pathArrowLayerInstance,
+			pathFeatures = self._getPathFeatures();
 
 		arrowLayerInstance.hide();
-
-		const arrowOnPath = self._isArrowOnPath();
-		await _redrawArrowLayer(fieldTripsData, arrowLayerInstance, pathFeatures, data, arrowOnPath);
-		const expression = _calculateArrowLayerExpression(self.fieldTripsData);
-		_setFieldTripPathArrowVisibility(expression);
+		await self._redrawArrowLayer(fieldTripsData, arrowLayerInstance, pathFeatures, data);
+		const expression = self._calculateArrowLayerExpression();
+		self.setFieldTripPathArrowVisibility(expression);
 		arrowLayerInstance.show();
 	}
 
 	FieldTripMapOperation.prototype.redrawSequenceArrowLayer = async function(_, data, fieldTrips = null)
 	{
 		const self = this;
-		if (self.pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.PATH_LINE)
+		if (self.pathLineType === PATH_LINE_TYPE.Path)
 		{
 			return;
 		}
 
 		const fieldTripsData = fieldTrips || self.fieldTripsData,
-			arrowLayerInstance = _sequenceLineArrowLayerInstance,
-			sequenceLineFeatures = _getSequenceLineFeatures();
+			arrowLayerInstance = self.sequenceLineArrowLayerInstance,
+			sequenceLineFeatures = self._getSequenceLineFeatures();
 
 		arrowLayerInstance.hide();
-
-		const arrowOnPath = self._isArrowOnPath();
-		await _redrawArrowLayer(fieldTripsData, arrowLayerInstance, sequenceLineFeatures, data, arrowOnPath);
-		const expression = _calculateArrowLayerExpression(self.fieldTripsData);
-		_setFieldTripSequenceLineArrowVisibility(expression);
+		await self._redrawArrowLayer(fieldTripsData, arrowLayerInstance, sequenceLineFeatures, data);
+		const expression = self._calculateArrowLayerExpression();
+		self.setFieldTripSequenceLineArrowVisibility(expression);
 		arrowLayerInstance.show();
 	}
 
-	const _redrawArrowLayer = async (fieldTrips, arrowLayerInstance, pathFeatures, data, arrowOnPath) =>
+	FieldTripMapOperation.prototype._redrawArrowLayer = async function(fieldTrips, arrowLayerInstance, pathFeatures, data)
 	{
+		const self = this;
+
 		for (let i = 0; i < fieldTrips.length; i++)
 		{
 			const fieldTrip = fieldTrips[i];
-			const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip);
+			const { DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip);
 			const features = pathFeatures.filter(feature => feature.attributes.DBID === DBID && feature.attributes.FieldTripId === FieldTripId);
 			if (!arrowLayerInstance.isPathWithinMapExtentChanged(features, data))
 			{
@@ -1529,7 +1517,7 @@
 			}
 
 			const edits = {};
-			const condition = _extractArrowCondition(DBID, FieldTripId);
+			const condition = self._extractArrowCondition(DBID, FieldTripId);
 			const arrowFeatures = await arrowLayerInstance.queryArrowFeatures(condition);
 			const deleteArrows = arrowFeatures;
 			if (deleteArrows.length > 0)
@@ -1541,7 +1529,7 @@
 			for (let j = 0; j < features.length; j++)
 			{
 				const feature = features[j];
-				arrows = arrows.concat(_computeArrowFeatures(feature, arrowOnPath));
+				arrows = arrows.concat(self._computeArrowFeatures(feature));
 			}
 
 			if (arrows.length >= 0)
@@ -1553,7 +1541,7 @@
 		}
 	}
 
-	const _computeArrowFeatures = (polylineFeature, arrowOnPath) =>
+	FieldTripMapOperation.prototype._computeArrowFeatures = function(polylineFeature)
 	{
 		let arrows = [];
 		if (!polylineFeature)
@@ -1561,11 +1549,13 @@
 			return arrows;
 		}
 
-		const { DBID, FieldTripId, Color } = polylineFeature.attributes,
+		const self = this,
+			arrowOnPath = self._isArrowOnPath(),
+			{ DBID, FieldTripId, Color } = polylineFeature.attributes,
 			attributes = { DBID, Color };
 
 		attributes.Id = FieldTripId;
-		arrows = _arrowLayerHelper.computeArrowFeatures(polylineFeature, arrowOnPath);
+		arrows = self.arrowLayerHelper.computeArrowFeatures(polylineFeature, arrowOnPath);
 
 		for (let k = 0; k < arrows.length; k++)
 		{
@@ -1578,19 +1568,29 @@
 		return arrows;
 	}
 
-	const _setFieldTripPathArrowVisibility = (expression) => _pathArrowLayerInstance.setLayerDefinitionExpression(expression);
-
-	const _getVisibleFieldTrips = (fieldTripsData) => fieldTripsData.filter(item => item.visible);
-
-	const _setFieldTripSequenceLineArrowVisibility = (expression) => _sequenceLineArrowLayerInstance.setLayerDefinitionExpression(expression);
-
-	const _calculateArrowLayerExpression = (fieldTripsData) =>
+	FieldTripMapOperation.prototype.setFieldTripPathArrowVisibility = function(expression)
 	{
-		const visibleFieldTrips = _getVisibleFieldTrips(fieldTripsData),
+		this.pathArrowLayerInstance.setLayerDefinitionExpression(expression);
+	}
+
+	FieldTripMapOperation.prototype._getVisibleFieldTrips = function()
+	{
+		return this.fieldTripsData.filter(item => item.visible);
+	}
+
+	FieldTripMapOperation.prototype.setFieldTripSequenceLineArrowVisibility = function(expression)
+	{
+		this.sequenceLineArrowLayerInstance.setLayerDefinitionExpression(expression);
+	}
+
+	FieldTripMapOperation.prototype._calculateArrowLayerExpression = function()
+	{
+		const self = this,
+			visibleFieldTrips = self._getVisibleFieldTrips(),
 			conditions = visibleFieldTrips.map(item =>
 			{
-				const { DBID, FieldTripId } = _extractFieldTripFeatureFields(item);
-				return _extractArrowCondition(DBID, FieldTripId);
+				const { DBID, FieldTripId } = self._extractFieldTripFeatureFields(item);
+				return this._extractArrowCondition(DBID, FieldTripId);
 			}),
 			expression = (conditions.length > 1) ? `(${conditions.join(") OR (")})` :
 				(conditions.length === 0) ? "1 = 0" : conditions;
@@ -1599,10 +1599,13 @@
 
 	FieldTripMapOperation.prototype._isArrowOnPath = function()
 	{
-		return this.pathLineType === TF.RoutingPalette.FieldTripEnum.PATH_TYPE.SEQUENCE_LINE;
+		return this.pathLineType === PATH_LINE_TYPE.Sequence;
 	}
 
-	const _extractArrowCondition = (DBID, fieldTripId) => `DBID = ${DBID} and id = ${fieldTripId}`;
+	FieldTripMapOperation.prototype._extractArrowCondition = function(DBID, fieldTripId)
+	{
+		return `DBID = ${DBID} and id = ${fieldTripId}`;
+	}
 
 	//#endregion
 
@@ -1676,15 +1679,16 @@
 		});
 	}
 
-	const _computePathAttributes = (fieldTrip) =>
+	FieldTripMapOperation.prototype._computePathAttributes = function(fieldTrip, routeResult)
 	{
-		const Color = _getFieldTripColor(fieldTrip),
-			{ DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
-			attributes = { DBID, FieldTripId, Color };
+		const Color = this._getColor(fieldTrip),
+			{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip),
+			route = routeResult?.route,
+			attributes = Object.assign({}, route?.attributes, {DBID, FieldTripId, Color});
 		return attributes;
 	}
 
-	const _computeSequenceLine = (fieldTrip) =>
+	FieldTripMapOperation.prototype._computeSequenceLine = function(fieldTrip)
 	{
 		const paths = [];
 
@@ -2054,37 +2058,58 @@
 
 	//#region Private Methods
 
-	const _getStopFeatures = () => _stopLayerInstance.getFeatures();
-
-	const _getPathFeatures = () => _pathLayerInstance.getFeatures();
-
-	const _getHighlightFeatures = () => _highlightLayerInstance.getFeatures();
-
-	const _getHighlightStopFeatures = () => _highlightStopLayerInstance?.getFeatures();
-
-	const _getPathArrowFeatures = async (condition = '1 = 1') =>
+	FieldTripMapOperation.prototype._getStopFeatures = function()
 	{
-		return await _getArrowFeatures(_pathArrowLayerInstance, condition);
+		return this.stopLayerInstance?.getFeatures();
 	}
 
-	const _getSequenceLineFeatures = () => _sequenceLineLayerInstance?.getFeatures();
-
-	const _getSequenceLineArrowFeatures = async (condition = '1 = 1') =>
+	FieldTripMapOperation.prototype._getPathFeatures = function()
 	{
-		return await _getArrowFeatures(_sequenceLineArrowLayerInstance, condition);
+		return this.pathLayerInstance?.getFeatures();
 	}
 
-	const _getArrowFeatures = async (arrowLayerInstance, condition = '1 = 1') =>
+	FieldTripMapOperation.prototype._getHighlightFeatures = function()
+	{
+		return this.highlightLayerInstance?.getFeatures();
+	}
+
+	FieldTripMapOperation.prototype._getHighlightStopFeatures = function()
+	{
+		return this.highlightStopLayerInstance?.getFeatures();
+	}
+
+	FieldTripMapOperation.prototype._getPathArrowFeatures = async function(condition = '1 = 1')
+	{
+		return await this._getArrowFeatures(this.pathArrowLayerInstance, condition);
+	}
+
+	FieldTripMapOperation.prototype._getSequenceLineFeatures = function()
+	{
+		return this.sequenceLineLayerInstance?.getFeatures();
+	}
+
+	FieldTripMapOperation.prototype._getSequenceLineArrowFeatures = async function(condition = '1 = 1')
+	{
+		return await this._getArrowFeatures(this.sequenceLineArrowLayerInstance, condition);
+	}
+
+	FieldTripMapOperation.prototype._getArrowFeatures = async function(arrowLayerInstance, condition = '1 = 1')
 	{
 		const queryResult = await arrowLayerInstance?.queryFeatures(null, condition);
 		return queryResult.features || [];
 	}
 
-	const _getFieldTripColor = (fieldTrip) => fieldTrip.color;
+	FieldTripMapOperation.prototype._getColor = function(fieldTrip)
+	{
+		return fieldTrip.color;
+	}
 
-	const _sortBySequence = (stops) => stops.sort((a, b) => a.Sequence - b.Sequence);
+	FieldTripMapOperation.prototype._sortBySequence = function(stops)
+	{
+		return stops.sort((a, b) => a.Sequence - b.Sequence);
+	}
 
-	const _queryMapFeatures = (features, DBID, FieldTripId) =>
+	FieldTripMapOperation.prototype._queryMapFeatures = function(features, DBID, FieldTripId)
 	{
 		const results = [];
 		for (let i = 0; i < features.length; i++)
@@ -2100,7 +2125,7 @@
 		return results;
 	}
 
-	const _queryArrowFeatures = (features, DBID, Id) =>
+	FieldTripMapOperation.prototype._queryArrowFeatures = function(features, DBID, Id)
 	{
 		const results = [];
 		for (let i = 0; i < features.length; i++)
@@ -2116,13 +2141,13 @@
 		return results;
 	}
 
-	const _extractFieldTripFeatureFields = (fieldTrip) =>
+	FieldTripMapOperation.prototype._extractFieldTripFeatureFields = function(fieldTrip)
 	{
 		const DBID = fieldTrip.DBID,
 			FieldTripId = fieldTrip.oldId || fieldTrip.id;
 
 		return { DBID, FieldTripId };
-	};
+	}
 
 	FieldTripMapOperation.prototype.showLoadingIndicator = function()
 	{
@@ -2142,61 +2167,34 @@
 
 	//#endregion
 
-	//#region Manage FieldTripRoute
-
-	const _createFieldTripRoute = (fieldTrip) =>
-	{
-		const fieldTripRoute = new TF.GIS.ADT.FieldTripRoute(fieldTrip);
-		_fieldTripRoutes.push(fieldTripRoute);
-		return fieldTripRoute;
-	}
-
-	const _findFieldTripRoute = (fieldTripId) => _fieldTripRoutes.find(item => item.Id === fieldTripId);
-
-	const _getFieldTripRoute = (fieldTrip) =>
-	{
-		let fieldTripRoute = _findFieldTripRoute(fieldTrip.id);
-		if (fieldTripRoute === undefined)
-		{
-			fieldTripRoute = _createFieldTripRoute(fieldTrip);
-		}
-		return fieldTripRoute;
-	}
-
-	//#endregion
-
 	FieldTripMapOperation.prototype.dispose = function()
 	{
-		if (_arrowLayerHelper)
-		{
-			_arrowLayerHelper.dispose();
-			_arrowLayerHelper = null;
-		}
+		const self = this;
 
-		for (let i = 0; i < _fieldTripRoutes.length; i++)
+		if (self.arrowLayerHelper)
 		{
-			_fieldTripRoutes[i].dispose();
+			self.arrowLayerHelper.dispose();
+			self.arrowLayerHelper = null;
 		}
-		_fieldTripRoutes = null;
 
 		const layerInstances = [
-			_stopLayerInstance,
-			_pathLayerInstance,
-			_sequenceLineLayerInstance,
-			_highlightLayerInstance,
-			_highlightStopLayerInstance,
-			_pathArrowLayerInstance,
-			_sequenceLineArrowLayerInstance,
+			self.stopLayerInstance,
+			self.pathLayerInstance,
+			self.sequenceLineLayerInstance,
+			self.highlightLayerInstance,
+			self.highlightStopLayerInstance,
+			self.pathArrowLayerInstance,
+			self.sequenceLineArrowLayerInstance,
 		];
-		_layerManager.removeLayerInstances(layerInstances);
-		_layerManager = null;
+		self.layerManager.removeLayerInstances(layerInstances);
+		self.layerManager = null;
 
-		_stopLayerInstance = null;
-		_pathLayerInstance = null;
-		_sequenceLineLayerInstance = null;
-		_highlightLayerInstance = null;
-		_highlightStopLayerInstance = null;
-		_pathArrowLayerInstance = null;
-		_sequenceLineArrowLayerInstance = null;
+		self.stopLayerInstance = null;
+		self.pathLayerInstance = null;
+		self.sequenceLineLayerInstance = null;
+		self.highlightLayerInstance = null;
+		self.highlightStopLayerInstance = null;
+		self.pathArrowLayerInstance = null;
+		self.sequenceLineArrowLayerInstance = null;
 	}
 })();
