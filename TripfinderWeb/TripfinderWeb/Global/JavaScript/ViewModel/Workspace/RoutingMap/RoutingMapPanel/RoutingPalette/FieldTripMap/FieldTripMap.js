@@ -20,6 +20,7 @@
 	const FieldTripMap_HighlightStopLayerId = "FieldTripMap_HighlightStopLayer";
 	const FieldTripMap_HighlightStopLayer_Index = BASE_LAYER_ID + 7;
 
+	const UNNAMED_ADDRESS = "Unnamed";
 	const INFO_STOP_COLOR = "#FFFFFF";
 	const LAYER_TYPE = {
 		PATH: "PathLayer",
@@ -417,6 +418,32 @@
 		return await this.mapInstance?.findFeaturesByHitTest(event, FieldTripMap_PathLayerId);
 	};
 
+	FieldTripMap.prototype.createNewRouteStop = async function(longitude, latitude)
+	{
+		const options = { longitude, latitude };
+		const newRouteStop = new TF.GIS.ADT.RouteStop(options);
+		const result = await newRouteStop.geocoding(longitude, latitude);
+		if (result === null)
+		{
+			return null;
+		}
+
+		const { Address, City, RegionAbbr, CountryCode } = result;
+		const Name = Address || UNNAMED_ADDRESS;
+		const NEW_STOP_ID = 0,
+			NEW_STOP_SEQUENCE = 0,
+			attributes = {
+				id: NEW_STOP_ID,
+				Name,
+				Sequence: NEW_STOP_SEQUENCE
+			},
+			newStop = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes);
+
+		_addHighlightStops(newStop);
+
+		return { Name, City, RegionAbbr, CountryCode, newStop, XCoord: +longitude.toFixed(6), YCoord: +latitude.toFixed(6) };
+	};
+
 	FieldTripMap.prototype.quickAddStops = function(stops)
 	{
 		if (stops.length === 1)
@@ -436,6 +463,67 @@
 		fieldTripRoute.removeRouteStops(routeStopIds);
 		fieldTripRoute.refreshRouteStopSequence();
 		fieldTripRoute.clearRoutePath();
+
+		// refresh route on map.
+		await this.removeRoute(DBID, fieldTripId);
+		await this.addRoute(DBID, fieldTripId, fieldTripRoute);
+	};
+
+	FieldTripMap.prototype.addRouteStops = async function(addFieldTripStops)
+	{
+		const routeStops = [];
+		let DBID = null, fieldTripId = null, passCheck = true;
+		for (let i = 0; i < addFieldTripStops.length; i++)
+		{
+			const fieldTripStop = addFieldTripStops[i];
+			if (DBID === null && fieldTripId === null)
+			{
+				DBID = fieldTripStop.DBID;
+				fieldTripId = fieldTripStop.FieldTripId;
+			}
+			else
+			{
+				const checkItem = (DBID !== fieldTripStop.DBID || fieldTripId !== fieldTripStop.FieldTripId);
+				const assertMessage = `add route stop data error! DBID: ${DBID}, fieldTripId: ${fieldTripId}`;
+				passCheck = false;
+				console.assert(checkItem, assertMessage);
+				continue;
+			}
+			
+			const options = {
+				id: fieldTripStop.id,
+				curbApproach: fieldTripStop.vehicleCurbApproach,
+				sequence: fieldTripStop.Sequence,
+				street: fieldTripStop.Street,
+				longitude: fieldTripStop.XCoord,
+				latitude: fieldTripStop.YCoord,
+			};
+			const addRouteStop = new TF.GIS.ADT.RouteStop(options);
+			routeStops.push(addRouteStop);
+		}
+
+		if (!passCheck)
+		{
+			return;
+		}
+
+		// update stop sequence.
+		const fieldTripRoute = _findFieldTripRoute(fieldTripId);
+		const fieldTripRouteStops = fieldTripRoute.getRouteStops();
+
+		for (let j = 0; j < routeStops.length; j++)
+		{
+			const addRouteStop = routeStops[j];
+			for (let i = 0; i < fieldTripRouteStops.length; i++)
+			{
+				const stop = fieldTripRouteStops[i];
+				if (stop.Sequence >= addRouteStop.Sequence)
+				{
+					stop.Sequence += 1;
+				}
+			}
+		}
+		fieldTripRoute.addRouteStops(routeStops);
 
 		// refresh route on map.
 		await this.removeRoute(DBID, fieldTripId);
@@ -1089,22 +1177,6 @@
 				Sequence: NEW_STOP_SEQUENCE
 			};
 		return TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes);
-	}
-
-	const _createGeocodingNewStop = async (longitude, latitude) =>
-	{
-		const data = await _highlightStopLayerInstance.getGeocodeStop(longitude, latitude);
-		if (!data)
-		{
-			return null;
-		}
-
-		const UNNAMED_ADDRESS = "unnamed",
-			{ Address, City, RegionAbbr, CountryCode } = data,
-			Name = Address || UNNAMED_ADDRESS,
-			newStop = _createNewStop(longitude, latitude, Name);
-
-		return { Name, City, RegionAbbr, CountryCode, newStop, XCoord: +longitude.toFixed(6), YCoord: +latitude.toFixed(6) };
 	}
 
 	//#endregion

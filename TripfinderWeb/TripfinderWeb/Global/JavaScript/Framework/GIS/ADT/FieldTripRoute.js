@@ -139,6 +139,12 @@
 		return this._routeStops;
 	}
 
+	FieldTripRoute.prototype.addRouteStops = function(routeStops)
+	{
+		this._routeStops = this._routeStops.concat(routeStops);
+		this._routeStops.sort((a, b) => a.Sequence - b.Sequence);
+	}
+
 	FieldTripRoute.prototype.removeRouteStops = async function(routeStopIds)
 	{
 		// _removeFieldTripStops(this._fieldTrip, routeStopIds);
@@ -361,9 +367,15 @@
 
 	const _getRouteParameters = async (stopFeatureSet) =>
 	{
-		const travelModeName = TF.GIS.ADT.FieldTripRouteConfiguration.TRAVEL_MODE;
-		const travelMode = await networkService.fetchSupportedTravelModes(travelModeName);
-		travelMode.uturnAtJunctions = TF.GIS.ADT.FieldTripRouteConfiguration.U_TURN_POLICY;
+		const ENABLE_TRAVEL_MODE = false;
+		let travelMode = null;
+
+		if (ENABLE_TRAVEL_MODE)
+		{
+			const travelModeName = TF.GIS.ADT.FieldTripRouteConfiguration.TRAVEL_MODE;
+			travelMode = await networkService.fetchSupportedTravelModes(travelModeName);
+			travelMode.uturnAtJunctions = TF.GIS.ADT.FieldTripRouteConfiguration.U_TURN_POLICY;
+		}
 
 		return {
 			travelMode: travelMode,

@@ -297,7 +297,6 @@
 
 	FieldTripMapOperation.prototype.applyAddFieldTripStops = async function(stops, callback = ()=>{})
 	{
-		console.log("16 FieldTripMapOperation.prototype.applyAddFieldTripStops");
 		if (!stops?.length >= 1)
 		{
 			console.warn(`No stops for applyAddFieldTripStops. RETURN`);
@@ -305,10 +304,10 @@
 		}
 
 		this.showLoadingIndicator();
-		_refreshStopsSequenceLabel(stops);
-		_drawNewStopsFromMap(this.fieldTripsData, stops);
+
 		await _fieldTripMap.unfocusedRouteStop();
-		await this._drawNewStopPathsFromMap(this.fieldTripsData, stops);
+		await _fieldTripMap.addRouteStops(stops);
+
 		this.hideLoadingIndicator();
 
 		callback();
@@ -317,116 +316,6 @@
 	FieldTripMapOperation.prototype.onQuickAddStops = function(stops)
 	{
 		_fieldTripMap.quickAddStops(stops);
-	}
-
-	const _addHighlightStops = (stopGraphic) =>
-	{
-		const highlightStop = _getHighlightStop();
-
-		let newStopGraphic = null;
-		if (highlightStop)
-		{
-			newStopGraphic = highlightStop;
-			newStopGraphic.geometry = stopGraphic.geometry;
-			newStopGraphic.attributes.Name = stopGraphic.attributes.Name;
-		}
-		else
-		{
-			newStopGraphic = stopGraphic;
-			_highlightStopLayerInstance.addStops([newStopGraphic]);
-		}
-	}
-
-	const _createNewStop = (longitude, latitude, stopName) =>
-	{
-		const NEW_STOP_ID = 0,
-			NEW_STOP_SEQUENCE = 0,
-			attributes = {
-				id: NEW_STOP_ID,
-				Name: stopName,
-				Sequence: NEW_STOP_SEQUENCE
-			};
-		return TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes);
-	}
-
-	const _createGeocodingNewStop = async (longitude, latitude) =>
-	{
-		const data = await _highlightStopLayerInstance.getGeocodeStop(longitude, latitude);
-		if (!data)
-		{
-			return null;
-		}
-
-		const UNNAMED_ADDRESS = "unnamed",
-			{ Address, City, RegionAbbr, CountryCode } = data,
-			Name = Address || UNNAMED_ADDRESS,
-			newStop = _createNewStop(longitude, latitude, Name);
-
-		return { Name, City, RegionAbbr, CountryCode, newStop, XCoord: +longitude.toFixed(6), YCoord: +latitude.toFixed(6) };
-	}
-
-	const _refreshStopsSequenceLabel = (data) =>
-	{
-		const { DBID, FieldTripId } = data[0],
-			fieldTripStops = _getStopFeatures(),
-			stopGraphics = fieldTripStops.filter(item => item.attributes.DBID === DBID && item.attributes.FieldTripId === FieldTripId);
-
-		for (let j = 0, jCount = data.length; j < jCount; j++)
-		{
-			const Sequence = data[j].Sequence;
-			for (let i = 0, iCount = stopGraphics.length; i < iCount; i++)
-			{
-				const stop = stopGraphics[i],
-				attributes = stop.attributes,
-				stopSequence = attributes.Sequence;
-
-				if (stopSequence >= Sequence)
-				{
-					attributes.Sequence += 1;
-					_updateStopGraphicSequenceLabel(stop);
-				}
-			}
-		}
-	}
-
-	const _drawNewStopsFromMap = (fieldTripsData, data) =>
-	{
-		const { FieldTripId } = data[0],
-			Color = fieldTripsData.find(item => item.id === FieldTripId)?.color || INFO_STOP_COLOR,  // prevent Color is undefined
-			graphics = [];
-
-		for (let i = 0; i < data.length; i++)
-		{
-			const { id, DBID, FieldTripId, Name, Sequence, VehicleCurbApproach, XCoord, YCoord } = data[i];
-			const CurbApproach = VehicleCurbApproach;
-			const attributes = { DBID, FieldTripId, id, Name, CurbApproach, Sequence, Color };
-			const stop = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(XCoord, YCoord, attributes);
-			graphics.push(stop);
-		}
-
-		_stopLayerInstance.addStops(graphics);
-	}
-
-	const _updateStopGraphicSequenceLabel = (stopGraphic) =>
-	{
-		const attributes = stopGraphic.attributes;
-		stopGraphic.symbol = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.GetSymbol(attributes.Sequence, attributes.Color);
-	}
-
-	FieldTripMapOperation.prototype._drawNewStopPathsFromMap = async function(fieldTripsData, data)
-	{
-		console.log("20 FieldTripMapOperation.prototype._drawNewStopPathsFromMap");
-		const self = this,
-			{ DBID, FieldTripId } = data[0],
-			fieldTrip = fieldTripsData.find(item => item.DBID === DBID && item.id === FieldTripId),
-			effectSequences = data.map(item => item.Sequence),
-			previousSequence = effectSequences[0] - 1,
-			nextSequence = effectSequences[effectSequences.length - 1] + 1;
-
-		effectSequences.unshift(previousSequence);
-		effectSequences.push(nextSequence);
-
-		await self.refreshFieldTripPath(fieldTrip, effectSequences);
 	}
 
 	//#endregion
@@ -583,18 +472,6 @@
 		await _fieldTripMap.unfocusedRouteStop();
 	}
 
-	const _getHighlightStop = () =>
-	{
-		const features = _getHighlightStopFeatures();
-		let highlightStop = null;
-		if (features && features.length === 1)
-		{
-			highlightStop = features[0];
-		}
-
-		return highlightStop;
-	}
-
 	FieldTripMapOperation.prototype.updateStopInfo = function(data)
 	{
 		const self = this,
@@ -624,18 +501,18 @@
 			// click on map
 			if (this.editing.isAddingStop)
 			{
+				self.showLoadingIndicator();
+
 				const mapPoint = data.event.mapPoint;
 				const { longitude, latitude } = mapPoint;
-				self.showLoadingIndicator();
-				const newStopData = await _createGeocodingNewStop(longitude, latitude);
+				const newStopData = await _fieldTripMap.createNewRouteStop(longitude, latitude);
+
+				self.hideLoadingIndicator();
+
 				if (newStopData === null)
 				{
-					self.hideLoadingIndicator();
 					return;
 				}
-
-				_addHighlightStops(newStopData.newStop);
-				self.hideLoadingIndicator();
 
 				this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMapCompleted, data: newStopData });
 				self.stopAddFieldTripStop();
@@ -788,23 +665,6 @@
 		}
 	};
 
-	const _drawSequenceLine = async (fieldTrip) =>
-	{
-		return new Promise((resolve, reject) =>
-		{
-			const sequenceLine = _computeSequenceLine(fieldTrip);
-			const Color = _getFieldTripColor(fieldTrip),
-				{ DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
-				attributes = { DBID, FieldTripId, Color };
-			// hide by default for UX.
-			const graphic = TF.RoutingPalette.FieldTripMap.PathGraphicWrapper.CreatePath(sequenceLine, attributes, false);
-			_sequenceLineLayerInstance?.addPath(graphic, () =>
-			{
-				resolve();
-			});
-		});
-	}
-
 	//#region - Path Arrows
 
 
@@ -902,28 +762,6 @@
 			{ DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
 			attributes = { DBID, FieldTripId, Color };
 		return attributes;
-	}
-
-	const _computeSequenceLine = (fieldTrip) =>
-	{
-		const paths = [];
-
-		if (fieldTrip.FieldTripStops.length === 0)
-		{
-			paths.push([fieldTrip.SchoolXCoord, fieldTrip.SchoolYCoord]);
-			paths.push([fieldTrip.FieldTripDestinationXCoord, fieldTrip.FieldTripDestinationYCoord]);
-		}
-		else
-		{
-			const fieldTripStops = fieldTrip.FieldTripStops;
-			for (let i = 0; i < fieldTripStops.length; i++)
-			{
-				const stop = fieldTripStops[i];
-				paths.push([stop.XCoord, stop.YCoord]);
-			}
-		}
-
-		return paths;
 	}
 
 	//#endregion
@@ -1276,49 +1114,9 @@
 
 	const _getStopFeatures = () => _stopLayerInstance.getFeatures();
 
-	const _getPathFeatures = () => _pathLayerInstance.getFeatures();
-
-	const _getHighlightFeatures = () => _highlightLayerInstance.getFeatures();
-
-	const _getHighlightStopFeatures = () => _highlightStopLayerInstance?.getFeatures();
-
-	const _getPathArrowFeatures = async (condition = '1 = 1') =>
-	{
-		return await _getArrowFeatures(_pathArrowLayerInstance, condition);
-	}
-
-	const _getSequenceLineFeatures = () => _sequenceLineLayerInstance?.getFeatures();
-
-	const _getSequenceLineArrowFeatures = async (condition = '1 = 1') =>
-	{
-		return await _getArrowFeatures(_sequenceLineArrowLayerInstance, condition);
-	}
-
-	const _getArrowFeatures = async (arrowLayerInstance, condition = '1 = 1') =>
-	{
-		const queryResult = await arrowLayerInstance?.queryFeatures(null, condition);
-		return queryResult.features || [];
-	}
-
 	const _getFieldTripColor = (fieldTrip) => fieldTrip.color;
 
 	const _sortBySequence = (stops) => stops.sort((a, b) => a.Sequence - b.Sequence);
-
-	const _queryMapFeatures = (features, DBID, FieldTripId) =>
-	{
-		const results = [];
-		for (let i = 0; i < features.length; i++)
-		{
-			const feature = features[i];
-			if (feature.attributes.DBID === DBID &&
-				feature.attributes.FieldTripId === FieldTripId)
-			{
-				results.push(feature);
-			}
-		}
-
-		return results;
-	}
 
 	const _extractFieldTripFeatureFields = (fieldTrip) =>
 	{

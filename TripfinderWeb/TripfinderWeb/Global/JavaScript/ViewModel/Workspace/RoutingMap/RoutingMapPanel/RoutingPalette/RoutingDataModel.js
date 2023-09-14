@@ -2108,7 +2108,7 @@
 				});
 			return Promise.resolve();
 		}
-		self.fieldTripPaletteSectionVM.routingChangePath.stop();
+		self.fieldTripPaletteSectionVM.routingChangePath?.stop();
 		return self.saveRoutingFieldTrips(trips).then(function(success)
 		{
 			if (success)
@@ -2141,7 +2141,7 @@
 				});
 			return Promise.resolve();
 		}
-		self.fieldTripPaletteSectionVM.routingChangePath.stop();
+		self.fieldTripPaletteSectionVM.routingChangePath?.stop();
 		return self.saveRoutingFieldTrips(fieldTrips).then(function(success)
 		{
 			if (success)
@@ -2428,7 +2428,7 @@
 			var trips = refreshTrips.slice();
 			self.featureData.clear();
 			self.clearRevertInfo();
-			self.fieldTripPaletteSectionVM.routingChangePath.clearAll();
+			self.fieldTripPaletteSectionVM.routingChangePath?.clearAll();
 			self.setFieldTrips(self.getViewTrips());
 			self.changeDataStack([]);
 			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: trips });
