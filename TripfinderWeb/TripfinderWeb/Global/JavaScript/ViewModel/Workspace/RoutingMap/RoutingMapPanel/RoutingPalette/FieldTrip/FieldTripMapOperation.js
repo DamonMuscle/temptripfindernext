@@ -336,7 +336,7 @@
 		this.showLoadingIndicator();
 		_refreshStopsSequenceLabel(stops);
 		_drawNewStopsFromMap(this.fieldTripsData, stops);
-		this.clearHighlightFeatures();
+		await _fieldTripMap.unfocusedRouteStop();
 		await this._drawNewStopPathsFromMap(this.fieldTripsData, stops);
 		this.hideLoadingIndicator();
 
@@ -682,18 +682,8 @@
 	//#region Update Stop
 	FieldTripMapOperation.prototype.updateStopSymbol = function(fieldTrip, stops)
 	{
-		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
-			stopFeatures = _getStopFeatures().filter(f => f.attributes.DBID === DBID && f.attributes.FieldTripId === FieldTripId);
-
-		stops.forEach(stop =>
-		{
-			const stopFeature = stopFeatures.find(s => s.attributes.id === stop.id);
-			if (stopFeature)
-			{
-				stopFeature.attributes.Sequence = stop.Sequence;
-				stopFeature.symbol = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.GetSymbol(stop.Sequence, stopFeature.attributes.Color);
-			}
-		});
+		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip);
+		_fieldTripMap.updateRouteStopSequence(DBID, FieldTripId, stops);
 	};
 	//#endregion
 
@@ -726,20 +716,9 @@
 		const self = this,
 			{ DBID, fieldTripStopId, fromFieldTripId, toFieldTripId, toStopSequence, color } = data,
 			fieldTrip = self.fieldTripsData.find(item => item.id === toFieldTripId),
-			stopFeatures = _getStopFeatures().filter(f => f.attributes.DBID === DBID &&
-				f.attributes.FieldTripId === fromFieldTripId &&
-				f.attributes.id === fieldTripStopId);
+			visible = fieldTrip?.visible;
 
-		if (stopFeatures.length === 1)
-		{
-			const feature = stopFeatures[0];
-			feature.attributes.DBID = DBID;
-			feature.attributes.FieldTripId = toFieldTripId;
-			feature.attributes.Color = color;
-			feature.attributes.Sequence = toStopSequence;
-			feature.symbol = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.GetSymbol(toStopSequence, color);
-			feature.visible = fieldTrip?.visible;
-		}
+		_fieldTripMap.updateRouteStopAttribute(DBID, fieldTripStopId, fromFieldTripId, toFieldTripId, toStopSequence, color, visible);
 	}
 
 	//#endregion
@@ -860,7 +839,7 @@
 		const apply = async () =>
 		{
 			this.stopAddFieldTripStop();
-			await this.clearHighlightFeatures();
+			await _fieldTripMap.unfocusedRouteStop();
 			if (doFireEvent)
 			{
 				this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.ExitAddingStop });

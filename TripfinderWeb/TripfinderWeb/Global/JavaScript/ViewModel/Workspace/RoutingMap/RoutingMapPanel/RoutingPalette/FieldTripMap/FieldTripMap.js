@@ -313,6 +313,42 @@
 		await _redrawSequenceArrowLayer(null, {}, [fieldTrip], allFieldTrips);
 	};
 
+	FieldTripMap.prototype.updateRouteStopSequence = function(DBID, FieldTripId, stops)
+	{
+		const stopFeatures = _getStopFeatures().filter(f => f.attributes.DBID === DBID && f.attributes.FieldTripId === FieldTripId);
+
+		stops.forEach(stop =>
+		{
+			const stopFeature = stopFeatures.find(s => s.attributes.id === stop.id);
+			if (stopFeature)
+			{
+				stopFeature.attributes.Sequence = stop.Sequence;
+				stopFeature.symbol = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.GetSymbol(stop.Sequence, stopFeature.attributes.Color);
+			}
+		});
+	};
+
+	FieldTripMap.prototype.updateRouteStopAttribute = function(DBID, fieldTripStopId, fromFieldTripId, toFieldTripId, toStopSequence, color, visible)
+	{
+		const stopFeatures = _getStopFeatures().filter(f => f.attributes.DBID === DBID &&
+			f.attributes.FieldTripId === fromFieldTripId &&
+			f.attributes.id === fieldTripStopId);
+
+		if (stopFeatures.length === 1)
+		{
+			const feature = stopFeatures[0];
+			feature.attributes.DBID = DBID;
+			feature.attributes.FieldTripId = toFieldTripId;
+			feature.attributes.Color = color;
+			feature.attributes.Sequence = toStopSequence;
+			feature.symbol = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.GetSymbol(toStopSequence, color);
+			if (visible !== undefined)
+			{
+				feature.visible = visible;
+			}
+		}
+	};
+
 	/**
 	 * Click stop info, show focus stop on map.
 	 * (Verify)
