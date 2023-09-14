@@ -143,13 +143,12 @@
 		}
 
 		_sortBySequence(fieldTrip.FieldTripStops);
-		const color = _getFieldTripColor(fieldTrip);
 		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip);
 
 		const fieldTripRoute = _fieldTripMap.initRoute(fieldTrip);
-		const isEmptyRoute = await _fieldTripMap.addRoute(DBID, FieldTripId, color, fieldTripRoute);
+		await _fieldTripMap.addRoute(DBID, FieldTripId, fieldTripRoute);
 
-		if (!isEmptyRoute)
+		if (!fieldTripRoute.IsEmpty)
 		{
 			const data = { fieldTrip };
 			await this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated, data });
@@ -462,83 +461,25 @@
 
 	//#region Refresh Field Trip Path
 
-	FieldTripMapOperation.prototype.refreshFieldTripPath = async function(fieldTrip, effectSequences, callZoomToLayers = true)
+	FieldTripMapOperation.prototype.refreshFieldTripPath = async function(fieldTrip, effectSequences, isZoomToLayer = true)
 	{
 		console.log("21 FieldTripMapOperation.prototype.refreshFieldTripPath");
-		_clearFieldTripPath(fieldTrip);
-		await _clearFieldTripPathArrow(fieldTrip);
 
-		_clearSequenceLine(fieldTrip);
-		await _clearSequenceLineArrow(fieldTrip);
-
-		await this.drawFieldTripPath(fieldTrip, effectSequences);
-		await _drawSequenceLine(fieldTrip);
-
-		await this.updateFieldTripPathVisibility([fieldTrip]);
-
-		await this.orderFeatures();
-		if (callZoomToLayers)
-		{
-			this.zoomToFieldTripLayers([fieldTrip]);
-		}
+		this.refresh([fieldTrip], isZoomToLayer);
 	}
 
-	const _clearFieldTripPath = (fieldTrip) =>
+	FieldTripMapOperation.prototype.refresh = async function(fieldTrips, isZoomToLayer = true)
 	{
-		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
-			pathFeatures = _getPathFeatures(),
-			fieldTripPaths = _queryMapFeatures(pathFeatures, DBID, FieldTripId);
-		
-		for (let i = 0; i < fieldTripPaths.length; i++)
+		const self = this;
+		self.updateArrowRenderer();
+		self.setFieldTripStopVisibility(fieldTrips);
+		await self.updateFieldTripPathVisibility(fieldTrips);
+		await self.orderFeatures();
+
+		if (isZoomToLayer)
 		{
-			_pathLayerInstance.deletePath(fieldTripPaths[i]);
+			self.zoomToFieldTripLayers(fieldTrips);
 		}
-
-		fieldTrip.routePath = null;
-		fieldTrip.routePathAttributes = null;
-		fieldTrip.directions = null;
-	}
-
-	const _clearSequenceLine = (fieldTrip) =>
-	{
-		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
-			sequenceLineFeatures = _getSequenceLineFeatures();
-			sequenceLines = _queryMapFeatures(sequenceLineFeatures, DBID, FieldTripId);
-
-		for (let i = 0; i < sequenceLines.length; i++)
-		{
-			_sequenceLineLayerInstance.deletePath(sequenceLines[i]);
-		}
-	}
-
-	const _clearFieldTripPathArrow = async (fieldTrip) =>
-	{
-		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
-			edits = {},
-			condition = _extractArrowCondition(DBID, FieldTripId);
-			deleteArrows = await _getPathArrowFeatures(condition);
-
-		if (deleteArrows.length >= 0)
-		{
-			edits.deleteFeatures = deleteArrows;
-		}
-
-		await _pathArrowLayerInstance.layer.applyEdits(edits);
-	}
-
-	const _clearSequenceLineArrow = async (fieldTrip) =>
-	{
-		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
-			edits = {},
-			condition = _extractArrowCondition(DBID, FieldTripId);
-			deleteArrows = await _getSequenceLineArrowFeatures(condition);
-
-		if (deleteArrows.length >= 0)
-		{
-			edits.deleteFeatures = deleteArrows;
-		}
-
-		await _sequenceLineArrowLayerInstance.layer.applyEdits(edits);
 	}
 
 	//#endregion
@@ -633,49 +574,20 @@
 
 	//#region Delete Stop
 
-	FieldTripMapOperation.prototype.deleteStopLocation = async function(fieldTrip, stop)
+	FieldTripMapOperation.prototype.deleteStopLocation = async function(DBID, fieldTripId, routeStopIds)
 	{
 		const self = this;
-		if (!_stopLayerInstance)
-		{
-			return;
-		}
-
 		self.showLoadingIndicator();
 
 		self.stopAddFieldTripStop();
 
-		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip),
-			sequence = stop.Sequence,
-			fieldTripStops = _getStopFeatures();
+		await _fieldTripMap.deleteRouteStops(DBID, fieldTripId, routeStopIds);
 
-		for (let i = 0; i < fieldTripStops.length; i++)
-		{
-			const stop = fieldTripStops[i],
-				attributes = stop.attributes;
-			if (attributes.DBID === DBID && attributes.FieldTripId === FieldTripId)
-			{
-				if (attributes.Sequence === sequence)
-				{
-					_stopLayerInstance.deleteStop(stop);
-				}
-				else if (attributes.Sequence > sequence)
-				{
-					attributes.Sequence -= 1;
-					_updateStopGraphicSequenceLabel(stop);
-				}
-			}
-		}
-
-		const data = { fieldTripStopId: stop.id };
+		const data = { fieldTripStopId: routeStopIds[0] };
 		self.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocationCompleted, data });
 
-		const effectSequences = self._computeEffectSequences(fieldTrip, {deleteStop: stop});
-
-		await self.refreshFieldTripPath(fieldTrip, effectSequences);
-
 		self.hideLoadingIndicator();
-	}
+	};
 
 	//#endregion
 
@@ -940,8 +852,6 @@
 
 		_fieldTripMap.updateArrowRenderer(sortedFieldTrips);
 	}
-
-	const _extractArrowCondition = (DBID, fieldTripId) => `DBID = ${DBID} and id = ${fieldTripId}`;
 
 	//#endregion
 

@@ -182,14 +182,7 @@
 		
 		if (fieldTripCount > 0)
 		{
-			const self = this;
-			(async () => {
-				self.fieldTripMapOperation.updateArrowRenderer();
-				await self.fieldTripMapOperation.setFieldTripStopVisibility(fieldTrips);
-				await self.fieldTripMapOperation.updateFieldTripPathVisibility(fieldTrips);
-				await self.fieldTripMapOperation.orderFeatures();
-				self.fieldTripMapOperation.zoomToFieldTripLayers(fieldTrips);	
-			})();
+			await this.fieldTripMapOperation.refresh(fieldTrips, true);
 		}
 	}
 
@@ -335,7 +328,7 @@
 			return;
 		}
 
-		this.fieldTripMapOperation?.deleteStopLocation(fieldTrip, fieldTripStop);
+		this.fieldTripMapOperation?.deleteStopLocation(fieldTrip.DBID, fieldTripId, [fieldTripStopId]);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapDeleteStopLocationCompleted = function(data)

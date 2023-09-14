@@ -4,6 +4,7 @@
 
 	function RoutePath(options)
 	{
+		this._id = options.id || 0;
 		this._drivingDirections = options.drivingDirections || null;
 		this._routeDrivingDirections = options.routeDrivingDirections || null;
 		this._distance = options.distance || -1;
@@ -15,6 +16,13 @@
 	}
 
 	//#region Property
+
+	Object.defineProperty(RoutePath.prototype, "Id", {
+		get() { return this._id; },
+		set(value) { this._id = value; },
+		enumerable: false,
+		configurable: false
+	});
 
 	Object.defineProperty(RoutePath.prototype, "DrivingDirections", {
 		get() { return this._drivingDirections; },
@@ -73,4 +81,16 @@
 	});
 
 	//#endregion
+
+	RoutePath.prototype.clear = function()
+	{
+		this._drivingDirections = null;
+		this._routeDrivingDirections = null;
+		this._distance = 0;
+		this._time = -1;
+		this._speed = 0;
+		this._streetSpeed = 0;
+		this._paths = null;
+		this._isCustomDirection = false;
+	}
 })();

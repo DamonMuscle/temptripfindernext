@@ -138,45 +138,25 @@
 		return _getFieldTripRoute(fieldTrip);
 	};
 
-	FieldTripMap.prototype.addRoute = async function(DBID, FieldTripId, color, fieldTripRoute)
+	FieldTripMap.prototype.addRoute = async function(DBID, FieldTripId, fieldTripRoute)
 	{
-		_drawRouteStops(DBID, FieldTripId, color, fieldTripRoute);
+		_drawRouteStops(DBID, FieldTripId, fieldTripRoute);
 
-		const routePaths = await _computeRoutePaths(fieldTripRoute);
-		const isEmptyRoute = routePaths.length === 0;
-		if (!isEmptyRoute)
+		await fieldTripRoute.compute();
+
+		if (!fieldTripRoute.IsEmpty)
 		{
-			await _drawRoutePaths(DBID, FieldTripId, color, routePaths);
+			await _drawRoutePaths(DBID, FieldTripId, fieldTripRoute);
 		}
 
-		await _drawSequenceLine(DBID, FieldTripId, color, fieldTripRoute);
-
-		return isEmptyRoute;
+		await _drawSequenceLine(DBID, FieldTripId, fieldTripRoute);
 	};
 
 	FieldTripMap.prototype.removeRoute = async function(DBID, fieldTripId)
 	{
-		const stopFeatures = _getStopFeatures(),
-			pathArrowFeatures = await _getPathArrowFeatures(),
-			pathFeatures = _getPathFeatures(),
-			sequenceLineArrowFeatures = await _getSequenceLineArrowFeatures(),
-			sequenceLineFeatures = _getSequenceLineFeatures(),
-			mapFeaturesTable = [stopFeatures, pathFeatures, sequenceLineFeatures],
-			mapLayerInstanceTable = [_stopLayerInstance, _pathLayerInstance, _sequenceLineLayerInstance],
-			mapArrowFeaturesTable = [pathArrowFeatures, sequenceLineArrowFeatures],
-			mapArrowLayerInstanceTable = [_pathArrowLayerInstance, _sequenceLineArrowLayerInstance];
-
-		for (let i = 0; i < mapFeaturesTable.length; i++)
-		{
-			const features = _queryMapFeatures(mapFeaturesTable[i], DBID, fieldTripId);
-			_removeMapLayerFeatures(mapLayerInstanceTable[i], features);
-		}
-
-		for (let i = 0; i < mapArrowFeaturesTable.length; i++)
-		{
-			const features = _queryArrowFeatures(mapArrowFeaturesTable[i], DBID, fieldTripId);
-			_removeMapLayerFeatures(mapArrowLayerInstanceTable[i], features);
-		}
+		_removeRouteStop(DBID, fieldTripId);
+		await _removeRoutePath(DBID, fieldTripId);
+		await _removeRouteSequenceLine(DBID, fieldTripId);
 	};
 
 	FieldTripMap.prototype.updateArrowRenderer = function(sortedFieldTrips)
@@ -440,7 +420,17 @@
 		}
 	};
 
+	FieldTripMap.prototype.deleteRouteStops = async function(DBID, fieldTripId, routeStopIds)
+	{
+		const fieldTripRoute = _findFieldTripRoute(fieldTripId);
+		fieldTripRoute.removeRouteStops(routeStopIds);
+		fieldTripRoute.refreshRouteStopSequence();
+		fieldTripRoute.clearRoutePath();
 
+		// refresh route on map.
+		await this.removeRoute(DBID, fieldTripId);
+		await this.addRoute(DBID, fieldTripId, fieldTripRoute);
+	};
 
 
 
@@ -588,14 +578,7 @@
 		arrowLayerInstance.show();
 	};
 
-	const _computeRoutePaths = async (fieldTripRoute) =>
-	{
-		fieldTripRoute.reset();
-		await fieldTripRoute.compute();
-		return fieldTripRoute.getRoutePaths();
-	};
-
-	const _drawRouteStops = (DBID, FieldTripId, Color, fieldTripRoute) =>
+	const _drawRouteStops = (DBID, FieldTripId, fieldTripRoute) =>
 	{
 		const DEFAULT_VISIBILITY = false,
 			routeStops = fieldTripRoute.getRouteStops(),
@@ -611,7 +594,7 @@
 					Name: stop.Street,
 					CurbApproach: stop.CurbApproach,
 					Sequence: stop.Sequence,
-					Color
+					Color: fieldTripRoute.Color
 				};
 			const graphic = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(stop.Longitude, stop.Latitude, attributes, null, DEFAULT_VISIBILITY);
 			graphics.push(graphic);
@@ -620,11 +603,13 @@
 		_stopLayerInstance.addStops(graphics);
 	};
 
-	const _drawRoutePaths = async (DBID, FieldTripId, Color, routePaths) =>
+	const _drawRoutePaths = async (DBID, FieldTripId, fieldTripRoute) =>
 	{
 		const DEFAULT_VISIBILITY = false;
+		const Color = fieldTripRoute.Color;
 		const attributes = { DBID, FieldTripId, Color };
-
+		
+		const routePaths = fieldTripRoute.getRoutePaths();
 		for (let i = 0; i < routePaths.length; i++)
 		{
 			const routePath = routePaths[i];
@@ -634,13 +619,13 @@
 		}
 	};
 
-	const _drawSequenceLine = async (DBID, FieldTripId, Color, fieldTripRoute) =>
+	const _drawSequenceLine = async (DBID, FieldTripId, fieldTripRoute) =>
 	{
 		return new Promise((resolve, reject) =>
 		{
 			const DEFAULT_VISIBILITY = false;
 			const sequenceLine = _computeSequenceLine(fieldTripRoute);
-			const attributes = { DBID, FieldTripId, Color };
+			const attributes = { DBID, FieldTripId, Color: fieldTripRoute.Color };
 			// hide by default for UX.
 			const graphic = TF.RoutingPalette.FieldTripMap.PathGraphicWrapper.CreatePath(sequenceLine, attributes, DEFAULT_VISIBILITY);
 			_sequenceLineLayerInstance?.addPath(graphic, () =>
@@ -650,7 +635,43 @@
 		});
 	};
 
+	//#region Remove Map Features
+
+	const _removeRouteStop = (DBID, fieldTripId) =>
+	{
+		const stopFeatures = _getStopFeatures();
+		const features = _queryMapFeatures(stopFeatures, DBID, fieldTripId);
+		_removeMapLayerFeatures(_stopLayerInstance, features);
+	};
+
+	const _removeRoutePath = async (DBID, fieldTripId) =>
+	{
+		const pathArrowFeatures = await _getPathArrowFeatures(),
+			pathFeatures = _getPathFeatures();
+
+		const arrowFeatures = _queryArrowFeatures(pathArrowFeatures, DBID, fieldTripId);
+		_removeMapLayerFeatures(_pathArrowLayerInstance, arrowFeatures);
+
+		const features = _queryMapFeatures(pathFeatures, DBID, fieldTripId);
+		_removeMapLayerFeatures(_pathLayerInstance, features);
+	};
+
+	const _removeRouteSequenceLine = async (DBID, fieldTripId) =>
+	{
+		const sequenceLineArrowFeatures = await _getSequenceLineArrowFeatures(),
+			sequenceLineFeatures = _getSequenceLineFeatures();
+
+		const arrowFeatures = _queryArrowFeatures(sequenceLineArrowFeatures, DBID, fieldTripId);
+		_removeMapLayerFeatures(_sequenceLineArrowLayerInstance, arrowFeatures);
+
+		const features = _queryMapFeatures(sequenceLineFeatures, DBID, fieldTripId);
+		_removeMapLayerFeatures(_sequenceLineLayerInstance, features);
+	};
+
 	const _removeMapLayerFeatures = (layerInstance, removeFeatures) => layerInstance.removeMany(removeFeatures);
+
+	//#endregion
+
 
 	//#region Query Map Features
 
