@@ -33,8 +33,6 @@
 
 	function FieldTripMapOperation(mapInstance)
 	{
-		console.log("1 function FieldTripMapOperation");
-
 		if (!mapInstance)
 		{
 			console.error("FieldTripMapOperation constructor failed! No valid mapInstance.");
@@ -113,15 +111,11 @@
 
 	FieldTripMapOperation.prototype.initLayers = async function()
 	{
-		console.log("2[DONE] FieldTripMapOperation.prototype.initLayers");
-
 		await _fieldTripMap.initLayers();
 	}
 
 	FieldTripMapOperation.prototype.initArrowLayers = function()
 	{
-		console.log("3[DONE] FieldTripMapOperation.prototype.initArrowLayers");
-
 		const self = this;
 		const sortedFieldTrips = _getSortedFieldTrips(self.fieldTripsData);
 		_fieldTripMap.initArrowLayers(sortedFieldTrips);
@@ -135,8 +129,6 @@
 
 	FieldTripMapOperation.prototype.addFieldTrip = async function(fieldTrip)
 	{
-		console.log("4[DONE] FieldTripMapOperation.prototype.addFieldTrip");
-
 		if (!this.mapInstance)
 		{
 			return;
@@ -157,8 +149,6 @@
 
 	FieldTripMapOperation.prototype.orderFeatures = async function()
 	{
-		console.log("5[DONE] FieldTripMapOperation.prototype.orderFeatures");
-
 		const self = this,
 			fieldTrips = self.fieldTripsData,
 			sortedFieldTrips = _sortFieldTripByName(fieldTrips);
@@ -210,16 +200,12 @@
 
 	FieldTripMapOperation.prototype.setFieldTripVisibility = async function(fieldTrips)
 	{
-		console.log("6[DONE] FieldTripMapOperation.prototype.setFieldTripVisibility");
-
 		this.setFieldTripStopVisibility(fieldTrips);
-
 		_fieldTripMap.updateFieldTripPathVisibility(this.fieldTripsData, fieldTrips);
 	}
 
 	FieldTripMapOperation.prototype.setFieldTripStopVisibility = function(fieldTrips)
 	{
-		console.log("7[DONE] FieldTripMapOperation.prototype.setFieldTripStopVisibility");
 		_fieldTripMap.setFieldTripStopVisibility(fieldTrips);
 	}
 
@@ -229,15 +215,11 @@
 
 	FieldTripMapOperation.prototype.zoomToFieldTripLayers = function(fieldTrips)
 	{
-		console.log("8[DONE] FieldTripMapOperation.prototype.zoomToFieldTripLayers");
-
 		_fieldTripMap.zoomToLayers(fieldTrips);
 	}
 
 	FieldTripMapOperation.prototype.zoomToFieldTripStop = function(fieldTripId, stopSequence)
 	{
-		console.log("9[DONE] FieldTripMapOperation.prototype.zoomToFieldTripStop");
-
 		_fieldTripMap.zoomToRouteStop(fieldTripId, stopSequence);
 	}
 
@@ -247,8 +229,6 @@
 
 	FieldTripMapOperation.prototype.removeFieldTrip = async function(fieldTrip)
 	{
-		console.log("10[DONE] FieldTripMapOperation.prototype.removeFieldTrip");
-
 		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip);
 		_fieldTripMap.removeRoute(DBID, FieldTripId);
 	}
@@ -259,8 +239,6 @@
 
 	FieldTripMapOperation.prototype.updateSymbolColor = async function(fieldTrip)
 	{
-		console.log("11[DONE] FieldTripMapOperation.prototype.updateSymbolColor");
-
 		await _fieldTripMap.updateRouteColor(fieldTrip, this.fieldTripsData);
 	}
 
@@ -270,16 +248,12 @@
 
 	FieldTripMapOperation.prototype.switchPathType = async function(fieldTrips)
 	{
-		console.log("12[DONE] FieldTripMapOperation.prototype.switchPathType");
-
 		const sortedFieldTrips = _getSortedFieldTrips(this.fieldTripsData);
 		await _fieldTripMap.onPathTypeChanged(sortedFieldTrips, fieldTrips);
 	}
 
 	FieldTripMapOperation.prototype.updateFieldTripPathVisibility = async function(fieldTrips)
 	{
-		console.log("13[DONE] FieldTripMapOperation.prototype.updateFieldTripPathVisibility");
-
 		await _fieldTripMap.redrawArrowLayer(this.fieldTripsData, fieldTrips);
 		await _fieldTripMap.updateFieldTripPathVisibility(this.fieldTripsData, fieldTrips);
 	}
@@ -305,7 +279,6 @@
 
 	FieldTripMapOperation.prototype.startAddFieldTripStop = function()
 	{
-		console.log("14 FieldTripMapOperation.prototype.startAddFieldTripStop");
 		if (!this.editing.isAddingStop)
 		{
 			this.editing.isAddingStop = true;
@@ -315,7 +288,6 @@
 
 	FieldTripMapOperation.prototype.stopAddFieldTripStop = async function()
 	{
-		console.log("15 FieldTripMapOperation.prototype.stopAddFieldTripStop");
 		if (this.editing.isAddingStop)
 		{
 			this.editing.isAddingStop = false;
@@ -672,9 +644,8 @@
 		else if (event.button === 2)
 		{
 			// right click
-
-			const stopGraphics = await self.mapInstance?.findFeaturesByHitTest(event, FieldTripMap_StopLayerId);
-			const pathGraphics = await self.mapInstance?.findFeaturesByHitTest(event, FieldTripMap_PathLayerId);
+			const stopGraphics = await _fieldTripMap.hitTestRouteStops(event);
+			const pathGraphics = await _fieldTripMap.hitTestRoutePaths(event);
 			if (stopGraphics.length > 0 || pathGraphics.length > 0)
 			{
 				await this.confirmToExitAddingStop(false);

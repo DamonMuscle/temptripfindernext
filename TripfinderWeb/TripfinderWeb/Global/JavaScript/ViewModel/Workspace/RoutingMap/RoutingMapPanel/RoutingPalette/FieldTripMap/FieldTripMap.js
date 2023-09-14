@@ -407,6 +407,16 @@
 		await _highlightStopLayerInstance.clearLayer();
 	};
 
+	FieldTripMap.prototype.hitTestRouteStops = async function(event)
+	{
+		return await this.mapInstance?.findFeaturesByHitTest(event, FieldTripMap_StopLayerId);
+	};
+
+	FieldTripMap.prototype.hitTestRoutePaths = async function(event)
+	{
+		return await this.mapInstance?.findFeaturesByHitTest(event, FieldTripMap_PathLayerId);
+	};
+
 	FieldTripMap.prototype.quickAddStops = function(stops)
 	{
 		if (stops.length === 1)
