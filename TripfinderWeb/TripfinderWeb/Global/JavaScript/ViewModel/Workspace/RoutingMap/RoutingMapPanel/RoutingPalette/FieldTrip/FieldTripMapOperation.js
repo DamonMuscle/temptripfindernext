@@ -343,43 +343,27 @@
 		callback();
 	}
 
-	FieldTripMapOperation.prototype.highlightQuickAddStops = function(stops)
+	FieldTripMapOperation.prototype.onQuickAddStops = function(stops)
 	{
-		console.log("17 FieldTripMapOperation.prototype.highlightQuickAddStops");
-		const self = this, graphics = [];
-		for (let index = 0; index < stops.length; index++)
-		{
-			const stop = stops[index];
-			const graphic = self.createNewStop(stop);
-			graphics.push(graphic);
-		}
-
-		_highlightStopLayerInstance.addStops(graphics);
+		_fieldTripMap.quickAddStops(stops);
 	}
 
-	FieldTripMapOperation.prototype.addHighlightStops = function(addGraphic)
+	const _addHighlightStops = (stopGraphic) =>
 	{
-		console.log("18 FieldTripMapOperation.prototype.addHighlightStops");
 		const highlightStop = _getHighlightStop();
 
 		let newStopGraphic = null;
 		if (highlightStop)
 		{
 			newStopGraphic = highlightStop;
-			newStopGraphic.geometry = addGraphic.geometry;
-			newStopGraphic.attributes.Name = addGraphic.attributes.Name;
+			newStopGraphic.geometry = stopGraphic.geometry;
+			newStopGraphic.attributes.Name = stopGraphic.attributes.Name;
 		}
 		else
 		{
-			newStopGraphic = addGraphic;
+			newStopGraphic = stopGraphic;
 			_highlightStopLayerInstance.addStops([newStopGraphic]);
 		}
-	}
-
-	FieldTripMapOperation.prototype.createNewStop = function(stop)
-	{
-		console.log("19 FieldTripMapOperation.prototype.createNewStop");
-		return _createNewStop(stop.XCoord, stop.YCoord, stop.Street);
 	}
 
 	const _createNewStop = (longitude, latitude, stopName) =>
@@ -787,7 +771,7 @@
 					return;
 				}
 
-				self.addHighlightStops(newStopData.newStop);
+				_addHighlightStops(newStopData.newStop);
 				self.hideLoadingIndicator();
 
 				this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMapCompleted, data: newStopData });

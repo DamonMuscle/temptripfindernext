@@ -523,15 +523,7 @@
 
 	RoutingPaletteViewModel.prototype.onQuickAddStops = function(stops)
 	{
-		if (stops.length === 1)
-		{
-			const newStop = this.fieldTripMapOperation?.createNewStop(stops[0]);
-			this.fieldTripMapOperation?.addHighlightStops(newStop);
-		}
-		else
-		{
-			this.fieldTripMapOperation?.highlightQuickAddStops(stops);
-		}
+		this.fieldTripMapOperation?.onQuickAddStops(stops);
 	}
 
 	RoutingPaletteViewModel.prototype.close = function()

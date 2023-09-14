@@ -391,9 +391,22 @@
 		await _highlightStopLayerInstance.clearLayer();
 	};
 
+	FieldTripMap.prototype.quickAddStops = function(stops)
+	{
+		if (stops.length === 1)
+		{
+			const stopGraphic = createNewStop(stops[0]);
+			_addHighlightStops(stopGraphic);
+		}
+		else
+		{
+			_highlightQuickAddStops(stops);
+		}
+	};
 
 
-	
+
+
 
 	FieldTripMap.prototype.dispose = function()
 	{
@@ -960,6 +973,71 @@
 		}
 
 		return highlightStop;
+	}
+
+	//#endregion
+
+	//#region (Quick) Add Stop(s)
+
+	const _highlightQuickAddStops = (stops) =>
+	{
+		const graphics = [];
+		for (let index = 0; index < stops.length; index++)
+		{
+			const stop = stops[index];
+			const graphic = createNewStop(stop);
+			graphics.push(graphic);
+		}
+
+		_highlightStopLayerInstance.addStops(graphics);
+	}
+
+	const _addHighlightStops = (stopGraphic) =>
+	{
+		const highlightStop = _getHighlightStop();
+
+		let newStopGraphic = null;
+		if (highlightStop)
+		{
+			newStopGraphic = highlightStop;
+			newStopGraphic.geometry = stopGraphic.geometry;
+			newStopGraphic.attributes.Name = stopGraphic.attributes.Name;
+		}
+		else
+		{
+			newStopGraphic = stopGraphic;
+			_highlightStopLayerInstance.addStops([newStopGraphic]);
+		}
+	}
+
+	const createNewStop = (stop) => _createNewStop(stop.XCoord, stop.YCoord, stop.Street);
+
+	const _createNewStop = (longitude, latitude, stopName) =>
+	{
+		const NEW_STOP_ID = 0,
+			NEW_STOP_SEQUENCE = 0,
+			attributes = {
+				id: NEW_STOP_ID,
+				Name: stopName,
+				Sequence: NEW_STOP_SEQUENCE
+			};
+		return TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes);
+	}
+
+	const _createGeocodingNewStop = async (longitude, latitude) =>
+	{
+		const data = await _highlightStopLayerInstance.getGeocodeStop(longitude, latitude);
+		if (!data)
+		{
+			return null;
+		}
+
+		const UNNAMED_ADDRESS = "unnamed",
+			{ Address, City, RegionAbbr, CountryCode } = data,
+			Name = Address || UNNAMED_ADDRESS,
+			newStop = _createNewStop(longitude, latitude, Name);
+
+		return { Name, City, RegionAbbr, CountryCode, newStop, XCoord: +longitude.toFixed(6), YCoord: +latitude.toFixed(6) };
 	}
 
 	//#endregion
