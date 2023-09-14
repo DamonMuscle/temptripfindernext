@@ -67,19 +67,6 @@
 
 					addedStops.forEach((stop) => {
 						routingDataModel.fieldTripStopDataModel.insertTripStopToTrip(stop, stop.Sequence - 1);
-					})
-					
-					await routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.applyAddFieldTripStops(addedStops, () => {
-						const fieldTripId = addedStops[0].FieldTripId;
-
-						addedStops.forEach(data =>
-						{
-							data.StopTime = data.ActualStopTime;
-							routingDataModel.fieldTripStopDataModel.insertToRevertData(data);
-						});
-			
-						routingDataModel.changeTripVisibility(fieldTripId, true);
-						routingDataModel.fieldTripStopDataModel.changeRevertStack(addedStops, false);
 					});
 				}
 
@@ -98,21 +85,23 @@
 
 					updatedStops.forEach(stop => {
 						routingDataModel.fieldTripStopDataModel.insertTripStopToTrip(stop, stop.Sequence - 1);
-					})
-
-					await routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.applyAddFieldTripStops(updatedStops, (stop) => {
-						const fieldTripId = updatedStops[0].FieldTripId;
-
-						updatedStops.forEach(data =>
-						{
-							data.StopTime = data.ActualStopTime;
-							routingDataModel.fieldTripStopDataModel.insertToRevertData(data);
-						});
-			
-						routingDataModel.changeTripVisibility(fieldTripId, true);
-						routingDataModel.fieldTripStopDataModel.changeRevertStack(updatedStops, false);
 					});
 				}
+
+				// update map
+				let savedStops = addedStops.concat(updatedStops);
+				await routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.applyAddFieldTripStops(savedStops, () => {
+					const fieldTripId = savedStops[0].FieldTripId;
+
+					addedStops.forEach(data =>
+					{
+						data.StopTime = data.ActualStopTime;
+						routingDataModel.fieldTripStopDataModel.insertToRevertData(data);
+					});
+		
+					routingDataModel.changeTripVisibility(fieldTripId, true);
+					routingDataModel.fieldTripStopDataModel.changeRevertStack(addedStops, false);
+				});
 
 				const deletedStops = updatedResult[2];
 				if (deletedStops && deletedStops.length > 0)
