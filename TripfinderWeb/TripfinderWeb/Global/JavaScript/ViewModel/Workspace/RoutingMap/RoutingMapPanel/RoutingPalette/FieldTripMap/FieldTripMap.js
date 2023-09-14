@@ -484,10 +484,13 @@
 			else
 			{
 				const checkItem = (DBID !== fieldTripStop.DBID || fieldTripId !== fieldTripStop.FieldTripId);
-				const assertMessage = `add route stop data error! DBID: ${DBID}, fieldTripId: ${fieldTripId}`;
-				passCheck = false;
-				console.assert(checkItem, assertMessage);
-				continue;
+				if (checkItem === true)
+				{
+					passCheck = false;
+					const assertMessage = `add route stop data error! DBID: ${DBID}, fieldTripId: ${fieldTripId}`;
+					console.assert(checkItem, assertMessage);
+					continue;
+				}
 			}
 			
 			const options = {
