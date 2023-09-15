@@ -12,6 +12,12 @@
 		this.reset();
 	}
 
+	Object.defineProperty(FieldTripRoute.prototype, "DBID", {
+		get() { return this._fieldTrip.DBID; },
+		enumerable: false,
+		configurable: false
+	});
+
 	Object.defineProperty(FieldTripRoute.prototype, "Id", {
 		get() { return this._fieldTrip.id; },
 		enumerable: false,

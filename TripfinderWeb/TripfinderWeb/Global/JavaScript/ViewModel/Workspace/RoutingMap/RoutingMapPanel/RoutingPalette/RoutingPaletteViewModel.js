@@ -34,7 +34,6 @@
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.ClearHighlightFieldTripStop, self.onFieldTripMapClearHighlightFieldTripStop.bind(self));
 
 		mapCanvasPage.onMapViewCustomizedEvent.subscribe(self.onMapCanvasMapViewCustomizedEventHandler.bind(self));
-		PubSub.subscribe("on_MapCanvas_RecalculateTripMove", self.onMapCanvas_RecalculateTripMove.bind(self));
 		PubSub.subscribe("on_MapCanvas_RefreshTripByStops", self.onMapCanvas_RefreshPathByStops.bind(self));
 
 		self.dataModel.onTripSequenceChangeEvent.subscribe(self.onTripSequenceChange.bind(this));
@@ -219,27 +218,6 @@
 		}
 	}
 
-	RoutingPaletteViewModel.prototype.onMapCanvas_RecalculateTripMove = function(_, data)
-	{
-		const { fieldTripId, stopId } = data;
-		const fieldTrip = this.dataModel.getFieldTripById(fieldTripId);
-		if (!fieldTrip)
-		{
-			console.warn(`Cannot find field trip id=${fieldTripId}`);
-			return;
-		}
-
-		const fieldTripStop = fieldTrip.FieldTripStops.find(item=>item.id === stopId);
-		if (!fieldTripStop)
-		{
-			console.warn(`Cannot find field trip stop id=${stopId} in field trip id=${fieldTripId}`);
-			return;
-		}
-
-		const effectSequences = this.fieldTripMapOperation?._computeEffectSequences(fieldTrip, {moveStop: fieldTripStop});
-		this.fieldTripMapOperation?.refreshFieldTripPath(fieldTrip, effectSequences);
-	};
-
 	RoutingPaletteViewModel.prototype.onMapCanvas_RefreshPathByStops = async function(_, data)
 	{
 		const { tripStops, callZoomToLayers, onCompleted} = data;
@@ -247,8 +225,7 @@
 		{
 			const fieldTripId = tripStops[0].FieldTripId;
 			const fieldTrip = this.dataModel.getFieldTripById(fieldTripId);
-			const effectSequences = tripStops.map(s => s.Sequence);
-			await this.fieldTripMapOperation?.refreshFieldTripPath(fieldTrip, effectSequences, callZoomToLayers);
+			await this.fieldTripMapOperation?.refresh([fieldTrip], callZoomToLayers);
 		}
 
 		this.checkIfCompletedHandlerExists(data);
@@ -288,19 +265,19 @@
 			return;
 		}
 
-		this.fieldTripMapOperation?.moveStopLocation(fieldTrip, fieldTripStop, this.mapCanvasPage.sketchTool);
+		this.fieldTripMapOperation?.moveStopLocation(fieldTripId, stopId, this.mapCanvasPage.sketchTool);
 	};
 
 	RoutingPaletteViewModel.prototype.onRefreshFieldTripPath = async function({fieldTripId})
 	{
 		const fieldTrip = this.dataModel.getFieldTripById(fieldTripId);
-		await this.fieldTripMapOperation?.refreshFieldTripPath(fieldTrip);
+		await this.fieldTripMapOperation?.refresh([fieldTrip]);
 	};
 
-	RoutingPaletteViewModel.prototype.onFieldTripMapMoveStopLocationCompleted = function(data)
+	RoutingPaletteViewModel.prototype.onFieldTripMapMoveStopLocationCompleted = async function(data)
 	{
-		const trip = this.dataModel.getFieldTripById(data.FieldTripId);
-		const stop = this.dataModel.getFieldTripStopBySequence(trip, data.Sequence);
+		const fieldTrip = this.dataModel.getFieldTripById(data.FieldTripId);
+		const stop = this.dataModel.getFieldTripStopBySequence(fieldTrip, data.Sequence);
 
 		let updateStop = {...stop};
 
@@ -309,6 +286,8 @@
 		updateStop.YCoord = data.YCoord;
 		
 		this.dataModel.update([updateStop], true); // pass true to stop calling onTripStopsChangeEvent
+
+		await this.fieldTripMapOperation?.refresh([fieldTrip]);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapDeleteStopLocation = function(_, data)
@@ -328,7 +307,7 @@
 			return;
 		}
 
-		this.fieldTripMapOperation?.deleteStopLocation(fieldTrip.DBID, fieldTripId, [fieldTripStopId]);
+		this.fieldTripMapOperation?.deleteStopLocation(fieldTripId, [fieldTripStopId]);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapDeleteStopLocationCompleted = function(data)
@@ -575,7 +554,6 @@
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocation);
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.HighlightFieldTripStop);
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.ClearHighlightFieldTripStop);
-		PubSub.unsubscribe("on_MapCanvas_RecalculateTripMove");
 		PubSub.unsubscribe("on_MapCanvas_RefreshTripByStops");
 
 		tfdispose(this);

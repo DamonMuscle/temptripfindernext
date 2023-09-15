@@ -45,22 +45,16 @@
 		sketchTool.transform(stopGraphic.clone(), options, self._moveStopCallback.bind(self, callback));
 	}
 
-	StopLayer.prototype._moveStopCallback = async function(callback, graphics)
+	StopLayer.prototype._moveStopCallback = function(callback, graphics)
 	{
 		if (!graphics)
 		{
 			return;
 		}
 
-		if (tf.loadingIndicator)
-		{
-			tf.loadingIndicator.showImmediately();
-			// loadingIndicator should be hide onStopLayerMoveStopCompleted
-		}
-
 		const self = this;
 		const updateGraphic = self._getMovedStopGraphic(graphics);
-		const movedStopData = await self._updateMovedStop(updateGraphic);
+		const movedStopData = self._updateMovedStop(updateGraphic);
 
 		// remove edit moving stop graphic.
 		self.deleteStop(updateGraphic);
@@ -134,7 +128,7 @@
 		return data;
 	}
 
-	StopLayer.prototype._updateMovedStop = async function(updateGraphic)
+	StopLayer.prototype._updateMovedStop = function(updateGraphic)
 	{
 		const self = this,
 			movingStopGraphic = self.editing.movingStop.graphic;
@@ -146,14 +140,7 @@
 
 		// update stop name by geocoding.
 		const { longitude, latitude } = updateGeometry;
-		const geocodeStop = await this.getGeocodeStop(longitude, latitude);
-		if (geocodeStop?.Address !== "")
-		{
-			movingStopGraphic.attributes.Name = geocodeStop?.Address || "Unnamed";
-		}
-
-		const data = Object.assign({}, { longitude, latitude }, geocodeStop);
-		return data;
+		return { longitude, latitude };
 	}
 
 	//#region Settings for sketchTool

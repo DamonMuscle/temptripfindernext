@@ -311,13 +311,9 @@
 
 	FieldTripMap.prototype.updateRouteStopAttribute = function(DBID, fieldTripStopId, fromFieldTripId, toFieldTripId, toStopSequence, color, visible)
 	{
-		const stopFeatures = _getStopFeatures().filter(f => f.attributes.DBID === DBID &&
-			f.attributes.FieldTripId === fromFieldTripId &&
-			f.attributes.id === fieldTripStopId);
-
-		if (stopFeatures.length === 1)
+		const feature = _getRouteStopFeature(DBID, fromFieldTripId, fieldTripStopId);
+		if (feature)
 		{
-			const feature = stopFeatures[0];
 			feature.attributes.DBID = DBID;
 			feature.attributes.FieldTripId = toFieldTripId;
 			feature.attributes.Color = color;
@@ -418,30 +414,17 @@
 		return await this.mapInstance?.findFeaturesByHitTest(event, FieldTripMap_PathLayerId);
 	};
 
-	FieldTripMap.prototype.createNewRouteStop = async function(longitude, latitude)
+	FieldTripMap.prototype.focusOnNewRouteStop = async function(longitude, latitude)
 	{
-		const options = { longitude, latitude };
-		const newRouteStop = new TF.GIS.ADT.RouteStop(options);
-		const result = await newRouteStop.geocoding(longitude, latitude);
-		if (result === null)
+		const geocodeStop = await _createNewGeocodeStop(longitude, latitude);
+		if (geocodeStop === null)
 		{
 			return null;
 		}
 
-		const { Address, City, RegionAbbr, CountryCode } = result;
-		const Name = Address || UNNAMED_ADDRESS;
-		const NEW_STOP_ID = 0,
-			NEW_STOP_SEQUENCE = 0,
-			attributes = {
-				id: NEW_STOP_ID,
-				Name,
-				Sequence: NEW_STOP_SEQUENCE
-			},
-			newStop = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes);
+		_addHighlightStops(geocodeStop.newStop);
 
-		_addHighlightStops(newStop);
-
-		return { Name, City, RegionAbbr, CountryCode, newStop, XCoord: +longitude.toFixed(6), YCoord: +latitude.toFixed(6) };
+		return geocodeStop;
 	};
 
 	FieldTripMap.prototype.quickAddStops = function(stops)
@@ -457,16 +440,13 @@
 		}
 	};
 
-	FieldTripMap.prototype.deleteRouteStops = async function(DBID, fieldTripId, routeStopIds)
+	FieldTripMap.prototype.deleteRouteStops = async function(fieldTripId, routeStopIds)
 	{
 		const fieldTripRoute = _findFieldTripRoute(fieldTripId);
 		fieldTripRoute.removeRouteStops(routeStopIds);
 		fieldTripRoute.refreshRouteStopSequence();
 		fieldTripRoute.clearRoutePath();
-
-		// refresh route on map.
-		await this.removeRoute(DBID, fieldTripId);
-		await this.addRoute(DBID, fieldTripId, fieldTripRoute);
+		await this.refreshRoute(fieldTripRoute);
 	};
 
 	FieldTripMap.prototype.addRouteStops = async function(addFieldTripStops)
@@ -527,8 +507,50 @@
 			}
 		}
 		fieldTripRoute.addRouteStops(routeStops);
+		await this.refreshRoute(fieldTripRoute);
+	};
 
-		// refresh route on map.
+	FieldTripMap.prototype.moveRouteStop = async function(fieldTripId, routeStopId, sketchTool)
+	{
+		const fieldTripRoute = _findFieldTripRoute(fieldTripId),
+			routeStops = fieldTripRoute.getRouteStops(),
+			routeStop = routeStops.find(item => item.Id === routeStopId);
+		const routeStopFeature = _getRouteStopFeature(fieldTripRoute.DBID, fieldTripId, routeStopId);
+
+		_stopLayerInstance?.moveStop(routeStopFeature, sketchTool, async (location) =>
+		{
+			const { longitude, latitude } = location;
+			const geocodeStop = await _createNewGeocodeStop(longitude, latitude);
+			// update route stop.
+			routeStop.Street = geocodeStop.Name;
+			routeStop.Longitude = geocodeStop.XCoord;
+			routeStop.Latitude = geocodeStop.YCoord;
+
+			await this.refreshRoute(fieldTripRoute);
+
+			const data = {
+				DBID: fieldTripRoute.DBID,
+				FieldTripId: fieldTripId,
+				Sequence: routeStop.Sequence,
+				Name: routeStop.Street,
+				XCoord: routeStop.Longitude,
+				YCoord: routeStop.Latitude,
+			};
+			this.mapInstance.fireCustomizedEvent({ eventType: TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocationCompleted, data });
+		});
+
+		routeStopFeature.visible = false;
+	};
+
+	FieldTripMap.prototype.refresh = async function(fieldTripId)
+	{
+		const fieldTripRoute = _findFieldTripRoute(fieldTripId);
+		this.refreshRoute(fieldTripRoute);
+	};
+
+	FieldTripMap.prototype.refreshRoute = async function(fieldTripRoute)
+	{
+		const DBID = fieldTripRoute.DBID, fieldTripId = fieldTripRoute.Id;
 		await this.removeRoute(DBID, fieldTripId);
 		await this.addRoute(DBID, fieldTripId, fieldTripRoute);
 	};
@@ -832,7 +854,18 @@
 		}
 
 		return results;
-	}
+	};
+
+	const _getRouteStopFeature = (DBID, fieldTripId, routeStopId) => 
+	{
+		const stopFeatures = _getStopFeatures().filter(f => f.attributes.DBID === DBID &&
+			f.attributes.FieldTripId === fieldTripId &&
+			f.attributes.id === routeStopId);
+
+		console.assert(stopFeatures.length === 1, `Cannot find route stop feature. DBID=${DBID},fieldTripId=${fieldTripId},routeStopId=${routeStopId}`);
+
+		return stopFeatures[0];
+	};
 
 	//#endregion
 
@@ -1148,7 +1181,7 @@
 		}
 
 		_highlightStopLayerInstance.addStops(graphics);
-	}
+	};
 
 	const _addHighlightStops = (stopGraphic) =>
 	{
@@ -1166,7 +1199,7 @@
 			newStopGraphic = stopGraphic;
 			_highlightStopLayerInstance.addStops([newStopGraphic]);
 		}
-	}
+	};
 
 	const createNewStop = (stop) => _createNewStop(stop.XCoord, stop.YCoord, stop.Street);
 
@@ -1180,7 +1213,31 @@
 				Sequence: NEW_STOP_SEQUENCE
 			};
 		return TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes);
-	}
+	};
+
+	const _createNewGeocodeStop = async (longitude, latitude) =>
+	{
+		const options = { longitude, latitude };
+		const newRouteStop = new TF.GIS.ADT.RouteStop(options);
+		const result = await newRouteStop.geocoding(longitude, latitude);
+		if (result === null)
+		{
+			return null;
+		}
+
+		const { Address, City, RegionAbbr, CountryCode } = result;
+		const Name = Address || UNNAMED_ADDRESS;
+		const NEW_STOP_ID = 0,
+			NEW_STOP_SEQUENCE = 0,
+			attributes = {
+				id: NEW_STOP_ID,
+				Name,
+				Sequence: NEW_STOP_SEQUENCE
+			},
+			newStop = TF.RoutingPalette.FieldTripMap.StopGraphicWrapper.CreateStop(longitude, latitude, attributes);
+
+		return { Name, City, RegionAbbr, CountryCode, newStop, XCoord: +longitude.toFixed(6), YCoord: +latitude.toFixed(6) };
+	};
 
 	//#endregion
 

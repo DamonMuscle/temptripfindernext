@@ -131,7 +131,8 @@
 				{
 					deletedStops.forEach(async (stop) => {
 						const data = { fieldTripId: stop.FieldTripId, fieldTripStopId: stop.id };
-						await routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.deleteStopLocation(result, stop);
+						// await routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.deleteStopLocation(result, stop);
+						await routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.deleteStopLocation(stop.FieldTripId, stop.id);
 					});
 				}
 
