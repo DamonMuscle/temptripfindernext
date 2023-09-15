@@ -5,6 +5,9 @@
 	const DEFAULT_LONGITUDE = 0;
 	const DEFAULT_LATITUDE = 0;
 	const DEFAULT_STOP_ID = 0;
+	const UNNAMED_ADDRESS = "Unnamed";
+
+	const geocodeService = TF.GIS.Analysis.getInstance().geocodeService;
 
 	function RouteStop(options)
 	{
@@ -13,7 +16,7 @@
 		this._locationType = options.locationType || TF.GIS.NetworkEnum.LOCATION_TYPE.STOP;
 		this._name = options.name || options.sequence;
 		this._sequence = options.sequence;
-		this._street = options.street || "Unnamed";
+		this._street = options.street || UNNAMED_ADDRESS;
 		this._longitude = options.longitude || DEFAULT_LONGITUDE;
 		this._latitude = options.latitude || DEFAULT_LATITUDE;
 	}
@@ -76,6 +79,34 @@
 	});
 
 	//#endregion
+
+	RouteStop.prototype.geocoding = async function(longitude, latitude)
+	{
+		const geocodeResult = await geocodeService.locationToAddress({x: longitude, y: latitude});
+
+		if (geocodeResult?.errorMessage)
+		{
+			console.error(geocodeResult.errorMessage);
+			return null;
+		}
+
+		const { Address, City, RegionAbbr, CountryCode } = geocodeResult?.attributes;
+		if (!geocodeService.isAvailableCountry(CountryCode))
+		{
+			tf.promiseBootbox.alert({
+				message: "Please add a stop in USA or Canada.",
+				title: "Alert"
+			});
+			return null;
+		}
+
+		return { Address, City, RegionAbbr, CountryCode };
+	};
+
+	RouteStop.prototype.moveTo = function(longitude, latitude)
+	{
+
+	};
 
 	RouteStop.prototype.toGraphic = function()
 	{
