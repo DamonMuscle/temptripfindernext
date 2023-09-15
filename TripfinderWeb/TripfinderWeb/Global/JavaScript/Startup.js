@@ -404,8 +404,6 @@
 				.then(function(){
 					return self.loadArcgisUrls().then(function()
 						{
-							return;
-
 							return self._registerToken().then(function(response)
 							{
 								if (response)
