@@ -1413,6 +1413,7 @@
 	RoutingTripViewModel.prototype.addStopsFromSearch = function(data)
 	{
 		var self = this;
+		data.type = "tripStop";
 		data.address = data.address.split(",")[0];
 
 		this.dataModel.viewModel.eventsManager.createFieldTripStopFromSearchResult([data], { trip: this.trip, operate: "CreateNewTrip" }).then(function(trip)
@@ -1426,7 +1427,7 @@
 				self.obTripStops(self.trip.FieldTripStops);
 			}
 		});
-	};	
+	};
 
 	RoutingTripViewModel.prototype.fileOpenComplete = function(e, trip)
 	{
