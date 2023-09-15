@@ -51,69 +51,10 @@
 		{
 			if (result)
 			{
-				var updatedResult = self.viewModel.getUpdatedStops(result);
 				const routingDataModel = self.viewModel.dataModel;
 
-				const addedStops = updatedResult[0];
-				if (addedStops.length > 0)
-				{
-					addedStops.forEach(function(tripStop)
-					{
-						tripStop.FieldTripId = result.id;
-						tripStop.DBID = result.DBID;
-						tripStop.OpenType = "Edit";
-						tripStop.type = "tripStop";
-					});
-
-					addedStops.forEach((stop) => {
-						routingDataModel.fieldTripStopDataModel.insertTripStopToTrip(stop, stop.Sequence - 1);
-					});
-				}
-
-				const updatedStops = updatedResult[1];
-				if (updatedStops && updatedStops.length > 0)
-				{
-					updatedStops.forEach(function(tripStop)
-					{
-						tripStop.FieldTripId = result.id;
-						tripStop.DBID = result.DBID;
-						tripStop.OpenType = "Edit";
-						tripStop.type = "tripStop";
-					});
-
-					routingDataModel.fieldTripStopDataModel.removeTripStopsFromTrip(updatedStops);
-
-					updatedStops.forEach(stop => {
-						routingDataModel.fieldTripStopDataModel.insertTripStopToTrip(stop, stop.Sequence - 1);
-					});
-				}
-
-				// update map
-				let savedStops = addedStops.concat(updatedStops);
-				await routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.applyAddFieldTripStops(savedStops, () => {
-					const fieldTripId = savedStops[0].FieldTripId;
-
-					addedStops.forEach(data =>
-					{
-						data.StopTime = data.ActualStopTime;
-						routingDataModel.fieldTripStopDataModel.insertToRevertData(data);
-					});
-		
-					routingDataModel.changeTripVisibility(fieldTripId, true);
-					routingDataModel.fieldTripStopDataModel.changeRevertStack(addedStops, false);
-				});
-
-				const deletedStops = updatedResult[2];
-				if (deletedStops && deletedStops.length > 0)
-				{
-					deletedStops.forEach(async (stop) => {
-						const data = { fieldTripId: stop.FieldTripId, fieldTripStopId: stop.id };
-						// await routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.deleteStopLocation(result, stop);
-						await routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.deleteStopLocation(stop.FieldTripId, stop.id);
-					});
-				}
-
-				result = routingDataModel.getFieldTripById(result.FieldTripId);
+				await routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.removeFieldTrip(result);
+				await routingDataModel.viewModel.routingPaletteVM.fieldTripMapOperation?.addFieldTrip(result);
 
 				this.positiveClose(result);
 			}
