@@ -160,6 +160,16 @@
 		await _removeRouteSequenceLine(DBID, fieldTripId);
 	};
 
+	FieldTripMap.prototype.disposeRoute = function(fieldTripId)
+	{
+		const index = _fieldTripRoutes.findIndex(item => item.Id === fieldTripId);
+		if (index >= 0)
+		{
+			_fieldTripRoutes[index].dispose();
+			_fieldTripRoutes.splice(index, 1);
+		}
+	};
+
 	FieldTripMap.prototype.updateArrowRenderer = function(sortedFieldTrips)
 	{
 		const arrowRenderer = _getArrowRenderer(sortedFieldTrips);

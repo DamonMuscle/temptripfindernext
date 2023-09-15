@@ -193,6 +193,7 @@
 	{
 		const { DBID, FieldTripId } = _extractFieldTripFeatureFields(fieldTrip);
 		_fieldTripMap.removeRoute(DBID, FieldTripId);
+		_fieldTripMap.disposeRoute(FieldTripId);
 	}
 
 	//#endregion
