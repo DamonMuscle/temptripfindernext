@@ -21,7 +21,6 @@
 				addingStop: null
 			}
 		};
-		this.defineReadOnlyProperty("PATH_LINE_TYPE", PATH_LINE_TYPE);
 		mapInstance.events.onMapViewKeyUpEvent.subscribe(this.onMapKeyUpEvent.bind(this));
 	}
 
@@ -119,7 +118,7 @@
 		await _fieldTripMap.reorderFeatures(sortedFieldTrips);
 	}
 
-	FieldTripMapOperation.prototype._compareFieldTripNames = function(a, b)
+	const _compareFieldTripNames = (a, b) =>
 	{
 		// get the field trip data from palette.
 		// sort the result as same as palette.
@@ -136,12 +135,11 @@
 		return a.id - b.id;
 	}
 
-	FieldTripMapOperation.prototype._sortFieldTripByName = function(fieldTrips)
+	const _sortFieldTripByName = (fieldTrips) =>
 	{
-		const self = this;
 		const fieldTripIdMapping = fieldTrips.map(item =>
 		{
-			const { DBID, FieldTripId } = self._extractFieldTripFeatureFields(item);
+			const { DBID, FieldTripId } = _extractFieldTripFeatureFields(item);
 			const data = {
 				DBID: DBID,
 				Name: item.Name,
@@ -150,7 +148,7 @@
 			return data;
 		});
 
-		const sortedFieldTrips = fieldTripIdMapping.sort(self._compareFieldTripNames).map(item => {
+		const sortedFieldTrips = fieldTripIdMapping.sort(_compareFieldTripNames).map(item => {
 			const { DBID, id } = item;
 			return { DBID, id };
 		});
@@ -226,12 +224,9 @@
 
 	//#region New Copy
 
-	FieldTripMapOperation.prototype.isNewCopy = function(fieldTrip)
-	{
-		return fieldTrip.Id === 0;
-	}
+	const _isNewCopy = (fieldTrip) => fieldTrip.Id === 0;
 
-	FieldTripMapOperation.prototype.updateCopyFieldTripAttribute = function(fieldTrip)
+	const _updateCopyFieldTripAttribute = (fieldTrip) =>
 	{
 		if (fieldTrip.id !== fieldTrip.routePathAttributes.FieldTripId)
 		{
@@ -320,19 +315,6 @@
 
 		await _fieldTripMap.moveRouteStop(fieldTripId, stopId, sketchTool);
 	}
-
-
-	//#endregion
-
-	//#region TODO: Insert Field Trip Stop
-
-	//#endregion
-
-	//#region TODO: Geo Select Field Trip Stop
-
-	//#endregion
-
-	//#region TODO: Optimize Field Trip
 
 	//#endregion
 
@@ -528,14 +510,15 @@
 	//#region - Path Arrows
 
 
-	FieldTripMapOperation.prototype.updateArrowRenderer = function()
+	const _getSortedFieldTrips = (fieldTrips) =>
 	{
-		const arrowRenderer = this._getArrowRenderer();
-		this.pathArrowLayerInstance.setRenderer(arrowRenderer);
-		this.sequenceLineArrowLayerInstance.setRenderer(arrowRenderer);
-	}
+		const fieldTripsClone = [...fieldTrips];
+		fieldTripsClone.sort(_compareFieldTripNames);
 
-	FieldTripMapOperation.prototype.hideArrowLayer = function()
+		return fieldTripsClone;
+	};
+
+	FieldTripMapOperation.prototype.updateArrowRenderer = function()
 	{
 		const sortedFieldTrips = _getSortedFieldTrips(this.fieldTripsData);
 
@@ -558,7 +541,7 @@
 			FieldTripId = fieldTrip.oldId || fieldTrip.id;
 
 		return { DBID, FieldTripId };
-	}
+	};
 
 	FieldTripMapOperation.prototype.showLoadingIndicator = function()
 	{
