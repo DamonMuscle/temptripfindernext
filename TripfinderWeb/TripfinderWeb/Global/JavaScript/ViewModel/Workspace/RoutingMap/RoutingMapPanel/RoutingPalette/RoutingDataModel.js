@@ -322,7 +322,7 @@
 			newTrips = self._getNewTrip(data);
 			newTripIds = newTrips.map(function(c) { return c.id; });
 			self.setFieldTrips(self.fieldTrips.concat(newTrips));
-			self.fieldTripPaletteSectionVM.routingChangePath && self.fieldTripPaletteSectionVM.routingChangePath.stop();
+			self.fieldTripPaletteSectionVM.routingChangePath?.stop();
 			self._removeNotOpenEditTrips(data);
 			self.bindColor();
 
@@ -1786,7 +1786,7 @@
 			}
 		}
 
-		self.fieldTripPaletteSectionVM.routingChangePath && self.fieldTripPaletteSectionVM.routingChangePath.clearAll();
+		self.fieldTripPaletteSectionVM.routingChangePath?.clearAll();
 		self.clearContextMenuOperation();
 		self.fieldTripPaletteSectionVM.editFieldTripStopModal.closeEditModal();
 		self.fieldTripPaletteSectionVM.routingPaletteVM?.fieldTripMapOperation?.confirmToExitAddingStop(false);
@@ -2108,7 +2108,7 @@
 				});
 			return Promise.resolve();
 		}
-		self.fieldTripPaletteSectionVM.routingChangePath.stop();
+		self.fieldTripPaletteSectionVM.routingChangePath?.stop();
 		return self.saveRoutingFieldTrips(trips).then(function(success)
 		{
 			if (success)
@@ -2141,7 +2141,7 @@
 				});
 			return Promise.resolve();
 		}
-		self.fieldTripPaletteSectionVM.routingChangePath.stop();
+		self.fieldTripPaletteSectionVM.routingChangePath?.stop();
 		return self.saveRoutingFieldTrips(fieldTrips).then(function(success)
 		{
 			if (success)
@@ -2371,7 +2371,7 @@
 		trips = trips || self.fieldTrips;
 		self.featureData.clear();
 		self.clearRevertInfo();
-		self.fieldTripPaletteSectionVM.routingChangePath && self.fieldTripPaletteSectionVM.routingChangePath.clearAll();
+		self.fieldTripPaletteSectionVM.routingChangePath?.clearAll();
 		var unsavedNewTrips = [], viewTrips = [], editTrips = [];
 		trips.map(function(trip)
 		{
@@ -2428,7 +2428,7 @@
 			var trips = refreshTrips.slice();
 			self.featureData.clear();
 			self.clearRevertInfo();
-			self.fieldTripPaletteSectionVM.routingChangePath.clearAll();
+			self.fieldTripPaletteSectionVM.routingChangePath?.clearAll();
 			self.setFieldTrips(self.getViewTrips());
 			self.changeDataStack([]);
 			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: trips });

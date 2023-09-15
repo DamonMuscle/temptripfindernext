@@ -200,10 +200,7 @@
 		this.dataModel.dispose();
 		this.display.dispose();
 		this.eventsManager = null;
-		if (this.routingChangePath)
-		{
-			this.routingChangePath.dispose();
-		}
+		this.routingChangePath?.dispose();
 		this.documentChange && this.documentChange.dispose();
 		tfdispose(this);
 	};
